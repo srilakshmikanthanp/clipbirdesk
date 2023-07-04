@@ -1,22 +1,22 @@
 {
-    "cSpell.words": [
-        "bytemv",
-        "charmv",
-        "clipbirdesk"
-    ],
-    "cmake.generator": "MinGW Makefiles",
-    "C_Cpp.default.cppStandard": "",
-    "C_Cpp.inlayHints.autoDeclarationTypes.enabled": true,
-    "C_Cpp.inlayHints.referenceOperator.enabled": true,
-    "C_Cpp.clang_format_fallbackStyle": "Google",
-    "files.associations": {
-        ".env*": "dotenv",
-        "stdexcept": "cpp",
-        "atomic": "cpp",
-        "cinttypes": "cpp",
-        "concepts": "cpp",
-        "cstdint": "cpp",
-        "type_traits": "cpp",
-        "bit": "cpp"
-    }
+  "C_Cpp.inlayHints.autoDeclarationTypes.enabled": true,
+  "C_Cpp.inlayHints.referenceOperator.enabled": true,
+  "C_Cpp.clang_format_fallbackStyle": "Google",
+  "cmake.generator": "MinGW Makefiles",
+  "cSpell.words": [
+    "bytemv",
+    "charmv",
+    "clipbirdesk"
+  ],
+  "files.associations": {
+    ".env*": "dotenv",
+    "stdexcept": "cpp",
+    "atomic": "cpp",
+    "cinttypes": "cpp",
+    "concepts": "cpp",
+    "cstdint": "cpp",
+    "type_traits": "cpp",
+    "bit": "cpp",
+    "string": "cpp"
+  }
 }

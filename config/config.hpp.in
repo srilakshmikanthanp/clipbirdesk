@@ -1,0 +1,57 @@
+// Copyright (c) 2023 Sri Lakshmi Kanthan P
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+#include <string>
+
+#define CLIPBIRDESK_VERSION_MAJOR "@clipbirdesk_VERSION_MAJOR@"
+#define CLIPBIRDESK_VERSION_MINOR "@clipbirdesk_VERSION_MINOR@"
+#define CLIPBIRDESK_VERSION_PATCH "@clipbirdesk_VERSION_PATCH@"
+
+namespace srilakshmikanthanp::clipbirdesk::config {
+/**
+ * @brief Get the Application Version
+ *
+ * @return std::string
+ */
+std::string getAppMajorVersion() {
+  return std::string(CLIPBIRDESK_VERSION_MAJOR);
+}
+
+/**
+ * @brief Get the Application Version
+ *
+ * @return std::string
+ */
+std::string getAppMinorVersion() {
+  return std::string(CLIPBIRDESK_VERSION_MINOR);
+}
+
+/**
+ * @brief Get the Application Version
+ *
+ * @return std::string
+ */
+std::string getAppPatchVersion() {
+  return std::string(CLIPBIRDESK_VERSION_PATCH);
+}
+
+/**
+ * @brief Get the Application Name
+ *
+ * @return std::string
+ */
+std::string getAppName() {
+  return "clipbirdesk";
+}
+
+/**
+ * @brief Get App Home Directory
+ *
+ * @return std::string
+ */
+std::string getAppHome() {
+  return std::string(getenv("HOME")) + "/.clipbirdesk/";
+}
+}  // namespace srilakshmikanthanp::clipbirdesk::config
