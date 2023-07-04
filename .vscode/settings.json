@@ -17,6 +17,7 @@
     "cstdint": "cpp",
     "type_traits": "cpp",
     "bit": "cpp",
-    "string": "cpp"
+    "string": "cpp",
+    "vector": "cpp"
   }
 }
