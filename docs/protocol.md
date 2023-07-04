@@ -94,9 +94,9 @@ The **Server Discovery Response** packet is sent by the server in response to a 
 | Server Port     | 2      |           |
 
 
-### Clipboard Sync Packet
+### Clipboard Sync Request
 
-The **Clipboard Sync Packet** is used to transfer clipboard data between the client and the server. This packet contains the following fields:
+The **Clipboard Sync Request** is used to transfer clipboard data between the client and the server. This packet contains the following fields:
 
 #### Header
 
