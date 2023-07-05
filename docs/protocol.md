@@ -40,7 +40,7 @@ Clipbird utilizes a variety of packet types for different purposes. These packet
 ### What are the packets Required for Clipbird
 
 During the synchronization process, two types of packets are utilized. Firstly, the client initiates the communication by sending a **Server Discovery Request** packet, prompting the server to respond with a message in the form of a **Server Discovery Response** packet. This exchange facilitates the discovery of the server within the local network.
-Note this to packet have same structure so we can combine the two for simplicity, and call them **Server Discovery Packets**.
+Note this to packet have same structure so we can combine the two for simplicity, and call them **Server Discovery Packet**.
 
 Once the server has been identified, clipboard data is transmitted between the client and the server using a single type of packet known as the **Clipboard Sync Packet**. This packet is responsible for transferring clipboard data from the client to the server and vice versa, ensuring seamless sharing of clipboard content between the two devices.
 
@@ -50,14 +50,14 @@ The **Server Discovery Packet** packet is sent by the client to discover a compa
 
 #### Header
 
-- **Packet Type**: This field specifies the type of packet, which is set to 0x01 for the Server Discovery Request packet.
+- **Packet Type**: This field specifies the type of packet, which is set to 0x01 for the Server Discovery Request and 0x02 for the Server Discovery Response.
 - **Packet Length**: This field specifies the length of the packet, for server discovery request packet it is length of ip address of host and port number.
 
 #### Body
 
 - **IP Type**: This field specifies the type of IP address, which can be IPv4 (0x04) or IPv6 (0x06).
-- **host IP**: This field contains the IP address of the host device. That is, the device that is sending the Server Discovery Request packet.
-- **host Port**: This field contains the port number of the host device. That is, the device that is sending the Server Discovery Request packet.
+- **host IP**: This field contains the IP address of the host device.
+- **host Port**: This field contains the port number of the host device.
 
 #### Structure
 
