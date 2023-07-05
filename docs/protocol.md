@@ -40,62 +40,38 @@ Clipbird utilizes a variety of packet types for different purposes. These packet
 ### What are the packets Required for Clipbird
 
 During the synchronization process, two types of packets are utilized. Firstly, the client initiates the communication by sending a **Server Discovery Request** packet, prompting the server to respond with a message in the form of a **Server Discovery Response** packet. This exchange facilitates the discovery of the server within the local network.
+Note this to packet have same structure so we can combine the two for simplicity, and call them **Server Discovery Packets**.
 
 Once the server has been identified, clipboard data is transmitted between the client and the server using a single type of packet known as the **Clipboard Sync Packet**. This packet is responsible for transferring clipboard data from the client to the server and vice versa, ensuring seamless sharing of clipboard content between the two devices.
 
-### Server Discovery Request
+### Server Discovery Packet
 
-The **Server Discovery Request** packet is sent by the client to discover a compatible server within the local network. This packet contains the following fields:
+The **Server Discovery Packet** packet is sent by the client to discover a compatible server within the local network. This packet contains the following fields:
 
 #### Header
 
 - **Packet Type**: This field specifies the type of packet, which is set to 0x01 for the Server Discovery Request packet.
-- **Packet Length**: This field specifies the length of the packet, for server discovery request packet it is length of ip address of client and port number.
+- **Packet Length**: This field specifies the length of the packet, for server discovery request packet it is length of ip address of host and port number.
 
 #### Body
 
 - **IP Type**: This field specifies the type of IP address, which can be IPv4 (0x04) or IPv6 (0x06).
-- **Client IP**: This field contains the IP address of the client device. That is, the device that is sending the Server Discovery Request packet.
-- **Client Port**: This field contains the port number of the client device. That is, the device that is sending the Server Discovery Request packet.
+- **host IP**: This field contains the IP address of the host device. That is, the device that is sending the Server Discovery Request packet.
+- **host Port**: This field contains the port number of the host device. That is, the device that is sending the Server Discovery Request packet.
 
 #### Structure
 
 | Field           | Bytes  | value     |
 |-----------------|--------|-----------|
-| Packet Type     | 1      | 0x01      |
+| Packet Type     | 1      | 0x01/0x02 |
 | Packet Length   | 4      |           |
 | IP Type         | 1      | 0x04/0x06 |
-| Client IP       | varies |           |
-| Client Port     | 2      |           |
+| host IP         | varies |           |
+| host Port       | 2      |           |
 
-### Server Discovery Response
+### Clipboard Sync Packet
 
-The **Server Discovery Response** packet is sent by the server in response to a Server Discovery Request packet. This packet contains the following fields:
-
-#### Header
-
-- **Packet Type**: This field specifies the type of packet, which is set to 0x02 for the Server Discovery Response packet.
-- **Packet Length**: This field specifies the length of the packet, for server discovery response packet it is length of ip address of server and port number.
-
-#### Body
-
-- **IP Type**: This field specifies the type of IP address, which can be IPv4 (0x04) or IPv6 (0x06).
-- **Server IP**: This field contains the IP address of the server device. That is, the device that is sending the Server Discovery Response packet.
-- **Server Port**: This field contains the port number of the server device. That is, the device that is sending the Server Discovery Response packet.
-
-#### Structure
-
-| Field           | Bytes  | value     |
-|-----------------|--------|-----------|
-| Packet Type     | 1      | 0x02      |
-| Packet Length   | 4      |           |
-| IP Type         | 1      | 0x04/0x06 |
-| Server IP       | varies |           |
-| Server Port     | 2      |           |
-
-### Clipboard Sync Request
-
-The **Clipboard Sync Request** is used to transfer clipboard data between the client and the server. This packet contains the following fields:
+The **Clipboard Sync Packet** is used to transfer clipboard data between the client and the server. This packet contains the following fields:
 
 #### Header
 

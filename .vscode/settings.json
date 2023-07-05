@@ -1,11 +1,12 @@
 {
-  "C_Cpp.inlayHints.autoDeclarationTypes.enabled": true,
+  "C_Cpp.inlayHints.autoDeclarationTypes.enabled": false,
   "C_Cpp.inlayHints.referenceOperator.enabled": true,
   "C_Cpp.clang_format_fallbackStyle": "Google",
   "cmake.generator": "MinGW Makefiles",
   "cSpell.words": [
     "bytemv",
     "charmv",
+    "Clipbird",
     "clipbirdesk"
   ],
   "files.associations": {
@@ -19,5 +20,8 @@
     "bit": "cpp",
     "string": "cpp",
     "vector": "cpp"
-  }
+  },
+  "C_Cpp.inlayHints.parameterNames.suppressWhenArgumentContainsName": false,
+  "C_Cpp.inlayHints.parameterNames.hideLeadingUnderscores": false,
+  "C_Cpp.errorSquiggles": "enabled"
 }
