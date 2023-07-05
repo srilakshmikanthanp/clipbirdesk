@@ -1,3 +1,5 @@
+#pragma once // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -7,7 +9,7 @@
 #include <cinttypes>
 #include <vector>
 
-namespace srilakshmikanthanp::clipbirdesk::utility::functions {
+namespace srilakshmikanthanp::clipbirdesk::utility::functions::coding {
 /**
  * @brief convert from host to network byte order
  *

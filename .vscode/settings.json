@@ -75,7 +75,12 @@
     "streambuf": "cpp",
     "thread": "cpp",
     "typeinfo": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "xmemory": "cpp",
+    "xstddef": "cpp",
+    "xstring": "cpp",
+    "xtr1common": "cpp",
+    "xutility": "cpp"
   },
   "C_Cpp.inlayHints.parameterNames.suppressWhenArgumentContainsName": false,
   "C_Cpp.inlayHints.parameterNames.hideLeadingUnderscores": false,

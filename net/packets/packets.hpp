@@ -1,3 +1,5 @@
+#pragma once // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -7,8 +9,8 @@
 #include <stdexcept>
 #include <vector>
 
-#include "../../utility/functions/functions.hpp"
 #include "../../interface/INetworkPacket.hpp"
+#include "../../utility/functions/coding.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::net::packets {
 /**
@@ -19,8 +21,23 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
   std::uint8_t packetType;
   std::uint32_t packetLength;
   std::uint8_t ipType;
-  std::uint8_t hostIp[16];
+  std::vector<std::uint8_t> hostIp;
   std::uint16_t hostPort;
+
+ public:
+  /**
+   * @brief Packet Type
+   */
+  enum PacketType : std::uint8_t {
+    Request = 0x01, Response = 0x02
+  };
+
+  /**
+   * @brief Ip Type
+   */
+  enum IpType : std::uint8_t {
+    Ipv4 = 0x04, Ipv6 = 0x06
+  };
 
  public:
   /**
@@ -28,7 +45,7 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @param type
    */
-  void setPacketType(std::uint8_t type) noexcept {
+  void setPacketType(std::uint8_t type) {
     if (type != 0x01 && type != 0x02) {
       throw std::invalid_argument("Invalid Packet Type");
     }
@@ -41,14 +58,16 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @return std::uint8_t
    */
-  std::uint8_t getPacketType() const noexcept { return this->packetType; }
+  std::uint8_t getPacketType() const noexcept {
+    return this->packetType;
+  }
 
   /**
    * @brief Set the Packet Length object
    *
    * @param length
    */
-  void setPacketLength(std::uint32_t length) noexcept {
+  void setPacketLength(std::uint32_t length) {
     this->packetLength = length;
   }
 
@@ -57,14 +76,16 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @return std::uint32_t
    */
-  std::uint32_t getPacketLength() const noexcept { return this->packetLength; }
+  std::uint32_t getPacketLength() const noexcept {
+    return this->packetLength;
+  }
 
   /**
    * @brief Set the Ip Type object
    *
    * @param type
    */
-  void setIpType(std::uint8_t type) noexcept {
+  void setIpType(std::uint8_t type) {
     // check the ip type
     if (type != 0x04 && type != 0x06) {
       throw std::runtime_error("Invalid ip type");
@@ -78,15 +99,26 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @return std::uint8_t
    */
-  std::uint8_t getIpType() const noexcept { return this->ipType; }
+  std::uint8_t getIpType() const noexcept {
+    return this->ipType;
+  }
 
   /**
    * @brief Set the Client Ip object
    *
    * @param ip
    */
-  void setClientIp(std::uint8_t ip[16]) noexcept {
-    for (int i = 0; i < 16; i++) {
+  void setHostIp(std::vector<std::uint8_t> ip) {
+    // check the ip type
+    if (ipType == 0x06 && ip.size() != 16) {
+      throw std::runtime_error("Invalid ip length");
+    }
+
+    if (ipType == 0x04 && ip.size() != 4) {
+      throw std::runtime_error("Invalid ip length");
+    }
+
+    for (int i = 0; i < ip.size(); i++) {
       this->hostIp[i] = ip[i];
     }
   }
@@ -96,21 +128,27 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @return const std::uint8_t*
    */
-  const std::uint8_t *getClientIp() noexcept { return this->hostIp; }
+  std::vector<std::uint8_t> getHostIp() const noexcept {
+    return this->hostIp;
+  }
 
   /**
    * @brief Set the Client Port object
    *
    * @param port
    */
-  void setClientPort(std::uint16_t port) noexcept { this->hostPort = port; }
+  void setHostPort(std::uint16_t port) noexcept {
+    this->hostPort = port;
+  }
 
   /**
    * @brief Get the Client Port object
    *
    * @return std::uint16_t
    */
-  std::uint16_t getClientPort() const noexcept { return this->hostPort; }
+  std::uint16_t getHostPort() const noexcept {
+    return this->hostPort;
+  }
 
   /**
    * @brief Get the binary data of the packet
@@ -119,7 +157,7 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    */
   std::vector<std::uint8_t> toNetBytes() const {
     // using utility::functions namespace
-    using namespace utility::functions;
+    using namespace utility::functions::coding;
 
     // Create a vector to store the packet
     std::vector<std::uint8_t> packet;
@@ -159,7 +197,7 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    */
   void fromNetBytes(std::vector<std::uint8_t> bytes) {
     // using utility::functions namespace
-    using namespace utility::functions;
+    using namespace utility::functions::coding;
 
     // check the packet type
     if (bytes[0] != 0x01 && bytes[0] != 0x02) {
@@ -220,17 +258,18 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
  private:
   std::uint8_t packetType = 0x03;
   std::uint32_t packetLength;
-  std::uint32_t typeLength;
-  std::vector<std::uint8_t> type;
+  std::uint32_t dataTypeLength;
+  std::vector<std::uint8_t> dataType;
   std::uint32_t dataLength;
   std::vector<std::uint8_t> data;
+
  public:
   /**
    * @brief Set the Packet Type object
    *
    * @param type
    */
-  void setPacketType(std::uint8_t type) noexcept {
+  void setPacketType(std::uint8_t type) {
     if (type != 0x03) {
       throw std::invalid_argument("Invalid Packet Type");
     }
@@ -250,7 +289,7 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param length
    */
-  void setPacketLength(std::uint32_t length) noexcept {
+  void setPacketLength(std::uint32_t length) {
     this->packetLength = length;
   }
 
@@ -268,8 +307,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param length
    */
-  void setTypeLength(std::uint32_t length) noexcept {
-    this->typeLength = length;
+  void setDataTypeLength(std::uint32_t length) {
+    this->dataTypeLength = length;
   }
 
   /**
@@ -277,8 +316,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @return std::uint32_t
    */
-  std::uint32_t getTypeLength() const noexcept {
-    return this->typeLength;
+  std::uint32_t getDataTypeLength() const noexcept {
+    return this->dataTypeLength;
   }
 
   /**
@@ -286,8 +325,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param type
    */
-  void setType(std::vector<std::uint8_t> type) noexcept {
-    this->type = type;
+  void setDataType(std::vector<std::uint8_t> type) {
+    this->dataType = type;
   }
 
   /**
@@ -295,8 +334,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @return std::vector<std::uint8_t>
    */
-  std::vector<std::uint8_t> getType() const noexcept {
-    return this->type;
+  std::vector<std::uint8_t> getDataType() const noexcept {
+    return this->dataType;
   }
 
   /**
@@ -304,7 +343,7 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param length
    */
-  void setDataLength(std::uint32_t length) noexcept {
+  void setDataLength(std::uint32_t length) {
     this->dataLength = length;
   }
 
@@ -322,7 +361,7 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param data
    */
-  void setData(std::vector<std::uint8_t> data) noexcept {
+  void setData(std::vector<std::uint8_t> data) {
     this->data = data;
   }
 
@@ -342,7 +381,7 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    */
   std::vector<std::uint8_t> toNetBytes() const {
     // using utility::functions namespace
-    using namespace utility::functions;
+    using namespace utility::functions::coding;
 
     // create a vector to store the packet
     std::vector<std::uint8_t> packet;
@@ -356,12 +395,12 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
     }
 
     // push the type length
-    for (const auto &i : toBytes(hostToNet(this->typeLength))) {
+    for (const auto &i : toBytes(hostToNet(this->dataTypeLength))) {
       packet.push_back(i);
     }
 
     // push the type
-    for (const auto &i : this->type) {
+    for (const auto &i : this->dataType) {
       packet.push_back(i);
     }
 
@@ -386,7 +425,7 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    */
   void fromNetBytes(std::vector<std::uint8_t> bytes) {
     // using utility::functions namespace
-    using namespace utility::functions;
+    using namespace utility::functions::coding;
 
     // check the packet type
     if (bytes[0] != 0x03) throw std::invalid_argument("Invalid Packet Type");
@@ -401,18 +440,18 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
     bytes.erase(bytes.begin(), bytes.begin() + 4);
 
     // get the type length
-    this->typeLength = netToHost(fromBytes<std::uint32_t>(bytes));
+    this->dataTypeLength = netToHost(fromBytes<std::uint32_t>(bytes));
 
     // remove the type length
     bytes.erase(bytes.begin(), bytes.begin() + 4);
 
     // get the type
-    for (std::uint32_t i = 0; i < this->typeLength; i++) {
-      this->type.push_back(bytes[i]);
+    for (std::uint32_t i = 0; i < this->dataTypeLength; i++) {
+      this->dataType.push_back(bytes[i]);
     }
 
     // remove the type
-    bytes.erase(bytes.begin(), bytes.begin() + this->typeLength);
+    bytes.erase(bytes.begin(), bytes.begin() + this->dataTypeLength);
 
     // get the data length
     this->dataLength = netToHost(fromBytes<std::uint32_t>(bytes));

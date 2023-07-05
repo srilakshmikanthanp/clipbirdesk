@@ -1,3 +1,5 @@
+#pragma once // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -5,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../utility/functions/functions.hpp"
+#include "../../../utility/functions/coding.hpp"
 
 /**
  * @brief testing netToHost function with different types
@@ -13,7 +15,7 @@
  */
 TEST(HostToNetTest, TestingHostToNet) {
   // using the hostToNet function
-  using srilakshmikanthanp::clipbirdesk::utility::functions::hostToNet;
+  using srilakshmikanthanp::clipbirdesk::utility::functions::coding::hostToNet;
 
   // int64_t
   int64_t i64_t = 0x123456789ABCDEF0;
@@ -46,7 +48,7 @@ TEST(HostToNetTest, TestingHostToNet) {
  */
 TEST(NetToHostTest, TestingNetToHost) {
   // using the netToHost function
-  using srilakshmikanthanp::clipbirdesk::utility::functions::netToHost;
+  using srilakshmikanthanp::clipbirdesk::utility::functions::coding::netToHost;
 
   // int64_t
   int64_t i64_t = 0x123456789ABCDEF0;
@@ -79,7 +81,7 @@ TEST(NetToHostTest, TestingNetToHost) {
  */
 TEST(ToBytesTest, TestingToBytes) {
   // using the toBytes function
-  using srilakshmikanthanp::clipbirdesk::utility::functions::toBytes;
+  using srilakshmikanthanp::clipbirdesk::utility::functions::coding::toBytes;
 
   // int64_t
   int64_t i64_t = 0x123456789ABCDEF0;
@@ -112,7 +114,7 @@ TEST(ToBytesTest, TestingToBytes) {
  */
 TEST(FromBytesTest, TestingFromBytes) {
   // using the fromBytes function
-  using srilakshmikanthanp::clipbirdesk::utility::functions::fromBytes;
+  using srilakshmikanthanp::clipbirdesk::utility::functions::coding::fromBytes;
 
   // int64_t
   std::vector<std::uint8_t> i64_t = {0xF0, 0xDE, 0xBC, 0x9A, 0x78, 0x56, 0x34, 0x12};

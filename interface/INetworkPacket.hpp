@@ -1,3 +1,5 @@
+#pragma once // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -16,7 +18,7 @@ class INetworkPacket {
    * @param bytes
    * @throws std::runtime_error
    */
-  void fromNetBytes(std::vector<std::uint8_t>) = 0;
+  virtual void fromNetBytes(std::vector<std::uint8_t>) = 0;
 
   /**
    * @brief Make Network packet to bytes that
@@ -24,6 +26,6 @@ class INetworkPacket {
    * @throws std::runtime_error
    * @return std::vector<std::uint8_t>
    */
-  std::vector<std::uint8_t> toNetBytes() const = 0;
-}
+  virtual std::vector<std::uint8_t> toNetBytes() const = 0;
+};
 }  // namespace srilakshmikanthanp::clipbirdesk::interface
