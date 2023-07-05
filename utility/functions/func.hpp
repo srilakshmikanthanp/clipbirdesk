@@ -3,5 +3,5 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-namespace srilakshmikanthanp::clipbirdesk::utility::gen {
+namespace srilakshmikanthanp::clipbirdesk::utility::functions {
 } // namespace srilakshmikanthanp::clipbirdesk::utility

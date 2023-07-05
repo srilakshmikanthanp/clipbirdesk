@@ -3,6 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+#include <filesystem>
 #include <string>
 
 #define CLIPBIRDESK_VERSION_MAJOR "@clipbirdesk_VERSION_MAJOR@"
@@ -52,6 +53,6 @@ std::string getAppName() {
  * @return std::string
  */
 std::string getAppHome() {
-  return std::string(getenv("HOME")) + "/.clipbirdesk/";
+  return std::filesystem::path(getenv("HOME")) / ("." + getAppName());
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::config
