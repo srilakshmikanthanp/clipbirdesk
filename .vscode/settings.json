@@ -7,7 +7,8 @@
     "bytemv",
     "charmv",
     "Clipbird",
-    "clipbirdesk"
+    "clipbirdesk",
+    "typeconv"
   ],
   "files.associations": {
     ".env*": "dotenv",
@@ -80,7 +81,20 @@
     "xstddef": "cpp",
     "xstring": "cpp",
     "xtr1common": "cpp",
-    "xutility": "cpp"
+    "xutility": "cpp",
+    "ios": "cpp",
+    "locale": "cpp",
+    "xfacet": "cpp",
+    "xhash": "cpp",
+    "xiosbase": "cpp",
+    "xlocale": "cpp",
+    "xlocbuf": "cpp",
+    "xlocinfo": "cpp",
+    "xlocmes": "cpp",
+    "xlocmon": "cpp",
+    "xlocnum": "cpp",
+    "xloctime": "cpp",
+    "xtree": "cpp"
   },
   "C_Cpp.inlayHints.parameterNames.suppressWhenArgumentContainsName": false,
   "C_Cpp.inlayHints.parameterNames.hideLeadingUnderscores": false,

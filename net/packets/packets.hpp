@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "../../interface/INetworkPacket.hpp"
+#include "../../types/types.hpp"
 #include "../../utility/functions/coding.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::net::packets {
@@ -18,11 +19,11 @@ namespace srilakshmikanthanp::clipbirdesk::net::packets {
  */
 class ServerDiscoveryPacket : public interface::INetworkPacket {
  private:
-  std::uint8_t packetType;
-  std::uint32_t packetLength;
-  std::uint8_t ipType;
-  std::vector<std::uint8_t> hostIp;
-  std::uint16_t hostPort;
+  std::uint8_t    packetType;
+  std::uint32_t   packetLength;
+  std::uint8_t    ipType;
+  types::varies_t hostIp;
+  std::uint16_t   hostPort;
 
  public:
   /**
@@ -108,19 +109,24 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @param ip
    */
-  void setHostIp(std::vector<std::uint8_t> ip) {
-    // check the ip type
+  void setHostIp(types::varies_t ip) {
+    // check the ip type is set or not
+    if (ipType != 0x04 && ipType != 0x06) {
+      throw std::runtime_error("Set the ip type first");
+    }
+
+    // check the ip length of ipv16
     if (ipType == 0x06 && ip.size() != 16) {
       throw std::runtime_error("Invalid ip length");
     }
 
+    // check the ip length of ipv4
     if (ipType == 0x04 && ip.size() != 4) {
       throw std::runtime_error("Invalid ip length");
     }
 
-    for (int i = 0; i < ip.size(); i++) {
-      this->hostIp[i] = ip[i];
-    }
+    // set the ip if tests are passed
+    this->hostIp = ip;
   }
 
   /**
@@ -128,7 +134,7 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @return const std::uint8_t*
    */
-  std::vector<std::uint8_t> getHostIp() const noexcept {
+  types::varies_t getHostIp() const noexcept {
     return this->hostIp;
   }
 
@@ -137,7 +143,7 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @param port
    */
-  void setHostPort(std::uint16_t port) noexcept {
+  void setHostPort(std::uint16_t port) {
     this->hostPort = port;
   }
 
@@ -153,14 +159,14 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
   /**
    * @brief Get the binary data of the packet
    *
-   * @return std::vector<std::uint8_t>
+   * @return types::varies_t
    */
-  std::vector<std::uint8_t> toNetBytes() const {
+  types::varies_t toNetBytes() const {
     // using utility::functions namespace
     using namespace utility::functions::coding;
 
     // Create a vector to store the packet
-    std::vector<std::uint8_t> packet;
+    types::varies_t packet;
 
     // Push the packet length
     packet.push_back(this->packetType);
@@ -195,7 +201,7 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @param packet
    */
-  void fromNetBytes(std::vector<std::uint8_t> bytes) {
+  void fromNetBytes(types::varies_t bytes) {
     // using utility::functions namespace
     using namespace utility::functions::coding;
 
@@ -232,7 +238,7 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
 
     // get the client ip
     for (std::size_t i = 0; i < ipLength; i++) {
-      this->hostIp[i] = bytes[i];
+      this->hostIp.push_back(bytes[i]);
     }
 
     // remove the client ip
@@ -256,12 +262,17 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
  */
 class ClipbirdSyncPacket : public interface::INetworkPacket {
  private:
-  std::uint8_t packetType = 0x03;
-  std::uint32_t packetLength;
-  std::uint32_t dataTypeLength;
-  std::vector<std::uint8_t> dataType;
-  std::uint32_t dataLength;
-  std::vector<std::uint8_t> data;
+  std::uint8_t      packetType = 0x03;
+  std::uint32_t     packetLength;
+  std::uint32_t     dataTypeLength;
+  types::varies_t   dataType;
+  std::uint32_t     dataLength;
+  types::varies_t   data;
+
+ public:
+  enum PacketType : std::uint8_t {
+    SyncPacket = 0x03
+  };
 
  public:
   /**
@@ -325,16 +336,16 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param type
    */
-  void setDataType(std::vector<std::uint8_t> type) {
+  void setDataType(types::varies_t type) {
     this->dataType = type;
   }
 
   /**
    * @brief Get the Type object
    *
-   * @return std::vector<std::uint8_t>
+   * @return types::varies_t
    */
-  std::vector<std::uint8_t> getDataType() const noexcept {
+  types::varies_t getDataType() const noexcept {
     return this->dataType;
   }
 
@@ -361,30 +372,30 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param data
    */
-  void setData(std::vector<std::uint8_t> data) {
+  void setData(types::varies_t data) {
     this->data = data;
   }
 
   /**
    * @brief Get the Data object
    *
-   * @return std::vector<std::uint8_t>
+   * @return types::varies_t
    */
-  std::vector<std::uint8_t> getData() const noexcept {
+  types::varies_t getData() const noexcept {
     return this->data;
   }
 
   /**
    * @brief Get the binary data of the packet
    *
-   * @return std::vector<std::uint8_t>
+   * @return types::varies_t
    */
-  std::vector<std::uint8_t> toNetBytes() const {
+  types::varies_t toNetBytes() const {
     // using utility::functions namespace
     using namespace utility::functions::coding;
 
     // create a vector to store the packet
-    std::vector<std::uint8_t> packet;
+    types::varies_t packet;
 
     // push the packet type
     packet.push_back(this->packetType);
@@ -423,7 +434,7 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param bytes
    */
-  void fromNetBytes(std::vector<std::uint8_t> bytes) {
+  void fromNetBytes(types::varies_t bytes) {
     // using utility::functions namespace
     using namespace utility::functions::coding;
 

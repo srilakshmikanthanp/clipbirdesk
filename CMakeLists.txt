@@ -51,7 +51,7 @@ FetchContent_Declare(googletest
 FetchContent_MakeAvailable(googletest)
 
 # Add Executable to test
-add_executable(clipbirdesk_test
+add_executable(check
   tests/test.cpp
 )
 
@@ -62,8 +62,8 @@ enable_testing()
 include(GoogleTest)
 
 # Discover tests
-gtest_discover_tests(clipbirdesk_test)
+gtest_discover_tests(check)
 
 #link test executable to gtest & gtest_main
-target_link_libraries(clipbirdesk_test
+target_link_libraries(check
   PRIVATE GTest::gtest_main)
