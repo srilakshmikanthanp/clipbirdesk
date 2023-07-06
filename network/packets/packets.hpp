@@ -13,7 +13,7 @@
 #include "../../types/types.hpp"
 #include "../../utility/functions/coding.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::net::packets {
+namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
  * @brief Server Discovery Packet
  */
@@ -484,4 +484,4 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
     }
   }
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::net::packets
+}  // namespace srilakshmikanthanp::clipbirdesk::network::packets

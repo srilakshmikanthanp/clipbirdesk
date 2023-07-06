@@ -8,7 +8,7 @@
 namespace srilakshmikanthanp::clipbirdesk::interface {
 /**
  * @brief Interface for network packet that can
- *       send and receive from network in bytes
+ *        send and receive from network in bytes
  */
 class INetworkPacket {
  public:

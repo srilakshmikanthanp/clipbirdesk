@@ -5,7 +5,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "../../net/packets/packets.hpp"
+#include "../../network/packets/packets.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions::packet {
 /**
@@ -13,9 +13,9 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions::packet {
  * @param packet
  * @return std::size_t
  */
-std::size_t sizeOfPacket(net::packets::ServerDiscoveryPacket packet) {
+std::size_t sizeOfPacket(network::packets::ServerDiscoveryPacket packet) {
   // get the size of packet type
-  auto size = sizeof(net::packets::ServerDiscoveryPacket);
+  auto size = sizeof(network::packets::ServerDiscoveryPacket);
 
   // add the bytes for ip
   if (packet.getIpType() == 0x04) {
@@ -32,12 +32,12 @@ std::size_t sizeOfPacket(net::packets::ServerDiscoveryPacket packet) {
  * @param packet
  * @return std::size_t
  */
-std::size_t sizeOfPacket(net::packets::ClipbirdSyncPacket packet) {
+std::size_t sizeOfPacket(network::packets::ClipbirdSyncPacket packet) {
   // size of data type to subtract
   auto extra = sizeof(packet.getDataType()) + sizeof(packet.getData());
 
   // get the size of packet type
-  auto size = sizeof(net::packets::ClipbirdSyncPacket) - extra;
+  auto size = sizeof(network::packets::ClipbirdSyncPacket) - extra;
 
   // Add the size of data type
   size += packet.getDataType().size() + packet.getData().size();

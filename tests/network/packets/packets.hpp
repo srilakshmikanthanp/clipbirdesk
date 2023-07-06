@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../net/packets/packets.hpp"
+#include "../../../network/packets/packets.hpp"
 #include "../../../utility/functions/packet.hpp"
 #include "../../../utility/typeconv/veries.hpp"
 
@@ -19,7 +19,7 @@ TEST(ServerDiscoveryPacketTest, TestingServerDiscoveryPacket) {
   using srilakshmikanthanp::clipbirdesk::utility::functions::packet::sizeOfPacket;
 
   // using the ServerDiscoveryPacket
-  using srilakshmikanthanp::clipbirdesk::net::packets::ServerDiscoveryPacket;
+  using srilakshmikanthanp::clipbirdesk::network::packets::ServerDiscoveryPacket;
 
   // constant ip
   const auto ip = std::vector<uint8_t>({127, 127, 127, 127});
@@ -72,7 +72,7 @@ TEST(ClipbirdSyncPacket, TestingClipbirdSyncPacket) {
   using srilakshmikanthanp::clipbirdesk::utility::functions::packet::sizeOfPacket;
 
   // using the ClipbirdSyncPacket
-  using srilakshmikanthanp::clipbirdesk::net::packets::ClipbirdSyncPacket;
+  using srilakshmikanthanp::clipbirdesk::network::packets::ClipbirdSyncPacket;
 
   // using to varies
   using srilakshmikanthanp::clipbirdesk::utility::typeconv::varies::to_varies;

@@ -15,7 +15,6 @@
 namespace srilakshmikanthanp::clipbirdesk::config {
 /**
  * @brief Get the Application Version
- *
  * @return std::string
  */
 std::string getAppMajorVersion() {
@@ -24,7 +23,6 @@ std::string getAppMajorVersion() {
 
 /**
  * @brief Get the Application Version
- *
  * @return std::string
  */
 std::string getAppMinorVersion() {
@@ -33,7 +31,6 @@ std::string getAppMinorVersion() {
 
 /**
  * @brief Get the Application Version
- *
  * @return std::string
  */
 std::string getAppPatchVersion() {
@@ -42,7 +39,6 @@ std::string getAppPatchVersion() {
 
 /**
  * @brief Get the Application Name
- *
  * @return std::string
  */
 std::string getAppName() {
@@ -51,7 +47,6 @@ std::string getAppName() {
 
 /**
  * @brief Get App Home Directory
- *
  * @return std::string
  */
 std::string getAppHome() {
