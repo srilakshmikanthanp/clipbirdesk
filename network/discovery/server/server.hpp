@@ -5,5 +5,5 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-namespace srilakshmikanthanp::clipbirdesk::network::unicast::client {
-} // namespace srilakshmikanthanp::clipbirdesk::network::unicast::client
+namespace srilakshmikanthanp::clipbirdesk::network::discovery::server {
+} // namespace srilakshmikanthanp::clipbirdesk::network::unicast::server
