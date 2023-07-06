@@ -8,3 +8,7 @@
 # clipbirdesk
 
 A Bird that syncs Your clipboard data between devices, the word clipbirdesk came from a combination of the words clipboard + bird + desktop.
+
+## Status
+
+clipbirdesk is in development stage, for protocol see [protocol.md](docs/protocol.md) 😄
