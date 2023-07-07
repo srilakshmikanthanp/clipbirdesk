@@ -6,6 +6,7 @@
 // https://opensource.org/licenses/MIT
 
 #include "../../network/packets/packets.hpp"
+#include "../../types/types.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions::packet {
 /**
@@ -13,12 +14,12 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions::packet {
  * @param packet
  * @return std::size_t
  */
-std::size_t sizeOfPacket(network::packets::ServerDiscoveryPacket packet) {
+std::size_t sizeOfPacket(network::packets::ServiceDiscoveryPacket packet) {
   // get the size of packet type
-  auto size = sizeof(network::packets::ServerDiscoveryPacket);
+  auto size = sizeof(network::packets::ServiceDiscoveryPacket);
 
   // add the bytes for ip
-  if (packet.getIpType() == 0x04) {
+  if (packet.getIpType() == types::IPType::IPv4) {
     size -= 12;
   }
 

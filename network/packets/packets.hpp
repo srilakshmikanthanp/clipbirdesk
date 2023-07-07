@@ -5,39 +5,37 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include <cinttypes>
+// Standard header files
 #include <stdexcept>
-#include <vector>
 
+// Qt header files
+#include <QByteArray>
+#include <QDataStream>
+#include <QIODevice>
+#include <QtTypes>
+
+// Local header files
 #include "../../interface/INetworkPacket.hpp"
 #include "../../types/types.hpp"
-#include "../../utility/functions/coding.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
  * @brief Server Discovery Packet
  */
-class ServerDiscoveryPacket : public interface::INetworkPacket {
+class ServiceDiscoveryPacket : public interface::INetworkPacket {
  private:
-  std::uint8_t    packetType;
-  std::uint32_t   packetLength;
-  std::uint8_t    ipType;
-  types::varies_t hostIp;
-  std::uint16_t   hostPort;
+  quint8     packetType;
+  qint32     packetLength;
+  quint8     ipType;
+  QByteArray hostIp;
+  qint16     hostPort;
 
  public:
   /**
    * @brief Packet Type
    */
-  enum PacketType : std::uint8_t {
+  enum PacketType : quint8 {
     Request = 0x01, Response = 0x02
-  };
-
-  /**
-   * @brief Ip Type
-   */
-  enum IpType : std::uint8_t {
-    Ipv4 = 0x04, Ipv6 = 0x06
   };
 
  public:
@@ -46,7 +44,7 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @param type
    */
-  void setPacketType(std::uint8_t type) {
+  void setPacketType(quint8 type) {
     if (type != 0x01 && type != 0x02) {
       throw std::invalid_argument("Invalid Packet Type");
     }
@@ -57,9 +55,9 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
   /**
    * @brief Get the Packet Type object
    *
-   * @return std::uint8_t
+   * @return quint8
    */
-  std::uint8_t getPacketType() const noexcept {
+  quint8 getPacketType() const noexcept {
     return this->packetType;
   }
 
@@ -68,16 +66,16 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @param length
    */
-  void setPacketLength(std::uint32_t length) {
+  void setPacketLength(qint32 length) {
     this->packetLength = length;
   }
 
   /**
    * @brief Get the Packet Length object
    *
-   * @return std::uint32_t
+   * @return qint32
    */
-  std::uint32_t getPacketLength() const noexcept {
+  qint32 getPacketLength() const noexcept {
     return this->packetLength;
   }
 
@@ -86,22 +84,27 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @param type
    */
-  void setIpType(std::uint8_t type) {
+  void setIpType(types::IPType type) {
     // check the ip type
-    if (type != 0x04 && type != 0x06) {
-      throw std::runtime_error("Invalid ip type");
+    if (type != types::IPType::IPv4 && type != types::IPType::IPv6) {
+      throw std::invalid_argument("Invalid ip type");
     }
 
-    this->ipType = type;
+    // set the ip type
+    this->ipType = type == types::IPType::IPv4 ? 0x04 : 0x06;
   }
 
   /**
    * @brief Get the Ip Type object
    *
-   * @return std::uint8_t
+   * @return quint8
    */
-  std::uint8_t getIpType() const noexcept {
-    return this->ipType;
+  types::IPType getIpType() const noexcept {
+    if (this->ipType == 0x04) {
+      return types::IPType::IPv4;
+    } else {
+      return types::IPType::IPv6;
+    }
   }
 
   /**
@@ -109,7 +112,7 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @param ip
    */
-  void setHostIp(types::varies_t ip) {
+  void setHostIp(QByteArray ip) {
     // check the ip type is set or not
     if (ipType != 0x04 && ipType != 0x06) {
       throw std::runtime_error("Set the ip type first");
@@ -132,9 +135,9 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
   /**
    * @brief Get the Client Ip object
    *
-   * @return const std::uint8_t*
+   * @return const quint8*
    */
-  types::varies_t getHostIp() const noexcept {
+  QByteArray getHostIp() const noexcept {
     return this->hostIp;
   }
 
@@ -143,57 +146,33 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @param port
    */
-  void setHostPort(std::uint16_t port) {
+  void setHostPort(qint16 port) {
     this->hostPort = port;
   }
 
   /**
    * @brief Get the Client Port object
    *
-   * @return std::uint16_t
+   * @return qint16
    */
-  std::uint16_t getHostPort() const noexcept {
+  qint16 getHostPort() const noexcept {
     return this->hostPort;
   }
 
   /**
    * @brief Get the binary data of the packet
    *
-   * @return types::varies_t
+   * @return QByteArray
    */
-  types::varies_t toNetBytes() const {
-    // using utility::functions namespace
-    using namespace utility::functions::coding;
+  QByteArray toNetBytes() const {
+    // Create a QByteArray & QDataStream to store the bytes
+    QByteArray bytes; QDataStream stream(&bytes, QIODevice::WriteOnly);
 
-    // Create a vector to store the packet
-    types::varies_t packet;
+    // write the object
+    stream << *this;
 
-    // Push the packet length
-    packet.push_back(this->packetType);
-
-    // push packet length
-    for (const auto &i : toBytes(hostToNet(this->packetLength))) {
-      packet.push_back(i);
-    }
-
-    // Push the ip type
-    packet.push_back(this->ipType);
-
-    // length of the ip
-    std::size_t ipLength = this->ipType == 0x04 ? 4 : 16;
-
-    // Push the client ip
-    for (std::size_t i = 0; i < ipLength; i++) {
-      packet.push_back(this->hostIp[i]);
-    }
-
-    // Push the client port
-    for (const auto &i : toBytes(hostToNet(this->hostPort))) {
-      packet.push_back(i);
-    }
-
-    // return the packet
-    return packet;
+    // return the bytes
+    return bytes;
   }
 
   /**
@@ -201,59 +180,91 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
    *
    * @param packet
    */
-  void fromNetBytes(types::varies_t bytes) {
-    // using utility::functions namespace
-    using namespace utility::functions::coding;
+  void fromNetBytes(QByteArray bytes) {
+    // create a data stream
+    QDataStream stream(bytes);
+
+    // read the object
+    stream >> *this;
+  }
+
+  /**
+   * @brief Input stream operator for QDataStream
+   *
+   * @param stream
+   * @param packet
+   * @return QDataStream&
+   */
+  friend QDataStream& operator<<(QDataStream& stream, const ServiceDiscoveryPacket& packet) {
+    // set the byte order
+    stream.setByteOrder(QDataStream::BigEndian);
+
+    // set the version
+    stream.setVersion(QDataStream::Qt_5_15);
+
+    // write the packet type
+    stream << packet.packetType;
+
+    // write the packet length
+    stream << packet.packetLength;
+
+    // write the ip type
+    stream << packet.ipType;
+
+    // write the ip
+    stream.writeRawData(packet.hostIp.data(), packet.hostIp.size());
+
+    // write the port
+    stream << packet.hostPort;
+
+    // return the stream
+    return stream;
+  }
+
+  /**
+   * @brief Output stream operator for QDataStream
+   *
+   * @param stream
+   * @param packet
+   * @return QDataStream&
+   */
+  friend QDataStream& operator>>(QDataStream& stream, ServiceDiscoveryPacket& packet) {
+    // set the byte order
+    stream.setByteOrder(QDataStream::BigEndian);
+
+    // set the version
+    stream.setVersion(QDataStream::Qt_5_15);
+
+    // read the packet type
+    stream >> packet.packetType;
 
     // check the packet type
-    if (bytes[0] != 0x01 && bytes[0] != 0x02) {
-      throw std::runtime_error("Invalid packet type");
+    if (packet.packetType != 0x01 && packet.packetType != 0x02) {
+      throw std::runtime_error("Invalid Packet Type");
     }
 
-    // get the packet type
-    this->packetType = bytes[0];
+    // read the packet length
+    stream >> packet.packetLength;
 
-    // remove the packet type
-    bytes.erase(bytes.begin());
-
-    // get the packet length
-    this->packetLength = netToHost(fromBytes<std::uint32_t>(bytes));
-
-    // remove the packet length
-    bytes.erase(bytes.begin(), bytes.begin() + 4);
-
-    // get the ip type
-    this->ipType = bytes[5];
-
-    // remove the ip type
-    bytes.erase(bytes.begin());
+    // read the ip type
+    stream >> packet.ipType;
 
     // check the ip type
-    if (this->ipType != 0x04 && this->ipType != 0x06) {
+    if (packet.ipType != 0x04 && packet.ipType != 0x06) {
       throw std::runtime_error("Invalid ip type");
     }
 
-    // length of the ip
-    std::size_t ipLength = this->ipType == 0x04 ? 4 : 16;
+    // resize the ip
+    packet.hostIp.resize(packet.ipType == 0x04 ? 4 : 16);
 
-    // get the client ip
-    for (std::size_t i = 0; i < ipLength; i++) {
-      this->hostIp.push_back(bytes[i]);
-    }
+    // read the ip
+    packet.hostIp = stream.device()->read(packet.hostIp.size());
 
-    // remove the client ip
-    bytes.erase(bytes.begin(), bytes.begin() + ipLength);
+    // read the port
+    stream >> packet.hostPort;
 
-    // get the client port
-    this->hostPort = netToHost(fromBytes<std::uint16_t>(bytes));
-
-    // remove the client port
-    bytes.erase(bytes.begin(), bytes.begin() + 2);
-
-    // check the packet length
-    if (bytes.size() != 0) {
-      throw std::runtime_error("Invalid packet length");
-    }
+    // return the stream
+    return stream;
   }
 };
 
@@ -262,15 +273,15 @@ class ServerDiscoveryPacket : public interface::INetworkPacket {
  */
 class ClipbirdSyncPacket : public interface::INetworkPacket {
  private:
-  std::uint8_t      packetType = 0x03;
-  std::uint32_t     packetLength;
-  std::uint32_t     dataTypeLength;
-  types::varies_t   dataType;
-  std::uint32_t     dataLength;
-  types::varies_t   data;
+  quint8     packetType = 0x03;
+  qint32     packetLength;
+  qint32     dataTypeLength;
+  QByteArray dataType;
+  qint32     dataLength;
+  QByteArray data;
 
  public:
-  enum PacketType : std::uint8_t {
+  enum PacketType : quint8 {
     SyncPacket = 0x03
   };
 
@@ -280,7 +291,7 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param type
    */
-  void setPacketType(std::uint8_t type) {
+  void setPacketType(quint8 type) {
     if (type != 0x03) {
       throw std::invalid_argument("Invalid Packet Type");
     }
@@ -289,9 +300,9 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
   /**
    * @brief Get the Packet Type object
    *
-   * @return std::uint8_t
+   * @return quint8
    */
-  std::uint8_t getPacketType() const noexcept {
+  quint8 getPacketType() const noexcept {
     return this->packetType;
   }
 
@@ -300,16 +311,16 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param length
    */
-  void setPacketLength(std::uint32_t length) {
+  void setPacketLength(qint32 length) {
     this->packetLength = length;
   }
 
   /**
    * @brief Get the Packet Length object
    *
-   * @return std::uint32_t
+   * @return qint32
    */
-  std::uint32_t getPacketLength() const noexcept {
+  qint32 getPacketLength() const noexcept {
     return this->packetLength;
   }
 
@@ -318,16 +329,16 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param length
    */
-  void setDataTypeLength(std::uint32_t length) {
+  void setDataTypeLength(qint32 length) {
     this->dataTypeLength = length;
   }
 
   /**
    * @brief Get the Type Length object
    *
-   * @return std::uint32_t
+   * @return qint32
    */
-  std::uint32_t getDataTypeLength() const noexcept {
+  qint32 getDataTypeLength() const noexcept {
     return this->dataTypeLength;
   }
 
@@ -336,16 +347,16 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param type
    */
-  void setDataType(types::varies_t type) {
+  void setDataType(QByteArray type) {
     this->dataType = type;
   }
 
   /**
    * @brief Get the Type object
    *
-   * @return types::varies_t
+   * @return QByteArray
    */
-  types::varies_t getDataType() const noexcept {
+  QByteArray getDataType() const noexcept {
     return this->dataType;
   }
 
@@ -354,16 +365,16 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param length
    */
-  void setDataLength(std::uint32_t length) {
+  void setDataLength(qint32 length) {
     this->dataLength = length;
   }
 
   /**
    * @brief Get the Data Length object
    *
-   * @return std::uint32_t
+   * @return qint32
    */
-  std::uint32_t getDataLength() const noexcept {
+  qint32 getDataLength() const noexcept {
     return this->dataLength;
   }
 
@@ -372,61 +383,33 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param data
    */
-  void setData(types::varies_t data) {
+  void setData(QByteArray data) {
     this->data = data;
   }
 
   /**
    * @brief Get the Data object
    *
-   * @return types::varies_t
+   * @return QByteArray
    */
-  types::varies_t getData() const noexcept {
+  QByteArray getData() const noexcept {
     return this->data;
   }
 
   /**
    * @brief Get the binary data of the packet
    *
-   * @return types::varies_t
+   * @return QByteArray
    */
-  types::varies_t toNetBytes() const {
-    // using utility::functions namespace
-    using namespace utility::functions::coding;
+  QByteArray toNetBytes() const {
+    // Create a QByteArray & QDataStream to store the bytes
+    QByteArray bytes; QDataStream stream(&bytes, QIODevice::WriteOnly);
 
-    // create a vector to store the packet
-    types::varies_t packet;
+    // write the object
+    stream << *this;
 
-    // push the packet type
-    packet.push_back(this->packetType);
-
-    // push the packet length
-    for (const auto &i : toBytes(hostToNet(this->packetLength))) {
-      packet.push_back(i);
-    }
-
-    // push the type length
-    for (const auto &i : toBytes(hostToNet(this->dataTypeLength))) {
-      packet.push_back(i);
-    }
-
-    // push the type
-    for (const auto &i : this->dataType) {
-      packet.push_back(i);
-    }
-
-    // push the data length
-    for (const auto &i : toBytes(hostToNet(this->dataLength))) {
-      packet.push_back(i);
-    }
-
-    // push the data
-    for (const auto &i : this->data) {
-      packet.push_back(i);
-    }
-
-    // return the packet
-    return packet;
+    // return the bytes
+    return bytes;
   }
 
   /**
@@ -434,54 +417,95 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param bytes
    */
-  void fromNetBytes(types::varies_t bytes) {
-    // using utility::functions namespace
-    using namespace utility::functions::coding;
+  void fromNetBytes(QByteArray bytes) {
+    // create a data stream
+    QDataStream stream(bytes);
+
+    // Read the packet
+    stream >> *this;
+  }
+
+  /**
+   * @brief Input stream operator for QDataStream
+   *
+   * @param stream
+   * @param packet
+   * @return QDataStream&
+   */
+  friend QDataStream& operator<<(QDataStream& stream, const ClipbirdSyncPacket& packet) {
+    // set the byte order
+    stream.setByteOrder(QDataStream::BigEndian);
+
+    // set the version
+    stream.setVersion(QDataStream::Qt_5_15);
+
+    // write the packet type
+    stream << packet.packetType;
+
+    // write the packet length
+    stream << packet.packetLength;
+
+    // write the data type length
+    stream << packet.dataTypeLength;
+
+    // write the data type
+    stream.writeRawData(packet.dataType.data(), packet.dataType.size());
+
+    // write the data length
+    stream << packet.dataLength;
+
+    // write the data
+    stream.writeRawData(packet.data.data(), packet.data.size());
+
+    // return the stream
+    return stream;
+  }
+
+  /**
+   * @brief Output stream operator for QDataStream
+   *
+   * @param stream
+   * @param packet
+   * @return QDataStream&
+   */
+  friend QDataStream& operator>>(QDataStream& stream, ClipbirdSyncPacket& packet) {
+    // set the byte order
+    stream.setByteOrder(QDataStream::BigEndian);
+
+    // set the version
+    stream.setVersion(QDataStream::Qt_5_15);
+
+    // read the packet type
+    stream >> packet.packetType;
 
     // check the packet type
-    if (bytes[0] != 0x03) throw std::invalid_argument("Invalid Packet Type");
-
-    // remove the packet type
-    bytes.erase(bytes.begin());
-
-    // get the packet length
-    this->packetLength = netToHost(fromBytes<std::uint32_t>(bytes));
-
-    // remove the packet length
-    bytes.erase(bytes.begin(), bytes.begin() + 4);
-
-    // get the type length
-    this->dataTypeLength = netToHost(fromBytes<std::uint32_t>(bytes));
-
-    // remove the type length
-    bytes.erase(bytes.begin(), bytes.begin() + 4);
-
-    // get the type
-    for (std::uint32_t i = 0; i < this->dataTypeLength; i++) {
-      this->dataType.push_back(bytes[i]);
+    if (packet.packetType != 0x03) {
+      throw std::runtime_error("Invalid Packet Type");
     }
 
-    // remove the type
-    bytes.erase(bytes.begin(), bytes.begin() + this->dataTypeLength);
+    // read the packet length
+    stream >> packet.packetLength;
 
-    // get the data length
-    this->dataLength = netToHost(fromBytes<std::uint32_t>(bytes));
+    // read the data type length
+    stream >> packet.dataTypeLength;
 
-    // remove the data length
-    bytes.erase(bytes.begin(), bytes.begin() + 4);
+    // resize the data type
+    packet.dataType.resize(packet.dataTypeLength);
 
-    // get the data
-    for (std::uint32_t i = 0; i < this->dataLength; i++) {
-      this->data.push_back(bytes[i]);
-    }
+    // read the data type
+    packet.dataType = stream.device()->read(packet.dataType.size());
 
-    // remove the data
-    bytes.erase(bytes.begin(), bytes.begin() + this->dataLength);
+    // read the data length
+    stream >> packet.dataLength;
 
-    // check the packet length
-    if (bytes.size() != 0) {
-      throw std::invalid_argument("Invalid Packet Length");
-    }
+    // resize the data
+    packet.data.resize(packet.dataLength);
+
+    // read the data
+    packet.data = stream.device()->read(packet.data.size());
+
+    // return the stream
+    return stream;
   }
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::network::packets
+} // namespace srilakshmikanthanp::clipbirdesk::network::packets

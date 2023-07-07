@@ -8,6 +8,7 @@
     "charmv",
     "Clipbird",
     "clipbirdesk",
+    "ipconv",
     "typeconv"
   ],
   "files.associations": {
@@ -94,7 +95,15 @@
     "xlocmon": "cpp",
     "xlocnum": "cpp",
     "xloctime": "cpp",
-    "xtree": "cpp"
+    "xtree": "cpp",
+    "buffer": "cpp",
+    "executor": "cpp",
+    "internet": "cpp",
+    "io_context": "cpp",
+    "netfwd": "cpp",
+    "socket": "cpp",
+    "timer": "cpp",
+    "future": "cpp"
   },
   "C_Cpp.inlayHints.parameterNames.suppressWhenArgumentContainsName": false,
   "C_Cpp.inlayHints.parameterNames.hideLeadingUnderscores": false,

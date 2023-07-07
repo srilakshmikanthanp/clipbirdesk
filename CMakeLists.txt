@@ -51,7 +51,7 @@ FetchContent_Declare(googletest
 FetchContent_MakeAvailable(googletest)
 
 # Add Executable to test
-add_executable(check
+qt_add_executable(check
   tests/test.cpp
 )
 
@@ -66,4 +66,6 @@ gtest_discover_tests(check)
 
 #link test executable to gtest & gtest_main
 target_link_libraries(check
-  PRIVATE GTest::gtest_main)
+  PRIVATE GTest::gtest_main
+  PRIVATE Qt6::Core
+  PRIVATE Qt6::Network)

@@ -3,8 +3,11 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// Google test header files
+#include <gtest/gtest.h>
+
+// Local header files
 #include "./network/packets/packets.hpp"
-#include "./utility/functions/coding.hpp"
 
 /**
  * @brief Testing the clipbirdesk Application
