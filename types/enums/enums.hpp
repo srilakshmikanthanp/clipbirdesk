@@ -5,5 +5,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-namespace srilakshmikanthanp::clipbirdesk::network::clipbird::server {
-} // namespace srilakshmikanthanp::clipbirdesk::network::broadcast::server
+#include <cstdint>
+
+namespace srilakshmikanthanp::clipbirdesk::types::enums {
+/// @brief IP type
+enum class IPType : std::uint8_t {
+  IPv4 = 0,
+  IPv6 = 1,
+};
+}  // namespace srilakshmikanthanp::clipbirdesk::types

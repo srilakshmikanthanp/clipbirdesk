@@ -44,6 +44,36 @@ Note this to packet have same structure so we can combine the two for simplicity
 
 Once the server has been identified, clipboard data is transmitted between the client and the server using a single type of packet known as the **Clipboard Sync Packet**. This packet is responsible for transferring clipboard data from the client to the server and vice versa, ensuring seamless sharing of clipboard content between the two devices.
 
+Finally we have **Invalid Packet** which is used to indicate that the packet is invalid. This packet is used to indicate that the packet is invalid. so that the sender is aware of the invalid packet.
+
+### Invalid Packet
+
+The **Invalid Packet** is used to indicate that the packet is invalid. This packet contains the following fields:
+
+#### Header
+
+- **Packet Type**: This field specifies the type of packet, which is set to 0x00 for the Invalid Packet.
+- **Packet Length**: This field specifies the length of the packet, for invalid packet it is length of error code and error message.
+
+#### Body
+- **Error Code**: This field specifies the error code. 
+- **Error Message**: This field contains the error message.
+
+#### Structure
+
+| Field           | Bytes | value |
+|-----------------|-------| ----- |
+| Packet Type     | 1     | 0x00  |
+| Packet Length   | 4     |       |
+| Error Code      | 1     |       |
+| Error Message   | varies|       |
+
+#### Possible Error Codes
+
+| Error Code | Error Message |
+|------------|---------------|
+| 0x01       | Coding Error  |
+
 ### Server Discovery Packet
 
 The **Server Discovery Packet** packet is sent by the client to discover a compatible server within the local network. This packet contains the following fields:

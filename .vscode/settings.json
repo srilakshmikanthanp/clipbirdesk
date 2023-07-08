@@ -103,7 +103,8 @@
     "netfwd": "cpp",
     "socket": "cpp",
     "timer": "cpp",
-    "future": "cpp"
+    "future": "cpp",
+    "qtimer": "cpp"
   },
   "C_Cpp.inlayHints.parameterNames.suppressWhenArgumentContainsName": false,
   "C_Cpp.inlayHints.parameterNames.hideLeadingUnderscores": false,

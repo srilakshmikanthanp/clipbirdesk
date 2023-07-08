@@ -27,6 +27,12 @@ class INetworkPacket {
   virtual void fromNetBytes(QByteArray) = 0;
 
   /**
+   * @brief   Get the size of the packet
+   * @return  size_t
+   */
+  virtual std::size_t size() const = 0;
+
+  /**
    * @brief   Make Network packet to bytes that
    *          send to network
    * @throws  std::runtime_error

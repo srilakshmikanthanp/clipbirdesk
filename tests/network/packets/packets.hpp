@@ -13,21 +13,55 @@
 
 // Local header files
 #include "../../../network/packets/packets.hpp"
-#include "../../../types/types.hpp"
-#include "../../../utility/functions/packet.hpp"
+#include "../../../types/enums/enums.hpp"
+
+/**
+ * @brief testing the MalformedPacket
+ */
+TEST(MalformedPacketTest, TestingMalformedPacket) {
+  // using the MalformedPacket
+  using srilakshmikanthanp::clipbirdesk::network::packets::MalformedPacket;
+
+  // creating the packet
+  MalformedPacket packet_send, packet_recv;
+
+  // setting the packet type
+  packet_send.setPacketType(MalformedPacket::PacketType::InvalidPacket);
+
+  // setting the packet length
+  packet_send.setErrorCode(MalformedPacket::ErrorCode::CodingError);
+
+  // setting the message
+  packet_send.setErrorMessage("Hello");
+
+  // setting the packet length
+  packet_send.setPacketLength(packet_send.size());
+
+  // load the packet from network byte order
+  packet_recv.fromNetBytes(packet_send.toNetBytes());
+
+  // check the packet type
+  EXPECT_EQ(packet_recv.getPacketType(), MalformedPacket::PacketType::InvalidPacket);
+
+  // check the packet length
+  EXPECT_EQ(packet_recv.getPacketLength(), packet_recv.size());
+
+  // check the error code
+  EXPECT_EQ(packet_recv.getErrorCode(), MalformedPacket::ErrorCode::CodingError);
+
+  // check the message
+  EXPECT_EQ(packet_recv.getErrorMessage(), "Hello");
+}
 
 /**
  * @brief testing the ServiceDiscoveryPacket
  */
 TEST(ServerDiscoveryPacketTest, TestingServerDiscoveryPacket) {
-  //  using the sizeOfPacket
-  using srilakshmikanthanp::clipbirdesk::utility::functions::packet::sizeOfPacket;
-
-  // using the IPType
-  typedef srilakshmikanthanp::clipbirdesk::types::IPType IPType;
-
   // using the ServiceDiscoveryPacket
   using srilakshmikanthanp::clipbirdesk::network::packets::ServiceDiscoveryPacket;
+
+  // using the IPType
+  typedef srilakshmikanthanp::clipbirdesk::types::enums::IPType IPType;
 
   // constant ip
   const auto ip = QByteArray("\x7F\x00\x00\x01", 4);
@@ -51,7 +85,7 @@ TEST(ServerDiscoveryPacketTest, TestingServerDiscoveryPacket) {
   packet_send.setHostPort(port);
 
   // setting the packet length
-  packet_send.setPacketLength(sizeOfPacket(packet_send));
+  packet_send.setPacketLength(packet_send.size());
 
   // load the packet from network byte order
   packet_recv.fromNetBytes(packet_send.toNetBytes());
@@ -60,7 +94,7 @@ TEST(ServerDiscoveryPacketTest, TestingServerDiscoveryPacket) {
   EXPECT_EQ(packet_recv.getPacketType(), ServiceDiscoveryPacket::PacketType::Request);
 
   // check the packet length
-  EXPECT_EQ(packet_recv.getPacketLength(), sizeOfPacket(packet_recv));
+  EXPECT_EQ(packet_recv.getPacketLength(), packet_send.size());
 
   // check the ip type
   EXPECT_EQ(packet_recv.getIpType(), IPType::IPv4);
@@ -76,9 +110,6 @@ TEST(ServerDiscoveryPacketTest, TestingServerDiscoveryPacket) {
  * @brief testing the ServiceDiscoveryPacket
  */
 TEST(ClipbirdSyncPacket, TestingClipbirdSyncPacket) {
-  // using the sizeOfPacket
-  using srilakshmikanthanp::clipbirdesk::utility::functions::packet::sizeOfPacket;
-
   // using the ClipbirdSyncPacket
   using srilakshmikanthanp::clipbirdesk::network::packets::ClipbirdSyncPacket;
 
@@ -107,7 +138,7 @@ TEST(ClipbirdSyncPacket, TestingClipbirdSyncPacket) {
   packet_send.setData(data);
 
   // setting the packet length
-  packet_send.setPacketLength(sizeOfPacket(packet_send));
+  packet_send.setPacketLength(packet_send.size());
 
   // load the packet from network byte order
   packet_recv.fromNetBytes(packet_send.toNetBytes());
@@ -116,7 +147,7 @@ TEST(ClipbirdSyncPacket, TestingClipbirdSyncPacket) {
   EXPECT_EQ(packet_recv.getPacketType(), ClipbirdSyncPacket::PacketType::SyncPacket);
 
   // check the packet length
-  EXPECT_EQ(packet_recv.getPacketLength(), sizeOfPacket(packet_recv));
+  EXPECT_EQ(packet_recv.getPacketLength(), packet_send.size());
 
   // check the data type length
   EXPECT_EQ(packet_recv.getDataTypeLength(), dataType.size());

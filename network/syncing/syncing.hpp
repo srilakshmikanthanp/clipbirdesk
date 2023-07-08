@@ -5,5 +5,5 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-namespace srilakshmikanthanp::clipbirdesk::network::clipbird::client {
-} // namespace srilakshmikanthanp::clipbirdesk::network::broadcast::client
+namespace srilakshmikanthanp::clipbirdesk::network::syncing {
+} // namespace srilakshmikanthanp::clipbirdesk::network::broadcast::server

@@ -1,3 +1,5 @@
+#pragma once // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -17,7 +19,7 @@ QHostAddress toQHostIPv4Address(const QByteArray& host) {
   QHostAddress address;
 
   // convert the IP address to QHostAddress
-  address.setAddress(reinterpret_cast<const quint32>(host.data()));
+  address.setAddress(*(reinterpret_cast<const quint32*>(host.data())));
 
   // Done return the address
   return address;
