@@ -1,3 +1,11 @@
 {
-  "cmake.generator": "MinGW Makefiles"
+  "C_Cpp.clang_format_fallbackStyle": "Google",
+  "cmake.generator": "MinGW Makefiles",
+  "grammarly.files.exclude": [
+    "**/CMakeLists.txt"
+  ],
+  "cSpell.words": [
+    "clipbirdesk",
+    "ipconv"
+  ],
 }

@@ -35,7 +35,7 @@ class DiscoveryServer : public QObject {
   using InvalidPacket = types::except::InvalidPacket;  // Invalid packet exception
 
  private:               // variables
-  QUdpSocket m_socket;  // Udp socket used to listen for the broadcast message
+  QUdpSocket m_socket = QUdpSocket(this);
 
  private:  // functions
   /**
@@ -99,10 +99,14 @@ class DiscoveryServer : public QObject {
     packets::ServiceDiscoveryPacket sendPacket;
 
     // set the IP address and port number
-    sendPacket.setPacketType(pakType);
-    sendPacket.setIpType(getIPType());
-    sendPacket.setHostIp(getIPAddress());
-    sendPacket.setHostPort(getPort());
+    try {
+      sendPacket.setPacketType(pakType);
+      sendPacket.setIpType(getIPType());
+      sendPacket.setHostIp(getIPAddress());
+      sendPacket.setHostPort(getPort());
+    } catch (...) {
+      return; // return if any error occurs
+    }
 
     // set the Length of the packet
     sendPacket.setPacketLength(sendPacket.size());
@@ -153,8 +157,7 @@ class DiscoveryServer : public QObject {
    *
    * @param parent Parent object
    */
-  explicit DiscoveryServer(QObject* parent = nullptr)
-      : QObject(parent), m_socket(this) {
+  explicit DiscoveryServer(QObject* parent = nullptr): QObject(parent) {
     // Bind the socket to listen for the broadcast message
     // The Host address is set to AnyIPv4 to listen for
     // the broadcast message and the port is set to 0 to
@@ -172,6 +175,8 @@ class DiscoveryServer : public QObject {
     QObject::connect(&m_socket, signal, this, slot);
   }
 
+ protected:  // functions
+
   /**
    * @brief Destroy the Discovery Server object
    */
@@ -184,6 +189,7 @@ class DiscoveryServer : public QObject {
    * the IP type is IPv6 then the IP address is 16 bytes long
    *
    * @return types::IPType IP type
+   * @throw Any Exception If any error occurs
    */
   virtual types::enums::IPType getIPType() const = 0;
 
@@ -194,6 +200,7 @@ class DiscoveryServer : public QObject {
    * services
    *
    * @return types::Port Port number
+   * @throw Any Exception If any error occurs
    */
   virtual quint16 getPort() const = 0;
 
@@ -203,6 +210,7 @@ class DiscoveryServer : public QObject {
    * the IP type is IPv6 then the IP address is 16 bytes long
    *
    * @return types::IPAddress IP address
+   * @throw Any Exception If any error occurs
    */
   virtual QByteArray getIPAddress() const = 0;
 };
@@ -215,18 +223,10 @@ class DiscoveryServer : public QObject {
 class DiscoveryClient : public QObject {
  private:
   /// @brief Udp socket
-  QUdpSocket m_socket;  // Udp socket used to send the broadcast message
+  QUdpSocket m_socket = QUdpSocket(this);
 
   /// @brief Timer to send the broadcast message
-  QTimer m_timer;
-
- public:
-  /// @brief OnServer found callback
-  using OnServerFound = void (*)(const QHostAddress, const quint16);
-
- private:
-  /// @brief listeners for the server found
-  std::vector<OnServerFound> m_listeners;
+  QTimer m_timer = QTimer(this);
 
  private:  // functions
   /**
@@ -252,10 +252,8 @@ class DiscoveryClient : public QObject {
       address = toQHostIPv6Address(host);
     }
 
-    // Notify the listeners
-    for (const auto& listener : m_listeners) {
-      listener(address, port);
-    }
+    // Notify
+    this->onServerFound(address, port);
   }
 
   /**
@@ -340,8 +338,7 @@ class DiscoveryClient : public QObject {
    *
    * @param parent Parent object
    */
-  explicit DiscoveryClient(QObject* parent = nullptr)
-      : QObject(parent), m_timer(this) {
+  explicit DiscoveryClient(QObject* parent = nullptr): QObject(parent) {
     // Bind the socket to listen for the broadcast message
     // The Host address is set to AnyIPv4 to listen for
     // the broadcast message and the port is set to 0 to
@@ -365,27 +362,6 @@ class DiscoveryClient : public QObject {
   }
 
   /**
-   * @brief Add the listener for the server found
-   * event.
-   *
-   * @param listener Listener to be added
-   */
-  void addOnServerFound(const OnServerFound& listener) {
-    m_listeners.push_back(listener);
-  }
-
-  /**
-   * @brief Remove the listener for the server found
-   * event.
-   *
-   * @param listener Listener to be removed
-   */
-  void removeOnServerFound(const OnServerFound& listener) {
-    m_listeners.erase(
-        std::find(m_listeners.begin(), m_listeners.end(), listener));
-  }
-
-  /**
    * @brief Destroy the Discovery Client object
    */
   ~DiscoveryClient() = default;
@@ -404,5 +380,14 @@ class DiscoveryClient : public QObject {
    * @brief Stops the discovery client
    */
   void stopDiscovery() { m_timer.stop(); }
+
+  /**
+   * @brief On server found abstract function that
+   * is called when the server is found
+   *
+   * @param host Host address
+   * @param port Port number
+   */
+  virtual void onServerFound(const QHostAddress host, const quint16 port) = 0;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::discovery
