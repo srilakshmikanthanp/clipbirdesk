@@ -19,6 +19,9 @@ find_package(Qt6 REQUIRED COMPONENTS
   Network
 )
 
+# Find OpenSSL
+find_package(OpenSSL REQUIRED)
+
 # Configure config.hpp
 configure_file(
   ${PROJECT_SOURCE_DIR}/config/config.hpp.in
@@ -36,7 +39,9 @@ qt_add_executable(clipbirdesk
 # Link libraries
 target_link_libraries(clipbirdesk
   PRIVATE Qt6::Widgets
-  PRIVATE Qt6::Network)
+  PRIVATE Qt6::Network
+  PRIVATE OpenSSL::SSL
+  PRIVATE OpenSSL::Crypto)
 
 # Include config.hpp
 target_include_directories(clipbirdesk

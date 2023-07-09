@@ -3,9 +3,11 @@
         {
             "name": "Win32",
             "includePath": [
+                "${workspaceFolder}/build/_deps/googletest-src/googletest/include",
                 "${workspaceFolder}/**",
                 "C:/Qt/6.5.1/mingw_64/include/QtCore",
-                "${workspaceFolder}/build/_deps/googletest-src/googletest/include"
+                "C:/Qt/6.5.1/mingw_64/include/QtNetwork",
+                "C:/Program Files/OpenSSL-Win64/include"
             ],
             "defines": [
                 "_DEBUG",

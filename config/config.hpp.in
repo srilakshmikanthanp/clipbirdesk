@@ -8,9 +8,13 @@
 #include <filesystem>
 #include <string>
 
+// Application Version
 #define CLIPBIRDESK_VERSION_MAJOR "@clipbirdesk_VERSION_MAJOR@"
 #define CLIPBIRDESK_VERSION_MINOR "@clipbirdesk_VERSION_MINOR@"
 #define CLIPBIRDESK_VERSION_PATCH "@clipbirdesk_VERSION_PATCH@"
+
+// Application Name
+#define CLIPBIRDESK_NAME "@CMAKE_PROJECT_NAME@"
 
 namespace srilakshmikanthanp::clipbirdesk::config {
 /**
@@ -42,7 +46,7 @@ std::string getAppPatchVersion() {
  * @return std::string
  */
 std::string getAppName() {
-  return "clipbirdesk";
+  return std::string(CLIPBIRDESK_NAME);
 }
 
 /**

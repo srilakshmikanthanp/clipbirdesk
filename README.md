@@ -11,4 +11,15 @@ A Bird that syncs Your clipboard data between devices, the word clipbirdesk came
 
 ## Status
 
-clipbirdesk is in development stage, for protocol see [protocol.md](docs/protocol.md) 😄
+clipbirdek is in development stage, for protocol see [protocol.md](docs/protocol.md) 😄
+
+## Dependencies
+
+- Qt6 framework
+- openssl
+
+## Environment
+
+~~~sh
+QT_CMAKE_DIR = Path/to/Qt/cmake/directory
+~~~
