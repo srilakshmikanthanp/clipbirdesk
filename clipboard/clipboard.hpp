@@ -107,7 +107,7 @@ class Clipboard : public QObject {
 
     // if mime data is not supported
     if (mimeData == nullptr) {
-      throw types::except::NotSupported("Clipboard data is not supported");
+      throw types::except::NotSupported("Error");
     }
 
     // get the formats
@@ -133,9 +133,16 @@ class Clipboard : public QObject {
    * @param mime mime type of the data
    * @param data data to be set
    */
-  void set(const QString& mime, const QByteArray& data) {
-    QMimeData* mimeData = new QMimeData();
-    mimeData->setData(mime, data);
+  void set(const QVector<QPair<QString, QByteArray>> data) {
+    // create the mime data object
+    auto mimeData = new QMimeData();
+
+    // set the data
+    for (const auto& [mime, data] : data) {
+      mimeData->setData(mime, data);
+    }
+
+    // set the mime data
     m_clipboard->setMimeData(mimeData);
   }
 };
