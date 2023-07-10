@@ -1,3 +1,5 @@
+#pragma once // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -38,7 +40,7 @@ class Clipboard : public QObject {
    * @brief Slot to receive the clipboard change
    * and notify the listeners
    */
-  void onChange() {
+  void onClipboardChange() {
     // default clipboard data
     QVector<QPair<QString, QByteArray>> clipboardData;
 
@@ -68,7 +70,7 @@ class Clipboard : public QObject {
     // connect the clipboard change signal to the slot
     // that is used to notify the listeners
     const auto signal = &QClipboard::changed;
-    const auto slot = &Clipboard::onChange;
+    const auto slot = &Clipboard::onClipboardChange;
     QObject::connect(m_clipboard, signal, this, slot);
   }
 
