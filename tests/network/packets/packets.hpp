@@ -12,8 +12,8 @@
 #include <QByteArray>
 
 // Local header files
-#include "../../../network/packets/packets.hpp"
-#include "../../../types/enums/enums.hpp"
+#include "network/packets/packets.hpp"
+#include "types/enums/enums.hpp"
 
 /**
  * @brief testing the MalformedPacket

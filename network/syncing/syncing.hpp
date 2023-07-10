@@ -10,9 +10,9 @@
 #include <QSslConfiguration>
 #include <QSslServer>
 
-#include "../../types/enums/enums.hpp"
-#include "../../utility/functions/ipconv.hpp"
-#include "../discovery/discovery.hpp"
+#include "discovery/discovery.hpp"
+#include "types/enums/enums.hpp"
+#include "utility/functions/ipconv.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 /**

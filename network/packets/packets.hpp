@@ -15,9 +15,9 @@
 #include <QtTypes>
 
 // Local header files
-#include "../../interface/INetworkPacket.hpp"
-#include "../../types/enums/enums.hpp"
-#include "../../types/except/except.hpp"
+#include "interface/INetworkPacket.hpp"
+#include "types/enums/enums.hpp"
+#include "types/except/except.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**

@@ -8,6 +8,9 @@ set(CMAKE_CXX_STANDARD 20)
 # include cmake modules
 include(FetchContent)
 
+# include project root
+include_directories(${PROJECT_SOURCE_DIR})
+
 # --------------------------------- Main Project ---------------------------------#
 
 # Append Qt cmake dir to CMAKE_PREFIX_PATH

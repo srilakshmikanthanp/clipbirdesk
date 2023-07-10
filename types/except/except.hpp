@@ -35,4 +35,22 @@ class InvalidPacket : public std::exception {
   // Virtual destructor for inheritance
   virtual ~InvalidPacket() noexcept = default;
 };
+
+/**
+ * @brief Exception for Not supported type
+ */
+class NotSupported : public std::exception {
+ private:
+  std::string message;
+
+ public:
+  // Constructor
+  NotSupported(const std::string& message) noexcept
+    : message(message) {}
+
+  // get message
+  const char* what() const noexcept override {
+    return message.c_str();
+  }
+};
 }  // namespace srilakshmikanthanp::clipbirdesk::types::except

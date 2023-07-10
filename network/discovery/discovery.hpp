@@ -18,10 +18,10 @@
 #include <QtLogging>
 
 // Local headers
-#include "../../../network/packets/packets.hpp"
-#include "../../../types/enums/enums.hpp"
-#include "../../../types/except/except.hpp"
-#include "../../../utility/functions/ipconv.hpp"
+#include "network/packets/packets.hpp"
+#include "types/enums/enums.hpp"
+#include "types/except/except.hpp"
+#include "utility/functions/ipconv.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::discovery {
 /**
