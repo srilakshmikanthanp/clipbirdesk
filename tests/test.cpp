@@ -7,7 +7,9 @@
 #include <gtest/gtest.h>
 
 // Local header files
-#include "./network/packets/packets.hpp"
+#include "./network/packets/DiscoveryPacket.hpp"
+#include "./network/packets/InvalidPacket.hpp"
+#include "./network/packets/SyncingPacket.hpp"
 
 /**
  * @brief Testing the clipbirdesk Application

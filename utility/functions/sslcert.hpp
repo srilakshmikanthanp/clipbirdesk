@@ -17,7 +17,7 @@
 // openssl headers
 #include <openssl/pem.h>
 
-namespace srilakshmikanthanp::clipbirdesk::utility::functions::sslcert {
+namespace srilakshmikanthanp::clipbirdesk::utility::functions {
 /**
  * @brief Generate a self signed certificate and key and return in
  * as QSslConfiguration
@@ -28,4 +28,4 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions::sslcert {
 QSslConfiguration generateSelfSignedConfiguration() {
 
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::utility::functions::sslcert
+}  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

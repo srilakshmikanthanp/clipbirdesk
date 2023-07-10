@@ -10,7 +10,7 @@
 #include <QSslConfiguration>
 #include <QSslServer>
 
-#include "discovery/discovery.hpp"
+#include "discovery/DiscoveryServer.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv.hpp"
 
@@ -102,39 +102,14 @@ class SyncingServer : public discovery::DiscoveryServer {
    * @throw Any Exception If any error occurs
    */
   virtual QByteArray getIPAddress() const {
-    // using toQHostIPv4Address from ipconv namespace
-    using utility::functions::ipconv::toQByteArrayIPv4Address;
+    // using toIPV4QHostAddress from ipconv namespace
+    using utility::functions::ipconv::toIPV4QByteArray;
 
     // Address of the server
     const auto address = m_ssl_server.serverAddress();
 
     // return the IP address of the server
-    return toQByteArrayIPv4Address(address);
-  }
-
- public:  // functions
-  /**
-   * @brief Set the SSL Configuration for the SyncingServer
-   *
-   * @param config SSL Configuration
-   */
-  void setSSLConfiguration(const QSslConfiguration &config) {
-    m_ssl_server.setSslConfiguration(config);
-  }
-
-  /**
-   * @brief Get the SSL Configuration for the SyncingServer
-   *
-   * @return QSslConfiguration SSL Configuration
-   */
-  QSslConfiguration getSSLConfiguration() const {
-    return m_ssl_server.sslConfiguration();
+    return toIPV4QByteArray(address);
   }
 };
-
-/**
- * @brief Syncing client that syncs the clipboard data between
- * client and server
- */
-class SyncingClient : public QObject {};
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

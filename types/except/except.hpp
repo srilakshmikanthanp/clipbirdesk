@@ -12,14 +12,14 @@ namespace srilakshmikanthanp::clipbirdesk::types::except {
 /**
  * @brief Exception for Invalid Packet
  */
-class InvalidPacket : public std::exception {
+class MalformedPacket : public std::exception {
  private:
   std::string message;
   std::uint8_t code;
 
  public:
  // Constructor
-  InvalidPacket(std::uint8_t code, const std::string& message) noexcept
+  MalformedPacket(std::uint8_t code, const std::string& message) noexcept
       : message(message), code(code) {}
 
   // get message
@@ -33,7 +33,7 @@ class InvalidPacket : public std::exception {
   }
 
   // Virtual destructor for inheritance
-  virtual ~InvalidPacket() noexcept = default;
+  virtual ~MalformedPacket() noexcept = default;
 };
 
 /**

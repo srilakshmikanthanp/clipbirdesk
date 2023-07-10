@@ -11,12 +11,12 @@ A Bird that syncs Your clipboard data between devices, the word clipbirdesk came
 
 ## Status
 
-clipbirdek is in development stage, for protocol see [protocol.md](docs/protocol.md) 😄
+clipbirdesk is in the development stage, for protocol see [protocol.md](docs/protocol.md) 😄
 
 ## Dependencies
 
-- Qt6 framework
-- openssl
+- Qt6 Framework
+- OpenSSL
 
 ## Environment
 

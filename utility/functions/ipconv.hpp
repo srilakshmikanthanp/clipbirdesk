@@ -8,13 +8,13 @@
 #include <QByteArray>
 #include <QHostAddress>
 
-namespace srilakshmikanthanp::clipbirdesk::utility::functions::ipconv {
+namespace srilakshmikanthanp::clipbirdesk::utility::functions {
 /**
  * @brief Convert the QByteArray to QHostAddress IPv4
  * @param host Host address
  * @return QHostAddress
  */
-QHostAddress toQHostIPv4Address(const QByteArray& host) {
+QHostAddress toIPV4QHostAddress(const QByteArray& host) {
   // Create the QHostAddress from the IP address
   QHostAddress address;
 
@@ -30,7 +30,7 @@ QHostAddress toQHostIPv4Address(const QByteArray& host) {
  * @param host Host address
  * @return QHostAddress
  */
-QHostAddress toQHostIPv6Address(const QByteArray& host) {
+QHostAddress toIPV6QHostAddress(const QByteArray& host) {
   // Create the QHostAddress from the IP address
   QHostAddress address;
 
@@ -52,7 +52,7 @@ QHostAddress toQHostIPv6Address(const QByteArray& host) {
  * @param host Host address
  * @return QByteArray
  */
-QByteArray toQByteArrayIPv4Address(const QHostAddress& host) {
+QByteArray toIPV4QByteArray(const QHostAddress& host) {
   // get the address
   const auto address = host.toIPv4Address();
 
@@ -68,7 +68,7 @@ QByteArray toQByteArrayIPv4Address(const QHostAddress& host) {
  * @param host Host address
  * @return QByteArray
  */
-QByteArray toQByteArrayIPv6Address(const QHostAddress& host) {
+QByteArray toIPV6QByteArray(const QHostAddress& host) {
   // get the address
   const auto address = host.toIPv6Address();
 
@@ -78,4 +78,4 @@ QByteArray toQByteArrayIPv6Address(const QHostAddress& host) {
   // convert the IP address to QByteArray
   return QByteArray(cast, sizeof(address));
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::utility::functions::ipconv
+}  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

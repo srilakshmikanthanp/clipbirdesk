@@ -6,7 +6,8 @@
       "name": "Win32",
       "includePath": [
         "C:/Program Files/OpenSSL-Win64/include/**",
-        "${workspaceFolder}/**",
+        "${workspaceFolder}/",
+        "${workspaceFolder}/build/_deps/**",
         "C:/Qt/6.5.1/mingw_64/include/**"
       ],
       "defines": [

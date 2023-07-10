@@ -5,18 +5,15 @@
 
 // Qt header
 #include <QByteArray>
-#include <QBuffer>
 #include <QClipboard>
 #include <QMimeData>
 #include <QObject>
 #include <QString>
-#include <QImage>
-#include <QVariant>
+#include <QPair>
+#include <QVector>
 
 // C++ header
 #include <algorithm>
-#include <vector>
-#include <utility>
 
 // project header
 #include "types/except/except.hpp"
@@ -31,7 +28,7 @@ class Clipboard : public QObject {
   QClipboard* m_clipboard = nullptr;  // clipboard that is managed by this class
 
  public:   // typedefs
-  using OnClipboardChange = void (*)(std::pair<QString, QByteArray>);
+  using OnClipboardChange = void (*)(QVector<QPair<QString, QByteArray>>);
 
  private:  // member
   std::vector<OnClipboardChange> m_listeners;
@@ -42,14 +39,17 @@ class Clipboard : public QObject {
    * and notify the listeners
    */
   void onChange() {
-    std::pair<QString, QByteArray> clipboardData;
+    // default clipboard data
+    QVector<QPair<QString, QByteArray>> clipboardData;
 
+    // try to get the data
     try {
       clipboardData = this->get();
     } catch (const std::exception& e) {
       return;
     }
 
+    // notify the listeners
     for (const auto& listener : m_listeners) {
       listener(clipboardData);
     }
@@ -94,6 +94,38 @@ class Clipboard : public QObject {
   }
 
   /**
+   * @brief Get the clipboard data from the clipboard
+   *
+   * @return mime type and data
+   */
+  QVector<QPair<QString, QByteArray>> get() {
+    // Default clipboard data & mime data
+    QVector<QPair<QString, QByteArray>> data;
+    const auto mimeData = m_clipboard->mimeData();
+
+    // if mime data is not supported
+    if (mimeData == nullptr) {
+      throw types::except::NotSupported("Clipboard data is not supported");
+    }
+
+    // get the formats
+    const auto formats = mimeData->formats();
+
+    // push the data to the vector
+    for (const auto& format : formats) {
+      data.push_back({format, mimeData->data(format)});
+    }
+
+    // return the data
+    return data;
+  }
+
+  /**
+   * @brief Clear the clipboard content
+   */
+  void clear() { m_clipboard->clear(); }
+
+  /**
    * @brief Set the clipboard data to the clipboard
    *
    * @param mime mime type of the data
@@ -103,53 +135,6 @@ class Clipboard : public QObject {
     QMimeData* mimeData = new QMimeData();
     mimeData->setData(mime, data);
     m_clipboard->setMimeData(mimeData);
-  }
-
-  /**
-   * @brief Clear the clipboard content
-   */
-  void clear() { m_clipboard->clear(); }
-
-  /**
-   * @brief Get the clipboard data from the clipboard
-   *
-   * @return mime type and data
-   */
-  std::pair<QString, QByteArray> get() {
-    const auto mimeData = m_clipboard->mimeData();
-
-    if (mimeData->hasImage()) {
-      const auto image = qvariant_cast<QImage>(mimeData->imageData());
-      auto buffer = QBuffer();
-      buffer.open(QIODevice::WriteOnly);
-      image.save(&buffer, "PNG");
-      return std::make_pair("image/png", buffer.data());
-    }
-
-    if (mimeData->hasColor()) {
-      const auto data = mimeData->data("application/x-color");
-      return std::make_pair("application/x-color", data);
-    }
-
-    if (mimeData->hasText()) {
-      const auto data = mimeData->data("text/plain");
-      const auto text = QString::fromUtf8(data);
-      return std::make_pair("text/plain", text.toUtf8());
-    }
-
-    if (mimeData->hasHtml()) {
-      const auto data = mimeData->data("text/html");
-      const auto text = QString::fromUtf8(data);
-      return std::make_pair("text/html", text.toUtf8());
-    }
-
-    if (mimeData->hasUrls()) {
-      const auto data = mimeData->data("text/uri-list");
-      return std::make_pair("text/uri-list", data);
-    }
-
-    // If the data is not supported throw exception
-    throw types::except::NotSupported("Not supported");
   }
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::clipboard
