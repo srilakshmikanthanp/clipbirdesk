@@ -109,33 +109,33 @@ TEST(ServerDiscoveryPacketTest, TestingServerDiscoveryPacket) {
 /**
  * @brief testing the ServiceDiscoveryPacket
  */
-TEST(ClipbirdSyncPacket, TestingClipbirdSyncPacket) {
-  // using the ClipbirdSyncPacket
-  using srilakshmikanthanp::clipbirdesk::network::packets::ClipbirdSyncPacket;
+TEST(ClipboardSyncPacket, TestingClipbirdSyncPacket) {
+  // using the ClipboardSyncPacket
+  using srilakshmikanthanp::clipbirdesk::network::packets::ClipboardSyncPacket;
 
   // data type
-  const auto dataType = QByteArray("text/plain", 10);
+  const auto mimeType = QByteArray("text/plain", 10);
 
   // data
   const auto data = QByteArray("Hello World", 11);
 
   // creating the packet
-  ClipbirdSyncPacket packet_send, packet_recv;
+  ClipboardSyncPacket packet_send, packet_recv;
 
   // setting the packet type
-  packet_send.setPacketType(ClipbirdSyncPacket::PacketType::SyncPacket);
+  packet_send.setPacketType(ClipboardSyncPacket::PacketType::SyncPacket);
 
   // setting the data type length
-  packet_send.setDataTypeLength(dataType.size());
+  packet_send.setMimeLength(mimeType.size());
 
   // setting the data type
-  packet_send.setDataType(dataType);
+  packet_send.setMimeType(mimeType);
 
   // setting the data length
-  packet_send.setDataLength(data.size());
+  packet_send.setPayloadLength(data.size());
 
   // setting the data
-  packet_send.setData(data);
+  packet_send.setPayload(data);
 
   // setting the packet length
   packet_send.setPacketLength(packet_send.size());
@@ -144,20 +144,20 @@ TEST(ClipbirdSyncPacket, TestingClipbirdSyncPacket) {
   packet_recv.fromNetBytes(packet_send.toNetBytes());
 
   // check the packet type
-  EXPECT_EQ(packet_recv.getPacketType(), ClipbirdSyncPacket::PacketType::SyncPacket);
+  EXPECT_EQ(packet_recv.getPacketType(), ClipboardSyncPacket::PacketType::SyncPacket);
 
   // check the packet length
   EXPECT_EQ(packet_recv.getPacketLength(), packet_send.size());
 
   // check the data type length
-  EXPECT_EQ(packet_recv.getDataTypeLength(), dataType.size());
+  EXPECT_EQ(packet_recv.getMimeLength(), mimeType.size());
 
   // check the data type
-  EXPECT_EQ(packet_recv.getDataType(), dataType);
+  EXPECT_EQ(packet_recv.getMimeType(), mimeType);
 
   // check the data length
-  EXPECT_EQ(packet_recv.getDataLength(), data.size());
+  EXPECT_EQ(packet_recv.getPayloadLength(), data.size());
 
   // check the data
-  EXPECT_EQ(packet_recv.getData(), data);
+  EXPECT_EQ(packet_recv.getPayload(), data);
 }

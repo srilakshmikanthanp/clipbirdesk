@@ -39,16 +39,15 @@ Clipbird utilizes a variety of packet types for different purposes. These packet
 
 ### What are the packets Required for Clipbird
 
-During the synchronization process, two types of packets are utilized. Firstly, the client initiates the communication by sending a **Server Discovery Request** packet, prompting the server to respond with a message in the form of a **Server Discovery Response** packet. This exchange facilitates the discovery of the server within the local network.
-Note this to packet have same structure so we can combine the two for simplicity, and call them **Server Discovery Packet**.
+During the synchronization process, two types of packets are used. The first type is the **Server Discovery Request** packet, which the client sends to initiate communication. This packet prompts the server to respond with a message in the form of a **Server Discovery Response** packet. This exchange helps the client locate the server within the local network. To simplify the process, we can note that both packets have the same structure. Therefore, we can combine them into a single type of packet called the **Server Discovery Packet**.
 
 Once the server has been identified, clipboard data is transmitted between the client and the server using a single type of packet known as the **Clipboard Sync Packet**. This packet is responsible for transferring clipboard data from the client to the server and vice versa, ensuring seamless sharing of clipboard content between the two devices.
 
-Finally we have **Invalid Packet** which is used to indicate that the packet is invalid. This packet is used to indicate that the packet is invalid. so that the sender is aware of the invalid packet.
+Finally we have **MalformedPacket** which is used to indicate that the packet sent by client is invalid so it provides a way to indicate that the packet is invalid. This packet should only sent from server to client not from client to server.
 
-### Invalid Packet
+### MalformedPacket
 
-The **Invalid Packet** is used to indicate that the packet is invalid. This packet contains the following fields:
+The **MalformedPacket** is used to indicate that the packet is invalid. This packet contains the following fields:
 
 #### Header
 
@@ -56,6 +55,7 @@ The **Invalid Packet** is used to indicate that the packet is invalid. This pack
 - **Packet Length**: This field specifies the length of the packet, for invalid packet it is length of error code and error message.
 
 #### Body
+
 - **Error Code**: This field specifies the error code. 
 - **Error Message**: This field contains the error message.
 
@@ -110,10 +110,10 @@ The **Clipboard Sync Packet** is used to transfer clipboard data between the cli
 
 #### Body
 
-- **Type Length**: This field specifies the length of the clipboard data type.
-- **Type**: This field contains the type of clipboard data, which can be text, image, or other data, asper mime type.
-- **Data Length**: This field specifies the length of the clipboard data.
-- **Data**: This field contains the actual clipboard data.
+- **MimeLength**: This field specifies the length of the clipboard data type.
+- **MimeType**: This field contains the type of clipboard data, which can be text, image, or other data, asper mime type.
+- **PayloadLength**: This field specifies the length of the clipboard data.
+- **Payload**: This field contains the actual clipboard data.
 
 #### Structure
 
@@ -121,7 +121,7 @@ The **Clipboard Sync Packet** is used to transfer clipboard data between the cli
 |-----------------|-------| ----- |
 | Packet Type     | 1     | 0x03  |
 | Packet Length   | 4     |       |
-| Type Length     | 4     |       |
-| Type            | varies|       |
-| Data Length     | 4     |       |
-| Data            | varies|       |
+| MimeLength      | 4     |       |
+| MimeType        | varies|       |
+| PayloadLength   | 4     |       |
+| Payload         | varies|       |

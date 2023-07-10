@@ -578,16 +578,16 @@ class ServiceDiscoveryPacket : public interface::INetworkPacket {
 };
 
 /**
- * @brief Clipbird Sync Request
+ * @brief Clipboard Sync Packet
  */
-class ClipbirdSyncPacket : public interface::INetworkPacket {
+class ClipboardSyncPacket : public interface::INetworkPacket {
  private:
   quint8     packetType = 0x03;
   qint32     packetLength;
-  qint32     dataTypeLength;
-  QByteArray dataType;
-  qint32     dataLength;
-  QByteArray data;
+  qint32     mimeLength;
+  QByteArray mimeType;
+  qint32     payloadLength;
+  QByteArray Payload;
 
  public:
   enum PacketType : quint8 {
@@ -638,8 +638,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param length
    */
-  void setDataTypeLength(qint32 length) {
-    this->dataTypeLength = length;
+  void setMimeLength(qint32 length) {
+    this->mimeLength = length;
   }
 
   /**
@@ -647,8 +647,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @return qint32
    */
-  qint32 getDataTypeLength() const noexcept {
-    return this->dataTypeLength;
+  qint32 getMimeLength() const noexcept {
+    return this->mimeLength;
   }
 
   /**
@@ -656,8 +656,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param type
    */
-  void setDataType(QByteArray type) {
-    this->dataType = type;
+  void setMimeType(QByteArray type) {
+    this->mimeType = type;
   }
 
   /**
@@ -665,8 +665,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @return QByteArray
    */
-  QByteArray getDataType() const noexcept {
-    return this->dataType;
+  QByteArray getMimeType() const noexcept {
+    return this->mimeType;
   }
 
   /**
@@ -674,8 +674,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param length
    */
-  void setDataLength(qint32 length) {
-    this->dataLength = length;
+  void setPayloadLength(qint32 length) {
+    this->payloadLength = length;
   }
 
   /**
@@ -683,8 +683,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @return qint32
    */
-  qint32 getDataLength() const noexcept {
-    return this->dataLength;
+  qint32 getPayloadLength() const noexcept {
+    return this->payloadLength;
   }
 
   /**
@@ -692,8 +692,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @param data
    */
-  void setData(QByteArray data) {
-    this->data = data;
+  void setPayload(QByteArray data) {
+    this->Payload = data;
   }
 
   /**
@@ -701,8 +701,8 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    *
    * @return QByteArray
    */
-  QByteArray getData() const noexcept {
-    return this->data;
+  QByteArray getPayload() const noexcept {
+    return this->Payload;
   }
 
   /**
@@ -743,10 +743,10 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
     return (
       sizeof(packetType) +
       sizeof(packetLength) +
-      sizeof(dataTypeLength) +
-      sizeof(dataLength) +
-      dataType.size() +
-      data.size()
+      sizeof(mimeLength) +
+      mimeType.size() +
+      sizeof(payloadLength) +
+      Payload.size()
     );
   }
 
@@ -757,7 +757,7 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    * @param packet
    * @return QDataStream&
    */
-  friend QDataStream& operator<<(QDataStream& stream, const ClipbirdSyncPacket& packet) {
+  friend QDataStream& operator<<(QDataStream& stream, const ClipboardSyncPacket& packet) {
     // set the byte order
     stream.setByteOrder(QDataStream::BigEndian);
 
@@ -771,16 +771,16 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
     stream << packet.packetLength;
 
     // write the data type length
-    stream << packet.dataTypeLength;
+    stream << packet.mimeLength;
 
     // write the data type
-    stream.writeRawData(packet.dataType.data(), packet.dataType.size());
+    stream.writeRawData(packet.mimeType.data(), packet.mimeType.size());
 
     // write the data length
-    stream << packet.dataLength;
+    stream << packet.payloadLength;
 
     // write the data
-    stream.writeRawData(packet.data.data(), packet.data.size());
+    stream.writeRawData(packet.Payload.data(), packet.Payload.size());
 
     // return the stream
     return stream;
@@ -793,7 +793,7 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
    * @param packet
    * @return QDataStream&
    */
-  friend QDataStream& operator>>(QDataStream& stream, ClipbirdSyncPacket& packet) {
+  friend QDataStream& operator>>(QDataStream& stream, ClipboardSyncPacket& packet) {
     // set the byte order
     stream.setByteOrder(QDataStream::BigEndian);
 
@@ -828,7 +828,7 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
     }
 
     // read the data type length
-    stream >> packet.dataTypeLength;
+    stream >> packet.mimeLength;
 
     // is the stream status is bad
     if (stream.status() != QDataStream::Ok) {
@@ -838,10 +838,10 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
     }
 
     // resize the data type
-    packet.dataType.resize(packet.dataTypeLength);
+    packet.mimeType.resize(packet.mimeLength);
 
     // read the data type
-    stream.readRawData(packet.dataType.data(), packet.dataType.size());
+    stream.readRawData(packet.mimeType.data(), packet.mimeType.size());
 
     // is the stream status is bad
     if (stream.status() != QDataStream::Ok) {
@@ -851,7 +851,7 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
     }
 
     // read the data length
-    stream >> packet.dataLength;
+    stream >> packet.payloadLength;
 
     // is the stream status is bad
     if (stream.status() != QDataStream::Ok) {
@@ -861,10 +861,10 @@ class ClipbirdSyncPacket : public interface::INetworkPacket {
     }
 
     // resize the data
-    packet.data.resize(packet.dataLength);
+    packet.Payload.resize(packet.payloadLength);
 
     // read the data
-    stream.readRawData(packet.data.data(), packet.data.size());
+    stream.readRawData(packet.Payload.data(), packet.Payload.size());
 
     // is the stream status is bad
     if (stream.status() != QDataStream::Ok) {
