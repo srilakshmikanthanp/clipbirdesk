@@ -12,10 +12,8 @@
 #include <QObject>
 #include <QString>
 #include <QPair>
+#include <QList>
 #include <QVector>
-
-// C++ header
-#include <algorithm>
 
 // project header
 #include "types/except/except.hpp"
@@ -33,7 +31,7 @@ class Clipboard : public QObject {
   using OnClipboardChange = void (*)(QVector<QPair<QString, QByteArray>>);
 
  private:  // member
-  std::vector<OnClipboardChange> m_listeners;
+  QList<OnClipboardChange> m_listeners;
 
  private:  // slots
   /**
@@ -80,7 +78,7 @@ class Clipboard : public QObject {
    * @param listener listener to be added
    */
   void addListener(OnClipboardChange listener) {
-    m_listeners.push_back(listener);
+    m_listeners.append(listener);
   }
 
   /**
@@ -89,10 +87,7 @@ class Clipboard : public QObject {
    * @param listener listener to be removed
    */
   void removeListener(OnClipboardChange listener) {
-    auto it = std::find(m_listeners.begin(), m_listeners.end(), listener);
-    if (it != m_listeners.end()) {
-      m_listeners.erase(it);
-    }
+    m_listeners.removeOne(listener);
   }
 
   /**

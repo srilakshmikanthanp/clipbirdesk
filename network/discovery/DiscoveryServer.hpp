@@ -24,6 +24,7 @@
 #include "types/except/except.hpp"
 #include "utility/functions/ipconv.hpp"
 #include "utility/functions/nbytes.hpp"
+#include "utility/functions/packet.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::discovery {
 /**
@@ -56,17 +57,9 @@ class DiscoveryServer : public QObject {
     using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
 
     // Create the malformed packet to send
-    packets::InvalidPacket invalidPacket;
-
-    // set the packet type & length
-    invalidPacket.setPacketType(pakType);
-
-    // set the error code and msg
-    invalidPacket.setErrorCode(e.getCode());
-    invalidPacket.setErrorMessage(e.what());
-
-    // set the Length of the packet
-    invalidPacket.setPacketLength(invalidPacket.size());
+    packets::InvalidPacket invalidPacket = createPacket({
+      pakType, e.getCode(), e.what()
+    });
 
     // Create the datagram and send it
     const auto datagram = toQByteArray(invalidPacket);
@@ -106,16 +99,12 @@ class DiscoveryServer : public QObject {
 
     // set the IP address and port number
     try {
-      sendPacket.setPacketType(pakType);
-      sendPacket.setIpType(getIPType());
-      sendPacket.setHostIp(getIPAddress());
-      sendPacket.setHostPort(getPort());
+      sendPacket = createPacket({
+        pakType, getIPType(),getIPAddress(), getPort()
+      });
     } catch (...) {
       return; // return if any error occurs
     }
-
-    // set the Length of the packet
-    sendPacket.setPacketLength(sendPacket.size());
 
     // Create the datagram and send it
     const auto datagram = toQByteArray(sendPacket);
@@ -218,6 +207,6 @@ class DiscoveryServer : public QObject {
    * @return types::IPAddress IP address
    * @throw Any Exception If any error occurs
    */
-  virtual QByteArray getIPAddress() const = 0;
+  virtual QHostAddress getIPAddress() const = 0;
 };
 } // namespace srilakshmikanthanp::clipbirdesk::network::discovery

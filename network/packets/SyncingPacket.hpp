@@ -197,7 +197,7 @@ class SyncingItem {
     // check if stream is valid
     if (in.status() != QDataStream::Ok) {
       throw types::except::MalformedPacket(
-        types::enums::ErrorCode::CodingError, "Invalid Payload"
+        types::enums::ErrorCode::CodingError, "Invalid Payload Attempt"
       );
     }
 
