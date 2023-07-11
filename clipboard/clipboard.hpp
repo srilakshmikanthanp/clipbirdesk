@@ -24,16 +24,17 @@ namespace srilakshmikanthanp::clipbirdesk::clipboard {
  * set and notify the clipboard change
  */
 class Clipboard : public QObject {
- private:  // members
+ signals:   // signals
+  void OnClipboardChange(QVector<QPair<QString, QByteArray>>);
+
+ private:   // just for Qt
+  /// Qt meta object
+  Q_OBJECT
+
+ private:   // members
   QClipboard* m_clipboard = nullptr;  // clipboard that is managed by this class
 
- public:   // typedefs
-  using OnClipboardChange = void (*)(QVector<QPair<QString, QByteArray>>);
-
- private:  // member
-  QList<OnClipboardChange> m_listeners;
-
- private:  // slots
+ private:   // slots
   /**
    * @brief Slot to receive the clipboard change
    * and notify the listeners
@@ -50,9 +51,7 @@ class Clipboard : public QObject {
     }
 
     // notify the listeners
-    for (const auto& listener : m_listeners) {
-      listener(clipboardData);
-    }
+    emit OnClipboardChange(clipboardData);
   }
 
  public:   // constructor
@@ -70,24 +69,6 @@ class Clipboard : public QObject {
     const auto signal = &QClipboard::changed;
     const auto slot = &Clipboard::onClipboardChange;
     QObject::connect(m_clipboard, signal, this, slot);
-  }
-
-  /**
-   * @brief Add listener to receive the clipboard change
-   *
-   * @param listener listener to be added
-   */
-  void addListener(OnClipboardChange listener) {
-    m_listeners.append(listener);
-  }
-
-  /**
-   * @brief Remove listener from the list
-   *
-   * @param listener listener to be removed
-   */
-  void removeListener(OnClipboardChange listener) {
-    m_listeners.removeOne(listener);
   }
 
   /**

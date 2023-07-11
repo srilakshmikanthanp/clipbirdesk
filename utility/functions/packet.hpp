@@ -37,7 +37,7 @@ struct DiscoveryPacketParams {
 struct InvalidPacketParams {
   quint8 packetType;
   quint8 errorCode;
-  const QByteArray& errorMessage;
+  const QString& errorMessage;
 };
 
 /**
@@ -117,7 +117,7 @@ inline network::packets::InvalidPacket createPacket(
   packet.setErrorCode(params.errorCode);
 
   // set the error message
-  packet.setErrorMessage(params.errorMessage);
+  packet.setErrorMessage(params.errorMessage.toUtf8());
 
   // set the packet length
   packet.setPacketLength(packet.size());

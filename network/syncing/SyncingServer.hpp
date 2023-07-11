@@ -23,64 +23,37 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * the clients
  */
 class SyncingServer : public discovery::DiscoveryServer {
- private:   // members of the class
+ signals:    // signals
+  /// @brief On client state changed
+  void OnCLientStateChanged(QSslSocket *client, bool connected);
+
+ signals:    // signals
+  /// @brief On Sync Request
+  void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
+
+ private:    // just for Qt
+  /// @brief Qt meta object
+  Q_OBJECT
+
+ private:    // members of the class
   /// @brief SSL server
   QSslServer m_ssl_server = QSslServer(this);
 
   /// @brief List of clients
   QList<QSslSocket *> m_clients;
 
- public:    // listeners
-  /// @brief On client state changed
-  using OnCLientStateChanged = void (*)(QSslSocket *client, bool connected);
-
-  /// @brief On Sync Request
-  using OnSyncRequest = void (*)(QVector<QPair<QString, QByteArray>>);
-
- private:   // members
-  /// @brief List of listeners
-  QList<OnCLientStateChanged> m_listeners;
-
-  /// @brief List of listeners
-  QList<OnSyncRequest> m_sync_listeners;
-
- public:    // Authenticator Type
+ public:     // Authenticator Type
   /// @brief Authenticator
   using Authenticator = bool (*)(QSslSocket *client);
 
- private:  // Authenticator Instance
+ private:    // Authenticator Instance
   /// @brief Authenticator
   Authenticator m_authenticator = nullptr;
 
- private:  // some typedefs
+ private:    // some typedefs
   using MalformedPacket = types::except::MalformedPacket;
 
  private:
-  /**
-   * @brief Notify the listeners that the client has
-   * requested for sync
-   *
-   * @param data QVector<QPair<QString, QByteArray>>
-   */
-  void notifySyncRequestListeners(QVector<QPair<QString, QByteArray>> data) {
-    for (auto listener : m_sync_listeners) {
-      listener(data);
-    }
-  }
-
-  /**
-   * @brief Notify the listeners that the client state
-   * has been changed
-   *
-   * @param client Client
-   * @param connected Connected or not
-   */
-  void notifyClientStateListeners(QSslSocket *client, bool connected) {
-    for (auto listener : m_listeners) {
-      listener(client, connected);
-    }
-  }
-
   /**
    * @brief set up the client that has been connected
    *
@@ -105,7 +78,7 @@ class SyncingServer : public discovery::DiscoveryServer {
     m_clients.append(client);
 
     // Notify the listeners that the client has been connected
-    notifyClientStateListeners(client, true);
+    emit OnCLientStateChanged(client, true);
   }
 
   /**
@@ -121,17 +94,9 @@ class SyncingServer : public discovery::DiscoveryServer {
     using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
 
     // Create the malformed packet to send
-    packets::InvalidPacket invalidPacket;
-
-    // set the packet type & length
-    invalidPacket.setPacketType(pakType);
-
-    // set the error code and msg
-    invalidPacket.setErrorCode(e.getCode());
-    invalidPacket.setErrorMessage(e.what());
-
-    // set the Length of the packet
-    invalidPacket.setPacketLength(invalidPacket.size());
+    packets::InvalidPacket invalidPacket = createPacket({
+      pakType, e.getCode(), e.what(),
+    });
 
     // Create the datagram and return it
     return toQByteArray(invalidPacket);
@@ -214,7 +179,7 @@ class SyncingServer : public discovery::DiscoveryServer {
     }
 
     // Notify the listeners to sync the data
-    notifySyncRequestListeners(items);
+    emit OnSyncRequest(items);
   }
 
   /**
@@ -232,7 +197,7 @@ class SyncingServer : public discovery::DiscoveryServer {
     client->deleteLater();
 
     // Notify the listeners client state
-    notifyClientStateListeners(client, false);
+    emit OnCLientStateChanged(client, false);
   }
 
  public:
@@ -314,39 +279,18 @@ class SyncingServer : public discovery::DiscoveryServer {
 
  public:
   /**
-   * @brief Add the client state changed listener
+   * @brief Request the clients to sync the clipboard items
    *
-   * @param listener Listener
+   * @param data QVector<QPair<QString, QByteArray>>
    */
-  void addClientStateChangedListener(OnCLientStateChanged listener) {
-    m_listeners.append(listener);
-  }
+  void requestClientsToSync(QVector<QPair<QString, QByteArray>> items) {
+    // using create Packet form the utility::functions namespace
+    packets::SyncingPacket packet = utility::functions::createPacket({
+      packets::SyncingPacket::PacketType::SyncPacket, items,
+    });
 
-  /**
-   * @brief Remove the client state changed listener
-   *
-   * @param listener Listener
-   */
-  void removeClientStateChangedListener(OnCLientStateChanged listener) {
-    m_listeners.removeOne(listener);
-  }
-
-  /**
-   * @brief Add the sync request listener
-   *
-   * @param listener Listener
-   */
-  void addSyncRequestListener(OnSyncRequest listener) {
-    m_sync_listeners.append(listener);
-  }
-
-  /**
-   * @brief Remove the sync request listener
-   *
-   * @param listener Listener
-   */
-  void removeSyncRequestListener(OnSyncRequest listener) {
-    m_sync_listeners.removeOne(listener);
+    // send the SyncingPacket to all the clients
+    this->requestClientsToSync(packet);
   }
 
   /**
@@ -356,21 +300,6 @@ class SyncingServer : public discovery::DiscoveryServer {
    */
   QList<QSslSocket *> getConnectedClientsList() const {
     return m_clients;
-  }
-
-  /**
-   * @brief Request the clients to sync the data
-   *
-   * @param data QVector<QPair<QString, QByteArray>>
-   */
-  void requestClientsToSync(QVector<QPair<QString, QByteArray>> data) {
-    // using create Packet form the utility::functions namespace
-    packets::SyncingPacket packet = utility::functions::createPacket({
-      packets::SyncingPacket::PacketType::SyncPacket, data,
-    });
-
-    // send the SyncingPacket to all the clients
-    this->requestClientsToSync(packet);
   }
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing
