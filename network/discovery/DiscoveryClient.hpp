@@ -23,6 +23,7 @@
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 #include "utility/functions/ipconv.hpp"
+#include "utility/functions/nbytes.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::discovery {
 /**
