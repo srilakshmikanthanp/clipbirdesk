@@ -27,6 +27,10 @@ class SyncingServer : public discovery::DiscoveryServer {
   /// @brief On client state changed
   void OnCLientStateChanged(QSslSocket *client, bool connected);
 
+ signals:  // signals for this class
+  /// @brief On Error Occurred
+  void OnErrorOccurred(QString error);
+
  signals:    // signals
   /// @brief On Sync Request
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
@@ -35,16 +39,16 @@ class SyncingServer : public discovery::DiscoveryServer {
   /// @brief Qt meta object
   Q_OBJECT
 
+ public:     // Authenticator Type
+  /// @brief Authenticator
+  using Authenticator = bool (*)(QSslSocket *client);
+
  private:    // members of the class
   /// @brief SSL server
   QSslServer m_ssl_server = QSslServer(this);
 
   /// @brief List of clients
   QList<QSslSocket *> m_clients;
-
- public:     // Authenticator Type
-  /// @brief Authenticator
-  using Authenticator = bool (*)(QSslSocket *client);
 
  private:    // Authenticator Instance
   /// @brief Authenticator
@@ -86,7 +90,7 @@ class SyncingServer : public discovery::DiscoveryServer {
    *
    * @param e Exception to construct the malformed packet
    */
-  QByteArray constructMalformedPacket(const MalformedPacket& e) {
+  QByteArray constructInvalidPacket(const MalformedPacket& e) {
     // using the ResponseType from the MalformedPacket
     const auto pakType = packets::InvalidPacket::PacketType::MalformedPacket;
 
@@ -134,9 +138,10 @@ class SyncingServer : public discovery::DiscoveryServer {
       if (!m_authenticator(client)) {
         client->disconnectFromHost();
         client->deleteLater();
-      } else {
-        setUpAuthenticatedClient(client);
       }
+
+      // set up the client
+      setUpAuthenticatedClient(client);
     }
   }
 
@@ -145,14 +150,14 @@ class SyncingServer : public discovery::DiscoveryServer {
    * read from the client
    */
   void processReadyRead() {
-    // using the fromQByteArray from namespace
-    using utility::functions::fromQByteArray;
-
     // Get the client that was ready to read
     auto client = qobject_cast<QSslSocket *>(sender());
 
     // Get the data from the client
     const auto data = client->readAll();
+
+    // using the fromQByteArray from namespace
+    using utility::functions::fromQByteArray;
 
     // Create the SyncingPacket
     packets::SyncingPacket packet;
@@ -161,7 +166,13 @@ class SyncingServer : public discovery::DiscoveryServer {
     try {
       packet = fromQByteArray<packets::SyncingPacket>(data);
     } catch (const types::except::MalformedPacket &e) {
-      client->write(constructMalformedPacket(e));
+      client->write(constructInvalidPacket(e));
+      return;
+    } catch (const std::exception &e) {
+      emit OnErrorOccurred(e.what());
+      return;
+    } catch (...) {
+      emit OnErrorOccurred("Unknown Error");
       return;
     }
 
@@ -173,9 +184,9 @@ class SyncingServer : public discovery::DiscoveryServer {
 
     // Get the items from the packet
     for (auto item : packet.getItems()) {
-      const auto mimeType = item.getMimeType().toStdString();
-      const auto payload = item.getPayload();
-      items.append({mimeType.c_str(), payload});
+      items.append({
+        item.getMimeType().toStdString().c_str(), item.getPayload()
+      });
     }
 
     // Notify the listeners to sync the data
@@ -275,6 +286,16 @@ class SyncingServer : public discovery::DiscoveryServer {
    */
   virtual QHostAddress getIPAddress() const override {
     return m_ssl_server.serverAddress();
+  }
+
+  /**
+   * @brief On Error Occurred this function is called when any error
+   * occurs in the socket
+   *
+   * @param error Error message
+   */
+  virtual void OnErrorOccurred(QString error) override {
+    emit OnErrorOccurred(error);
   }
 
  public:

@@ -136,7 +136,11 @@ class DiscoveryServer : public QObject {
       } catch (MalformedPacket& e) {
         sendInvalidPacket(e, address, port);
         continue;
+      } catch (std::exception& e) {
+        OnErrorOccurred(e.what());
+        continue;
       } catch (...) {
+        OnErrorOccurred("Unknown error");
         continue;
       }
 
@@ -208,5 +212,15 @@ class DiscoveryServer : public QObject {
    * @throw Any Exception If any error occurs
    */
   virtual QHostAddress getIPAddress() const = 0;
+
+  /**
+   * @brief On Error Occurred this function is called when any error
+   * occurs in the socket
+   *
+   * @param error Error message
+   */
+  virtual void OnErrorOccurred(QString error) {
+    qErrnoWarning(error.toStdString().c_str());
+  }
 };
 } // namespace srilakshmikanthanp::clipbirdesk::network::discovery

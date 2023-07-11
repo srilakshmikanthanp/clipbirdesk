@@ -25,34 +25,19 @@ namespace srilakshmikanthanp::clipbirdesk::clipboard {
  */
 class Clipboard : public QObject {
  signals:   // signals
+  /**
+   * @brief Signal to notify the clipboard change occurrence use
+   * the parameter or get method to get the clipboard data
+   * @param items clipboard data
+   */
   void OnClipboardChange(QVector<QPair<QString, QByteArray>>);
 
- private:   // just for Qt
-  /// Qt meta object
-  Q_OBJECT
-
  private:   // members
-  QClipboard* m_clipboard = nullptr;  // clipboard that is managed by this class
+  QClipboard* m_clipboard = nullptr;
 
- private:   // slots
-  /**
-   * @brief Slot to receive the clipboard change
-   * and notify the listeners
-   */
-  void onClipboardChange() {
-    // default clipboard data
-    QVector<QPair<QString, QByteArray>> clipboardData;
-
-    // try to get the data
-    try {
-      clipboardData = this->get();
-    } catch (const std::exception& e) {
-      return;
-    }
-
-    // notify the listeners
-    emit OnClipboardChange(clipboardData);
-  }
+ private:   // just for Qt
+  /// @brief Qt meta object
+  Q_OBJECT
 
  public:   // constructor
   /**
@@ -66,8 +51,9 @@ class Clipboard : public QObject {
       : QObject(parent), m_clipboard(clipboard) {
     // connect the clipboard change signal to the slot
     // that is used to notify the listeners
+    const auto func = &Clipboard::OnClipboardChange;
     const auto signal = &QClipboard::changed;
-    const auto slot = &Clipboard::onClipboardChange;
+    const auto slot = [this, func]{ emit (this->*func)(get()); };
     QObject::connect(m_clipboard, signal, this, slot);
   }
 
@@ -78,24 +64,22 @@ class Clipboard : public QObject {
    */
   QVector<QPair<QString, QByteArray>> get() {
     // Default clipboard data & mime data
-    QVector<QPair<QString, QByteArray>> data;
+    QVector<QPair<QString, QByteArray>> items;
     const auto mimeData = m_clipboard->mimeData();
 
     // if mime data is not supported
-    if (mimeData == nullptr) {
-      throw types::except::NotSupported("Error");
-    }
+    if (mimeData == nullptr) return items;
 
     // get the formats
     const auto formats = mimeData->formats();
 
     // push the data to the vector
     for (const auto& format : formats) {
-      data.push_back({format, mimeData->data(format)});
+      items.push_back({format, mimeData->data(format)});
     }
 
     // return the data
-    return data;
+    return items;
   }
 
   /**

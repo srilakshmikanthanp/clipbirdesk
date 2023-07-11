@@ -81,37 +81,46 @@ class DiscoveryClient : public QObject {
       // Read the datagram
       m_socket.readDatagram(data.data(), data.size(), &address, &port);
 
-      // Check if the datagram is MalformedPacket
-      packets::InvalidPacket invalidPacket;
-      QDataStream m_stream(data);
+      // check if the packet is discovery packet
+      packets::DiscoveryPacket disPacket;
+
+      // using fromQByteArray to parse the packet
+      using utility::functions::fromQByteArray;
 
       // try to parse the packet if it
       // fails then continue to next
       try {
-        m_stream >> invalidPacket;
+        disPacket = fromQByteArray<packets::DiscoveryPacket>(data);
+        this->processPacket(disPacket);
+        continue;
       } catch (types::except::MalformedPacket& e) {
-        qInfo(e.what());
+        OnErrorOccurred(e.what());
+      } catch (std::exception& e) {
+        OnErrorOccurred(e.what());
+        continue;
       } catch (...) {
-        qInfo("Unknown Error");
+        OnErrorOccurred("Unknown Error");
+        continue;
       }
 
-      // Convert the data to the packet
-      packets::DiscoveryPacket packet;
-      QDataStream p_stream(data);
+      // Check if the datagram is invalidPacket
+      packets::InvalidPacket invPacket;
 
       // try to parse the packet if it
       // fails then continue to next
       try {
-        p_stream >> packet;
-      } catch (types::except::MalformedPacket& e) {
-        qErrnoWarning(e.what());
+        invPacket = fromQByteArray<packets::InvalidPacket>(data);
+        OnErrorOccurred(invPacket.getErrorMessage());
         continue;
+      } catch (types::except::MalformedPacket& e) {
+        OnErrorOccurred(e.what());
       } catch (...) {
+        OnErrorOccurred("Unknown Error");
         continue;
       }
 
-      // Process the packet
-      this->processPacket(packet);
+      // log the error and continue
+      OnErrorOccurred("Unknown Packet Found");
     }
   }
 
@@ -126,21 +135,18 @@ class DiscoveryClient : public QObject {
     const auto pakType = packets::DiscoveryPacket::PacketType::Request;
 
     // Get the IP address and port number
-    const auto host = toIPV4QByteArray(m_socket.localAddress());
+    const auto host = m_socket.localAddress();
     const auto port = m_socket.localPort();
 
     // Create the packet
-    packets::DiscoveryPacket packet;
-    packet.setPacketType(pakType);
-    packet.setHostIp(host);
-    packet.setHostPort(port);
-    packet.setIpType(types::enums::IPType::IPv4);
+    packets::DiscoveryPacket packet = createPacket({
+      pakType, types::enums::IPType::IPv4, host, port
+    });
 
-    // set the length of the packet
-    packet.setPacketLength(packet.size());
-
-    // Send the data
-    m_socket.writeDatagram(toQByteArray(packet), QHostAddress::Broadcast, 0);
+    // Send the data to the broadcast address
+    const auto b_host = QHostAddress::Broadcast;
+    const auto b_port = 0;
+    m_socket.writeDatagram(toQByteArray(packet), b_host, port);
   }
 
  public:
@@ -192,6 +198,17 @@ class DiscoveryClient : public QObject {
    */
   void stopDiscovery() { m_timer.stop(); }
 
+ protected:   // abstract functions
+  /**
+   * @brief On Error Occurred this function is called when any error
+   * occurs in the socket
+   *
+   * @param error Error message
+   */
+  virtual void OnErrorOccurred(QString error) {
+    qErrnoWarning(error.toStdString().c_str());
+  }
+
   /**
    * @brief On server found abstract function that
    * is called when the server is found
@@ -199,6 +216,6 @@ class DiscoveryClient : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServerFound(const QHostAddress host, const quint16 port) = 0;
+  virtual void onServerFound(const QHostAddress& host, quint16 port) = 0;
 };
 } // namespace srilakshmikanthanp::clipbirdesk::network::discovery
