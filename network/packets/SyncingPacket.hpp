@@ -53,12 +53,11 @@ class SyncingItem {
    * @param type
    */
   void setMimeType(const QByteArray& type) {
-    // check the mime type
     if (type.size() != this->mimeLength) {
       throw std::invalid_argument("Invalid Mime Type");
+    } else {
+      this->mimeType = type;
     }
-
-    this->mimeType = type;
   }
 
   /**
@@ -94,12 +93,11 @@ class SyncingItem {
    * @param payload
    */
   void setPayload(const QByteArray& payload) {
-    // check the payload
     if (payload.size() != this->payloadLength) {
       throw std::invalid_argument("Invalid Payload");
+    } else {
+      this->payload = payload;
     }
-
-    this->payload = payload;
   }
 
   /**
@@ -135,11 +133,21 @@ class SyncingItem {
     // write the mime length
     out << payload.mimeLength;
 
+    // check the mime length
+    if (payload.mimeLength != payload.mimeType.size()) {
+      throw std::invalid_argument("Invalid Mime Length");
+    }
+
     // write the mime type
     out.writeRawData(payload.mimeType.data(), payload.mimeLength);
 
     // write the payload length
     out << payload.payloadLength;
+
+    // check the payload length
+    if (payload.payloadLength != payload.payload.size()) {
+      throw std::invalid_argument("Invalid Payload Length");
+    }
 
     // write the payload
     out.writeRawData(payload.payload.data(), payload.payloadLength);

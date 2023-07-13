@@ -15,7 +15,7 @@
 
 // Local header files
 #include "network/packets/DiscoveryPacket.hpp"
-#include "network/packets/InvalidPacket.hpp"
+#include "network/packets/InvalidRequest.hpp"
 #include "network/packets/SyncingPacket.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv.hpp"
@@ -32,7 +32,7 @@ struct DiscoveryPacketParams {
 };
 
 /**
- * @brief Parameters for the InvalidPacket
+ * @brief Parameters for the ErrorMessage
  */
 struct InvalidPacketParams {
   quint8 packetType;
@@ -97,18 +97,18 @@ network::packets::DiscoveryPacket createPacket(
 }
 
 /**
- * @brief Create the InvalidPacket
+ * @brief Create the ErrorMessage
  *
  * @param packetType
  * @param errorCode
  * @param errorMessage
  *
- * @return InvalidPacket
+ * @return ErrorMessage
  */
-inline network::packets::InvalidPacket createPacket(
+inline network::packets::InvalidRequest createPacket(
     internals::InvalidPacketParams params) {
   // create the packet
-  network::packets::InvalidPacket packet;
+  network::packets::InvalidRequest packet;
 
   // set the packet type
   packet.setPacketType(params.packetType);
@@ -187,6 +187,46 @@ inline network::packets::SyncingPacket createPacket(
 
   // set the items
   packet.setItems(items);
+
+  // set the packet length
+  packet.setPacketLength(packet.size());
+
+  // return the packet
+  return packet;
+}
+
+/**
+ * @brief Create the SyncingPacket
+ *
+ * @param packetType
+ * @param items
+ *
+ * @return SyncingPacket
+ */
+inline network::packets::SyncingPacket createPacket(
+    quint8 packetType, QVector<QPair<QString, QByteArray>> items) {
+  // create the packet
+  network::packets::SyncingPacket packet;
+
+  // set the packet type
+  packet.setPacketType(packetType);
+
+  // set the item count
+  packet.setItemCount(items.size());
+
+  // Convert the items to SyncingItem
+  QVector<network::packets::SyncingItem> syncItems;
+
+  // reserve the memory
+  syncItems.reserve(items.size());
+
+  // convert the items
+  for (const auto& [mime, payload] : items) {
+    syncItems.push_back(createPacket({mime, payload}));
+  }
+
+  // set the items
+  packet.setItems(syncItems);
 
   // set the packet length
   packet.setPacketLength(packet.size());

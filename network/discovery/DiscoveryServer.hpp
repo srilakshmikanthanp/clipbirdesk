@@ -19,7 +19,7 @@
 
 // Local headers
 #include "network/packets/DiscoveryPacket.hpp"
-#include "network/packets/InvalidPacket.hpp"
+#include "network/packets/InvalidRequest.hpp"
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 #include "utility/functions/ipconv.hpp"
@@ -34,50 +34,42 @@ namespace srilakshmikanthanp::clipbirdesk::network::discovery {
  * IP type, IP address and port number respectively
  */
 class DiscoveryServer : public QObject {
- private:   // typedefs
+ private:   // typedefs for this class
  using MalformedPacket = types::except::MalformedPacket;
  using IPType = types::enums::IPType;
+
+ signals:   // signals for this class
+  /// @brief On Error Occurred
+  void OnErrorOccurred(QString error);
 
  private:   // variables
   QUdpSocket m_socket = QUdpSocket(this);
 
- private:  // functions
+ private:   // private functions
   /**
-   * @brief Send the malformed packet to the client
+   * @brief Create the packet and send it to the client
    *
-   * @param e Exception to send
+   * @param packet Packet to send
    * @param host Host address
    * @param port Port number
    */
-  void sendInvalidPacket(const MalformedPacket& e, const QHostAddress& host, quint16 port) {
-    // using the ResponseType from the MalformedPacket
-    const auto pakType = packets::InvalidPacket::PacketType::MalformedPacket;
-
-    // using the functions namespace
-    using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
-
-    // Create the malformed packet to send
-    packets::InvalidPacket invalidPacket = createPacket({
-      pakType, e.getCode(), e.what()
-    });
-
-    // Create the datagram and send it
-    const auto datagram = toQByteArray(invalidPacket);
-
-    // send the datagram
-    m_socket.writeDatagram(datagram, host, port);
+  template <typename Packet>
+  void sendPacket(const Packet& pack, const QHostAddress& host, quint16 port) {
+    m_socket.writeDatagram(utility::functions::toQByteArray(pak), host, port);
   }
 
   /**
    * @brief Process the packet and return the packet
    * with server Information
    */
-  void processPacket(const packets::DiscoveryPacket& packet) {
-    // Using the ipconv namespace to convert the IP address
-    using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
-
-    // response type of the packet
+  void processDiscoveryPacket(const packets::DiscoveryPacket& packet) {
+    // response type of the packet is response
     const auto pakType = packets::DiscoveryPacket::PacketType::Response;
+
+    // Using the functions namespace
+    using utility::functions::toIPV4QHostAddress;
+    using utility::functions::createPacket;
+    using utility::functions::toIPV6QHostAddress;
 
     // get this client IP address & port number
     const auto host = packet.getHostIp();
@@ -94,23 +86,14 @@ class DiscoveryServer : public QObject {
       address = toIPV6QHostAddress(host);
     }
 
-    // Create the packet to send
-    packets::DiscoveryPacket sendPacket;
-
     // set the IP address and port number
     try {
-      sendPacket = createPacket({
-        pakType, getIPType(),getIPAddress(), getPort()
-      });
+      #define PARAMS pakType, getIPType(), getIPAddress(), getPort()
+      this->sendPacket(createPacket({PARAMS}), address, port);
+      #undef  PARAMS // just used to avoid long line
     } catch (...) {
       return; // return if any error occurs
     }
-
-    // Create the datagram and send it
-    const auto datagram = toQByteArray(sendPacket);
-
-    // send the datagram
-    m_socket.writeDatagram(datagram, address, port);
   }
 
   /**
@@ -121,35 +104,33 @@ class DiscoveryServer : public QObject {
     while (m_socket.hasPendingDatagrams()) {
       // Read the data from the socket
       QByteArray data(m_socket.pendingDatagramSize(), Qt::Uninitialized);
-      QHostAddress address;
-      quint16 port;
-      m_socket.readDatagram(data.data(), data.size(), &address, &port);
+      QHostAddress addr; quint16 port;
+      m_socket.readDatagram(data.data(), data.size(), &addr, &port);
 
-      // Convert the data to the packet
-      packets::DiscoveryPacket packet;
-      QDataStream stream(data);
+      // Using the ipconv namespace to convert the IP address
+      using utility::functions::fromQByteArray;
+      using utility::functions::createPacket;
 
       // try to parse the packet if it
       // fails then continue to next
       try {
-        stream >> packet;
+        this->processDiscoveryPacket(fromQByteArray<packets::DiscoveryPacket>(data));
+        continue;
       } catch (MalformedPacket& e) {
-        sendInvalidPacket(e, address, port);
+        const auto pakType = packets::InvalidRequest::PacketType::RequestFailed;
+        sendPacket(createPacket({pakType, e.getCode(), e.what()}), addr, port);
         continue;
       } catch (std::exception& e) {
-        OnErrorOccurred(e.what());
+        emit OnErrorOccurred(e.what());
         continue;
       } catch (...) {
-        OnErrorOccurred("Unknown error");
+        emit OnErrorOccurred("Unknown error");
         continue;
       }
-
-      // Process the packet
-      this->processPacket(packet);
     }
   }
 
- public:  // functions
+ public:  // public functions
   /**
    * @brief Construct a new Discovery Server object and bind
    * the socket to listen for the broadcast message
@@ -174,7 +155,7 @@ class DiscoveryServer : public QObject {
     QObject::connect(&m_socket, signal, this, slot);
   }
 
- protected:  // functions
+ protected:  // protected functions
 
   /**
    * @brief Destroy the Discovery Server object
@@ -212,15 +193,5 @@ class DiscoveryServer : public QObject {
    * @throw Any Exception If any error occurs
    */
   virtual QHostAddress getIPAddress() const = 0;
-
-  /**
-   * @brief On Error Occurred this function is called when any error
-   * occurs in the socket
-   *
-   * @param error Error message
-   */
-  virtual void OnErrorOccurred(QString error) {
-    qErrnoWarning(error.toStdString().c_str());
-  }
 };
 } // namespace srilakshmikanthanp::clipbirdesk::network::discovery

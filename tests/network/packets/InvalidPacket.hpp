@@ -20,7 +20,7 @@
  */
 TEST(InvalidPacketTest, TestingInvalidPacket) {
   // using the MalformedPacket
-  using srilakshmikanthanp::clipbirdesk::network::packets::InvalidPacket;
+  using srilakshmikanthanp::clipbirdesk::network::packets::InvalidRequest;
 
   // using the ErrorCode
   using srilakshmikanthanp::clipbirdesk::types::enums::ErrorCode;
@@ -29,10 +29,10 @@ TEST(InvalidPacketTest, TestingInvalidPacket) {
   using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
 
   // creating the packet
-  InvalidPacket packet_send, packet_recv;
+  InvalidRequest packet_send, packet_recv;
 
   // constant values
-  const auto packetType = InvalidPacket::PacketType::MalformedPacket;
+  const auto packetType = InvalidRequest::PacketType::RequestFailed;
   const auto errorCode = ErrorCode::CodingError;
   const auto errorMessage = QByteArray("Hello", 5);
 
@@ -49,7 +49,7 @@ TEST(InvalidPacketTest, TestingInvalidPacket) {
   packet_send.setPacketLength(packet_send.size());
 
   // load the packet from network byte order
-  packet_recv = fromQByteArray<InvalidPacket>(toQByteArray(packet_send));
+  packet_recv = fromQByteArray<InvalidRequest>(toQByteArray(packet_send));
 
   // check the packet type
   EXPECT_EQ(packet_recv.getPacketType(), packetType);

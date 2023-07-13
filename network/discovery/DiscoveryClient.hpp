@@ -19,11 +19,12 @@
 
 // Local headers
 #include "network/packets/DiscoveryPacket.hpp"
-#include "network/packets/InvalidPacket.hpp"
+#include "network/packets/InvalidRequest.hpp"
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 #include "utility/functions/ipconv.hpp"
 #include "utility/functions/nbytes.hpp"
+#include "utility/functions/packet.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::discovery {
 /**
@@ -32,21 +33,47 @@ namespace srilakshmikanthanp::clipbirdesk::network::discovery {
  * is found then the callback function is called
  */
 class DiscoveryClient : public QObject {
- private:
+ private:   // private members variables
   /// @brief Udp socket
   QUdpSocket m_socket = QUdpSocket(this);
 
   /// @brief Timer to send the broadcast message
   QTimer m_timer = QTimer(this);
 
- private:  // functions
+ signals:   // signals for this class
+  /// @brief On Error Occurred
+  void OnErrorOccurred(QString error);
+
+ private:  // private functions
+
+  /**
+   * @brief Create the packet and send it to the client
+   *
+   * @param packet Packet to send
+   * @param host Host address
+   * @param port Port number
+   */
+  template <typename Packet>
+  void sendPacket(const Packet& pack, const QHostAddress& host, quint16 port) {
+    m_socket.writeDatagram(utility::functions::toQByteArray(pak), host, port);
+  }
+
+  /**
+   * @brief Process the invalid packet
+   */
+  void processInvalidPacket(const packets::InvalidRequest& packet) {
+    emit OnErrorOccurred(packet.getErrorMessage());
+  }
+
   /**
    * @brief Process the packet and return the packet
    * with server Information
    */
-  void processPacket(const packets::DiscoveryPacket& packet) {
-    // Using the ipconv namespace to convert the IP address
-    using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
+  void processDiscoveryPacket(const packets::DiscoveryPacket& packet) {
+    // Using the functions namespace
+    using utility::functions::toIPV4QHostAddress;
+    using utility::functions::createPacket;
+    using utility::functions::toIPV6QHostAddress;
 
     // get this client IP address & port number
     const auto host = packet.getHostIp();
@@ -58,13 +85,10 @@ class DiscoveryClient : public QObject {
 
     // convert the IP address to QHostAddress
     if (type == types::enums::IPType::IPv4) {
-      address = toIPV4QHostAddress(host);
+      this->onServerFound(toIPV4QHostAddress(host), port);
     } else {
-      address = toIPV6QHostAddress(host);
+      this->onServerFound(toIPV6QHostAddress(host), port);
     }
-
-    // Notify
-    this->onServerFound(address, port);
   }
 
   /**
@@ -81,81 +105,79 @@ class DiscoveryClient : public QObject {
       // Read the datagram
       m_socket.readDatagram(data.data(), data.size(), &address, &port);
 
-      // check if the packet is discovery packet
-      packets::DiscoveryPacket disPacket;
-
       // using fromQByteArray to parse the packet
       using utility::functions::fromQByteArray;
 
       // try to parse the packet if it
       // fails then continue to next
       try {
-        disPacket = fromQByteArray<packets::DiscoveryPacket>(data);
-        this->processPacket(disPacket);
+        this->processDiscoveryPacket(fromQByteArray<packets::DiscoveryPacket>(data));
         continue;
       } catch (types::except::MalformedPacket& e) {
-        OnErrorOccurred(e.what());
+        emit OnErrorOccurred(e.what());
       } catch (std::exception& e) {
-        OnErrorOccurred(e.what());
+        emit OnErrorOccurred(e.what());
         continue;
       } catch (...) {
-        OnErrorOccurred("Unknown Error");
+        emit OnErrorOccurred("Unknown Error");
         continue;
       }
-
-      // Check if the datagram is invalidPacket
-      packets::InvalidPacket invPacket;
 
       // try to parse the packet if it
       // fails then continue to next
       try {
-        invPacket = fromQByteArray<packets::InvalidPacket>(data);
-        OnErrorOccurred(invPacket.getErrorMessage());
+        this->processInvalidPacket(fromQByteArray<packets::InvalidRequest>(data));
         continue;
       } catch (types::except::MalformedPacket& e) {
-        OnErrorOccurred(e.what());
+        emit OnErrorOccurred(e.what());
+        continue;
       } catch (...) {
-        OnErrorOccurred("Unknown Error");
+        emit OnErrorOccurred("Unknown Error");
         continue;
       }
 
       // log the error and continue
-      OnErrorOccurred("Unknown Packet Found");
+      emit OnErrorOccurred("Unknown Packet Found");
     }
   }
 
   /**
-   * @brief Send the broadcast message
+   * @brief Send the broadcast message to the local
+   * network to find the server
    */
   void sendBroadcastMessage() {
-    // Using the ipconv namespace to convert the IP address
-    using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
-
-    // response type of the packet
-    const auto pakType = packets::DiscoveryPacket::PacketType::Request;
-
-    // Get the IP address and port number
+    // make the necessary details to send the packet
+    const auto pakT = packets::DiscoveryPacket::PacketType::Request;
     const auto host = m_socket.localAddress();
     const auto port = m_socket.localPort();
 
+    // using the functions namespace
+    using utility::functions::createPacket;
+
     // Create the packet
     packets::DiscoveryPacket packet = createPacket({
-      pakType, types::enums::IPType::IPv4, host, port
+      pakT, types::enums::IPType::IPv4, host, port
     });
 
     // Send the data to the broadcast address
-    const auto b_host = QHostAddress::Broadcast;
-    const auto b_port = 0;
-    m_socket.writeDatagram(toQByteArray(packet), b_host, port);
+    this->sendPacket(packet, QHostAddress::Broadcast, 0);
   }
 
  public:
+
   /**
    * @brief Construct a new Discovery Client object
    *
    * @param parent Parent object
    */
   explicit DiscoveryClient(QObject* parent = nullptr): QObject(parent) {
+    // Connect the socket to the callback function that
+    // process the datagrams when the socket is ready
+    // to read so the listener can be notified
+    const auto signal_u = &QUdpSocket::readyRead;
+    const auto slot_u = &DiscoveryClient::processDatagrams;
+    QObject::connect(&m_socket, signal_u, this, slot_u);
+
     // Bind the socket to listen for the broadcast message
     // The Host address is set to AnyIPv4 to listen for
     // the broadcast message and the port is set to 0 to
@@ -163,13 +185,6 @@ class DiscoveryClient : public QObject {
     const auto host = QHostAddress::AnyIPv4;
     const auto port = 0;
     m_socket.bind(host, port);
-
-    // Connect the socket to the callback function that
-    // process the datagrams when the socket is ready
-    // to read so the listener can be notified
-    const auto signal_u = &QUdpSocket::readyRead;
-    const auto slot_u = &DiscoveryClient::processDatagrams;
-    QObject::connect(&m_socket, signal_u, this, slot_u);
 
     // Connect the timer to the callback function that
     // sends the broadcast message
@@ -199,15 +214,6 @@ class DiscoveryClient : public QObject {
   void stopDiscovery() { m_timer.stop(); }
 
  protected:   // abstract functions
-  /**
-   * @brief On Error Occurred this function is called when any error
-   * occurs in the socket
-   *
-   * @param error Error message
-   */
-  virtual void OnErrorOccurred(QString error) {
-    qErrnoWarning(error.toStdString().c_str());
-  }
 
   /**
    * @brief On server found abstract function that

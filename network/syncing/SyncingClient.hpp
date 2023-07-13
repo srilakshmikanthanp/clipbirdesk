@@ -42,12 +42,12 @@ class SyncingClient : public discovery::DiscoveryClient {
   void OnServerFound(QHostAddress host, quint16 port);
 
  signals:  // signals for this class
-  /// @brief On Server state changed
-  void OnServerStateChanged(bool isConnected);
-
- signals:  // signals for this class
   /// @brief On Error Occurred
   void OnErrorOccurred(QString error);
+
+ signals:  // signals for this class
+  /// @brief On Server state changed
+  void OnServerStateChanged(bool isConnected);
 
  signals:  // signals for this class
   /// @brief On Sync Request
@@ -70,22 +70,21 @@ class SyncingClient : public discovery::DiscoveryClient {
   /// @brief Threshold times
   qint64 m_threshold = 10000;
 
- private: // functions
-   /**
+ private: // private functions
+
+  /**
    * @brief Process the packet that has been received
    * from the server and emit the signal
    *
    * @param packet Syncing packet
    */
-  void processPacket(const packets::SyncingPacket& packet) {
+  void processSyncingPacket(const packets::SyncingPacket& packet) {
     // Make the vector of QPair<QString, QByteArray>
     QVector<QPair<QString, QByteArray>> items;
 
     // Get the items from the packet
     for (auto item : packet.getItems()) {
-      items.append({
-        item.getMimeType().toStdString().c_str(), item.getPayload()
-      });
+      items.append({item.getMimeType().toStdString().c_str(), item.getPayload()});
     }
 
     // emit the signal
@@ -93,19 +92,25 @@ class SyncingClient : public discovery::DiscoveryClient {
   }
 
   /**
-   * @brief Send the packet to the server to sync the
-   * clipboard data
+   * @brief Process the Invalid packet that has been received
+   * from the server and emit the signal
    *
-   * @param items packet Syncing packet
+   * @param packet Invalid packet
    */
-  void sendPacket(const packets::SyncingPacket& packet) {
-    // using createPacket to create the packet
-    using utility::functions::toQByteArray;
-    // send the packet to the server
-    m_ssl_socket.write(toQByteArray(packet));
+  void processInvalidPacket(const packets::InvalidRequest& packet) {
+    emit OnErrorOccurred(packet.getErrorMessage());
   }
 
- private: // slots
+  /**
+   * @brief Create the packet and send it to the client
+   *
+   * @param packet Packet to send
+   */
+  template <typename Packet>
+  void sendPacket(const Packet& pack) {
+    m_socket.write(utility::functions::toQByteArray(pak));
+  }
+
   /**
    * @brief Updates the server list by removing the
    * server that that has exceeded the threshold
@@ -146,13 +151,9 @@ class SyncingClient : public discovery::DiscoveryClient {
     // using fromQByteArray to parse the packet
     using utility::functions::fromQByteArray;
 
-    // get the packet from the data
-    packets::SyncingPacket syncPacket;
-
     // try to parse the packet
     try {
-      syncPacket = fromQByteArray<packets::SyncingPacket>(data);
-      processPacket(syncPacket);
+      processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
       return;
     } catch (const types::except::MalformedPacket& e) {
       OnErrorOccurred(e.what());
@@ -165,13 +166,9 @@ class SyncingClient : public discovery::DiscoveryClient {
       return;
     }
 
-    // get the packet from the data
-    packets::InvalidPacket invalidPacket;
-
     // try to parse the packet
     try {
-      invalidPacket = fromQByteArray<packets::InvalidPacket>(data);
-      OnErrorOccurred(invalidPacket.getErrorMessage());
+      processInvalidPacket(fromQByteArray<packets::InvalidRequest>(data));
       return;
     } catch (const types::except::MalformedPacket& e) {
       OnErrorOccurred(e.what());
@@ -188,39 +185,8 @@ class SyncingClient : public discovery::DiscoveryClient {
     OnErrorOccurred("Unknown Packet Found");
   }
 
- protected:  // abstract functions
-  /**
-   * @brief On Error Occurred this function is called when any error
-   * occurs in the socket
-   *
-   * @param error Error message
-   */
-  virtual void OnErrorOccurred(QString error) {
-    emit OnErrorOccurred(error);
-  }
-
-  /**
-   * @brief On server found function that That Called by the
-   * discovery client when the server is found
-   *
-   * @param host Host address
-   * @param port Port number
-   */
-  void onServerFound(const QHostAddress& host, quint16 port) {
-    // current timestamp in milliseconds
-    const auto current = QDateTime::currentMSecsSinceEpoch();
-
-    // emit the signal
-    emit OnServerFound(host, port);
-
-    // add the server to the list
-    m_servers.append({host, port, current});
-
-    // emit the signal
-    emit OnServerListChanged(getServerList());
-  }
-
  public:
+
   /**
    * @brief Construct a new Syncing Client object
    * and connect the signals and slots and start
@@ -232,12 +198,17 @@ class SyncingClient : public discovery::DiscoveryClient {
    */
   SyncingClient(quint64 th, QObject* parent = nullptr)
       : m_threshold(th), DiscoveryClient(parent) {
+    // connect the signal to emit the signal for
+    // OnErrorOccurred from the base class
+    const auto signal_e = &DiscoveryClient::OnErrorOccurred;
+    const auto slot_e = [&](QString error) { emit OnErrorOccurred(error); };
+    connect(this, signal_e, this, slot_e);
+
     // connected signal to emit the signal for
     // server state changed
     const auto signal_c = &QSslSocket::connected;
     const auto slot_c = [&]() { emit OnServerStateChanged(true); };
     connect(&m_ssl_socket, signal_c, this, slot_c);
-
 
     // connect the signals and slots for the socket
     // readyRead signal to process the packet
@@ -287,7 +258,7 @@ class SyncingClient : public discovery::DiscoveryClient {
    *
    * @param items QVector<QPair<QString, QByteArray>>
    */
-  void syncWithServer(QVector<QPair<QString, QByteArray>> items) {
+  void syncItems(QVector<QPair<QString, QByteArray>> items) {
     // check if the socket is connected else throw error
     if (!m_ssl_socket.isOpen()) {
       throw std::runtime_error("Socket is not connected");
@@ -321,6 +292,29 @@ class SyncingClient : public discovery::DiscoveryClient {
    */
   void disconnectFromServer() {
     m_ssl_socket.disconnectFromHost();
+  }
+
+ protected:  // abstract functions from the base class
+
+  /**
+   * @brief On server found function that That Called by the
+   * discovery client when the server is found
+   *
+   * @param host Host address
+   * @param port Port number
+   */
+  void onServerFound(const QHostAddress& host, quint16 port) {
+    // current timestamp in milliseconds
+    const auto current = QDateTime::currentMSecsSinceEpoch();
+
+    // emit the signal
+    emit OnServerFound(host, port);
+
+    // add the server to the list
+    m_servers.append({host, port, current});
+
+    // emit the signal
+    emit OnServerListChanged(getServerList());
   }
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

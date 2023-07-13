@@ -23,7 +23,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
  * @brief Invalid Packet used to indicate the error
  * on the client side
  */
-class InvalidPacket {
+class InvalidRequest {
  private:
   quint8     packetType = 0x00;
   qint32     packetLength;
@@ -32,7 +32,7 @@ class InvalidPacket {
 
  public:
   /// @brief Allowed Packet Types
-  enum PacketType : quint8 { MalformedPacket = 0x00 };
+  enum PacketType : quint8 { RequestFailed = 0x00 };
 
  public:
   /**
@@ -41,7 +41,7 @@ class InvalidPacket {
    * @param type
    */
   void setPacketType(quint8 type) {
-    if (type != PacketType::MalformedPacket) {
+    if (type != PacketType::RequestFailed) {
       throw std::invalid_argument("Invalid Packet Type");
     }
   }
@@ -134,7 +134,7 @@ class InvalidPacket {
    * @param packet
    * @return QDataStream&
    */
-  friend QDataStream& operator<<(QDataStream& stream, const InvalidPacket packet) {
+  friend QDataStream& operator<<(QDataStream& stream, const InvalidRequest packet) {
     // write the packet type
     stream << packet.packetType;
 
@@ -143,6 +143,15 @@ class InvalidPacket {
 
     // write the error code
     stream << packet.errorCode;
+
+    // check the error message size
+    if (packet.errorMessage.size() != packet.packetLength - (
+      sizeof(packet.packetType) +
+      sizeof(packet.packetLength) +
+      sizeof(packet.errorCode)
+    )) {
+      throw std::invalid_argument("Invalid Error Message");
+    }
 
     // write the error message
     stream.writeRawData(packet.errorMessage.data(), packet.errorMessage.size());
@@ -158,7 +167,7 @@ class InvalidPacket {
    * @param packet
    * @return QDataStream&
    */
-  friend QDataStream& operator>>(QDataStream& stream, InvalidPacket& packet) {
+  friend QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
     // read the packet type
     stream >> packet.packetType;
 

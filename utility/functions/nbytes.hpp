@@ -7,7 +7,7 @@
 
 // Local header files
 #include "network/packets/DiscoveryPacket.hpp"
-#include "network/packets/InvalidPacket.hpp"
+#include "network/packets/InvalidRequest.hpp"
 #include "network/packets/SyncingPacket.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions {
