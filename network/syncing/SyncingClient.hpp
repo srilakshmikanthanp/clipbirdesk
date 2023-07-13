@@ -57,6 +57,10 @@ class SyncingClient : public discovery::DiscoveryClient {
   /// @brief Qt meta object
   Q_OBJECT
 
+ private: // disable copy and move
+  /// @brief Disable copy and move
+  Q_DISABLE_COPY_MOVE(SyncingClient)
+
  private:  // Member variables
   /// @brief List of Found servers and timestamp
   QList<std::tuple<QHostAddress, quint16, qint64>> m_servers;

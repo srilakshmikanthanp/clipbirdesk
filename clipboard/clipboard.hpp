@@ -39,6 +39,9 @@ class Clipboard : public QObject {
   /// @brief Qt meta object
   Q_OBJECT
 
+ private: // disable copy and move
+  Q_DISABLE_COPY_MOVE(Clipboard)
+
  public:   // constructor
   /**
    * @brief Construct a new Clipboard object and manage

@@ -45,6 +45,9 @@ class DiscoveryServer : public QObject {
  private:   // variables
   QUdpSocket m_socket = QUdpSocket(this);
 
+ private: // disable copy and move
+  Q_DISABLE_COPY_MOVE(DiscoveryServer)
+
  private:   // private functions
   /**
    * @brief Create the packet and send it to the client

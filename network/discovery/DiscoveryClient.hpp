@@ -44,6 +44,9 @@ class DiscoveryClient : public QObject {
   /// @brief On Error Occurred
   void OnErrorOccurred(QString error);
 
+ private: // disable copy and move
+  Q_DISABLE_COPY_MOVE(DiscoveryClient)
+
  private:  // private functions
 
   /**

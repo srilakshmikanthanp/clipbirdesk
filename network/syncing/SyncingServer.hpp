@@ -43,6 +43,9 @@ class SyncingServer : public discovery::DiscoveryServer {
   /// @brief Qt meta object
   Q_OBJECT
 
+ private: // disable copy and move
+  Q_DISABLE_COPY_MOVE(SyncingServer)
+
  public:     // Authenticator Type
   /// @brief Authenticator
   using Authenticator = bool (*)(QSslSocket *client);
