@@ -17,20 +17,21 @@ class Host : public QWidget {
   const QString connect = "Connect", disconnect = "Disconnect";
 
  private:  // Member variable
-  individual::Label *hostname;
-  individual::Label *ip;
+  individual::Label  *hostname;
+  individual::Label  *ip;
   individual::Button *action;
 
  private:  // just for Qt
   Q_OBJECT
 
- public:
+ public:   // enum for action
   enum class Action { Connect, Disconnect };
 
  signals:  // Signals
-  void onActionClicked(Action action);
+  void onActionClicked(Action action, QString host, QString ip);
 
- public:
+ public:   // Member functions
+
   /**
    * @brief Construct a new HostView object
    * with parent as QWidget
@@ -39,7 +40,7 @@ class Host : public QWidget {
   explicit Host(QWidget *parent = nullptr) : QWidget(parent) {
     // connect the button signal to this signal
     QObject::connect(action, &individual::Button::clicked, [this]() {
-      emit onActionClicked(this->getAction());
+      emit onActionClicked(this->getAction(), this->getHostname(), this->getIp());
     });
 
     // create the components of the class
@@ -104,11 +105,7 @@ class Host : public QWidget {
    * @param action
    */
   void setAction(Action action) {
-    if (action == Action::Disconnect) {
-      this->action->setText(this->disconnect);
-    } else {
-      this->action->setText(this->connect);
-    }
+    this->action->setText(action == Action::Disconnect ? disconnect : connect);
   }
 
   /**
@@ -129,11 +126,7 @@ class Host : public QWidget {
    * @brief get the Action of the HostView
    */
   Action getAction() const {
-    if (action->text() == this->disconnect) {
-      return Action::Disconnect;
-    } else {
-      return Action::Connect;
-    }
+    return action->text() == disconnect ? Action::Disconnect : Action::Connect;
   }
 
  private:  // disable copy and move

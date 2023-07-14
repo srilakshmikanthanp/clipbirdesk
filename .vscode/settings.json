@@ -108,6 +108,7 @@
     "qtimer": "cpp",
     "qpushbutton": "cpp",
     "qhboxlayout": "cpp",
-    "qboxlayout": "cpp"
+    "qboxlayout": "cpp",
+    "qtwidgets": "cpp"
   },
 }

@@ -42,6 +42,8 @@ class Status : public QWidget {
 
     // set the layout to the widget
     this->setLayout(root);
+
+    // TODO: set the style sheet
   }
 
   /**

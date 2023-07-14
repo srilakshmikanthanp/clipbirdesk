@@ -7,4 +7,5 @@
 
 #include "Host.hpp"
 #include "Item.hpp"
+#include "List.hpp"
 #include "Status.hpp"

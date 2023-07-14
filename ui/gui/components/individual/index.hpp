@@ -8,3 +8,4 @@
 #include "Button.hpp"
 #include "Circle.hpp"
 #include "Label.hpp"
+#include "Tabbed.hpp"

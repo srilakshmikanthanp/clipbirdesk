@@ -42,6 +42,8 @@ class Item : public QWidget {
 
     // set the layout to the widget
     this->setLayout(root);
+
+    // TODO: set the style sheet
   }
 
   /**
@@ -66,6 +68,17 @@ class Item : public QWidget {
   }
 
   /**
+   * @brief Set as a pair
+   *
+   * @param key key
+   * @param val value
+   */
+  void set(const QString& key, const QString& val) {
+    this->key->setText(key);
+    this->val->setText(val);
+  }
+
+  /**
    * @brief get the key
    * @return QString key
    */
@@ -79,6 +92,15 @@ class Item : public QWidget {
    */
   QString getVal() const {
     return this->val->text();
+  }
+
+  /**
+   * @brief get the key and value as pair
+   *
+   * @return std::pair<QString, QString> key and value
+   */
+  std::pair<QString, QString> get() const {
+    return {this->key->text(), this->val->text()};
   }
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core
