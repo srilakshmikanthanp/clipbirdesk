@@ -11,7 +11,7 @@ A Bird that syncs Your clipboard data between devices, the word clipbirdesk came
 
 ## Status
 
-clipbirdesk is in the development stage, for protocol see [protocol.md](docs/protocol.md) 😄
+clipbirdesk is in the development stage, for protocol see [protocol.md](docs/design/protocol.md) 😄
 
 ## Dependencies
 
