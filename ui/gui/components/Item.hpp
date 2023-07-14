@@ -5,53 +5,55 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include <QHboxLayout>
+#include <QHBoxLayout>
 #include <QWidget>
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core {
-class KeyValue : public QWidget {
+class Item : public QWidget {
  private:  // Member variable
-    QWidget *key;
-    QWidget *value;
+  QWidget *label;
+  QWidget *value;
  private:  // just for Qt
   Q_OBJECT
 
  public:
   /**
-   * @brief Construct a new KeyValue object
+   * @brief Construct a new Item object
    * with parent as QWidget
    * @param parent parent object
    */
-  explicit KeyValue(QWidget* parent = nullptr) : QWidget(parent) {
-    this->setLayout(new QHboxLayout(this));
+  explicit Item(QWidget* parent = nullptr) : QWidget(parent) {
+    // set layout to QBocLayout in LeftToRight direction
+    this->setLayout(new QHBoxLayout(this));
+
     // TODO: set style sheet
   }
 
   /**
-   * @brief set the Key of the KeyValue
+   * @brief set the Key of the Item
    */
-  void setKey(QWidget* key) {
-    auto layout = static_cast<QHboxLayout*>(this->layout());
-    layout->addWidget((this->key = key), 0, Qt::AlignLeft);
+  void setLabel(QWidget* label) {
+    auto layout = qobject_cast<QBoxLayout*>(this->layout());
+    layout->addWidget((this->label = label), 0, Qt::AlignLeft);
   }
 
   /**
-   * @brief set the Value of the KeyValue
+   * @brief set the Value of the Item
    */
   void setValue(QWidget* value) {
-    auto layout = static_cast<QHboxLayout*>(this->layout());
+    auto layout = qobject_cast<QBoxLayout*>(this->layout());
     layout->addWidget((this->value = value), 0, Qt::AlignRight);
   }
 
   /**
-   * @brief get the Key of the KeyValue
+   * @brief get the Key of the Item
    */
-  QWidget* getKey() {
-    return key;
+  QWidget* getLabel() {
+    return label;
   }
 
   /**
-   * @brief get the Value of the KeyValue
+   * @brief get the Value of the Item
    */
   QWidget* getValue() {
     return value;
