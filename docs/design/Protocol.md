@@ -9,12 +9,6 @@
 
 Clipbird Software is a versatile tool designed to synchronize the clipboard across various devices within your local network. It supports multiple operating systems, including Windows, Linux, Mac, iOS, and Android, ensuring seamless compatibility. This cross-platform software enables the effortless sharing of clipboard content, allowing users to easily copy and paste text, images, and other data between devices. With Clipbird, you can conveniently access and transfer clipboard information across different platforms, enhancing productivity and streamlining workflow in a connected environment.
 
-## Features
-
-- Server-Client Configuration: Each device can function as either a server or a client, but not both simultaneously, allowing for clear roles and efficient clipboard syncing.
-- Clipboard Syncing: Easily synchronize clipboard content across devices within your local network, ensuring that the latest data is accessible on all connected devices.
-- Automated Sync: Clipboard synchronization happens automatically in the background, eliminating the need for manual intervention and providing a seamless user experience.
-
 ## Architecture
 
 The architecture of Clipbird revolves around a Client-Server model, where each device can assume the role of either a server or a client, but not both simultaneously. When a device is designated as a server, it acts as the central hub for receiving data packets from other clients within the local network. The server then distributes this data to all connected clients, facilitating seamless clipboard synchronization across devices. Additionally, the server has the option to exclude sending data back to the originating client, which can be useful in certain scenarios to avoid unnecessary duplication of clipboard content.
