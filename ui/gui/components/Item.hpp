@@ -8,13 +8,19 @@
 #include <QHBoxLayout>
 #include <QWidget>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core {
+#include "ui/gui/components/individual/Label.hpp"
+
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class Item : public QWidget {
  private:  // Member variable
-  QWidget *label;
-  QWidget *value;
+  individual::Label *key;
+  individual::Label *val;
+
  private:  // just for Qt
   Q_OBJECT
+
+ private:  // disable copy and move
+  Q_DISABLE_COPY_MOVE(Item)
 
  public:
   /**
@@ -22,41 +28,57 @@ class Item : public QWidget {
    * with parent as QWidget
    * @param parent parent object
    */
-  explicit Item(QWidget* parent = nullptr) : QWidget(parent) {
-    // set layout to QBocLayout in LeftToRight direction
-    this->setLayout(new QHBoxLayout(this));
+  explicit Item(QWidget* parent = nullptr) {
+    // create the components of the class
+    this->key = new individual::Label(this);
+    this->val = new individual::Label(this);
 
-    // TODO: set style sheet
+    // create a layout to align the widgets
+    auto root = new QHBoxLayout(this);
+
+    // add the widgets to the layout
+    root->addWidget(this->key, 0, Qt::AlignLeft);
+    root->addWidget(this->val, 0, Qt::AlignRight);
+
+    // set the layout to the widget
+    this->setLayout(root);
   }
 
   /**
-   * @brief set the Key of the Item
+   * @brief Destroy the Item object
    */
-  void setLabel(QWidget* label) {
-    auto layout = qobject_cast<QBoxLayout*>(this->layout());
-    layout->addWidget((this->label = label), 0, Qt::AlignLeft);
+  virtual ~Item() = default;
+
+  /**
+   * @brief set the key
+   * @param key key
+   */
+  void setKey(const QString& key) {
+    this->key->setText(key);
   }
 
   /**
-   * @brief set the Value of the Item
+   * @brief set the value
+   * @param val value
    */
-  void setValue(QWidget* value) {
-    auto layout = qobject_cast<QBoxLayout*>(this->layout());
-    layout->addWidget((this->value = value), 0, Qt::AlignRight);
+  void setVal(const QString& val) {
+    this->val->setText(val);
   }
 
   /**
-   * @brief get the Key of the Item
+   * @brief get the key
+   * @return QString key
    */
-  QWidget* getLabel() {
-    return label;
+  QString getKey() const {
+    return this->key->text();
   }
 
   /**
-   * @brief get the Value of the Item
+   * @brief get the value
+   * @return QString value
    */
-  QWidget* getValue() {
-    return value;
+  QString getVal() const {
+    return this->val->text();
   }
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core

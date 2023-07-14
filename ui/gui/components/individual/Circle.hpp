@@ -9,7 +9,7 @@
 #include <QPainter>
 #include <QWidget>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::individual {
 class Circle : public QWidget {
  private:          // Member
   int radius = 0;  // radius of the circle

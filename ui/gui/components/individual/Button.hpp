@@ -7,7 +7,7 @@
 
 #include <QPushButton>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::individual {
 class Button : public QPushButton {
  private:  // just for Qt
   Q_OBJECT

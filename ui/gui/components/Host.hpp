@@ -17,9 +17,9 @@ class Host : public QWidget {
   const QString connect = "Connect", disconnect = "Disconnect";
 
  private:  // Member variable
-  core::Label *hostname;
-  core::Label *ip;
-  core::Button *action;
+  individual::Label *hostname;
+  individual::Label *ip;
+  individual::Button *action;
 
  private:  // just for Qt
   Q_OBJECT
@@ -38,9 +38,14 @@ class Host : public QWidget {
    */
   explicit Host(QWidget *parent = nullptr) : QWidget(parent) {
     // connect the button signal to this signal
-    QObject::connect(action, &core::Button::clicked, [this]() {
+    QObject::connect(action, &individual::Button::clicked, [this]() {
       emit onActionClicked(this->getAction());
     });
+
+    // create the components of the class
+    this->hostname = new individual::Label(this);
+    this->ip = new individual::Label(this);
+    this->action = new individual::Button(this);
 
     // create a layout to align the widgets
     QHBoxLayout *layout = new QHBoxLayout();

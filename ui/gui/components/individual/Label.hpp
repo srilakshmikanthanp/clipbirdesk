@@ -7,7 +7,7 @@
 
 #include <QLabel>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::individual {
 class Label : public QLabel {
  private:  // just for Qt
   Q_OBJECT

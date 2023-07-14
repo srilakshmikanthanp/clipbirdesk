@@ -5,65 +5,13 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+#include <QHBoxLayout>
+#include <QTabWidget>
+#include <QVBoxLayout>
 #include <QWidget>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::internal {
-class Status : public QWidget {
- private:  // Member variable
- private:  // just for Qt
-  Q_OBJECT
-
- public:
-  /**
-   * @brief Construct a new Status object
-   * with parent as QWidget
-   * @param parent parent object
-   */
-  explicit Status(QWidget* parent = nullptr) {}
-};
-
-class ServerIP : public QWidget {
- private:  // Member variable
- private:  // just for Qt
-  Q_OBJECT
-
- public:
-  /**
-   * @brief Construct a new ServerIP object
-   * with parent as QWidget
-   * @param parent parent object
-   */
-  explicit ServerIP(QWidget* parent = nullptr) {}
-};
-
-class ServerName : public QWidget {
- private:  // Member variable
- private:  // just for Qt
-  Q_OBJECT
-
- public:
-  /**
-   * @brief Construct a new ServerName object
-   * with parent as QWidget
-   * @param parent parent object
-   */
-  explicit ServerName(QWidget* parent = nullptr) {}
-};
-
-class Hosts : public QWidget {
- private:  // Member variable
- private:  // just for Qt
-  Q_OBJECT
-
- public:
-  /**
-   * @brief Construct a new Hosts object
-   * with parent as QWidget
-   * @param parent parent object
-   */
-  explicit Hosts(QWidget* parent = nullptr) {}
-};
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::internal
+#include "ui/gui/components/index.hpp"
+#include "ui/gui/components/individual/index.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class Clipbird : public QWidget {
