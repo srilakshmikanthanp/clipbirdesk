@@ -37,11 +37,11 @@ During the synchronization process, two types of packets are used. The first typ
 
 Once the server has been identified, clipboard data is transmitted between the client and the server using a single type of packet known as the **SyncingPacket**. This packet is responsible for transferring clipboard data from the client to the server and vice versa, ensuring seamless sharing of clipboard content between the two devices.
 
-Finally we have **InvalidPacket** which is used to indicate that the packet sent by client is invalid so it provides a way to indicate that the packet is invalid. This packet should only sent from server to client not from client to server.
+Finally we have **InvalidRequest** which is used to indicate that the packet sent by client is invalid so it provides a way to indicate that the packet is invalid. This packet should only sent from server to client not from client to server.
 
-### InvalidPacket
+### InvalidRequest
 
-The **InvalidPacket** is used to indicate that the packet is invalid. This packet contains the following fields:
+The **InvalidRequest** is used to indicate that the packet is invalid. This packet contains the following fields:
 
 #### Header
 
@@ -67,6 +67,7 @@ The **InvalidPacket** is used to indicate that the packet is invalid. This packe
 | Error Code | Error Message |
 |------------|---------------|
 | 0x01       | Coding Error  |
+| 0x02       | TLS Error     |
 
 ### DiscoveryPacket
 

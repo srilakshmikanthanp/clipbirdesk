@@ -72,8 +72,8 @@ class SyncingServer : public discovery::DiscoveryServer {
    * @param client Client to send
    * @param packet Packet to send
    */
-  template <typename Packet>
-  void sendPacket(QSslSocket *client, const Packet& pack) {
+  template <typename Client, typename Packet>
+  void sendPacket(Client *client, const Packet& pack) {
     client->write(utility::functions::toQByteArray(pak));
   }
 
@@ -156,8 +156,15 @@ class SyncingServer : public discovery::DiscoveryServer {
       // Convert the client to SSL client
       auto client_tls = qobject_cast<QSslSocket *>(client_tcp);
 
+      // using the createPacket from namespace
+      using utility::functions::createPacket;
+
       // If the client is not SSL client then disconnect
       if (!client_tls) {
+        const auto packType = packets::InvalidRequest::PacketType::RequestFailed;
+        const auto code = types::enums::ErrorCode::SSLError;
+        const auto msg = "Client is not SSL client";
+        this->sendPacket(client_tcp, createPacket({packType, code, msg}));
         client_tcp->disconnectFromHost(); continue;
       }
 

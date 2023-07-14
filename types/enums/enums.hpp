@@ -5,17 +5,18 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include <cstdint>
+#include <QtTypes>
 
 namespace srilakshmikanthanp::clipbirdesk::types::enums {
 /// @brief IP type used in the discovery packet
-enum class IPType : std::uint8_t {
+enum class IPType : quint8 {
   IPv4 = 0,
   IPv6 = 1,
 };
 
 /// @brief Allowed Error Codes
 enum ErrorCode : quint8 {
-  CodingError = 0x01
+  CodingError = 0x01,
+  SSLError = 0x02,
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::types::enums
