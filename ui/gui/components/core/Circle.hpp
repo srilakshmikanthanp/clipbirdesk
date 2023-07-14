@@ -6,6 +6,7 @@
 // https://opensource.org/licenses/MIT
 
 #include <QColor>
+#include <QPainter>
 #include <QWidget>
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core {

@@ -46,14 +46,14 @@ class KeyValue : public QWidget {
   /**
    * @brief get the Key of the KeyValue
    */
-  QWidget& getKey() {
+  QWidget* getKey() {
     return key;
   }
 
   /**
    * @brief get the Value of the KeyValue
    */
-  QWidget& getValue() {
+  QWidget* getValue() {
     return value;
   }
 };
