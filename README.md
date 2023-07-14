@@ -7,7 +7,7 @@
 
 # clipbirdesk
 
-A Bird that syncs Your clipboard data between devices, the word clipbirdesk came from a combination of the words clipboard + bird + desktop.
+A Bird that syncs Your clipboard data between devices connected in a local network.
 
 ## Status
 
