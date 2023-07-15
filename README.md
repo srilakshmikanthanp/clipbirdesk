@@ -85,7 +85,7 @@ Clipbird Software is a versatile tool designed to synchronize the clipboard acro
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Clipbird is in the development stage if the project succeeds in the future, we will release the binaries for the project.
+Clipbird is in the development stage if the project succeeds in the future, we will release the binaries to use.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
