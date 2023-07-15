@@ -35,8 +35,6 @@
   <p align="center">
     A Bird that syncs Your clipboard data between devices connected in a local network.
     <br />
-    <br />
-    ·
     <a href="https://github.com/srilakshmikanthanp/clipbirdesk/issues">Report Bug</a>
     ·
     <a href="https://github.com/srilakshmikanthanp/clipbirdesk/issues">Request Feature</a>
