@@ -135,21 +135,11 @@ class DiscoveryServer : public QObject {
 
  public:  // public functions
   /**
-   * @brief Construct a new Discovery Server object and bind
-   * the socket to listen for the broadcast message
+   * @brief Construct a new Discovery Server object
    *
    * @param parent Parent object
    */
   explicit DiscoveryServer(QObject* parent = nullptr): QObject(parent) {
-    // Bind the socket to listen for the broadcast message
-    // The Host address is set to AnyIPv4 to listen for
-    // the broadcast message and the port is set to 0 to
-    // means that the OS will assign a port number
-    const auto mode = QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint;
-    const auto port = 0;
-    const auto host = QHostAddress::AnyIPv4;
-    m_socket.bind(host, port, mode);
-
     // Connect the socket to the callback function that
     // process the datagrams when the socket is ready
     // to read so the listener can be notified
@@ -196,5 +186,24 @@ class DiscoveryServer : public QObject {
    * @throw Any Exception If any error occurs
    */
   virtual QHostAddress getIPAddress() const = 0;
+
+public:
+
+  /**
+   * @brief Start the server
+   */
+  virtual void start() {
+    const auto mode = QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint;
+    const auto port = 0;
+    const auto host = QHostAddress::AnyIPv4;
+    m_socket.bind(host, port, mode);
+  }
+
+  /**
+   * @brief Stop the server
+   */
+  virtual void stop() {
+    m_socket.close();
+  }
 };
 } // namespace srilakshmikanthanp::clipbirdesk::network::discovery

@@ -14,6 +14,7 @@
 // standard headers
 #include <algorithm>
 #include <tuple>
+#include <variant>
 
 // project headers
 #include "ui/gui/components/index.hpp"
@@ -27,7 +28,7 @@ class Clipbird : public QWidget {
   components::Item* serverIP = new components::Item(this);
   components::Item* hostCount = new components::Item(this);
 
- private:  // Member variable
+ private:  // Member variable (Tabs)
   components::List* serverList = new components::List(this);
   components::List* clientList = new components::List(this);
 

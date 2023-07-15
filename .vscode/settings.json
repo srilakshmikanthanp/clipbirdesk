@@ -10,7 +10,8 @@
     "clipbirdesk",
     "ipconv",
     "qobject",
-    "qvariant"
+    "qvariant",
+    "SSLCONFIG"
   ],
   "files.associations": {
     ".env*": "dotenv",

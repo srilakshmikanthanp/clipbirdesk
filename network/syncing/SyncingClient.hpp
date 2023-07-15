@@ -32,7 +32,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing client that syncs the clipboard data between
  * client and server
  */
-class SyncingClient : public discovery::DiscoveryClient {
+class SyncingClient : protected discovery::DiscoveryClient {
  signals:  // signals for this class
   /// @brief On Server List Changed
   void OnServerListChanged(QList<QPair<QHostAddress, quint16>> servers);
@@ -196,12 +196,10 @@ class SyncingClient : public discovery::DiscoveryClient {
    * and connect the signals and slots and start
    * the timer and Service discovery
    *
-   * @param rm Remove threshold
-   * @param ec Search threshold
+   * @param th threshold
    * @param parent Parent
    */
-  SyncingClient(quint64 th, QObject* parent = nullptr)
-      : m_threshold(th), DiscoveryClient(parent) {
+  SyncingClient(QObject* parent = nullptr): DiscoveryClient(parent) {
     // connect the signal to emit the signal for
     // OnErrorOccurred from the base class
     const auto signal_e = &DiscoveryClient::OnErrorOccurred;
@@ -239,24 +237,6 @@ class SyncingClient : public discovery::DiscoveryClient {
   ~SyncingClient() override = default;
 
   /**
-   * @brief Get the Server List object
-   *
-   * @return QList<QPair<QHostAddress, quint16>> List of servers
-   */
-  QList<QPair<QHostAddress, quint16>> getServerList() {
-    // Host address and port number
-    QList<QPair<QHostAddress, quint16>> list;
-
-    // iterate and add the server
-    for (auto& [host, port, _] : m_servers) {
-      list.append({host, port});
-    }
-
-    // return the list
-    return list;
-  }
-
-  /**
    * @brief Send the items to the server to sync the
    * clipboard data
    *
@@ -281,6 +261,24 @@ class SyncingClient : public discovery::DiscoveryClient {
   }
 
   /**
+   * @brief Get the Server List object
+   *
+   * @return QList<QPair<QHostAddress, quint16>> List of servers
+   */
+  QList<QPair<QHostAddress, quint16>> getServerList() {
+    // Host address and port number
+    QList<QPair<QHostAddress, quint16>> list;
+
+    // iterate and add the server
+    for (auto& [host, port, _] : m_servers) {
+      list.append({host, port});
+    }
+
+    // return the list
+    return list;
+  }
+
+  /**
    * @brief Connect to the server with the given host and port
    * number
    *
@@ -288,6 +286,11 @@ class SyncingClient : public discovery::DiscoveryClient {
    * @param port Port number
    */
   void connectToServer(const QHostAddress& host, quint16 port) {
+    // check if the SSL configuration is set
+    if (m_ssl_socket.sslConfiguration().isNull()) {
+      throw std::runtime_error("SSL Configuration is not set");
+    }
+
     m_ssl_socket.connectToHostEncrypted(host.toString(), port);
   }
 
@@ -296,6 +299,42 @@ class SyncingClient : public discovery::DiscoveryClient {
    */
   void disconnectFromServer() {
     m_ssl_socket.disconnectFromHost();
+  }
+
+  /**
+   * @brief Set the Threshold object
+   * Default value is 10000
+   * @param threshold Threshold
+   */
+  void setThreshold(quint64 threshold) {
+    this->m_timer.start(m_threshold = threshold);
+  }
+
+  /**
+   * @brief Get the Threshold object
+   *
+   * @return quint64 Threshold
+   */
+  quint64 getThreshold() const {
+    return m_threshold;
+  }
+
+  /**
+   * @brief Set the SSL Configuration object
+   *
+   * @param config SSL Configuration
+   */
+  void setSSLConfiguration(QSslConfiguration config) {
+    m_ssl_socket.setSslConfiguration(config);
+  }
+
+  /**
+   * @brief Get the SSL Configuration object
+   *
+   * @return QSslConfiguration
+   */
+  QSslConfiguration getSSLConfiguration() const {
+    return m_ssl_socket.sslConfiguration();
   }
 
  protected:  // abstract functions from the base class

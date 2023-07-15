@@ -1,6 +1,6 @@
-# CMakeLists.txt for clipbirdesk
+# CMakeLists.txt for clipbird
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
-project(clipbirdesk VERSION 1.0.0 LANGUAGES CXX)
+project(clipbird VERSION 1.0.0 LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 20)
@@ -35,19 +35,19 @@ configure_file(
 qt_standard_project_setup()
 
 # Add executable
-qt_add_executable(clipbirdesk
+qt_add_executable(clipbird
   main.cpp
 )
 
 # Link libraries
-target_link_libraries(clipbirdesk
+target_link_libraries(clipbird
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto)
 
 # Include config.hpp
-target_include_directories(clipbirdesk
+target_include_directories(clipbird
   PUBLIC ${PROJECT_BINARY_DIR})
 
 # --------------------------------- Unit Tests ---------------------------------#

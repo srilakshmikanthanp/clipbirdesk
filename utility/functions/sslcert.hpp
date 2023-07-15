@@ -25,7 +25,7 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions {
  * @author Dharun R K
  * @return QSslConfiguration
  */
-QSslConfiguration generateSelfSignedConfiguration() {
+QSslConfiguration generateSslConfig() {
 
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

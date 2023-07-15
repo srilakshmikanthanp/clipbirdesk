@@ -50,7 +50,7 @@ class Clipboard : public QObject {
    * @param clipboard Clipboard that is managed
    * @param parent parent object
    */
-  explicit Clipboard(QClipboard* clipboard, QObject* parent)
+  explicit Clipboard(QClipboard* clipboard, QObject* parent = nullptr)
       : QObject(parent), m_clipboard(clipboard) {
     // connect the clipboard change signal to the slot
     // that is used to notify the listeners

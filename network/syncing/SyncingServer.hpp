@@ -22,7 +22,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing server that syncs the clipboard data between
  * the clients
  */
-class SyncingServer : public discovery::DiscoveryServer {
+class SyncingServer : protected discovery::DiscoveryServer {
  signals:    // signals
   /// @brief On client state changed
   void OnCLientStateChanged(QSslSocket *client, bool connected);
@@ -33,7 +33,7 @@ class SyncingServer : public discovery::DiscoveryServer {
 
  signals:    // signals for this class
   /// @brief On Sync Request
-  void OnClintListChanged(QList<QSslSocket *> clients);
+  void OnClientListChanged(QList<QSslSocket *> clients);
 
  signals:    // signals
   /// @brief On Sync Request
@@ -48,7 +48,7 @@ class SyncingServer : public discovery::DiscoveryServer {
 
  public:     // Authenticator Type
   /// @brief Authenticator
-  using Authenticator = bool (*)(QSslSocket *client);
+  using Authenticator = std::function<bool(QSslSocket *)>;
 
  private:    // members of the class
   /// @brief SSL server
@@ -133,8 +133,8 @@ class SyncingServer : public discovery::DiscoveryServer {
       this->processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
       return;
     } catch (const types::except::MalformedPacket &e) {
-      const auto packType = packets::InvalidRequest::PacketType::RequestFailed;
-      this->sendPacket(client, createPacket({packType, e.getCode(), e.what()}));
+      const auto type = packets::InvalidRequest::PacketType::RequestFailed;
+      this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
       return;
     } catch (const std::exception &e) {
       emit OnErrorOccurred(e.what());
@@ -160,11 +160,11 @@ class SyncingServer : public discovery::DiscoveryServer {
       using utility::functions::createPacket;
 
       // If the client is not SSL client then disconnect
-      if (!client_tls) {
+      if (client_tls == nullptr) {
         const auto packType = packets::InvalidRequest::PacketType::RequestFailed;
         const auto code = types::enums::ErrorCode::SSLError;
-        const auto msg = "Client is not SSL client";
-        this->sendPacket(client_tcp, createPacket({packType, code, msg}));
+        const auto message = "Client is not SSL client";
+        this->sendPacket(client_tcp, createPacket({packType, code, message}));
         client_tcp->disconnectFromHost(); continue;
       }
 
@@ -194,7 +194,7 @@ class SyncingServer : public discovery::DiscoveryServer {
       m_clients.append(client_tls);
 
       // Notify the listeners that the client list is changed
-      emit OnClintListChanged(m_clients);
+      emit OnClientListChanged(m_clients);
     }
   }
 
@@ -205,14 +205,14 @@ class SyncingServer : public discovery::DiscoveryServer {
     // Get the client that was disconnected
     auto client = qobject_cast<QSslSocket *>(sender());
 
+    // Notify the listeners that the client is disconnected
+    emit OnCLientStateChanged(client, false);
+
     // Remove the client from the list of clients
     m_clients.removeOne(client);
 
     // Notify the listeners that the client list is changed
-    emit OnClintListChanged(m_clients);
-
-    // Notify the listeners that the client is disconnected
-    emit OnCLientStateChanged(client, false);
+    emit OnClientListChanged(m_clients);
   }
 
  public:   // constructors and destructors
@@ -224,31 +224,29 @@ class SyncingServer : public discovery::DiscoveryServer {
    * @param config SSL configuration
    * @param parent Parent object
    */
-  #define PARAMS const QSslConfiguration &config, Authenticator auth, QObject *p = nullptr
-  explicit SyncingServer(PARAMS) : DiscoveryServer(p) {
-  #undef PARAMS // just used to avoid the long line
+  explicit SyncingServer(QObject *p = nullptr) : DiscoveryServer(p) {
     // Connect the socket to the callback function that
     // process the connections when the socket is ready
     // to read so the listener can be notified
     const auto signal_c = &QSslServer::pendingConnectionAvailable;
     const auto slot_c = &SyncingServer::processConnections;
     QObject::connect(&m_ssl_server, signal_c, this, slot_c);
-
-    // set the configuration For the SSL server
-    m_ssl_server.setSslConfiguration(config);
-
-    // Set the authenticator
-    m_authenticator = auth;
-
-    // bind the server to any available port and any available
-    // IP address and start listening for connections
-    m_ssl_server.listen(QHostAddress::Any);
   }
 
   /**
    * @brief Destroy the Syncing Server object
    */
   virtual ~SyncingServer() = default;
+
+  /**
+   * @brief Request the clients to sync the clipboard items
+   *
+   * @param data QVector<QPair<QString, QByteArray>>
+   */
+  void syncItems(QVector<QPair<QString, QByteArray>> items) {
+    const auto packType = packets::SyncingPacket::PacketType::SyncPacket;
+    this->sendPacket(utility::functions::createPacket(packType, items));
+  }
 
   /**
    * @brief Get the Clients that are connected to the server
@@ -270,13 +268,70 @@ class SyncingServer : public discovery::DiscoveryServer {
   }
 
   /**
-   * @brief Request the clients to sync the clipboard items
-   *
-   * @param data QVector<QPair<QString, QByteArray>>
+   * @brief Disconnect the all the clients from the server
    */
-  void syncItems(QVector<QPair<QString, QByteArray>> items) {
-    const auto packType = packets::SyncingPacket::PacketType::SyncPacket;
-    this->sendPacket(utility::functions::createPacket(packType, items));
+  void disconnectAllClients() {
+    for (auto client : m_clients) this->disconnectClient(client);
+  }
+
+  /**
+   * @brief Set the SSL Configuration object
+   *
+   * @param config SSL Configuration
+   */
+  void setSSLConfiguration(QSslConfiguration config) {
+    m_ssl_server.setSslConfiguration(config);
+  }
+
+  /**
+   * @brief Get the SSL Configuration object
+   *
+   * @return QSslConfiguration
+   */
+  QSslConfiguration getSSLConfiguration() const {
+    return m_ssl_server.sslConfiguration();
+  }
+
+  /**
+   * @brief Set the Authenticator object
+   *
+   * @param auth Authenticator
+   */
+  void setAuthenticator(Authenticator auth) {
+    m_authenticator = auth;
+  }
+
+  /**
+   * @brief Get the Authenticator object
+   *
+   * @return Authenticator
+   */
+  Authenticator getAuthenticator() const {
+    return m_authenticator;
+  }
+
+  /**
+   * @brief Start the server
+   */
+  void start() override {
+    // check if the SSL configuration is set
+    if (m_ssl_server.sslConfiguration().isNull()) {
+      throw std::runtime_error("SSL Configuration is not set");
+    }
+
+    // check if the authenticator is set
+    if (m_authenticator == nullptr) {
+      throw std::runtime_error("Authenticator is not set");
+    }
+
+    m_ssl_server.listen(); DiscoveryServer::start();
+  }
+
+  /**
+   * @brief Stop the server
+   */
+  void stop() override {
+    DiscoveryServer::stop(); m_ssl_server.close();
   }
 
  protected:  // override functions from the base class
