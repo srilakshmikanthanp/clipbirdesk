@@ -1,9 +1,8 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<!-- Improved compatibility of back-to-top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <!-- markdownlint-disable MD033 -->
 <a name="readme-top"></a>
 <!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
+*** Thanks for checking out the Best-README-Template. If you have a suggestion*** That would make this better, please fork the repo and create a pull request
 *** or simply open an issue with the tag "enhancement".
 *** Don't forget to give the project a star!
 *** Thanks again! Now go create something AMAZING! :D
@@ -86,9 +85,7 @@ Clipbird Software is a versatile tool designed to synchronize the clipboard acro
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Clipbird is in the development stage. soon it will be available for download.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+Clipbird is in the development stage if the project succeeds in the future, we will release the binaries for the project.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
