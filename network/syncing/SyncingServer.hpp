@@ -324,14 +324,22 @@ class SyncingServer : protected discovery::DiscoveryServer {
       throw std::runtime_error("Authenticator is not set");
     }
 
-    m_ssl_server.listen(); DiscoveryServer::start();
+    // start the server
+    m_ssl_server.listen();
+
+    // start the discovery server
+    DiscoveryServer::start();
   }
 
   /**
    * @brief Stop the server
    */
   void stop() override {
-    DiscoveryServer::stop(); m_ssl_server.close();
+    // stop the discovery server
+    DiscoveryServer::stop();
+
+    // stop the server
+    m_ssl_server.close();
   }
 
  protected:  // override functions from the base class

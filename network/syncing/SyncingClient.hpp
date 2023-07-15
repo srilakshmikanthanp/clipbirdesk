@@ -72,7 +72,7 @@ class SyncingClient : protected discovery::DiscoveryClient {
   QTimer m_timer;
 
   /// @brief Threshold times
-  qint64 m_threshold = 10000;
+  const qint64 m_threshold = 10000;
 
  private: // private functions
 
@@ -224,6 +224,9 @@ class SyncingClient : protected discovery::DiscoveryClient {
     const auto slot_t = &SyncingClient::updateServerList;
     connect(&m_timer, signal_t, this, slot_t);
 
+    // start the timer to update the server list
+    m_timer.start(m_threshold);
+
     // disconnected signal to emit the signal for
     // server state changed
     const auto signal_d = &QSslSocket::disconnected;
@@ -291,6 +294,7 @@ class SyncingClient : protected discovery::DiscoveryClient {
       throw std::runtime_error("SSL Configuration is not set");
     }
 
+    // connect to the server as encrypted
     m_ssl_socket.connectToHostEncrypted(host.toString(), port);
   }
 
@@ -299,24 +303,6 @@ class SyncingClient : protected discovery::DiscoveryClient {
    */
   void disconnectFromServer() {
     m_ssl_socket.disconnectFromHost();
-  }
-
-  /**
-   * @brief Set the Threshold object
-   * Default value is 10000
-   * @param threshold Threshold
-   */
-  void setThreshold(quint64 threshold) {
-    this->m_timer.start(m_threshold = threshold);
-  }
-
-  /**
-   * @brief Get the Threshold object
-   *
-   * @return quint64 Threshold
-   */
-  quint64 getThreshold() const {
-    return m_threshold;
   }
 
   /**

@@ -44,7 +44,7 @@ class Clipbird : public QWidget {
  private:  // just for Qt
   Q_OBJECT
 
- signals:
+ signals:  // signals
   void onHostAction(Tabs tab, Action action, QString host, QString ip);
 
  signals:  // signals
