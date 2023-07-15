@@ -247,7 +247,7 @@ class Controller : public QObject {
 
   //---------------------- Client functions -----------------------//
 
-    /**
+  /**
    * @brief Get the Server List object
    *
    * @return QList<QPair<QHostAddress, quint16>> List of servers
@@ -258,7 +258,7 @@ class Controller : public QObject {
     }
   }
 
-    /**
+  /**
    * @brief Connect to the server with the given host and port
    * number
    *

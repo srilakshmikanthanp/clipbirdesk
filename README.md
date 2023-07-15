@@ -27,7 +27,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/srilakshmikanthanp/clipbirdesk">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="assets/logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Clipbird</h3>
@@ -64,6 +64,7 @@
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#contributors">Contributors</a></li>
   </ol>
 </details>
 
@@ -136,6 +137,11 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 * [OpenSSL](https://www.openssl.org/)
 * [Qt](https://www.qt.io/)
 * [C++](https://www.cplusplus.com/)
+
+<!-- Contributors -->
+## Contributors
+
+* [Dharun RK](https://github.com/grindelwaldx)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
