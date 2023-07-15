@@ -12,7 +12,6 @@ include(FetchContent)
 include_directories(${PROJECT_SOURCE_DIR})
 
 # --------------------------------- Main Project ---------------------------------#
-
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
 
@@ -24,6 +23,17 @@ find_package(Qt6 REQUIRED COMPONENTS
 
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
+
+# set qt version for singleapplication
+set(QT_DEFAULT_MAJOR_VERSION 6)
+
+# SingleApplication Librray Fetch from github
+FetchContent_Declare(SingleApplication
+  URL https://github.com/itay-grudev/SingleApplication/archive/refs/tags/v3.4.0.zip
+)
+
+# Fetch content
+FetchContent_MakeAvailable(SingleApplication)
 
 # Configure config.hpp
 configure_file(
@@ -41,6 +51,7 @@ qt_add_executable(clipbird
 
 # Link libraries
 target_link_libraries(clipbird
+  PRIVATE SingleApplication::SingleApplication
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
