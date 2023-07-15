@@ -207,7 +207,7 @@ class CertificateInstaller : public QObject {
     certs.append(certificate);
   
     configuration.addCaCertificates(certs);
-    QSslConfiguration::setDefaultConfiguration(configuration);
+    //QSslConfiguration::setDefaultConfiguration(configuration);
     return configuration;
 
   }

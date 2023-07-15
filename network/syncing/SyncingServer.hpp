@@ -74,7 +74,7 @@ class SyncingServer : protected discovery::DiscoveryServer {
    */
   template <typename Client, typename Packet>
   void sendPacket(Client *client, const Packet& pack) {
-    client->write(utility::functions::toQByteArray(pak));
+    client->write(utility::functions::toQByteArray(pack));
   }
 
   /**

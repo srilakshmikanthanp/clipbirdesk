@@ -58,7 +58,7 @@ class DiscoveryServer : public QObject {
    */
   template <typename Packet>
   void sendPacket(const Packet& pack, const QHostAddress& host, quint16 port) {
-    m_socket.writeDatagram(utility::functions::toQByteArray(pak), host, port);
+    m_socket.writeDatagram(utility::functions::toQByteArray(pack), host, port);
   }
 
   /**

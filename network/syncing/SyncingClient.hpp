@@ -112,7 +112,7 @@ class SyncingClient : protected discovery::DiscoveryClient {
    */
   template <typename Packet>
   void sendPacket(const Packet& pack) {
-    m_socket.write(utility::functions::toQByteArray(pak));
+    m_socket.write(utility::functions::toQByteArray(pack));
   }
 
   /**
