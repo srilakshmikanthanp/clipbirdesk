@@ -5,6 +5,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// Qt headers
+#include <QSize>
+
+// C++ headers
 #include <filesystem>
 #include <string>
 
@@ -55,5 +59,13 @@ std::string getAppName() {
  */
 std::string getAppHome() {
   return std::filesystem::path(getenv("HOME")) / ("." + getAppName());
+}
+
+/**
+ * @brief Get the App Window Ratio
+ * @return QSize
+ */
+auto getAppWindowRatio() -> QSize {
+  return QSize(3, 3);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::config

@@ -48,13 +48,13 @@ class Controller : public QObject {
 
   //----------------------- server Signals ------------------------//
 
- signals:    // signals for this class
-  /// @brief On Sync Request  (From Server)
-  void OnClientListChanged(QList<QSslSocket *> clients);
-
  signals:    // signals
   /// @brief On client state changed (From Server)
-  void OnCLientStateChanged(QSslSocket *client, bool connected);
+  void OnCLientStateChanged(QPair<QHostAddress, quint16> client, bool connected);
+
+ signals:    // signals for this class
+  /// @brief On Sync Request  (From Server)
+  void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
 
  private:    // just for Qt
   Q_OBJECT
@@ -157,6 +157,9 @@ class Controller : public QObject {
     const auto signal_b = &clipboard::Clipboard::OnClipboardChange;
     const auto slot_b = &SyncingClient::syncItems;
     connect(&m_clipboard, signal_b, client, slot_b);
+
+    // Start the Discovery
+    client->startDiscovery();
   }
 
  public:   // Member functions
@@ -218,22 +221,56 @@ class Controller : public QObject {
    *
    * @return QList<QSslSocket*> List of clients
    */
-  const QList<QSslSocket *> getConnectedClientsList() const {
-    if (std::holds_alternative<SyncingServer>(m_host)) {
-      return std::get<SyncingServer>(m_host).getConnectedClientsList();
+  const QList<QPair<QHostAddress, quint16>> getConnectedClientsList() const {
+    if (!std::holds_alternative<SyncingServer>(m_host)) {
+      throw std::runtime_error("Host is not server");
+    }
+
+    // TODO: implement
+  }
+
+  /**
+   * @brief Disconnect the client from the server and delete
+   * the client
+   * @param host ip address of the client
+   * @param ip port number of the client
+   */
+  void disconnectClient(QPair<QHostAddress, quint16> client) {
+    // if the host is not server then throw
+    if (!std::holds_alternative<SyncingServer>(m_host)) {
+      throw std::runtime_error("Host is not server");
+    }
+
+    // find the client with the given host and ip
+    const auto match = [&](auto i) -> auto {
+      return i.first == client.first && i.second == client.second;
+    };
+
+    // get the list of clients
+    auto clients = getConnectedClientsList();
+
+    // find the client
+    auto it = std::find_if(clients.begin(), clients.end(), match);
+
+    // if the client is found then disconnect
+    if (it != clients.end()) {
+      disconnectClient(*it);
     }
   }
 
   /**
    * @brief Disconnect the client from the server and delete
    * the client
-   *
    * @param client Client to disconnect
    */
-  void disconnectClient(QSslSocket *client) {
-    if (std::holds_alternative<SyncingServer>(m_host)) {
-      std::get<SyncingServer>(m_host).disconnectClient(client);
+  void disconnectClient(QPair<QHostAddress, quint16> client) {
+    if (!std::holds_alternative<SyncingServer>(m_host)) {
+      throw std::runtime_error("Host is not server");
     }
+
+    std::get<SyncingServer>(m_host).disconnectClient({
+      client.first, client.second
+    });
   }
 
   /**
@@ -242,6 +279,8 @@ class Controller : public QObject {
   void disconnectAllClients() {
     if (std::holds_alternative<SyncingServer>(m_host)) {
       std::get<SyncingServer>(m_host).disconnectAllClients();
+    } else {
+      throw std::runtime_error("Host is not server");
     }
   }
 
@@ -253,9 +292,11 @@ class Controller : public QObject {
    * @return QList<QPair<QHostAddress, quint16>> List of servers
    */
   QList<QPair<QHostAddress, quint16>> getServerList() {
-    if (std::holds_alternative<SyncingClient>(m_host)) {
-      return std::get<SyncingClient>(m_host).getServerList();
+    if (!std::holds_alternative<SyncingClient>(m_host)) {
+      throw std::runtime_error("Host is not client");
     }
+
+    // TODO: implement
   }
 
   /**
@@ -265,19 +306,37 @@ class Controller : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  void connectToServer(const QHostAddress& host, quint16 port) {
-    if (std::holds_alternative<SyncingClient>(m_host)) {
-      std::get<SyncingClient>(m_host).connectToServer(host, port);
+  void connectToServer(QPair<QHostAddress, quint16> host) {
+    if (!std::holds_alternative<SyncingClient>(m_host)) {
+      throw std::runtime_error("Host is not client");
     }
+
+    // TODO: implement
+  }
+
+  /**
+   * @brief get the connected server address and port
+   *
+   * @return QPair<QHostAddress, quint16> address and port
+   */
+  QPair<QHostAddress, quint16> getConnectedServer() {
+    if (!std::holds_alternative<SyncingClient>(m_host)) {
+      throw std::runtime_error("Host is not client");
+    }
+
+    // TODO: implement
   }
 
   /**
    * @brief Disconnect from the server
    */
-  void disconnectFromServer() {
-    if (std::holds_alternative<SyncingClient>(m_host)) {
-      std::get<SyncingClient>(m_host).disconnectFromServer();
+  void disconnectFromServer(QPair<QHostAddress, quint16> host) {
+    // if the host is not client then throw error
+    if (!std::holds_alternative<SyncingClient>(m_host)) {
+      throw std::runtime_error("Host is not client");
     }
+
+    // TODO: implement
   }
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::controller

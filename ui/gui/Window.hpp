@@ -21,7 +21,10 @@
 #include "ui/gui/components/individual/index.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
-class Clipbird : public QWidget {
+class Window : public QWidget {
+ public:   // enum for this class
+  enum class Tabs { Server = 0, Client = 1 };
+
  private:  // Member variable
   components::Item* hostStatus = new components::Item(this);
   components::Item* serverName = new components::Item(this);
@@ -29,11 +32,8 @@ class Clipbird : public QWidget {
   components::Item* hostCount = new components::Item(this);
 
  private:  // Member variable (Tabs)
-  components::List* serverList = new components::List(this);
-  components::List* clientList = new components::List(this);
-
- public:   // enum for tabs
-  enum class Tabs { Server = 0, Client = 1 };
+  components::HList* clientList = new components::HList(this); // Server Tab
+  components::HList* serverList = new components::HList(this); // Client Tab
 
  private:  // Member variable
   Tabs currentTab = Tabs::Server;
@@ -52,11 +52,11 @@ class Clipbird : public QWidget {
 
  public:
   /**
-   * @brief Construct a new Clipbird object
+   * @brief Construct a new Window object
    * with parent as QWidget
    * @param parent parent object
    */
-  explicit Clipbird(QWidget* parent = nullptr) : QWidget(parent) {
+  explicit Window(QWidget* parent = nullptr) : QWidget(parent) {
     // create the root layout
     auto root = new QVBoxLayout(this);
 
@@ -86,7 +86,7 @@ class Clipbird : public QWidget {
 
     // using some components
     using components::individual::Tabbed;
-    using components::List;
+    using components::HList;
 
     // server list slot
     auto serverListSlot = [&](Action action, QString host, QString ip) {
@@ -104,10 +104,10 @@ class Clipbird : public QWidget {
     });
 
     // connect server list signal
-    connect(serverList, &List::onActionClicked, serverListSlot);
+    connect(serverList, &HList::onActionClicked, serverListSlot);
 
     // connect client list signal
-    connect(clientList, &List::onActionClicked, clientListSlot);
+    connect(clientList, &HList::onActionClicked, clientListSlot);
 
     // TODO: set the style sheet
   }
@@ -118,8 +118,16 @@ class Clipbird : public QWidget {
    * @param key
    * @param val
    */
-  void setHostStatus(const QString& key, const QString& val) {
-    hostStatus->set(key, val);
+  void setHostStatus(const QString& key, components::Status::Value val) {
+    // create the components of the class
+    auto label = new components::individual::Label(this);
+    auto status = new components::Status(this);
+
+    // set the values
+    label->setText(key); status->setStatus(val);
+
+    // set the status
+    hostStatus->set(label, status);
   }
 
   /**
@@ -127,8 +135,14 @@ class Clipbird : public QWidget {
    *
    * @return QPair<QString, QString>
    */
-  QPair<QString, QString> getHostStatus() {
-    return hostStatus->get();
+  QPair<QString, components::Status::Value> getHostStatus() {
+    using components::individual::Label;
+    using components::Status;
+
+    const auto status = qobject_cast<Status*>(hostStatus->get().second);
+    const auto label = qobject_cast<Label*>(hostStatus->get().first);
+
+    return {label->text(), status->getStatus()};
   }
 
   /**
@@ -138,7 +152,12 @@ class Clipbird : public QWidget {
    * @param val
    */
   void setServerName(const QString& key, const QString& val) {
-    serverName->set(key, val);
+    auto label = new components::individual::Label(this);
+    auto info = new components::individual::Label(this);
+
+    label->setText(key); info->setText(val);
+
+    serverName->set(label, info);
   }
 
   /**
@@ -147,7 +166,12 @@ class Clipbird : public QWidget {
    * @return QPair<QString, QString>
    */
   QPair<QString, QString> getServerName() {
-    return serverName->get();
+    using components::individual::Label;
+
+    const auto label = qobject_cast<Label*>(serverName->get().first);
+    const auto info = qobject_cast<Label*>(serverName->get().second);
+
+    return {label->text(), info->text()};
   }
 
   /**
@@ -157,7 +181,12 @@ class Clipbird : public QWidget {
    * @param val
    */
   void setServerIp(const QString& key, const QString& val) {
-    serverIP->set(key, val);
+    auto label = new components::individual::Label(this);
+    auto info = new components::individual::Label(this);
+
+    label->setText(key); info->setText(val);
+
+    serverIP->set(label, info);
   }
 
   /**
@@ -166,7 +195,12 @@ class Clipbird : public QWidget {
    * @return QPair<QString, QString>
    */
   QPair<QString, QString> getServerIp() {
-    return serverIP->get();
+    using components::individual::Label;
+
+    const auto label = qobject_cast<Label*>(serverIP->get().first);
+    const auto info = qobject_cast<Label*>(serverIP->get().second);
+
+    return {label->text(), info->text()};
   }
 
   /**
@@ -176,7 +210,12 @@ class Clipbird : public QWidget {
    * @param val
    */
   void setHostCount(const QString& key, int val) {
-    hostCount->set(key, QString::number(val));
+    auto label = new components::individual::Label(this);
+    auto info = new components::individual::Label(this);
+
+    label->setText(key); info->setText(QString::number(val));
+
+    hostCount->set(label, info);
   }
 
   /**
@@ -185,8 +224,15 @@ class Clipbird : public QWidget {
    * @return QPair<QString, QString>
    */
   QPair<QString, int> getHostCount() {
-    return {hostCount->get().first, hostCount->get().second.toInt()};
+    using components::individual::Label;
+
+    const auto label = qobject_cast<Label*>(hostCount->get().first);
+    const auto info = qobject_cast<Label*>(hostCount->get().second);
+
+    return {label->text(), info->text().toInt()};
   }
+
+  //---------------------- Server Tab ----------------------//
 
   /**
    * @brief Add Server to the list
@@ -194,7 +240,7 @@ class Clipbird : public QWidget {
    * @param hostName
    * @param ip
    */
-  void addServer(QString hostName, QString ip) {
+  void addClient(QString hostName, QString ip) {
     serverList->addHost(hostName, ip, Action::Disconnect);
   }
 
@@ -204,7 +250,7 @@ class Clipbird : public QWidget {
    * @param hostName
    * @param ip
    */
-  void removeServer(QString hostName, QString ip) {
+  void removeClient(QString hostName, QString ip) {
     serverList->removeHost(hostName, ip);
   }
 
@@ -213,51 +259,53 @@ class Clipbird : public QWidget {
    *
    * @return QList<QPair<QString, QString>>
    */
-  QList<QPair<QString, QString>> getServerList() {
+  QList<QPair<QString, QString>> getClientList() {
     return serverList->getAllHosts();
   }
 
   /**
    * @brief Remove all servers from the list
    */
-  void clearServerList() {
+  void clearClientList() {
     serverList->removeAllHosts();
   }
 
+  //---------------------- Client Tab ----------------------//
+
   /**
-   * @brief Add Client to the list
+   * @brief Add Server to the list
    *
    * @param hostName
    * @param ip
    * @param action
    */
-  void addClient(QString hostName, QString ip, Action action) {
+  void addServer(QString hostName, QString ip, Action action) {
     clientList->addHost(hostName, ip, action);
   }
 
   /**
-   * @brief Remove a Client from the list
+   * @brief Remove a Server from the list
    *
    * @param hostName
    * @param ip
    */
-  void removeClient(QString hostName, QString ip) {
+  void removeServer(QString hostName, QString ip) {
     clientList->removeHost(hostName, ip);
   }
 
   /**
-   * @brief Get the Client List object
+   * @brief Get the Server List from the tab
    *
    * @return QList<QPair<QString, QString>>
    */
-  QList<QPair<QString, QString>> getClientList() {
+  QList<QPair<QString, QString>> getServerList() {
     return clientList->getAllHosts();
   }
 
   /**
-   * @brief Remove all clients from the list
+   * @brief Remove all servers from the list
    */
-  void clearClientList() {
+  void clearServerList() {
     clientList->removeAllHosts();
   }
 };

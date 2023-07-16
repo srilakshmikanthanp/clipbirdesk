@@ -25,7 +25,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 class SyncingServer : public discovery::DiscoveryServer {
  signals:    // signals
   /// @brief On client state changed
-  void OnCLientStateChanged(QSslSocket *client, bool connected);
+  void OnCLientStateChanged(QPair<QHostAddress, quint16>, bool connected);
 
  signals:    // signals for this class
   /// @brief On Error Occurred
@@ -33,7 +33,7 @@ class SyncingServer : public discovery::DiscoveryServer {
 
  signals:    // signals for this class
   /// @brief On Sync Request
-  void OnClientListChanged(QList<QSslSocket *> clients);
+  void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
 
  signals:    // signals
   /// @brief On Sync Request
@@ -187,14 +187,18 @@ class SyncingServer : public discovery::DiscoveryServer {
       const auto slot_r = &SyncingServer::processReadyRead;
       QObject::connect(client_tls, signal_r, this, slot_r);
 
+    // convert to QPair<QHostAddress, quint16>
+      auto client_info = QPair<QHostAddress, quint16>(
+        client_tls->peerAddress(), client_tls->peerPort());
+
       // Notify the listeners that the client is connected
-      emit OnCLientStateChanged(client_tls, true);
+      emit OnCLientStateChanged(client_info, true);
 
       // Add the client to the list of clients
       m_clients.append(client_tls);
 
       // Notify the listeners that the client list is changed
-      emit OnClientListChanged(m_clients);
+      emit OnClientListChanged(getConnectedClientsList());
     }
   }
 
@@ -205,14 +209,18 @@ class SyncingServer : public discovery::DiscoveryServer {
     // Get the client that was disconnected
     auto client = qobject_cast<QSslSocket *>(sender());
 
+    // convert to QPair<QHostAddress, quint16>
+    auto client_info = QPair<QHostAddress, quint16>(
+        client->peerAddress(), client->peerPort());
+
     // Notify the listeners that the client is disconnected
-    emit OnCLientStateChanged(client, false);
+    emit OnCLientStateChanged(client_info, false);
 
     // Remove the client from the list of clients
     m_clients.removeOne(client);
 
     // Notify the listeners that the client list is changed
-    emit OnClientListChanged(m_clients);
+    emit OnClientListChanged(getConnectedClientsList());
   }
 
  public:   // constructors and destructors
@@ -253,8 +261,12 @@ class SyncingServer : public discovery::DiscoveryServer {
    *
    * @return QList<QSslSocket*> List of clients
    */
-  const QList<QSslSocket *> getConnectedClientsList() const {
-    return m_clients;
+  QList<QPair<QHostAddress, quint16>> getConnectedClientsList() const {
+    QList<QPair<QHostAddress, quint16>> list;
+    for (auto client : m_clients) {
+      list.append({client->peerAddress(), client->peerPort()});
+    }
+    return list;
   }
 
   /**
@@ -263,15 +275,19 @@ class SyncingServer : public discovery::DiscoveryServer {
    *
    * @param client Client to disconnect
    */
-  void disconnectClient(QSslSocket *client) {
-    client->disconnectFromHost();
+  void disconnectClient(QPair<QHostAddress, quint16> client) {
+    for (auto c : m_clients) {
+      if (c->peerAddress() == client.first && c->peerPort() == client.second) {
+        c->disconnectFromHost(); return;
+      }
+    }
   }
 
   /**
    * @brief Disconnect the all the clients from the server
    */
   void disconnectAllClients() {
-    for (auto client : m_clients) this->disconnectClient(client);
+    for (auto client : m_clients) client->disconnectFromHost();
   }
 
   /**

@@ -288,14 +288,31 @@ class SyncingClient : public discovery::DiscoveryClient {
    * @param host Host address
    * @param port Port number
    */
-  void connectToServer(const QHostAddress& host, quint16 port) {
+  void connectToServer(QPair<QHostAddress, quint16> client) {
     // check if the SSL configuration is set
     if (m_ssl_socket.sslConfiguration().isNull()) {
       throw std::runtime_error("SSL Configuration is not set");
     }
 
+    // check if the socket is connected
+    if (m_ssl_socket.isOpen()) {
+      this->disconnectFromServer();
+    }
+
+    // create the host address
+    const auto host = client.first.toString();
+    const auto port = client.second;
+
     // connect to the server as encrypted
-    m_ssl_socket.connectToHostEncrypted(host.toString(), port);
+    m_ssl_socket.connectToHostEncrypted(host, port);
+  }
+
+  /**
+   * @brief Get the Connection Host and Port object
+   * @return QPair<QHostAddress, quint16>
+   */
+  QPair<QHostAddress, quint16> getConnectedServer() const {
+    return {m_ssl_socket.peerAddress(), m_ssl_socket.peerPort()};
   }
 
   /**

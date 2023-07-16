@@ -10,10 +10,7 @@
 // C++ Headers
 
 // Project Headers
-#include "controller/Controller.hpp"
-#include "ui/gui/Clipbird.hpp"
-
-#include "utility/functions/sslcert.hpp"
+#include "config/config.hpp"
 
 /**
  * @brief main function that starts the application
@@ -26,6 +23,16 @@
  * @return int Status code
  */
 auto main(int argc, char **argv) -> int {
+  // create SingleApplication instance
   SingleApplication app(argc, argv);
+
+  // check if another instance is running
+  if (app.isSecondary()) {
+    app.sendMessage(app.arguments().join(' ').toUtf8());
+  } else {
+    // TODO: add code to start the application
+  }
+
+  // return status code
   return app.exec();
 }

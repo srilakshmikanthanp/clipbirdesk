@@ -12,15 +12,17 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class Status : public QWidget {
+ private:  // disable copy and move for this class
+  Q_DISABLE_COPY_MOVE(Status)
+
+ public:   // enum for this class
+  enum class Value { Connected, Disconnected, Active, Inactive };
+
  private:  // Member variable
-  individual::Circle *circle;
-  individual::Label *status;
+  Value value = Value::Disconnected;
 
  private:  // just for Qt
   Q_OBJECT
-
- private: // disable copy and move
-  Q_DISABLE_COPY_MOVE(Status)
 
  public:
   /**
@@ -28,23 +30,7 @@ class Status : public QWidget {
    * with parent as QWidget
    * @param parent parent object
    */
-  explicit Status(QWidget* parent = nullptr) {
-    // create the components of the class
-    this->circle = new individual::Circle(this);
-    this->status = new individual::Label(this);
-
-    // create a layout to align the widgets
-    auto root = new QHBoxLayout(this);
-
-    // add the widgets to the layout
-    root->addWidget(this->circle);
-    root->addWidget(this->status);
-
-    // set the layout to the widget
-    this->setLayout(root);
-
-    // TODO: set the style sheet
-  }
+  explicit Status(QWidget* parent = nullptr) : QWidget(parent) {}
 
   /**
    * @brief Destroy the Status object
@@ -52,35 +38,49 @@ class Status : public QWidget {
   virtual ~Status() = default;
 
   /**
-   * @brief set the color
-   * @param color color
-   */
-  void setColor(const QColor& color) {
-    this->circle->setColor(color);
-  }
-
-  /**
    * @brief set the Status
    * @param val Status
    */
-  void setStatus(const QString& val) {
-    this->status->setText(val);
-  }
+  void setStatus(Value val) {
+    // create the components of the class
+    auto circle = new individual::Circle(this);
+    auto status = new individual::Label(this);
 
-  /**
-   * @brief get the color
-   * @return QColor color
-   */
-  QColor getColor() const {
-    return this->circle->getColor();
+    // create a layout to align the widgets
+    auto root = new QHBoxLayout(this);
+
+    // add the widgets to the layout
+    root->addWidget(circle);
+    root->addWidget(status);
+
+    // set the text of the status
+    switch (val) {
+      case Value::Disconnected:
+        status->setText("Disconnected");
+        circle->setColor(Qt::red);
+        break;
+      case Value::Connected:
+        status->setText("Connected");
+        circle->setColor(Qt::green);
+        break;
+      case Value::Active:
+        status->setText("Active");
+        circle->setColor(Qt::green);
+        break;
+      case Value::Inactive:
+        status->setText("Inactive");
+        circle->setColor(Qt::red);
+        break;
+    }
+
+    // set the layout to the widget
+    this->setLayout(root);
   }
 
   /**
    * @brief get the Status
    * @return QString value
    */
-  QString getStatus() const {
-    return this->status->text();
-  }
+  Value getStatus() const { return value; }
 };
-} // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

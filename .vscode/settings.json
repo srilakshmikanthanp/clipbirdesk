@@ -111,6 +111,9 @@
     "qpushbutton": "cpp",
     "qhboxlayout": "cpp",
     "qboxlayout": "cpp",
-    "qtwidgets": "cpp"
+    "qtwidgets": "cpp",
+    "*.in": "cpp",
+    "qwidget": "cpp",
+    "source_location": "cpp"
   },
 }

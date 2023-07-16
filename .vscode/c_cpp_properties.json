@@ -11,7 +11,8 @@
                 "C:/Qt/6.5.1/mingw_64/include/**",
                 "C:/Qt/6.5.1/mingw_64/include/QtGui",
                 "${workspaceFolder}/build/_deps/singleapplication-src",
-                "C:/Qt/6.5.1/mingw_64/include/QtCore"
+                "C:/Qt/6.5.1/mingw_64/include/QtCore",
+                "${workspaceFolder}/build"
             ],
             "defines": [
                 "_DEBUG",

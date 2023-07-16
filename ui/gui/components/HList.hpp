@@ -6,26 +6,30 @@
 // https://opensource.org/licenses/MIT
 
 #include <QListWidget>
+#include <QHostAddress>
 #include <QListWidgetItem>
 
 #include "ui/gui/components/Host.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
-class List : public QListWidget {
- signals:  // Signals
-  void onActionClicked(components::Host::Action action, QString host, QString ip);
+class HList : public QListWidget {
+ signals:  // Signals for this class
+  void onDisConnectClicked(QHostAddress host, quint16 port);
+
+ signals:  // Signals for this class
+  void onConnectClicked(QHostAddress host, quint16 port);
+
+ private:  // disable copy and move
+  Q_DISABLE_COPY_MOVE(HList)
 
  private:  // just for Qt
   Q_OBJECT
 
- private:  // disable copy and move
-  Q_DISABLE_COPY_MOVE(List)
-
- public:  // Type alias
+ public:   // Type alias
   using Action = components::Host::Action;
 
- public:  // Member Functions
-  explicit List(QWidget* parent = nullptr) : QListWidget(parent) {}
+ public:   // Member Functions
+  explicit HList(QWidget* parent = nullptr) : QListWidget(parent) {}
 
   /**
    * @brief Add Host to the list
