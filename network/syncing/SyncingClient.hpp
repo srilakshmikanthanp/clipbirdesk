@@ -21,7 +21,7 @@
 #include <utility>
 
 // Local headers
-#include "network/discovery/DiscoveryClient.hpp"
+#include "network/discovery/discoveryclient.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv.hpp"
 #include "utility/functions/nbytes.hpp"
@@ -57,7 +57,7 @@ class SyncingClient : public discovery::DiscoveryClient {
   /// @brief Qt meta object
   Q_OBJECT
 
- private: // disable copy and move
+ private:  // disable copy and move
   /// @brief Disable copy and move
   Q_DISABLE_COPY_MOVE(SyncingClient)
 
@@ -74,37 +74,7 @@ class SyncingClient : public discovery::DiscoveryClient {
   /// @brief Threshold times
   const qint64 m_threshold = 10000;
 
- private: // private functions
-
-  /**
-   * @brief Process the packet that has been received
-   * from the server and emit the signal
-   *
-   * @param packet Syncing packet
-   */
-  void processSyncingPacket(const packets::SyncingPacket& packet) {
-    // Make the vector of QPair<QString, QByteArray>
-    QVector<QPair<QString, QByteArray>> items;
-
-    // Get the items from the packet
-    for (auto item : packet.getItems()) {
-      items.append({item.getMimeType().toStdString().c_str(), item.getPayload()});
-    }
-
-    // emit the signal
-    emit OnSyncRequest(items);
-  }
-
-  /**
-   * @brief Process the Invalid packet that has been received
-   * from the server and emit the signal
-   *
-   * @param packet Invalid packet
-   */
-  void processInvalidPacket(const packets::InvalidRequest& packet) {
-    emit OnErrorOccurred(packet.getErrorMessage());
-  }
-
+ private:  // private functions
   /**
    * @brief Create the packet and send it to the client
    *
@@ -116,81 +86,35 @@ class SyncingClient : public discovery::DiscoveryClient {
   }
 
   /**
+   * @brief Process the packet that has been received
+   * from the server and emit the signal
+   *
+   * @param packet Syncing packet
+   */
+  void processSyncingPacket(const packets::SyncingPacket& packet);
+
+  /**
+   * @brief Process the Invalid packet that has been received
+   * from the server and emit the signal
+   *
+   * @param packet Invalid packet
+   */
+  void processInvalidPacket(const packets::InvalidRequest& packet);
+
+  /**
    * @brief Updates the server list by removing the
    * server that that has exceeded the threshold
    * and emit the signal
    */
-  void updateServerList() {
-    // current timestamp in milliseconds
-    const auto current = QDateTime::currentMSecsSinceEpoch();
-
-    // candidate for removal
-    const auto candidate = [&](auto element) -> bool {
-      return (current - std::get<2>(element)) > m_threshold;
-    };
-
-    // remove the server that has exceeded the threshold
-    const auto start = m_servers.begin();
-    const auto end = m_servers.end();
-    const auto it = std::remove_if(start, end, candidate);
-
-    // if No change return
-    if (it == end) return;
-
-    // Remove the server from the list
-    m_servers.erase(it, end);
-
-    // emit the signal if changed
-    emit OnServerListChanged(getServerList());
-  }
+  void updateServerList();
 
   /**
    * @brief Process the packet that has been received
    * from the server
    */
-  void processReadyRead() {
-    // Read All the data from the socket
-    const auto data = m_ssl_socket.readAll();
-
-    // using fromQByteArray to parse the packet
-    using utility::functions::fromQByteArray;
-
-    // try to parse the packet
-    try {
-      processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
-      return;
-    } catch (const types::except::MalformedPacket& e) {
-      OnErrorOccurred(e.what());
-      return;
-    } catch (const std::exception& e) {
-      OnErrorOccurred(e.what());
-      return;
-    } catch (...) {
-      OnErrorOccurred("Unknown Error");
-      return;
-    }
-
-    // try to parse the packet
-    try {
-      processInvalidPacket(fromQByteArray<packets::InvalidRequest>(data));
-      return;
-    } catch (const types::except::MalformedPacket& e) {
-      OnErrorOccurred(e.what());
-      return;
-    } catch (const std::exception& e) {
-      OnErrorOccurred(e.what());
-      return;
-    } catch (...) {
-      OnErrorOccurred("Unknown Error");
-      return;
-    }
-
-    // if no packet is found
-    OnErrorOccurred("Unknown Packet Found");
-  }
+  void processReadyRead();
 
  public:
-
   /**
    * @brief Construct a new Syncing Client object
    * and connect the signals and slots and start
@@ -199,40 +123,7 @@ class SyncingClient : public discovery::DiscoveryClient {
    * @param th threshold
    * @param parent Parent
    */
-  SyncingClient(QObject* parent = nullptr): DiscoveryClient(parent) {
-    // connect the signal to emit the signal for
-    // OnErrorOccurred from the base class
-    const auto signal_e = &DiscoveryClient::OnErrorOccurred;
-    const auto slot_e = &SyncingClient::OnErrorOccurred;
-    connect(this, signal_e, this, slot_e);
-
-    // connected signal to emit the signal for
-    // server state changed
-    const auto signal_c = &QSslSocket::connected;
-    const auto slot_c = [&]() { emit OnServerStatusChanged(true); };
-    connect(&m_ssl_socket, signal_c, this, slot_c);
-
-    // connect the signals and slots for the socket
-    // readyRead signal to process the packet
-    const auto signal_r = &QSslSocket::readyRead;
-    const auto slot_r = &SyncingClient::processReadyRead;
-    connect(&m_ssl_socket, signal_r, this, slot_r);
-
-    // connect the signal to emit the signal for
-    // timer to update the server list
-    const auto signal_t = &QTimer::timeout;
-    const auto slot_t = &SyncingClient::updateServerList;
-    connect(&m_timer, signal_t, this, slot_t);
-
-    // start the timer to update the server list
-    m_timer.start(m_threshold);
-
-    // disconnected signal to emit the signal for
-    // server state changed
-    const auto signal_d = &QSslSocket::disconnected;
-    const auto slot_d = [&]() { emit OnServerStatusChanged(false); };
-    connect(&m_ssl_socket, signal_d, this, slot_d);
-  }
+  SyncingClient(QObject* parent = nullptr);
 
   /**
    * @brief Destroy the Syncing Client object
@@ -245,41 +136,14 @@ class SyncingClient : public discovery::DiscoveryClient {
    *
    * @param items QVector<QPair<QString, QByteArray>>
    */
-  void syncItems(QVector<QPair<QString, QByteArray>> items) {
-    // check if the socket is connected else throw error
-    if (!m_ssl_socket.isOpen()) {
-      throw std::runtime_error("Socket is not connected");
-    }
-
-    // using createPacket to create the packet
-    using utility::functions::createPacket;
-
-    // create the packet
-    packets::SyncingPacket packet = createPacket({
-      packets::SyncingPacket::PacketType::SyncPacket, items
-    });
-
-    // send the packet to the server
-    this->sendPacket(packet);
-  }
+  void syncItems(QVector<QPair<QString, QByteArray>> items);
 
   /**
    * @brief Get the Server List object
    *
    * @return QList<QPair<QHostAddress, quint16>> List of servers
    */
-  QList<QPair<QHostAddress, quint16>> getServerList() {
-    // Host address and port number
-    QList<QPair<QHostAddress, quint16>> list;
-
-    // iterate and add the server
-    for (auto& [host, port, _] : m_servers) {
-      list.append({host, port});
-    }
-
-    // return the list
-    return list;
-  }
+  QList<QPair<QHostAddress, quint16>> getServerList();
 
   /**
    * @brief Connect to the server with the given host and port
@@ -288,60 +152,34 @@ class SyncingClient : public discovery::DiscoveryClient {
    * @param host Host address
    * @param port Port number
    */
-  void connectToServer(QPair<QHostAddress, quint16> client) {
-    // check if the SSL configuration is set
-    if (m_ssl_socket.sslConfiguration().isNull()) {
-      throw std::runtime_error("SSL Configuration is not set");
-    }
-
-    // check if the socket is connected
-    if (m_ssl_socket.isOpen()) {
-      this->disconnectFromServer();
-    }
-
-    // create the host address
-    const auto host = client.first.toString();
-    const auto port = client.second;
-
-    // connect to the server as encrypted
-    m_ssl_socket.connectToHostEncrypted(host, port);
-  }
+  void connectToServer(QPair<QHostAddress, quint16> client);
 
   /**
    * @brief Get the Connection Host and Port object
    * @return QPair<QHostAddress, quint16>
    */
-  QPair<QHostAddress, quint16> getConnectedServer() const {
-    return {m_ssl_socket.peerAddress(), m_ssl_socket.peerPort()};
-  }
+  QPair<QHostAddress, quint16> getConnectedServer() const;
 
   /**
    * @brief Disconnect from the server
    */
-  void disconnectFromServer() {
-    m_ssl_socket.disconnectFromHost();
-  }
+  void disconnectFromServer();
 
   /**
    * @brief Set the SSL Configuration object
    *
    * @param config SSL Configuration
    */
-  void setSSLConfiguration(QSslConfiguration config) {
-    m_ssl_socket.setSslConfiguration(config);
-  }
+  void setSSLConfiguration(QSslConfiguration config);
 
   /**
    * @brief Get the SSL Configuration object
    *
    * @return QSslConfiguration
    */
-  QSslConfiguration getSSLConfiguration() const {
-    return m_ssl_socket.sslConfiguration();
-  }
+  QSslConfiguration getSSLConfiguration() const;
 
  protected:  // abstract functions from the base class
-
   /**
    * @brief On server found function that That Called by the
    * discovery client when the server is found
@@ -349,18 +187,6 @@ class SyncingClient : public discovery::DiscoveryClient {
    * @param host Host address
    * @param port Port number
    */
-  void onServerFound(QPair<QHostAddress, quint16> server) override {
-    // current timestamp in milliseconds
-    const auto current = QDateTime::currentMSecsSinceEpoch();
-
-    // emit the signal
-    emit OnServerFound(server);
-
-    // add the server to the list
-    m_servers.append({server.first, server.second, current});
-
-    // emit the signal
-    emit OnServerListChanged(getServerList());
-  }
+  void onServerFound(QPair<QHostAddress, quint16> server) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

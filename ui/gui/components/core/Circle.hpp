@@ -27,9 +27,7 @@ class Circle : public QWidget {
    * with parent as QWidget
    * @param parent parent object
    */
-  explicit Circle(QWidget *parent = nullptr) : QWidget(parent) {
-    setStyleSheet(style);
-  }
+  explicit Circle(QWidget *parent = nullptr);
 
   /**
    * @brief set the Radius of the circle

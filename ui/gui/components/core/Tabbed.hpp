@@ -22,9 +22,7 @@ class Tabbed : public QTabWidget {
    * with parent as QTabWidget
    * @param parent parent object
    */
-  explicit Tabbed(QWidget *parent = nullptr) : QTabWidget(parent) {
-    setStyleSheet(style);
-  }
+  explicit Tabbed(QWidget *parent = nullptr);
 
   /**
    * @brief Destroy the Tabbed object

@@ -30,9 +30,7 @@ class PairView : public QWidget {
    * with parent as QWidget
    * @param parent parent object
    */
-  explicit PairView(QWidget* parent = nullptr) : QWidget(parent) {
-    this->setStyleSheet(style);
-  }
+  explicit PairView(QWidget* parent = nullptr);
 
   /**
    * @brief Destroy the PairView object
@@ -45,28 +43,13 @@ class PairView : public QWidget {
    * @param key key
    * @param val value
    */
-  void set(QWidget *key, QWidget* val) {
-    // create a layout to align the widgets
-    auto root = new QFormLayout(this);
-
-    // save the widgets
-    this->key = key;
-    this->val = val;
-
-    // add the widgets to the layout
-    root->addRow(key, val);
-
-    // set the layout to the widget
-    this->setLayout(root);
-  }
+  void set(QWidget *key, QWidget* val);
 
   /**
    * @brief get the key and value as pair
    *
    * @return std::pair<QString, QString> key and value
    */
-  QPair<QWidget*, QWidget*> get() const {
-    return {this->key, this->val};
-  }
+  QPair<QWidget*, QWidget*> get() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core

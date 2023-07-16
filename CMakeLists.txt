@@ -5,6 +5,9 @@ project(clipbird VERSION 1.0.0 LANGUAGES CXX)
 # include cmake modules
 include(FetchContent)
 
+# glob pattern for cpp files
+file(GLOB_RECURSE cpp_files *.cpp)
+
 # --------------------------------- Main Project ---------------------------------#
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
@@ -40,7 +43,7 @@ qt_standard_project_setup()
 
 # Add executable
 qt_add_executable(clipbird
-  main.cpp
+  main.cpp ${cpp_files}
 )
 
 # Link libraries

@@ -13,7 +13,7 @@
 #include <QSslSocket>
 #include <QVector>
 
-#include "network/discovery/DiscoveryServer.hpp"
+#include "network/discovery/discoveryserver.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv.hpp"
 
@@ -23,53 +23,52 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * the clients
  */
 class SyncingServer : public discovery::DiscoveryServer {
- signals:    // signals
+ signals:  // signals
   /// @brief On client state changed
   void OnCLientStateChanged(QPair<QHostAddress, quint16>, bool connected);
 
- signals:    // signals for this class
+ signals:  // signals for this class
   /// @brief On Error Occurred
   void OnErrorOccurred(QString error);
 
- signals:    // signals for this class
+ signals:  // signals for this class
   /// @brief On Server State Changed
   void OnServerStateChanged(bool started);
 
- signals:    // signals for this class
+ signals:  // signals for this class
   /// @brief On Sync Request
   void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
 
- signals:    // signals
+ signals:  // signals
   /// @brief On Sync Request
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
 
- private:    // just for Qt
+ private:  // just for Qt
   /// @brief Qt meta object
   Q_OBJECT
 
- private: // disable copy and move
+ private:  // disable copy and move
   Q_DISABLE_COPY_MOVE(SyncingServer)
 
- public:     // Authenticator Type
+ public:  // Authenticator Type
   /// @brief Authenticator
   using Authenticator = std::function<bool(QPair<QHostAddress, quint16>)>;
 
- private:    // members of the class
+ private:  // members of the class
   /// @brief SSL server
   QSslServer m_ssl_server = QSslServer(this);
 
   /// @brief List of clients
-  QList<QSslSocket *> m_clients;
+  QList<QSslSocket*> m_clients;
 
- private:    // Authenticator Instance
+ private:  // Authenticator Instance
   /// @brief Authenticator
   Authenticator m_authenticator = nullptr;
 
- private:    // some typedefs
+ private:  // some typedefs
   using MalformedPacket = types::except::MalformedPacket;
 
- private:    // member functions
-
+ private:  // member functions
   /**
    * @brief Create the packet and send it to the client
    *
@@ -77,7 +76,7 @@ class SyncingServer : public discovery::DiscoveryServer {
    * @param packet Packet to send
    */
   template <typename Client, typename Packet>
-  void sendPacket(Client *client, const Packet& pack) {
+  void sendPacket(Client* client, const Packet& pack) {
     client->write(utility::functions::toQByteArray(pack));
   }
 
@@ -89,7 +88,7 @@ class SyncingServer : public discovery::DiscoveryServer {
    */
   template <typename Packet>
   void sendPacket(const Packet& pack) {
-    for (auto client: m_clients) {
+    for (auto client : m_clients) {
       this->sendPacket(client, pack);
     }
   }
@@ -99,135 +98,24 @@ class SyncingServer : public discovery::DiscoveryServer {
    *
    * @param packet SyncingPacket
    */
-  void processSyncingPacket(const packets::SyncingPacket& packet) {
-    // Make the vector of QPair<QString, QByteArray>
-    QVector<QPair<QString, QByteArray>> items;
-
-    // Get the items from the packet
-    #define STR(item) item.getMimeType().toStdString().c_str()
-    for (auto item : packet.getItems()) {
-      items.append({STR(item), item.getPayload()});
-    }
-    #undef  STR // just used to avoid the long line
-
-    // Notify the listeners to sync the data
-    emit OnSyncRequest(items);
-
-    // send the packet to all the clients
-    this->sendPacket(packet);
-  }
+  void processSyncingPacket(const packets::SyncingPacket& packet);
 
   /**
    * @brief Callback function that process the ready
    * read from the client
    */
-  void processReadyRead() {
-    // Get the client that was ready to read
-    auto client = qobject_cast<QSslSocket *>(sender());
-
-    // Get the data from the client
-    const auto data = client->readAll();
-
-    // using the fromQByteArray from namespace
-    using utility::functions::fromQByteArray;
-    using utility::functions::createPacket;
-
-    // Deserialize the data to SyncingPacket
-    try {
-      this->processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
-      return;
-    } catch (const types::except::MalformedPacket &e) {
-      const auto type = packets::InvalidRequest::PacketType::RequestFailed;
-      this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
-      return;
-    } catch (const std::exception &e) {
-      emit OnErrorOccurred(e.what());
-      return;
-    } catch (...) {
-      emit OnErrorOccurred("Unknown Error");
-      return;
-    }
-  }
+  void processReadyRead();
 
   /**
    * @brief Process the connections that are pending
    */
-  void processConnections() {
-    while (m_ssl_server.hasPendingConnections()) {
-      // Get the client that has been connected
-      auto client_tcp = (m_ssl_server.nextPendingConnection());
-
-      // Convert the client to SSL client
-      auto client_tls = qobject_cast<QSslSocket *>(client_tcp);
-
-      // using the createPacket from namespace
-      using utility::functions::createPacket;
-
-      // If the client is not SSL client then disconnect
-      if (client_tls == nullptr) {
-        const auto packType = packets::InvalidRequest::PacketType::RequestFailed;
-        const auto code = types::enums::ErrorCode::SSLError;
-        const auto message = "Client is not SSL client";
-        this->sendPacket(client_tcp, createPacket({packType, code, message}));
-        client_tcp->disconnectFromHost(); continue;
-      }
-
-      // Authenticate the client
-      if (!m_authenticator({client_tls->peerAddress(), client_tls->peerPort()})) {
-        client_tls->disconnectFromHost(); continue;
-      }
-
-      // Connect the client to the callback function that process
-      // the disconnection when the client is disconnected
-      // so the listener can be notified
-      const auto signal_d = &QSslSocket::disconnected;
-      const auto slot_d = &SyncingServer::processDisconnection;
-      QObject::connect(client_tls, signal_d, this, slot_d);
-
-      // Connect the socket to the callback function that
-      // process the ready read when the socket is ready
-      // to read so the listener can be notified
-      const auto signal_r = &QSslSocket::readyRead;
-      const auto slot_r = &SyncingServer::processReadyRead;
-      QObject::connect(client_tls, signal_r, this, slot_r);
-
-      // convert to QPair<QHostAddress, quint16>
-      auto client_info = QPair<QHostAddress, quint16>(
-        client_tls->peerAddress(), client_tls->peerPort());
-
-      // Notify the listeners that the client is connected
-      emit OnCLientStateChanged(client_info, true);
-
-      // Add the client to the list of clients
-      m_clients.append(client_tls);
-
-      // Notify the listeners that the client list is changed
-      emit OnClientListChanged(getConnectedClientsList());
-    }
-  }
-
+  void processConnections();
   /**
    * @brief Process the disconnection from the client
    */
-  void processDisconnection() {
-    // Get the client that was disconnected
-    auto client = qobject_cast<QSslSocket *>(sender());
+  void processDisconnection();
 
-    // convert to QPair<QHostAddress, quint16>
-    auto client_info = QPair<QHostAddress, quint16>(
-        client->peerAddress(), client->peerPort());
-
-    // Notify the listeners that the client is disconnected
-    emit OnCLientStateChanged(client_info, false);
-
-    // Remove the client from the list of clients
-    m_clients.removeOne(client);
-
-    // Notify the listeners that the client list is changed
-    emit OnClientListChanged(getConnectedClientsList());
-  }
-
- public:   // constructors and destructors
+ public:  // constructors and destructors
   /**
    * @brief Construct a new Syncing Server object and
    * bind to any available port and any available
@@ -236,14 +124,7 @@ class SyncingServer : public discovery::DiscoveryServer {
    * @param config SSL configuration
    * @param parent Parent object
    */
-  explicit SyncingServer(QObject *p = nullptr) : DiscoveryServer(p) {
-    // Connect the socket to the callback function that
-    // process the connections when the socket is ready
-    // to read so the listener can be notified
-    const auto signal_c = &QSslServer::pendingConnectionAvailable;
-    const auto slot_c = &SyncingServer::processConnections;
-    QObject::connect(&m_ssl_server, signal_c, this, slot_c);
-  }
+  explicit SyncingServer(QObject* p = nullptr);
 
   /**
    * @brief Destroy the Syncing Server object
@@ -255,23 +136,14 @@ class SyncingServer : public discovery::DiscoveryServer {
    *
    * @param data QVector<QPair<QString, QByteArray>>
    */
-  void syncItems(QVector<QPair<QString, QByteArray>> items) {
-    const auto packType = packets::SyncingPacket::PacketType::SyncPacket;
-    this->sendPacket(utility::functions::createPacket(packType, items));
-  }
+  void syncItems(QVector<QPair<QString, QByteArray>> items);
 
   /**
    * @brief Get the Clients that are connected to the server
    *
    * @return QList<QSslSocket*> List of clients
    */
-  QList<QPair<QHostAddress, quint16>> getConnectedClientsList() const {
-    QList<QPair<QHostAddress, quint16>> list;
-    for (auto client : m_clients) {
-      list.append({client->peerAddress(), client->peerPort()});
-    }
-    return list;
-  }
+  QList<QPair<QHostAddress, quint16>> getConnectedClientsList() const;
 
   /**
    * @brief Disconnect the client from the server and delete
@@ -279,108 +151,58 @@ class SyncingServer : public discovery::DiscoveryServer {
    *
    * @param client Client to disconnect
    */
-  void disconnectClient(QPair<QHostAddress, quint16> client) {
-    for (auto c : m_clients) {
-      if (c->peerAddress() == client.first && c->peerPort() == client.second) {
-        c->disconnectFromHost(); return;
-      }
-    }
-  }
+  void disconnectClient(QPair<QHostAddress, quint16> client);
 
   /**
    * @brief Disconnect the all the clients from the server
    */
-  void disconnectAllClients() {
-    for (auto client : m_clients) client->disconnectFromHost();
-  }
+  void disconnectAllClients();
 
   /**
    * @brief Get the Server QHostAddress & Port
    *
    * @return QPair<QHostAddress, quint16>
    */
-  QPair<QHostAddress, quint16> getServerInfo() const {
-    return {m_ssl_server.serverAddress(), m_ssl_server.serverPort()};
-  }
+  QPair<QHostAddress, quint16> getServerInfo() const;
 
   /**
    * @brief Set the SSL Configuration object
    *
    * @param config SSL Configuration
    */
-  void setSSLConfiguration(QSslConfiguration config) {
-    m_ssl_server.setSslConfiguration(config);
-  }
-
+  void setSSLConfiguration(QSslConfiguration config);
   /**
    * @brief Get the SSL Configuration object
    *
    * @return QSslConfiguration
    */
-  QSslConfiguration getSSLConfiguration() const {
-    return m_ssl_server.sslConfiguration();
-  }
+  QSslConfiguration getSSLConfiguration() const;
 
   /**
    * @brief Set the Authenticator object
    *
    * @param auth Authenticator
    */
-  void setAuthenticator(Authenticator auth) {
-    m_authenticator = auth;
-  }
+  void setAuthenticator(Authenticator auth);
 
   /**
    * @brief Get the Authenticator object
    *
    * @return Authenticator
    */
-  Authenticator getAuthenticator() const {
-    return m_authenticator;
-  }
+  Authenticator getAuthenticator() const;
 
   /**
    * @brief Start the server
    */
-  void start() override {
-    // check if the SSL configuration is set
-    if (m_ssl_server.sslConfiguration().isNull()) {
-      throw std::runtime_error("SSL Configuration is not set");
-    }
-
-    // check if the authenticator is set
-    if (m_authenticator == nullptr) {
-      throw std::runtime_error("Authenticator is not set");
-    }
-
-    // start the server
-    if (!m_ssl_server.listen()) {
-      throw std::runtime_error("Failed to start the server");
-    }
-
-    // start the discovery server
-    DiscoveryServer::start();
-
-    // Notify the listeners that the server is started
-    emit OnServerStateChanged(true);
-  }
+  void startServer() override;
 
   /**
    * @brief Stop the server
    */
-  void stop() override {
-    // stop the discovery server
-    DiscoveryServer::stop();
-
-    // stop the server
-    m_ssl_server.close();
-
-    // Notify the listeners
-    emit OnServerStateChanged(false);
-  }
+  void stopServer() override;
 
  protected:  // override functions from the base class
-
   /**
    * @brief Get the IP Type of the SyncingServer it can be IPv4 or
    * IPv6 the IP type is used to determine the length of the IP address
@@ -392,9 +214,7 @@ class SyncingServer : public discovery::DiscoveryServer {
    * @return types::IPType IP type
    * @throw Any Exception If any error occurs
    */
-  virtual types::enums::IPType getIPType() const override {
-    return types::enums::IPType::IPv4;
-  }
+  virtual types::enums::IPType getIPType() const override;
 
   /**
    * @brief Get the Port number of the SyncingServer it can be any port
@@ -405,9 +225,7 @@ class SyncingServer : public discovery::DiscoveryServer {
    * @return types::Port Port number
    * @throw Any Exception If any error occurs
    */
-  virtual quint16 getPort() const override {
-    return m_ssl_server.serverPort();
-  }
+  virtual quint16 getPort() const override;
 
   /**
    * @brief Get the IP Address of the SyncingServer it can be IPv4 or
@@ -417,8 +235,6 @@ class SyncingServer : public discovery::DiscoveryServer {
    * @return types::IPAddress IP address
    * @throw Any Exception If any error occurs
    */
-  virtual QHostAddress getIPAddress() const override {
-    return m_ssl_server.serverAddress();
-  }
+  virtual QHostAddress getIPAddress() const override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

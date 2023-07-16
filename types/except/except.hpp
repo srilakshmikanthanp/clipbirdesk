@@ -18,19 +18,14 @@ class MalformedPacket : public std::exception {
   std::uint8_t code;
 
  public:
- // Constructor
-  MalformedPacket(std::uint8_t code, const std::string& message) noexcept
-      : message(message), code(code) {}
+  // Constructor
+  MalformedPacket(std::uint8_t code, const std::string& message);
 
   // get message
-  const char* what() const noexcept override {
-    return (std::to_string(code) + ": " + message).c_str();
-  }
+  const char* what() const noexcept override;
 
   // get Code
-  std::uint8_t getCode() const noexcept {
-    return code;
-  }
+  std::uint8_t getCode() const noexcept;
 
   // Virtual destructor for inheritance
   virtual ~MalformedPacket() noexcept = default;
@@ -45,12 +40,9 @@ class NotSupported : public std::exception {
 
  public:
   // Constructor
-  NotSupported(const std::string& message) noexcept
-    : message(message) {}
+  NotSupported(const std::string& message) noexcept;
 
   // get message
-  const char* what() const noexcept override {
-    return message.c_str();
-  }
+  const char* what() const noexcept override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::types::except

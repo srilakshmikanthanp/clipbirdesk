@@ -15,7 +15,7 @@
 #include <QWidget>
 
 // Project Headers
-#include "controller/Controller.hpp"
+#include "controller/controller.hpp"
 #include "ui/gui/TrayIcon.hpp"
 #include "ui/gui/Window.hpp"
 

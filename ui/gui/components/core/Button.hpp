@@ -22,9 +22,7 @@ class Button : public QPushButton {
    * with parent as QButton
    * @param parent parent object
    */
-  explicit Button(QWidget *parent = nullptr) : QPushButton(parent) {
-    setStyleSheet(style);
-  }
+  explicit Button(QWidget *parent = nullptr);
 
   /**
    * @brief Destroy the Button object

@@ -18,8 +18,8 @@
 #include <QtLogging>
 
 // Local headers
-#include "network/packets/DiscoveryPacket.hpp"
-#include "network/packets/InvalidRequest.hpp"
+#include "network/packets/discoverypacket.hpp"
+#include "network/packets/invalidrequest.hpp"
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 #include "utility/functions/ipconv.hpp"
@@ -34,21 +34,24 @@ namespace srilakshmikanthanp::clipbirdesk::network::discovery {
  * IP type, IP address and port number respectively
  */
 class DiscoveryServer : public QObject {
- private:   // typedefs for this class
- using MalformedPacket = types::except::MalformedPacket;
- using IPType = types::enums::IPType;
+ private:  // typedefs for this class
+  using MalformedPacket = types::except::MalformedPacket;
+  using IPType = types::enums::IPType;
 
- private:   // variables
+ private:  // Just for Qt
+  Q_OBJECT
+
+ private:  // variables
   QUdpSocket m_socket = QUdpSocket(this);
 
- signals:   // signals for this class
+ signals:  // signals for this class
   /// @brief On Error Occurred
   void OnErrorOccurred(QString error);
 
- private: // disable copy and move
+ private:  // disable copy and move
   Q_DISABLE_COPY_MOVE(DiscoveryServer)
 
- private:   // private functions
+ private:  // private functions
   /**
    * @brief Create the packet and send it to the client
    *
@@ -65,73 +68,13 @@ class DiscoveryServer : public QObject {
    * @brief Process the packet and return the packet
    * with server Information
    */
-  void processDiscoveryPacket(const packets::DiscoveryPacket& packet) {
-    // response type of the packet is response
-    const auto pakType = packets::DiscoveryPacket::PacketType::Response;
-
-    // Using the functions namespace
-    using utility::functions::toIPV4QHostAddress;
-    using utility::functions::createPacket;
-    using utility::functions::toIPV6QHostAddress;
-
-    // get this client IP address & port number
-    const auto host = packet.getHostIp();
-    const auto port = packet.getHostPort();
-    const auto type = packet.getIpType();
-
-    // Create the QHostAddress from the IP address
-    QHostAddress address;
-
-    // convert the IP address to QHostAddress
-    if (type == IPType::IPv4) {
-      address = toIPV4QHostAddress(host);
-    } else {
-      address = toIPV6QHostAddress(host);
-    }
-
-    // set the IP address and port number
-    try {
-      #define PARAMS pakType, getIPType(), getIPAddress(), getPort()
-      this->sendPacket(createPacket({PARAMS}), address, port);
-      #undef  PARAMS // just used to avoid long line
-    } catch (...) {
-      return; // return if any error occurs
-    }
-  }
+  void processDiscoveryPacket(const packets::DiscoveryPacket& packet);
 
   /**
    * @brief Process the datagrams that are received
    * from the socket
    */
-  void processDatagrams() {
-    while (m_socket.hasPendingDatagrams()) {
-      // Read the data from the socket
-      QByteArray data(m_socket.pendingDatagramSize(), Qt::Uninitialized);
-      QHostAddress addr; quint16 port;
-      m_socket.readDatagram(data.data(), data.size(), &addr, &port);
-
-      // Using the ipconv namespace to convert the IP address
-      using utility::functions::fromQByteArray;
-      using utility::functions::createPacket;
-
-      // try to parse the packet if it
-      // fails then continue to next
-      try {
-        this->processDiscoveryPacket(fromQByteArray<packets::DiscoveryPacket>(data));
-        continue;
-      } catch (MalformedPacket& e) {
-        const auto pakType = packets::InvalidRequest::PacketType::RequestFailed;
-        sendPacket(createPacket({pakType, e.getCode(), e.what()}), addr, port);
-        continue;
-      } catch (std::exception& e) {
-        emit OnErrorOccurred(e.what());
-        continue;
-      } catch (...) {
-        emit OnErrorOccurred("Unknown error");
-        continue;
-      }
-    }
-  }
+  void processDatagrams();
 
  public:  // public functions
   /**
@@ -139,17 +82,9 @@ class DiscoveryServer : public QObject {
    *
    * @param parent Parent object
    */
-  explicit DiscoveryServer(QObject* parent = nullptr): QObject(parent) {
-    // Connect the socket to the callback function that
-    // process the datagrams when the socket is ready
-    // to read so the listener can be notified
-    const auto signal = &QUdpSocket::readyRead;
-    const auto slot = &DiscoveryServer::processDatagrams;
-    QObject::connect(&m_socket, signal, this, slot);
-  }
+  explicit DiscoveryServer(QObject* parent = nullptr);
 
  protected:  // protected functions
-
   /**
    * @brief Destroy the Discovery Server object
    */
@@ -187,23 +122,14 @@ class DiscoveryServer : public QObject {
    */
   virtual QHostAddress getIPAddress() const = 0;
 
-public:
-
+ public:
   /**
    * @brief Start the server
    */
-  virtual void start() {
-    const auto mode = QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint;
-    const auto port = 0;
-    const auto host = QHostAddress::AnyIPv4;
-    m_socket.bind(host, port, mode);
-  }
-
+  virtual void startServer();
   /**
    * @brief Stop the server
    */
-  virtual void stop() {
-    m_socket.close();
-  }
+  virtual void stopServer();
 };
-} // namespace srilakshmikanthanp::clipbirdesk::network::discovery
+}  // namespace srilakshmikanthanp::clipbirdesk::network::discovery

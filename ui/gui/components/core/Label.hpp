@@ -22,9 +22,7 @@ class Label : public QLabel {
    * with parent as QLabel
    * @param parent parent object
    */
-  explicit Label(QWidget *parent = nullptr) : QLabel(parent) {
-    setStyleSheet(style);
-  }
+  explicit Label(QWidget *parent = nullptr);
 
   /**
    * @brief Destroy the Label object

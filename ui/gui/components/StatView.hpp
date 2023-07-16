@@ -38,20 +38,7 @@ class StatView : public QWidget {
    * with parent as QWidget
    * @param parent parent object
    */
-  explicit StatView(QWidget* parent = nullptr) : QWidget(parent) {
-    // create a layout to align the widgets
-    auto root = new QHBoxLayout(this);
-
-    // add the widgets to the layout
-    root->addWidget(circle);
-    root->addWidget(status);
-
-    // set the layout to the widget
-    this->setLayout(root);
-
-    // set the Style to the widget
-    this->setStyleSheet(style);
-  }
+  explicit StatView(QWidget* parent = nullptr);
 
   /**
    * @brief Destroy the StatView object
@@ -62,32 +49,12 @@ class StatView : public QWidget {
    * @brief set the StatView
    * @param val StatView
    */
-  void setStatus(Value val) {
-    // set the text of the status
-    switch (val) {
-      case Value::Disconnected:
-        status->setText("Disconnected");
-        circle->setColor(Qt::red);
-        break;
-      case Value::Connected:
-        status->setText("Connected");
-        circle->setColor(Qt::green);
-        break;
-      case Value::Active:
-        status->setText("Active");
-        circle->setColor(Qt::green);
-        break;
-      case Value::Inactive:
-        status->setText("Inactive");
-        circle->setColor(Qt::red);
-        break;
-    }
-  }
+  void setStatus(Value val);
 
   /**
    * @brief get the StatView
    * @return QString value
    */
-  Value getStatus() const { return value; }
+  Value getStatus() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

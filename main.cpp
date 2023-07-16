@@ -5,7 +5,7 @@
 
 // Qt Headers
 #include <QApplication>
-#include <SingleApplication>
+#include <QApplication>
 
 // C++ Headers
 
@@ -25,17 +25,8 @@
  */
 auto main(int argc, char **argv) -> int {
   // create SingleApplication instance
-  SingleApplication app(argc, argv);
+  QApplication app(argc, argv);
 
-  // check if another instance is running
-  if (app.isSecondary()) {
-    app.sendMessage(app.arguments().join(' ').toUtf8());
-  } else {
-    // TODO: add code to start the application
-    // create GuiMain instance
-    srilakshmikanthanp::clipbirdesk::ui::gui::GuiMain guiMain;
-    guiMain.show();
-  }
 
   // return status code
   return app.exec();
