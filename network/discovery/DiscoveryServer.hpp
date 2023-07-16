@@ -38,12 +38,12 @@ class DiscoveryServer : public QObject {
  using MalformedPacket = types::except::MalformedPacket;
  using IPType = types::enums::IPType;
 
+ private:   // variables
+  QUdpSocket m_socket = QUdpSocket(this);
+
  signals:   // signals for this class
   /// @brief On Error Occurred
   void OnErrorOccurred(QString error);
-
- private:   // variables
-  QUdpSocket m_socket = QUdpSocket(this);
 
  private: // disable copy and move
   Q_DISABLE_COPY_MOVE(DiscoveryServer)

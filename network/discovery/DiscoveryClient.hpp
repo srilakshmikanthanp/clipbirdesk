@@ -40,6 +40,9 @@ class DiscoveryClient : public QObject {
   /// @brief Timer to send the broadcast message
   QTimer m_timer = QTimer(this);
 
+ private:  // Just for Qt
+  Q_OBJECT
+
  signals:   // signals for this class
   /// @brief On Error Occurred
   void OnErrorOccurred(QString error);

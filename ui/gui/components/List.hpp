@@ -15,6 +15,12 @@ class List : public QListWidget {
  signals:  // Signals
   void onActionClicked(components::Host::Action action, QString host, QString ip);
 
+ private:  // just for Qt
+  Q_OBJECT
+
+ private:  // disable copy and move
+  Q_DISABLE_COPY_MOVE(List)
+
  public:  // Type alias
   using Action = components::Host::Action;
 

@@ -22,7 +22,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing server that syncs the clipboard data between
  * the clients
  */
-class SyncingServer : protected discovery::DiscoveryServer {
+class SyncingServer : public discovery::DiscoveryServer {
  signals:    // signals
   /// @brief On client state changed
   void OnCLientStateChanged(QSslSocket *client, bool connected);

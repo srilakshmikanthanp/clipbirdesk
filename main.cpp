@@ -13,6 +13,8 @@
 #include "controller/Controller.hpp"
 #include "ui/gui/Clipbird.hpp"
 
+#include "utility/functions/sslcert.hpp"
+
 /**
  * @brief main function that starts the application
  * by ensuring that only one instance of the
@@ -25,7 +27,5 @@
  */
 auto main(int argc, char **argv) -> int {
   SingleApplication app(argc, argv);
-  // TODO Implement this function
   return app.exec();
 }
-

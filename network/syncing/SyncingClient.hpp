@@ -32,7 +32,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing client that syncs the clipboard data between
  * client and server
  */
-class SyncingClient : protected discovery::DiscoveryClient {
+class SyncingClient : public discovery::DiscoveryClient {
  signals:  // signals for this class
   /// @brief On Server List Changed
   void OnServerListChanged(QList<QPair<QHostAddress, quint16>> servers);
@@ -112,7 +112,7 @@ class SyncingClient : protected discovery::DiscoveryClient {
    */
   template <typename Packet>
   void sendPacket(const Packet& pack) {
-    m_socket.write(utility::functions::toQByteArray(pack));
+    m_ssl_socket.write(utility::functions::toQByteArray(pack));
   }
 
   /**
@@ -203,7 +203,7 @@ class SyncingClient : protected discovery::DiscoveryClient {
     // connect the signal to emit the signal for
     // OnErrorOccurred from the base class
     const auto signal_e = &DiscoveryClient::OnErrorOccurred;
-    const auto slot_e = [&](QString error) { emit OnErrorOccurred(error); };
+    const auto slot_e = &SyncingClient::OnErrorOccurred;
     connect(this, signal_e, this, slot_e);
 
     // connected signal to emit the signal for

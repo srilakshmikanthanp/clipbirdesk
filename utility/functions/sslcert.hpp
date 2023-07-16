@@ -1,17 +1,21 @@
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
+/// @authors : Dharun RK, Sri Lakshmi Kanthan P
+/// @file : sslcert.hpp
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
 // Qt headers
-#include <QFile>
 #include <QSslCertificate>
 #include <QSslConfiguration>
 #include <QSslKey>
+
 // C++ headers
-#include <cstdio>
-#include <iostream>
+#include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -19,197 +23,157 @@
 #include <openssl/pem.h>
 #include <openssl/x509.h>
 
+namespace srilakshmikanthanp::clipbirdesk::utility::functions::internal {
+/**
+ *  @brief generates a EVP_PEY using RSA_generate_key_ex
+ *  @returns EVP_PKEY* - shared pointer to the key
+ */
+std::shared_ptr<EVP_PKEY> generateRSAKey(int bits = 2048) {
+  // create a shared pointer to handle the memory
+  std::shared_ptr<EVP_PKEY> pkey(EVP_PKEY_new(), EVP_PKEY_free);
 
-class CertificateInstaller : public QObject {
- public:  //}  // namespace srilakshmikanthanp::clipbirdesk::utility::functions
-  /**
-   *  @brief generates a EVP_PEY
-   *
-   *  @returns pkey - an EVP_KEY  is returned
-   */
-
-  EVP_PKEY *generate_key() {
-    /* Allocate memory for the EVP_PKEY structure. */
-    EVP_PKEY *pkey = EVP_PKEY_new();
-    if (!pkey) {
-      std::cerr << "Unable to create EVP_PKEY structure." << std::endl;
-      return NULL;
-    }
-
-    /* Generate the RSA key and assign it to pkey. */
-    RSA *rsa = RSA_generate_key(2048, RSA_F4, NULL, NULL);
-    if (!EVP_PKEY_assign_RSA(pkey, rsa)) {
-      std::cerr << "Unable to generate 2048-bit RSA key." << std::endl;
-      EVP_PKEY_free(pkey);
-      return NULL;
-    }
-
-    /* The key has been generated, return it. */
-    return pkey;
+  // if pkey is null then throw an error
+  if (pkey.get() == NULL) {
+    throw std::runtime_error("Can't Create EVP_PKEY");
   }
 
-  /**
-   * @brief Generates a self-signed x509 certificate
-   *
-   * @param pkey an EVP_PKEY pointer
-   *
-   * @return bool - true if signing successfull else false
-   */
-  X509 *generate_x509(EVP_PKEY *pkey) {
-    /* Allocate memory for the X509 structure. */
-    X509 *x509 = X509_new();
-    if (!x509) {
-      std::cerr << "Unable to create X509 structure." << std::endl;
-      return NULL;
-    }
+  // rsa_key = RSA_new();
+  std::shared_ptr<RSA> rsa(RSA_new(), RSA_free);
 
-    /* Set the serial number. */
-    ASN1_INTEGER_set(X509_get_serialNumber(x509), 1);
-
-    /* This certificate is valid from now until exactly one year from now. */
-    X509_gmtime_adj(X509_get_notBefore(x509), 0);
-    X509_gmtime_adj(X509_get_notAfter(x509), 31536000L);
-
-    /* Set the public key for our certificate. */
-    X509_set_pubkey(x509, pkey);
-
-    /* We want to copy the subject name to the issuer name. */
-    X509_NAME *name = X509_get_subject_name(x509);
-
-    /* Set the country code and common name. */
-    X509_NAME_add_entry_by_txt(name, "C", MBSTRING_ASC, (unsigned char *)"CA",
-                               -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, "O", MBSTRING_ASC,
-                               (unsigned char *)"ClipBird", -1, -1, 0);
-    X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC,
-                               (unsigned char *)"localhost", -1, -1, 0);
-
-    /* Now set the issuer name. */
-    X509_set_issuer_name(x509, name);
-
-    /* Actually sign the certificate with our key. */
-    if (!X509_sign(x509, pkey, EVP_sha1())) {
-      std::cerr << "Error signing certificate." << std::endl;
-      X509_free(x509);
-      return NULL;
-    }
-
-    return x509;
+  // if rsa is null then throw an error
+  if (rsa.get() == NULL) {
+    throw std::runtime_error("Can't Create RSA");
   }
 
-  /**
-   * @brief Writes the key and certificates to
-   * the disk in corresponding names :
-   * key.pem and cert.pem
-   *
-   * @param pkey an EVP_PKEY pointer
-   * @param x509 x509 certificate pointer
-   *
-   * @return bool - true if write success else false
-   */
+  // BIGNUM *bn_exp = BN_new();
+  std::shared_ptr<BIGNUM> bn_exp(BN_new(), BN_free);
 
-  bool write_to_disk(EVP_PKEY *pkey, X509 *x509) {
-    /* Open the PEM file for writing the key to disk. */
-
-    BIO *pkey_file = BIO_new_file("key.pem", "wb");
-    if (!pkey_file) {
-      std::cerr << "Unable to open \"key.pem\" for writing." << std::endl;
-      return false;
-    }
-
-    /* Write the key to disk. */
-    bool ret =
-        PEM_write_bio_PrivateKey(pkey_file, pkey, NULL, NULL, 0, NULL, NULL);
-    BIO_free_all(pkey_file);
-
-    if (!ret) {
-      std::cerr << "Unable to write private key to disk." << std::endl;
-      return false;
-    }
-
-    /** Writing certificate to the disk using B i/o since
-     *  windows updated the file handling abstractions
-     */
-    BIO *x509file = BIO_new_file("cert.pem", "wb");
-    if (!x509file) {
-      return false;
-    }
-    if (!PEM_write_bio_X509(x509file, x509)) {
-      return false;
-    }
-    BIO_free_all(x509file);
-
-    if (!ret) {
-      std::cerr << "Unable to write certificate to disk." << std::endl;
-      return false;
-    }
-
-    return true;
+  // if bn_exp is null then throw an error
+  if (bn_exp.get() == NULL) {
+    throw std::runtime_error("Can't Create BIGNUM");
   }
 
-  /**
-   * @brief calls the key and certificate generate fucntion to create a self
-   * signed certificate
-   *
-   * @return X509* - certificate pointer
-   */
-  X509 *generateCertificate() {
-    EVP_PKEY *pkey = generate_key();
-    if (!pkey) return NULL;
-
-    /* Generate the certificate. */
-    X509 *x509 = generate_x509(pkey);
-
-    if (!x509) {
-      EVP_PKEY_free(pkey);
-      return NULL;
-    }
-
-    /*Writing files to the disk (certificate and key files)"*/
-    bool ret = write_to_disk(pkey, x509);
-
-    // EVP_PKEY_free(pkey);  //clears the key from memory
-
-    // X509_free(x509);
-
-    if (ret)
-      return x509;
-    else
-      return NULL;
+  // Set the exponent to F4
+  if (!BN_set_word(bn_exp.get(), RSA_F4)) {
+    throw std::runtime_error("Can't Set BIGNUM");
   }
 
-  /**
-   * @brief Generate a self signed certificate and key and return in
-   * as QSslConfiguration
-   * @param // add as you need
-   * @author Dharun R K
-   * @return QSslConfiguration
-   */
-  QSslConfiguration generateSslConfig() {
-    X509* x509=generateCertificate();
-    QFile file("cert.pem");
- 
-    if (!file.open(QIODevice::ReadOnly)) {
-      qFatal("Could not load certificate!");
-    }
-     
-    const QByteArray bytes = file.readAll();
-
-    const QSslCertificate certificate(bytes,QSsl::Pem);
-
-   
-    /// Add our own CA to the default SSL configuration
-    QSslConfiguration configuration = QSslConfiguration::defaultConfiguration();
-
-
-    auto certs = configuration.caCertificates();
-   
-    certs.append(certificate);
-  
-    configuration.addCaCertificates(certs);
-    //QSslConfiguration::setDefaultConfiguration(configuration);
-    return configuration;
-
+  // Try to generate the key
+  if (!RSA_generate_key_ex(rsa.get(), bits, bn_exp.get(), NULL)) {
+    throw std::runtime_error("Can't Generate RSA Key");
   }
-};
 
+  // Set the rsa key to the pkey
+  if (!EVP_PKEY_set1_RSA(pkey.get(), rsa.get())) {
+    throw std::runtime_error("Can't Assign RSA to EVP_PKEY");
+  }
+
+  // The key has been generated, return it
+  return pkey;
+}
+
+/**
+ * @brief Generates a self-signed x509 certificate
+ *
+ * @param pkey an EVP_PKEY pointer
+ *
+ * @return X509* - shared pointer to certificate
+ */
+std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey) {
+  // Allocate memory for the X509 structure.
+  std::shared_ptr<X509> x509(X509_new(), X509_free);
+
+  // if x509 is null then throw an error
+  if (x509.get() == NULL) {
+    throw std::runtime_error("Can't Create X509");
+  }
+
+  // Set the public key for our certificate.
+  X509_set_pubkey(x509.get(), pkey.get());
+
+  // Actually sign the certificate with our key.
+  if (!X509_sign(x509.get(), pkey.get(), EVP_sha1())) {
+    throw std::runtime_error("Can't Sign X509");
+  }
+
+  // return the certificate
+  return x509;
+}
+}  // namespace srilakshmikanthanp::clipbirdesk::utility::functions::internal
+
+namespace srilakshmikanthanp::clipbirdesk::utility::functions {
+/**
+ * @brief Get the Q Ssl Configuration object
+ * @param bits - RSA key size
+ * @return QSslConfiguration
+ */
+QSslConfiguration getQSslConfiguration(int bits = 2048) {
+  // Generate the RSA key for the certificate
+  std::shared_ptr<EVP_PKEY> pkey = internal::generateRSAKey(bits);
+
+  // Generate the certificate
+  std::shared_ptr<X509> x509 = internal::generateX509(pkey);
+
+  // using the defer as in golang
+  using Defer = std::shared_ptr<void>;
+
+  // Write the key to buffer
+  BIO *pkey_buffer = BIO_new(BIO_s_mem());
+
+  // Free the memory
+  Defer defer_pkey_buffer(pkey_buffer, BIO_free_all);
+
+  // Write the key to buffer
+  PEM_write_bio_PrivateKey(pkey_buffer, pkey.get(), NULL, NULL, 0, NULL, NULL);
+
+  // Get the key from buffer
+  BUF_MEM *pkey_buffer_memory;
+
+  // Get the key from buffer
+  BIO_get_mem_ptr(pkey_buffer, &pkey_buffer_memory);
+
+  // QByteArray for the Key
+  QByteArray key(QByteArray(pkey_buffer_memory->data, pkey_buffer_memory->length));
+
+  // Create the QSslKey
+  QSslKey sslKey(key, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+
+  // Write the certificate to buffer
+  BIO *x509_buffer = BIO_new(BIO_s_mem());
+
+  // Free the memory
+  Defer defer_x509_buffer(x509_buffer, BIO_free_all);
+
+  // Write the certificate to buffer
+  PEM_write_bio_X509(x509_buffer, x509.get());
+
+  // Get the certificate from buffer
+  BUF_MEM *x509_buffer_memory;
+
+  // Get the certificate from buffer
+  BIO_get_mem_ptr(x509_buffer, &x509_buffer_memory);
+
+  // QByteArray for the Certificate
+  QByteArray cert(QByteArray(x509_buffer_memory->data, x509_buffer_memory->length));
+
+  // Create the QSslCertificate
+  QSslCertificate sslCert(cert, QSsl::Pem);
+
+  // Create the QSslConfiguration
+  QSslConfiguration sslConfig;
+
+  // Add the certificate to the configuration
+  sslConfig.addCaCertificate(sslCert);
+
+  // Add the key to the configuration
+  sslConfig.setPrivateKey(sslKey);
+
+  // check if the configuration is valid
+  if (sslConfig.isNull()) {
+    throw std::runtime_error("Can't Create QSslConfiguration");
+  }
+
+  // return the configuration
+  return sslConfig;
+}
+}  // namespace srilakshmikanthanp::clipbirdesk::utility::functions
