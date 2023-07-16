@@ -32,6 +32,10 @@ class SyncingServer : public discovery::DiscoveryServer {
   void OnErrorOccurred(QString error);
 
  signals:    // signals for this class
+  /// @brief On Server State Changed
+  void OnServerStateChanged(bool started);
+
+ signals:    // signals for this class
   /// @brief On Sync Request
   void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
 
@@ -48,7 +52,7 @@ class SyncingServer : public discovery::DiscoveryServer {
 
  public:     // Authenticator Type
   /// @brief Authenticator
-  using Authenticator = std::function<bool(QSslSocket *)>;
+  using Authenticator = std::function<bool(QPair<QHostAddress, quint16>)>;
 
  private:    // members of the class
   /// @brief SSL server
@@ -169,7 +173,7 @@ class SyncingServer : public discovery::DiscoveryServer {
       }
 
       // Authenticate the client
-      if (!m_authenticator(client_tls)) {
+      if (!m_authenticator({client_tls->peerAddress(), client_tls->peerPort()})) {
         client_tls->disconnectFromHost(); continue;
       }
 
@@ -187,7 +191,7 @@ class SyncingServer : public discovery::DiscoveryServer {
       const auto slot_r = &SyncingServer::processReadyRead;
       QObject::connect(client_tls, signal_r, this, slot_r);
 
-    // convert to QPair<QHostAddress, quint16>
+      // convert to QPair<QHostAddress, quint16>
       auto client_info = QPair<QHostAddress, quint16>(
         client_tls->peerAddress(), client_tls->peerPort());
 
@@ -291,6 +295,15 @@ class SyncingServer : public discovery::DiscoveryServer {
   }
 
   /**
+   * @brief Get the Server QHostAddress & Port
+   *
+   * @return QPair<QHostAddress, quint16>
+   */
+  QPair<QHostAddress, quint16> getServerInfo() const {
+    return {m_ssl_server.serverAddress(), m_ssl_server.serverPort()};
+  }
+
+  /**
    * @brief Set the SSL Configuration object
    *
    * @param config SSL Configuration
@@ -341,10 +354,15 @@ class SyncingServer : public discovery::DiscoveryServer {
     }
 
     // start the server
-    m_ssl_server.listen();
+    if (!m_ssl_server.listen()) {
+      throw std::runtime_error("Failed to start the server");
+    }
 
     // start the discovery server
     DiscoveryServer::start();
+
+    // Notify the listeners that the server is started
+    emit OnServerStateChanged(true);
   }
 
   /**
@@ -356,6 +374,9 @@ class SyncingServer : public discovery::DiscoveryServer {
 
     // stop the server
     m_ssl_server.close();
+
+    // Notify the listeners
+    emit OnServerStateChanged(false);
   }
 
  protected:  // override functions from the base class

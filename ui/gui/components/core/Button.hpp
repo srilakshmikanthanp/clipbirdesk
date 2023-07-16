@@ -7,8 +7,12 @@
 
 #include <QPushButton>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::individual {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core {
 class Button : public QPushButton {
+ private:  // Constants
+  static constexpr const char *const style = R"(
+  )";
+
  private:  // just for Qt
   Q_OBJECT
 
@@ -19,7 +23,7 @@ class Button : public QPushButton {
    * @param parent parent object
    */
   explicit Button(QWidget *parent = nullptr) : QPushButton(parent) {
-    // TODO: set style sheet
+    setStyleSheet(style);
   }
 
   /**

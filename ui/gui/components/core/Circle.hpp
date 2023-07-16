@@ -9,8 +9,12 @@
 #include <QPainter>
 #include <QWidget>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::individual {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core {
 class Circle : public QWidget {
+ private:          // Constants
+  static constexpr const char *const style = R"(
+  )";
+
  private:          // Member
   int radius = 0;  // radius of the circle
   QColor color;    // color of the circle
@@ -24,7 +28,7 @@ class Circle : public QWidget {
    * @param parent parent object
    */
   explicit Circle(QWidget *parent = nullptr) : QWidget(parent) {
-    // TODO: set style sheet
+    setStyleSheet(style);
   }
 
   /**

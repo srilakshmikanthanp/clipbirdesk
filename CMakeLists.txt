@@ -2,14 +2,8 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 project(clipbird VERSION 1.0.0 LANGUAGES CXX)
 
-# Set C++ standard
-set(CMAKE_CXX_STANDARD 20)
-
 # include cmake modules
 include(FetchContent)
-
-# include project root
-include_directories(${PROJECT_SOURCE_DIR})
 
 # --------------------------------- Main Project ---------------------------------#
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
@@ -57,8 +51,9 @@ target_link_libraries(clipbird
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto)
 
-# Include config.hpp
+# Include directories
 target_include_directories(clipbird
+  PUBLIC ${PROJECT_SOURCE_DIR}
   PUBLIC ${PROJECT_BINARY_DIR})
 
 # --------------------------------- Unit Tests ---------------------------------#
@@ -82,6 +77,11 @@ include(GoogleTest)
 
 # Discover tests
 gtest_discover_tests(check)
+
+# Include directories
+target_include_directories(check
+  PUBLIC ${PROJECT_SOURCE_DIR}
+  PUBLIC ${PROJECT_BINARY_DIR})
 
 #link test executable to gtest & gtest_main
 target_link_libraries(check

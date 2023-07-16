@@ -58,7 +58,7 @@ std::string getAppName() {
  * @return std::string
  */
 std::string getAppHome() {
-  return std::filesystem::path(getenv("HOME")) / ("." + getAppName());
+  return (std::filesystem::path(getenv("HOME")) / ("." + getAppName())).string();
 }
 
 /**

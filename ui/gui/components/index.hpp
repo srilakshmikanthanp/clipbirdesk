@@ -5,7 +5,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "HList.hpp"
-#include "Host.hpp"
-#include "Item.hpp"
-#include "Status.hpp"
+#include "HostsList.hpp"
+#include "HostView.hpp"
+#include "PairView.hpp"
+#include "StatView.hpp"

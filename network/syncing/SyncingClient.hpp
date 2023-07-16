@@ -39,7 +39,7 @@ class SyncingClient : public discovery::DiscoveryClient {
 
  signals:  // signals for this class
   /// @brief On Server Found
-  void OnServerFound(QHostAddress host, quint16 port);
+  void OnServerFound(QPair<QHostAddress, quint16>);
 
  signals:  // signals for this class
   /// @brief On Error Occurred
@@ -47,7 +47,7 @@ class SyncingClient : public discovery::DiscoveryClient {
 
  signals:  // signals for this class
   /// @brief On Server state changed
-  void OnServerStateChanged(bool isConnected);
+  void OnServerStatusChanged(bool isConnected);
 
  signals:  // signals for this class
   /// @brief On Sync Request
@@ -209,7 +209,7 @@ class SyncingClient : public discovery::DiscoveryClient {
     // connected signal to emit the signal for
     // server state changed
     const auto signal_c = &QSslSocket::connected;
-    const auto slot_c = [&]() { emit OnServerStateChanged(true); };
+    const auto slot_c = [&]() { emit OnServerStatusChanged(true); };
     connect(&m_ssl_socket, signal_c, this, slot_c);
 
     // connect the signals and slots for the socket
@@ -230,7 +230,7 @@ class SyncingClient : public discovery::DiscoveryClient {
     // disconnected signal to emit the signal for
     // server state changed
     const auto signal_d = &QSslSocket::disconnected;
-    const auto slot_d = [&]() { emit OnServerStateChanged(false); };
+    const auto slot_d = [&]() { emit OnServerStatusChanged(false); };
     connect(&m_ssl_socket, signal_d, this, slot_d);
   }
 
@@ -349,15 +349,15 @@ class SyncingClient : public discovery::DiscoveryClient {
    * @param host Host address
    * @param port Port number
    */
-  void onServerFound(const QHostAddress& host, quint16 port) {
+  void onServerFound(QPair<QHostAddress, quint16> server) override {
     // current timestamp in milliseconds
     const auto current = QDateTime::currentMSecsSinceEpoch();
 
     // emit the signal
-    emit OnServerFound(host, port);
+    emit OnServerFound(server);
 
     // add the server to the list
-    m_servers.append({host, port, current});
+    m_servers.append({server.first, server.second, current});
 
     // emit the signal
     emit OnServerListChanged(getServerList());

@@ -114,6 +114,7 @@
     "qtwidgets": "cpp",
     "*.in": "cpp",
     "qwidget": "cpp",
-    "source_location": "cpp"
+    "source_location": "cpp",
+    "qicon": "cpp"
   },
 }

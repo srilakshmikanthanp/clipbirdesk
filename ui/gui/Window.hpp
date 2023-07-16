@@ -17,35 +17,40 @@
 #include <variant>
 
 // project headers
+#include "ui/gui/components/core/index.hpp"
 #include "ui/gui/components/index.hpp"
-#include "ui/gui/components/individual/index.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 class Window : public QWidget {
+ private:  // Member variable (Tabs)
+  components::HostsList* clientList = new components::HostsList(this); // Server Tab
+  components::HostsList* serverList = new components::HostsList(this); // Client Tab
+
+ private:  // Member variable
+  components::PairView* hostStatus = new components::PairView(this);
+  components::PairView* serverName = new components::PairView(this);
+  components::PairView* serverIP = new components::PairView(this);
+  components::PairView* hostCount = new components::PairView(this);
+
+ public:   // typedefs used in this class
+  using Action = components::HostView::Action;
+  using Status = components::StatView::Value;
+
+ private:  // Constants for style
+  static constexpr const char* const style = R"(
+  )";
+
  public:   // enum for this class
   enum class Tabs { Server = 0, Client = 1 };
 
  private:  // Member variable
-  components::Item* hostStatus = new components::Item(this);
-  components::Item* serverName = new components::Item(this);
-  components::Item* serverIP = new components::Item(this);
-  components::Item* hostCount = new components::Item(this);
-
- private:  // Member variable (Tabs)
-  components::HList* clientList = new components::HList(this); // Server Tab
-  components::HList* serverList = new components::HList(this); // Client Tab
-
- private:  // Member variable
   Tabs currentTab = Tabs::Server;
-
- public:   // Type alias
-  using Action = components::Host::Action;
 
  private:  // just for Qt
   Q_OBJECT
 
  signals:  // signals
-  void onHostAction(Tabs tab, Action action, QString host, QString ip);
+  void onHostAction(Tabs tab, std::tuple<QHostAddress, quint16, Action>);
 
  signals:  // signals
   void onTabChanged(Tabs tab);  // emit when tab changed
@@ -54,7 +59,6 @@ class Window : public QWidget {
   /**
    * @brief Construct a new Window object
    * with parent as QWidget
-   * @param parent parent object
    */
   explicit Window(QWidget* parent = nullptr) : QWidget(parent) {
     // create the root layout
@@ -73,7 +77,7 @@ class Window : public QWidget {
     root->addLayout(top);
 
     // create tab widget
-    auto tab = new components::individual::Tabbed(this);
+    auto tab = new components::core::Tabbed(this);
 
     // add server list to tab
     tab->addTab(serverList, "Server");
@@ -85,43 +89,41 @@ class Window : public QWidget {
     root->addWidget(tab);
 
     // using some components
-    using components::individual::Tabbed;
-    using components::HList;
-
-    // server list slot
-    auto serverListSlot = [&](Action action, QString host, QString ip) {
-      emit onHostAction(Tabs::Server, action, host, ip);
-    };
-
-    // client list slot
-    auto clientListSlot = [&](Action action, QString host, QString ip) {
-      emit onHostAction(Tabs::Client, action, host, ip);
-    };
+    using components::core::Tabbed;
+    using components::HostsList;
 
     // connect tab changed signal
     connect(tab, &Tabbed::currentChanged, [&](int index){
       emit onTabChanged((currentTab = static_cast<Tabs>(index)));
     });
 
+    // server list slot
+    auto serverListSlot = [&](auto action) {
+      emit onHostAction(Tabs::Server, action);
+    };
+
+    // client list slot
+    auto clientListSlot = [&](auto action) {
+      emit onHostAction(Tabs::Client, action);
+    };
+
     // connect server list signal
-    connect(serverList, &HList::onActionClicked, serverListSlot);
+    connect(serverList, &HostsList::onAction, serverListSlot);
 
     // connect client list signal
-    connect(clientList, &HList::onActionClicked, clientListSlot);
+    connect(clientList, &HostsList::onAction, clientListSlot);
 
-    // TODO: set the style sheet
+    // set the style sheet
+    setStyleSheet(style);
   }
 
   /**
    * @brief Set the Status object
-   *
-   * @param key
-   * @param val
    */
-  void setHostStatus(const QString& key, components::Status::Value val) {
+  void setHostStatus(const QString& key, components::StatView::Value val) {
     // create the components of the class
-    auto label = new components::individual::Label(this);
-    auto status = new components::Status(this);
+    auto label = new components::core::Label(this);
+    auto status = new components::StatView(this);
 
     // set the values
     label->setText(key); status->setStatus(val);
@@ -132,14 +134,12 @@ class Window : public QWidget {
 
   /**
    * @brief Get the Host Status object
-   *
-   * @return QPair<QString, QString>
    */
-  QPair<QString, components::Status::Value> getHostStatus() {
-    using components::individual::Label;
-    using components::Status;
+  QPair<QString, components::StatView::Value> getHostStatus() {
+    using components::core::Label;
+    using components::StatView;
 
-    const auto status = qobject_cast<Status*>(hostStatus->get().second);
+    const auto status = qobject_cast<StatView*>(hostStatus->get().second);
     const auto label = qobject_cast<Label*>(hostStatus->get().first);
 
     return {label->text(), status->getStatus()};
@@ -147,13 +147,10 @@ class Window : public QWidget {
 
   /**
    * @brief Set the Server Name object
-   *
-   * @param key
-   * @param val
    */
   void setServerName(const QString& key, const QString& val) {
-    auto label = new components::individual::Label(this);
-    auto info = new components::individual::Label(this);
+    auto label = new components::core::Label(this);
+    auto info = new components::core::Label(this);
 
     label->setText(key); info->setText(val);
 
@@ -162,11 +159,9 @@ class Window : public QWidget {
 
   /**
    * @brief Get the Server Name object
-   *
-   * @return QPair<QString, QString>
    */
   QPair<QString, QString> getServerName() {
-    using components::individual::Label;
+    using components::core::Label;
 
     const auto label = qobject_cast<Label*>(serverName->get().first);
     const auto info = qobject_cast<Label*>(serverName->get().second);
@@ -176,13 +171,10 @@ class Window : public QWidget {
 
   /**
    * @brief Set the Server Ip object
-   *
-   * @param key
-   * @param val
    */
   void setServerIp(const QString& key, const QString& val) {
-    auto label = new components::individual::Label(this);
-    auto info = new components::individual::Label(this);
+    auto label = new components::core::Label(this);
+    auto info = new components::core::Label(this);
 
     label->setText(key); info->setText(val);
 
@@ -191,11 +183,9 @@ class Window : public QWidget {
 
   /**
    * @brief Get the Server Ip object
-   *
-   * @return QPair<QString, QString>
    */
   QPair<QString, QString> getServerIp() {
-    using components::individual::Label;
+    using components::core::Label;
 
     const auto label = qobject_cast<Label*>(serverIP->get().first);
     const auto info = qobject_cast<Label*>(serverIP->get().second);
@@ -205,13 +195,10 @@ class Window : public QWidget {
 
   /**
    * @brief Set the Hosts object
-   *
-   * @param key
-   * @param val
    */
   void setHostCount(const QString& key, int val) {
-    auto label = new components::individual::Label(this);
-    auto info = new components::individual::Label(this);
+    auto label = new components::core::Label(this);
+    auto info = new components::core::Label(this);
 
     label->setText(key); info->setText(QString::number(val));
 
@@ -220,11 +207,9 @@ class Window : public QWidget {
 
   /**
    * @brief Get the Hosts object
-   *
-   * @return QPair<QString, QString>
    */
   QPair<QString, int> getHostCount() {
-    using components::individual::Label;
+    using components::core::Label;
 
     const auto label = qobject_cast<Label*>(hostCount->get().first);
     const auto info = qobject_cast<Label*>(hostCount->get().second);
@@ -235,77 +220,74 @@ class Window : public QWidget {
   //---------------------- Server Tab ----------------------//
 
   /**
-   * @brief Add Server to the list
-   *
-   * @param hostName
-   * @param ip
+   * @brief Set the Server List object
    */
-  void addClient(QString hostName, QString ip) {
-    serverList->addHost(hostName, ip, Action::Disconnect);
-  }
-
-  /**
-   * @brief Remove a Server from the list
-   *
-   * @param hostName
-   * @param ip
-   */
-  void removeClient(QString hostName, QString ip) {
-    serverList->removeHost(hostName, ip);
+  void setClientList(QList<std::tuple<QHostAddress, quint16, Action>> hosts) {
+    serverList->setHosts(hosts);
   }
 
   /**
    * @brief Get the Server List object
-   *
-   * @return QList<QPair<QString, QString>>
    */
-  QList<QPair<QString, QString>> getClientList() {
+  QList<std::tuple<QHostAddress, quint16, Action>> getClientList() {
     return serverList->getAllHosts();
+  }
+
+  /**
+   * @brief Add Server to the list
+   */
+  void addClient(std::tuple<QHostAddress, quint16, Action> host) {
+    serverList->addHost(host);
+  }
+
+  /**
+   * @brief Remove a Server from the list
+   */
+  void removeClient(std::tuple<QHostAddress, quint16, Action> host) {
+    serverList->removeHost(host);
   }
 
   /**
    * @brief Remove all servers from the list
    */
-  void clearClientList() {
+  void removeAllClient() {
     serverList->removeAllHosts();
   }
 
   //---------------------- Client Tab ----------------------//
 
   /**
-   * @brief Add Server to the list
-   *
-   * @param hostName
-   * @param ip
-   * @param action
+   * @brief Set the Server List object
    */
-  void addServer(QString hostName, QString ip, Action action) {
-    clientList->addHost(hostName, ip, action);
-  }
-
-  /**
-   * @brief Remove a Server from the list
-   *
-   * @param hostName
-   * @param ip
-   */
-  void removeServer(QString hostName, QString ip) {
-    clientList->removeHost(hostName, ip);
+  void setServerList(QList<std::tuple<QHostAddress, quint16, Action>> hosts) {
+    clientList->setHosts(hosts);
   }
 
   /**
    * @brief Get the Server List from the tab
-   *
-   * @return QList<QPair<QString, QString>>
    */
-  QList<QPair<QString, QString>> getServerList() {
+  QList<std::tuple<QHostAddress, quint16, Action>> getServerList() {
     return clientList->getAllHosts();
+  }
+
+  /**
+   * @brief Add Server to the list
+   */
+  void addServer(std::tuple<QHostAddress, quint16, Action> host) {
+    clientList->addHost(host);
+  }
+
+  /**
+   * @brief Remove a Server from the list
+   */
+  void removeServer(std::tuple<QHostAddress, quint16, Action> host) {
+    clientList->removeHost(host);
   }
 
   /**
    * @brief Remove all servers from the list
    */
-  void clearServerList() {
+  void removeAllServers() {
     clientList->removeAllHosts();
   }
 };

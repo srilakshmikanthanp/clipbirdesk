@@ -91,9 +91,9 @@ class DiscoveryClient : public QObject {
 
     // convert the IP address to QHostAddress
     if (type == types::enums::IPType::IPv4) {
-      this->onServerFound(toIPV4QHostAddress(host), port);
+      this->onServerFound({toIPV4QHostAddress(host), port});
     } else {
-      this->onServerFound(toIPV6QHostAddress(host), port);
+      this->onServerFound({toIPV6QHostAddress(host), port});
     }
   }
 
@@ -228,6 +228,6 @@ class DiscoveryClient : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServerFound(const QHostAddress& host, quint16 port) = 0;
+  virtual void onServerFound(QPair<QHostAddress, quint16>) = 0;
 };
 } // namespace srilakshmikanthanp::clipbirdesk::network::discovery

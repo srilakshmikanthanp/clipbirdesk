@@ -8,10 +8,12 @@
 #include <QFormLayout>
 #include <QWidget>
 
-#include "ui/gui/components/individual/Label.hpp"
-
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
-class Item : public QWidget {
+class PairView : public QWidget {
+ private:  // Constants for style
+  static constexpr const char *const style = R"(
+  )";
+
  private:  // Member variable
   QWidget *key;
   QWidget *val;
@@ -20,20 +22,22 @@ class Item : public QWidget {
   Q_OBJECT
 
  private:  // disable copy and move
-  Q_DISABLE_COPY_MOVE(Item)
+  Q_DISABLE_COPY_MOVE(PairView)
 
  public:
   /**
-   * @brief Construct a new Item object
+   * @brief Construct a new PairView object
    * with parent as QWidget
    * @param parent parent object
    */
-  explicit Item(QWidget* parent = nullptr) : QWidget(parent) { }
+  explicit PairView(QWidget* parent = nullptr) : QWidget(parent) {
+    this->setStyleSheet(style);
+  }
 
   /**
-   * @brief Destroy the Item object
+   * @brief Destroy the PairView object
    */
-  virtual ~Item() = default;
+  virtual ~PairView() = default;
 
   /**
    * @brief Set as a pair

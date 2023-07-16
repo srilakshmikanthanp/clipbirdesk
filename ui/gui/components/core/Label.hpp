@@ -7,8 +7,12 @@
 
 #include <QLabel>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::individual {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core {
 class Label : public QLabel {
+ private:          // Constants
+  static constexpr const char *const style = R"(
+  )";
+
  private:  // just for Qt
   Q_OBJECT
 
@@ -19,7 +23,7 @@ class Label : public QLabel {
    * @param parent parent object
    */
   explicit Label(QWidget *parent = nullptr) : QLabel(parent) {
-    // TODO: set style sheet
+    setStyleSheet(style);
   }
 
   /**

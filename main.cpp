@@ -11,6 +11,7 @@
 
 // Project Headers
 #include "config/config.hpp"
+#include "ui/gui/GuiMain.hpp"
 
 /**
  * @brief main function that starts the application
@@ -31,6 +32,9 @@ auto main(int argc, char **argv) -> int {
     app.sendMessage(app.arguments().join(' ').toUtf8());
   } else {
     // TODO: add code to start the application
+    // create GuiMain instance
+    srilakshmikanthanp::clipbirdesk::ui::gui::GuiMain guiMain;
+    guiMain.show();
   }
 
   // return status code

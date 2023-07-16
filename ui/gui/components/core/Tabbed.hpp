@@ -7,8 +7,12 @@
 
 #include <QTabWidget>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::individual {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core {
 class Tabbed : public QTabWidget {
+ private:          // Constants
+  static constexpr const char *const style = R"(
+  )";
+
  private:  // just for Qt
   Q_OBJECT
 
@@ -19,7 +23,7 @@ class Tabbed : public QTabWidget {
    * @param parent parent object
    */
   explicit Tabbed(QWidget *parent = nullptr) : QTabWidget(parent) {
-    // TODO: set the style sheet
+    setStyleSheet(style);
   }
 
   /**
