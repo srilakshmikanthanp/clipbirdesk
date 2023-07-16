@@ -1,0 +1,16 @@
+#pragma once // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
+// Copyright (c) 2023 Sri Lakshmi Kanthan P
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+
+
+// Application Version
+#define CLIPBIRDESK_VERSION_MAJOR "@clipbirdesk_VERSION_MAJOR@"
+#define CLIPBIRDESK_VERSION_MINOR "@clipbirdesk_VERSION_MINOR@"
+#define CLIPBIRDESK_VERSION_PATCH "@clipbirdesk_VERSION_PATCH@"
+
+// Application Name
+#define CLIPBIRDESK_NAME "@CMAKE_PROJECT_NAME@"
