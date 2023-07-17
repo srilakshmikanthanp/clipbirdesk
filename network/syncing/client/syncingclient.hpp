@@ -148,7 +148,7 @@ class SyncingClient : public discovery::DiscoveryClient {
    *
    * @return QList<QPair<QHostAddress, quint16>> List of servers
    */
-  QList<QPair<QHostAddress, quint16>> getServerList();
+  QList<QPair<QHostAddress, quint16>> getServerList() const;
 
   /**
    * @brief Connect to the server with the given host and port

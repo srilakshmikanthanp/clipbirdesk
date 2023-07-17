@@ -5,6 +5,9 @@ project(clipbird VERSION 1.0.0 LANGUAGES CXX)
 # include cmake modules
 include(FetchContent)
 
+# Set the logo.png path variable
+set(APPLICATION_LOGO_PATH "${PROJECT_SOURCE_DIR}/assets/logo.png")
+
 # --------------------------------- Main Project ---------------------------------#
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)

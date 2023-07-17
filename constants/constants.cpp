@@ -5,7 +5,7 @@
 
 #include "constants.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::config {
+namespace srilakshmikanthanp::clipbirdesk::constants {
 /**
  * @brief Get the Application Version
  * @return std::string
@@ -39,6 +39,14 @@ std::string getAppName() {
 }
 
 /**
+ * @brief Get logo path
+ * @return std::string
+ */
+std::string getAppLogo() {
+  return std::string(CLIPBIRDESK_LOGO);
+}
+
+/**
  * @brief Get App Home Directory
  * @return std::string
  */
@@ -51,6 +59,6 @@ std::string getAppHome() {
  * @return QSize
  */
 auto getAppWindowRatio() -> QSize {
-  return QSize(3, 3);
+  return QSize(4, 2);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::config

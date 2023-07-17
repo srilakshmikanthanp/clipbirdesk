@@ -12,3 +12,6 @@
 
 // Application Name
 #define CLIPBIRDESK_NAME          "@CMAKE_PROJECT_NAME@"
+
+// Application Logo
+#define CLIPBIRDESK_LOGO          "@APPLICATION_LOGO_PATH@"

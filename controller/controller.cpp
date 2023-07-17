@@ -7,6 +7,82 @@
 
 namespace srilakshmikanthanp::clipbirdesk::controller {
 /**
+ * @brief Handle On Server Status Changed (From client)
+ *
+ * @param isConnected is connected to the server
+ */
+void Controller::handleServerStatusChanged(bool isConnected) {
+  // if the host is not client then throw error
+  if (!std::holds_alternative<SyncingClient>(m_host)) {
+    throw std::runtime_error("Host is not client");
+  }
+
+  // get the client
+  auto *client = &std::get<SyncingClient>(m_host);
+
+  // if the client is connected then connect the signals
+  if (isConnected) {
+    // Connect the onClipboardChange signal to the client
+    const auto signal = &clipboard::Clipboard::OnClipboardChange;
+    const auto slot   = &SyncingClient::syncItems;
+    connect(&m_clipboard, signal, client, slot);
+  } else {
+    // Disconnect the onClipboardChange signal to the client
+    const auto signal = &clipboard::Clipboard::OnClipboardChange;
+    const auto slot   = &SyncingClient::syncItems;
+    disconnect(&m_clipboard, signal, client, slot);
+  }
+}
+
+/**
+ * @brief Construct a new Controller object and manage
+ * the clipboard, server and client
+ *
+ * @param board  clipboard that is managed
+ * @param parent parent object
+ */
+Controller::Controller(QClipboard *board, QObject *parent)
+    :  QObject(parent), m_clipboard(board, this) {}
+
+/**
+ * @brief set the authenticator
+ *
+ * @param authenticator authenticator function
+ */
+void Controller::setAuthenticator(Authenticator authenticator) {
+  m_authenticator = authenticator;
+}
+
+/**
+ * @brief get the authenticator
+ *
+ * @return Authenticator authenticator function
+ */
+Controller::Authenticator Controller::getAuthenticator() const {
+  return m_authenticator;
+}
+
+/**
+ * @brief set the ssl configuration
+ *
+ * @param sslConfig ssl configuration
+ */
+void Controller::setSSLConfiguration(QSslConfiguration sslConfig) {
+  m_sslConfig = sslConfig;
+}
+
+/**
+ * @brief get the ssl configuration
+ *
+ * @return QSslConfiguration ssl configuration
+ */
+QSslConfiguration Controller::getSSLConfiguration() const {
+  return m_sslConfig;
+}
+
+//---------------------- public slots -----------------------//
+
+/**
  * @brief set the host as server and start listening
  * to accept the client
  */
@@ -78,8 +154,10 @@ void Controller::setCurrentHostAsClient() {
 
   // Connect the onServerStateChanged signal to the signal
   const auto signal_c = &SyncingClient::OnServerStatusChanged;
-  const auto slot_c   = &Controller::OnServerStatusChanged;
+  const auto slot_c   = &Controller::handleServerStatusChanged;
+  const auto slot_d   = &Controller::handleServerStatusChanged;
   connect(client, signal_c, this, slot_c);
+  connect(client, signal_c, this, slot_d);
 
   // Connect the onErrorOccurred signal to the signal
   const auto signal_e = &SyncingClient::OnErrorOccurred;
@@ -91,59 +169,8 @@ void Controller::setCurrentHostAsClient() {
   const auto slot_r   = &clipboard::Clipboard::set;
   connect(client, signal_r, &m_clipboard, slot_r);
 
-  // Connect the onClipboardChange signal to the client
-  const auto signal_b = &clipboard::Clipboard::OnClipboardChange;
-  const auto slot_b   = &SyncingClient::syncItems;
-  connect(&m_clipboard, signal_b, client, slot_b);
-
   // Start the Discovery
   client->startDiscovery();
-}
-
-/**
- * @brief Construct a new Controller object and manage
- * the clipboard, server and client
- *
- * @param board  clipboard that is managed
- * @param parent parent object
- */
-Controller::Controller(QClipboard *board, QObject *parent)
-    : QObject(parent), m_clipboard(board, this) {}
-
-/**
- * @brief set the authenticator
- *
- * @param authenticator authenticator function
- */
-void Controller::setAuthenticator(Authenticator authenticator) {
-  m_authenticator = authenticator;
-}
-
-/**
- * @brief get the authenticator
- *
- * @return Authenticator authenticator function
- */
-Controller::Authenticator Controller::getAuthenticator() const {
-  return m_authenticator;
-}
-
-/**
- * @brief set the ssl configuration
- *
- * @param sslConfig ssl configuration
- */
-void Controller::setSSLConfiguration(QSslConfiguration sslConfig) {
-  m_sslConfig = sslConfig;
-}
-
-/**
- * @brief get the ssl configuration
- *
- * @return QSslConfiguration ssl configuration
- */
-QSslConfiguration Controller::getSSLConfiguration() const {
-  return m_sslConfig;
 }
 
 //---------------------- Server functions -----------------------//
@@ -153,7 +180,7 @@ QSslConfiguration Controller::getSSLConfiguration() const {
  *
  * @return QList<QSslSocket*> List of clients
  */
-const QList<QPair<QHostAddress, quint16>> Controller::getConnectedClientsList() const {
+QList<QPair<QHostAddress, quint16>> Controller::getConnectedClientsList() const {
   if (std::holds_alternative<SyncingServer>(m_host)) {
     return std::get<SyncingServer>(m_host).getConnectedClientsList();
   } else {
@@ -206,7 +233,7 @@ void Controller::disconnectAllClients() {
 /**
  * @brief Get the server QHostAddress and port
  */
-QPair<QHostAddress, quint16> Controller::getServer() {
+QPair<QHostAddress, quint16> Controller::getServerInfo() const {
   if (std::holds_alternative<SyncingServer>(m_host)) {
     return std::get<SyncingServer>(m_host).getServerInfo();
   } else {
@@ -221,7 +248,7 @@ QPair<QHostAddress, quint16> Controller::getServer() {
  *
  * @return QList<QPair<QHostAddress, quint16>> List of servers
  */
-QList<QPair<QHostAddress, quint16>> Controller::getServerList() {
+QList<QPair<QHostAddress, quint16>> Controller::getServerList() const {
   if (std::holds_alternative<SyncingClient>(m_host)) {
     return std::get<SyncingClient>(m_host).getServerList();
   } else {
@@ -249,7 +276,7 @@ void Controller::connectToServer(QPair<QHostAddress, quint16> host) {
  *
  * @return QPair<QHostAddress, quint16> address and port
  */
-QPair<QHostAddress, quint16> Controller::getConnectedServer() {
+QPair<QHostAddress, quint16> Controller::getConnectedServer() const {
   if (std::holds_alternative<SyncingClient>(m_host)) {
     return std::get<SyncingClient>(m_host).getConnectedServer();
   } else {

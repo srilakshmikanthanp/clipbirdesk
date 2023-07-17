@@ -15,7 +15,7 @@
 // project headers
 #include "config/config.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::config {
+namespace srilakshmikanthanp::clipbirdesk::constants {
 /**
  * @brief Get the Application Version
  * @return std::string
@@ -39,6 +39,12 @@ std::string getAppPatchVersion();
  * @return std::string
  */
 std::string getAppName();
+
+/**
+ * @brief Get logo path
+ * @return std::string
+ */
+std::string getAppLogo();
 
 /**
  * @brief Get App Home Directory

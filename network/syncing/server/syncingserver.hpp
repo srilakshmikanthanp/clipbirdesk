@@ -14,6 +14,7 @@
 #include <QVector>
 
 #include "network/discovery/server/discoveryserver.hpp"
+#include "types/callback/callback.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
@@ -57,7 +58,7 @@ class SyncingServer : public discovery::DiscoveryServer {
  public:  // Authenticator Type
 
   /// @brief Authenticator
-  using Authenticator = std::function<bool(QPair<QHostAddress, quint16>)>;
+  using Authenticator = types::callback::Authenticator;
 
  private:  // members of the class
 

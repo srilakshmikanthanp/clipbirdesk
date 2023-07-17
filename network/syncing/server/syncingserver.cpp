@@ -16,12 +16,10 @@ void SyncingServer::processSyncingPacket(const packets::SyncingPacket &packet) {
   // Make the vector of QPair<QString, QByteArray>
   QVector<QPair<QString, QByteArray>> items;
 
-// Get the items from the packet
-#define STR(item) item.getMimeType().toStdString().c_str()
+  // Get the items from the packet
   for (auto item : packet.getItems()) {
-    items.append({STR(item), item.getPayload()});
+    items.append({item.getMimeType().toStdString().c_str(), item.getPayload()});
   }
-#undef STR  // just used to avoid the long line
 
   // Notify the listeners to sync the data
   emit OnSyncRequest(items);
@@ -86,8 +84,12 @@ void SyncingServer::processConnections() {
       continue;
     }
 
+    // Peer info
+    const auto peerAddress = client_tls->peerAddress();
+    const auto peerPort    = client_tls->peerPort();
+
     // Authenticate the client
-    if (!m_authenticator({client_tls->peerAddress(), client_tls->peerPort()})) {
+    if (!m_authenticator({peerAddress, peerPort})) {
       client_tls->disconnectFromHost();
       continue;
     }
@@ -107,8 +109,7 @@ void SyncingServer::processConnections() {
     QObject::connect(client_tls, signal_r, this, slot_r);
 
     // convert to QPair<QHostAddress, quint16>
-    auto client_info =
-        QPair<QHostAddress, quint16>(client_tls->peerAddress(), client_tls->peerPort());
+    auto client_info = QPair<QHostAddress, quint16>(peerAddress, peerPort);
 
     // Notify the listeners that the client is connected
     emit OnCLientStateChanged(client_info, true);

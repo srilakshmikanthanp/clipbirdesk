@@ -6,6 +6,7 @@
   ],
   "cSpell.words": [
     "Antialiasing",
+    "Cilp",
     "Clipbird",
     "clipbirdesk",
     "ipconv",
@@ -117,6 +118,8 @@
     "source_location": "cpp",
     "qicon": "cpp",
     "qtlogging": "cpp",
-    "qobject": "cpp"
+    "qobject": "cpp",
+    "qhostinfo": "cpp",
+    "qsslconfiguration": "cpp"
   },
 }

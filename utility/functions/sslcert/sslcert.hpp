@@ -28,7 +28,7 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions::internal {
  *  @brief generates a EVP_PEY using RSA_generate_key_ex
  *  @returns EVP_PKEY* - shared pointer to the key
  */
-inline std::shared_ptr<EVP_PKEY> generateRSAKey(int bits = 2048);
+std::shared_ptr<EVP_PKEY> generateRSAKey(int bits = 2048);
 
 /**
  * @brief Generates a self-signed x509 certificate
@@ -37,7 +37,7 @@ inline std::shared_ptr<EVP_PKEY> generateRSAKey(int bits = 2048);
  *
  * @return X509* - shared pointer to certificate
  */
-inline std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey);
+std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey);
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions::internal
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions {
@@ -46,5 +46,5 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions {
  * @param bits - RSA key size
  * @return QSslConfiguration
  */
-inline QSslConfiguration getQSslConfiguration(int bits = 2048);
+QSslConfiguration getQSslConfiguration(int bits = 2048);
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

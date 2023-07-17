@@ -17,17 +17,12 @@
 
 // project headers
 #include "clipboard/clipboard.hpp"
+#include "types/callback/callback.hpp"
 #include "network/syncing/client/syncingclient.hpp"
 #include "network/syncing/server/syncingserver.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::controller {
 class Controller : public QObject {
- private:  // typedefs for this class
-
-  using Authenticator = std::function<bool(QPair<QHostAddress, quint16>)>;
-  using SyncingServer = network::syncing::SyncingServer;
-  using SyncingClient = network::syncing::SyncingClient;
-
   //----------------------- client Signals -------------------------//
 
  signals:  // signals for this class
@@ -62,6 +57,12 @@ class Controller : public QObject {
   /// @brief On Sync Request  (From Server)
   void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
 
+ private:  // typedefs for this class
+
+  using SyncingServer = network::syncing::SyncingServer;
+  using Authenticator = types::callback::Authenticator;
+  using SyncingClient = network::syncing::SyncingClient;
+
  private:  // just for Qt
 
   Q_OBJECT
@@ -73,18 +74,10 @@ class Controller : public QObject {
   clipboard::Clipboard m_clipboard;
   Authenticator m_authenticator = nullptr;
 
- public:  // slots
+ private:  // private slots
 
-  /**
-   * @brief set the host as server and start listening
-   * to accept the client
-   */
-  void setCurrentHostAsServer();
-
-  /**
-   * @brief set the host as client
-   */
-  void setCurrentHostAsClient();
+  /// @brief Handle On Server Status Changed (From client)
+  void handleServerStatusChanged(bool isConnected);
 
  public:  // Member functions
 
@@ -101,6 +94,21 @@ class Controller : public QObject {
    * @brief Destroy the Controller object
    */
   virtual ~Controller() = default;
+
+  //---------------------- public slots ----------------------//
+
+  /**
+   * @brief set the host as server and start listening
+   * to accept the client
+   */
+  void setCurrentHostAsServer();
+
+  /**
+   * @brief set the host as client
+   */
+  void setCurrentHostAsClient();
+
+  //--------------------- config functions --------------------//
 
   /**
    * @brief set the authenticator
@@ -137,7 +145,7 @@ class Controller : public QObject {
    *
    * @return QList<QSslSocket*> List of clients
    */
-  const QList<QPair<QHostAddress, quint16>> getConnectedClientsList() const;
+  QList<QPair<QHostAddress, quint16>> getConnectedClientsList() const;
 
   /**
    * @brief Disconnect the client from the server and delete
@@ -155,7 +163,7 @@ class Controller : public QObject {
   /**
    * @brief Get the server QHostAddress and port
    */
-  QPair<QHostAddress, quint16> getServer();
+  QPair<QHostAddress, quint16> getServerInfo() const;
 
   //---------------------- Client functions -----------------------//
 
@@ -164,7 +172,7 @@ class Controller : public QObject {
    *
    * @return QList<QPair<QHostAddress, quint16>> List of servers
    */
-  QList<QPair<QHostAddress, quint16>> getServerList();
+  QList<QPair<QHostAddress, quint16>> getServerList() const;
 
   /**
    * @brief Connect to the server with the given host and port
@@ -180,7 +188,7 @@ class Controller : public QObject {
    *
    * @return QPair<QHostAddress, quint16> address and port
    */
-  QPair<QHostAddress, quint16> getConnectedServer();
+  QPair<QHostAddress, quint16> getConnectedServer() const;
 
   /**
    * @brief Disconnect from the server

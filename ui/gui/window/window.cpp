@@ -82,11 +82,7 @@ void Window::handleClientListChange(QList<QPair<QHostAddress, quint16>> clients)
  * @brief Handle the Server State Change
  */
 void Window::handleServerStateChange(bool isStarted) {
-  // infer the status from the server state
-  const auto status = isStarted ? Status::Active : Status::Inactive;
-
-  // set the server status
-  this->setStatus(s_statusKey, status);
+  this->setStatus(s_statusKey, isStarted ? Status::Active : Status::Inactive);
 }
 
 //----------------------------- slots for Client --------------------------//
@@ -133,9 +129,10 @@ void Window::handleServerStatusChange(bool status) {
  * @brief Construct a new Window object
  * with parent as QWidget
  */
-Window::Window(QWidget* parent) : QWidget(parent) {
+Window::Window(Window::Controller* controller, QWidget* parent)
+    : QWidget(parent), controller(controller) {
   // set no taskbar icon & no window Frame
-  setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+  setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
   // create all the components
   this->hostStatus.first  = new components::Label(this);
@@ -227,12 +224,12 @@ Window::Window(QWidget* parent) : QWidget(parent) {
 
   // Connect the signal and slot for server status change
   const auto signal_ss = &Controller::OnServerStateChanged;
-  const auto slot_ss   = &Window::handleServerStatusChange;
+  const auto slot_ss   = &Window::handleServerStateChange;
   connect(controller, signal_ss, this, slot_ss);
 
   // Connect the signal and slot for server status change
-  const auto signal_sc = &Controller::OnServerStateChanged;
-  const auto slot_sc   = &Window::handleServerStateChange;
+  const auto signal_sc = &Controller::OnServerStatusChanged;
+  const auto slot_sc   = &Window::handleServerStatusChange;
   connect(controller, signal_sc, this, slot_sc);
 
   // Connect the signal and slot for host action
@@ -390,4 +387,53 @@ void Window::removeServer(components::Host::Value host) {
 void Window::removeAllServers() {
   clientList->removeAllHosts();
 }
+
+//---------------------- general ----------------------//
+
+/**
+ * @brief Set the Size Ratio object
+ */
+void Window::setSizeRatio(QSize r) {
+  this->ratio = r;
+}
+
+/**
+ * @brief Get the Size Ratio object
+ */
+QSize Window::getSizeRatio() {
+  return this->ratio;
+}
+
+/**
+ * @brief Override the setVisiblity
+ */
+void Window::setVisible(bool visible) {
+  // if visible
+  if (!visible) return QWidget::setVisible(visible);
+
+  // Get the Primary Screen
+  auto screen  = QGuiApplication::primaryScreen();
+
+  // get the screen size
+  auto sc_siz  = screen->availableGeometry();
+
+  // Calculate the window size from ratio
+  auto win_siz = QSize();
+
+  // calc the Height
+  win_siz.setHeight(sc_siz.height() / ratio.height());
+
+  // calc the Width
+  win_siz.setWidth(sc_siz.width() / ratio.width());
+
+  // set the window size
+  setFixedSize(win_siz);
+
+  // move the window to center
+  move(screen->geometry().center() - rect().center());
+
+  // show the window
+  QWidget::setVisible(visible);
+}
+
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

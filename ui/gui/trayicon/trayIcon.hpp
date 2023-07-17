@@ -33,13 +33,12 @@ class TrayIcon : public QSystemTrayIcon {
   void OnExitClicked();
 
  public:  // Member function
-
   /**
    * @brief Construct a new Sys Tray object
    *
    * @param parent
    */
-  explicit TrayIcon(QWidget* parent = nullptr);
+  TrayIcon(QWidget* parent = nullptr);
 
   /**
    * @brief Destroy the Sys Tray object

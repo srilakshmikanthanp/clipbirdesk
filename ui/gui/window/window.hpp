@@ -8,7 +8,10 @@
 // Qt headers
 #include <QApplication>
 #include <QFormLayout>
+#include <QGuiApplication>
 #include <QHBoxLayout>
+#include <QHostAddress>
+#include <QScreen>
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -73,7 +76,8 @@ class Window : public QWidget {
 
  private:  // Member Variables
 
-  Controller* controller = new Controller(QApplication::clipboard(), this);
+  QSize ratio = QSize(3, 3);
+  Controller* controller;
 
  signals:  // signals
   void onHostAction(Tabs tab, std::tuple<QHostAddress, quint16, Action>);
@@ -144,7 +148,7 @@ class Window : public QWidget {
    * @brief Construct a new Window object
    * with parent as QWidget
    */
-  explicit Window(QWidget* parent = nullptr);
+  explicit Window(Controller* controller, QWidget *parent = nullptr);
 
   /**
    * @brief Set the Status object
@@ -239,5 +243,22 @@ class Window : public QWidget {
    * @brief Remove all servers from the list
    */
   void removeAllServers();
+
+  //---------------------- General ----------------------//
+
+  /**
+   * @brief Set the Size Ratio object
+   */
+  void setSizeRatio(QSize r);
+
+  /**
+   * @brief Get the Size Ratio object
+   */
+  QSize getSizeRatio();
+
+  /**
+   * @brief Override the setVisible function
+   */
+  void setVisible(bool visible) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

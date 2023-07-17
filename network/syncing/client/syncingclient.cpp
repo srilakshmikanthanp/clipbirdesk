@@ -181,7 +181,7 @@ void SyncingClient::syncItems(QVector<QPair<QString, QByteArray>> items) {
  *
  * @return QList<QPair<QHostAddress, quint16>> List of servers
  */
-QList<QPair<QHostAddress, quint16>> SyncingClient::getServerList() {
+QList<QPair<QHostAddress, quint16>> SyncingClient::getServerList() const {
   // Host address and port number
   QList<QPair<QHostAddress, quint16>> list;
 
