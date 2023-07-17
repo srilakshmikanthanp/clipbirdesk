@@ -23,7 +23,7 @@ TEST(DiscoveryPacketTest, TestingDiscoveryPacket) {
   using srilakshmikanthanp::clipbirdesk::network::packets::DiscoveryPacket;
 
   // using the IPType
-  typedef srilakshmikanthanp::clipbirdesk::types::enums::IPType IPType;;
+  typedef srilakshmikanthanp::clipbirdesk::types::enums::IPType IPType;
 
   // using functions namespace
   using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
@@ -33,9 +33,9 @@ TEST(DiscoveryPacketTest, TestingDiscoveryPacket) {
 
   // Constant values
   const auto packetType = DiscoveryPacket::PacketType::Request;
-  const auto ipType = IPType::IPv4;
-  const auto ip = QByteArray("\x7F\x00\x00\x01", 4);
-  const auto port = 1234;
+  const auto ipType     = IPType::IPv4;
+  const auto ip         = QByteArray("\x7F\x00\x00\x01", 4);
+  const auto port       = 1234;
 
   // setting the packet type
   packet_send.setPacketType(packetType);

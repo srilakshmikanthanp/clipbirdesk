@@ -32,8 +32,8 @@ TEST(InvalidPacketTest, TestingInvalidPacket) {
   InvalidRequest packet_send, packet_recv;
 
   // constant values
-  const auto packetType = InvalidRequest::PacketType::RequestFailed;
-  const auto errorCode = ErrorCode::CodingError;
+  const auto packetType   = InvalidRequest::PacketType::RequestFailed;
+  const auto errorCode    = ErrorCode::CodingError;
   const auto errorMessage = QByteArray("Hello", 5);
 
   // setting the packet type
@@ -63,4 +63,3 @@ TEST(InvalidPacketTest, TestingInvalidPacket) {
   // check the message
   EXPECT_EQ(packet_recv.getErrorMessage(), errorMessage);
 }
-

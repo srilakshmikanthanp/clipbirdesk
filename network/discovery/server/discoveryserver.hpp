@@ -35,23 +35,28 @@ namespace srilakshmikanthanp::clipbirdesk::network::discovery {
  */
 class DiscoveryServer : public QObject {
  private:  // typedefs for this class
+
   using MalformedPacket = types::except::MalformedPacket;
-  using IPType = types::enums::IPType;
+  using IPType          = types::enums::IPType;
 
  private:  // Just for Qt
+
   Q_OBJECT
 
  private:  // variables
-  QUdpSocket m_socket = QUdpSocket(this);
+
+  QUdpSocket* m_socket = new QUdpSocket(this);
 
  signals:  // signals for this class
   /// @brief On Error Occurred
   void OnErrorOccurred(QString error);
 
  private:  // disable copy and move
+
   Q_DISABLE_COPY_MOVE(DiscoveryServer)
 
  private:  // private functions
+
   /**
    * @brief Create the packet and send it to the client
    *
@@ -61,7 +66,7 @@ class DiscoveryServer : public QObject {
    */
   template <typename Packet>
   void sendPacket(const Packet& pack, const QHostAddress& host, quint16 port) {
-    m_socket.writeDatagram(utility::functions::toQByteArray(pack), host, port);
+    m_socket->writeDatagram(utility::functions::toQByteArray(pack), host, port);
   }
 
   /**
@@ -77,6 +82,7 @@ class DiscoveryServer : public QObject {
   void processDatagrams();
 
  public:  // public functions
+
   /**
    * @brief Construct a new Discovery Server object
    *
@@ -85,10 +91,11 @@ class DiscoveryServer : public QObject {
   explicit DiscoveryServer(QObject* parent = nullptr);
 
  protected:  // protected functions
+
   /**
    * @brief Destroy the Discovery Server object
    */
-  virtual ~DiscoveryServer() = default;
+  virtual ~DiscoveryServer()                     = default;
 
   /**
    * @brief Get the IP Type of the server it can be IPv4 or IPv6
@@ -110,7 +117,7 @@ class DiscoveryServer : public QObject {
    * @return types::Port Port number
    * @throw Any Exception If any error occurs
    */
-  virtual quint16 getPort() const = 0;
+  virtual quint16 getPort() const                = 0;
 
   /**
    * @brief Get the IP Address of the server it can be IPv4 or IPv6
@@ -120,9 +127,10 @@ class DiscoveryServer : public QObject {
    * @return types::IPAddress IP address
    * @throw Any Exception If any error occurs
    */
-  virtual QHostAddress getIPAddress() const = 0;
+  virtual QHostAddress getIPAddress() const      = 0;
 
  public:
+
   /**
    * @brief Start the server
    */

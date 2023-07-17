@@ -11,17 +11,22 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class Circle : public QWidget {
- private:          // Constants
+ private:  // Constants
+
   static constexpr const char *const style = R"(
   )";
 
- private:          // Member
+ private:  // Member
+
   int radius = 0;  // radius of the circle
   QColor color;    // color of the circle
- private:          // just for Qt
+
+ private:  // just for Qt
+
   Q_OBJECT
 
  public:
+
   /**
    * @brief Construct a new Circle object
    * with parent as QWidget
@@ -61,6 +66,7 @@ class Circle : public QWidget {
   ~Circle() override = default;
 
  private:  // disable copy and move
+
   Q_DISABLE_COPY_MOVE(Circle)
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

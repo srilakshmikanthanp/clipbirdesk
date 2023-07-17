@@ -32,8 +32,7 @@ void SyncingClient::processSyncingPacket(const packets::SyncingPacket& packet) {
  *
  * @param packet Invalid packet
  */
-void SyncingClient::processInvalidPacket(
-    const packets::InvalidRequest& packet) {
+void SyncingClient::processInvalidPacket(const packets::InvalidRequest& packet) {
   emit OnErrorOccurred(packet.getErrorMessage());
 }
 
@@ -44,7 +43,7 @@ void SyncingClient::processInvalidPacket(
  */
 void SyncingClient::updateServerList() {
   // current timestamp in milliseconds
-  const auto current = QDateTime::currentMSecsSinceEpoch();
+  const auto current   = QDateTime::currentMSecsSinceEpoch();
 
   // candidate for removal
   const auto candidate = [&](auto element) -> bool {
@@ -53,8 +52,8 @@ void SyncingClient::updateServerList() {
 
   // remove the server that has exceeded the threshold
   const auto start = m_servers.begin();
-  const auto end = m_servers.end();
-  const auto it = std::remove_if(start, end, candidate);
+  const auto end   = m_servers.end();
+  const auto it    = std::remove_if(start, end, candidate);
 
   // if No change return
   if (it == end) return;
@@ -72,7 +71,7 @@ void SyncingClient::updateServerList() {
  */
 void SyncingClient::processReadyRead() {
   // Read All the data from the socket
-  const auto data = m_ssl_socket.readAll();
+  const auto data = m_ssl_socket->readAll();
 
   // using fromQByteArray to parse the packet
   using utility::functions::fromQByteArray;
@@ -123,35 +122,35 @@ SyncingClient::SyncingClient(QObject* parent) : DiscoveryClient(parent) {
   // connect the signal to emit the signal for
   // OnErrorOccurred from the base class
   const auto signal_e = &DiscoveryClient::OnErrorOccurred;
-  const auto slot_e = &SyncingClient::OnErrorOccurred;
+  const auto slot_e   = &SyncingClient::OnErrorOccurred;
   connect(this, signal_e, this, slot_e);
 
   // connected signal to emit the signal for
   // server state changed
   const auto signal_c = &QSslSocket::connected;
-  const auto slot_c = [&]() { emit OnServerStatusChanged(true); };
-  connect(&m_ssl_socket, signal_c, this, slot_c);
+  const auto slot_c   = [&]() { emit OnServerStatusChanged(true); };
+  connect(m_ssl_socket, signal_c, this, slot_c);
 
   // connect the signals and slots for the socket
   // readyRead signal to process the packet
   const auto signal_r = &QSslSocket::readyRead;
-  const auto slot_r = &SyncingClient::processReadyRead;
-  connect(&m_ssl_socket, signal_r, this, slot_r);
+  const auto slot_r   = &SyncingClient::processReadyRead;
+  connect(m_ssl_socket, signal_r, this, slot_r);
 
   // connect the signal to emit the signal for
   // timer to update the server list
   const auto signal_t = &QTimer::timeout;
-  const auto slot_t = &SyncingClient::updateServerList;
-  connect(&m_timer, signal_t, this, slot_t);
+  const auto slot_t   = &SyncingClient::updateServerList;
+  connect(m_timer, signal_t, this, slot_t);
 
   // start the timer to update the server list
-  m_timer.start(m_threshold);
+  m_timer->start(m_threshold);
 
   // disconnected signal to emit the signal for
   // server state changed
   const auto signal_d = &QSslSocket::disconnected;
-  const auto slot_d = [&]() { emit OnServerStatusChanged(false); };
-  connect(&m_ssl_socket, signal_d, this, slot_d);
+  const auto slot_d   = [&]() { emit OnServerStatusChanged(false); };
+  connect(m_ssl_socket, signal_d, this, slot_d);
 }
 
 /**
@@ -162,7 +161,7 @@ SyncingClient::SyncingClient(QObject* parent) : DiscoveryClient(parent) {
  */
 void SyncingClient::syncItems(QVector<QPair<QString, QByteArray>> items) {
   // check if the socket is connected else throw error
-  if (!m_ssl_socket.isOpen()) {
+  if (!m_ssl_socket->isOpen()) {
     throw std::runtime_error("Socket is not connected");
   }
 
@@ -204,12 +203,12 @@ QList<QPair<QHostAddress, quint16>> SyncingClient::getServerList() {
  */
 void SyncingClient::connectToServer(QPair<QHostAddress, quint16> client) {
   // check if the SSL configuration is set
-  if (m_ssl_socket.sslConfiguration().isNull()) {
+  if (m_ssl_socket->sslConfiguration().isNull()) {
     throw std::runtime_error("SSL Configuration is not set");
   }
 
   // check if the socket is connected
-  if (m_ssl_socket.isOpen()) {
+  if (m_ssl_socket->isOpen()) {
     this->disconnectFromServer();
   }
 
@@ -218,7 +217,7 @@ void SyncingClient::connectToServer(QPair<QHostAddress, quint16> client) {
   const auto port = client.second;
 
   // connect to the server as encrypted
-  m_ssl_socket.connectToHostEncrypted(host, port);
+  m_ssl_socket->connectToHostEncrypted(host, port);
 }
 
 /**
@@ -226,14 +225,14 @@ void SyncingClient::connectToServer(QPair<QHostAddress, quint16> client) {
  * @return QPair<QHostAddress, quint16>
  */
 QPair<QHostAddress, quint16> SyncingClient::getConnectedServer() const {
-  return {m_ssl_socket.peerAddress(), m_ssl_socket.peerPort()};
+  return {m_ssl_socket->peerAddress(), m_ssl_socket->peerPort()};
 }
 
 /**
  * @brief Disconnect from the server
  */
 void SyncingClient::disconnectFromServer() {
-  m_ssl_socket.disconnectFromHost();
+  m_ssl_socket->disconnectFromHost();
 }
 
 /**
@@ -242,7 +241,7 @@ void SyncingClient::disconnectFromServer() {
  * @param config SSL Configuration
  */
 void SyncingClient::setSSLConfiguration(QSslConfiguration config) {
-  m_ssl_socket.setSslConfiguration(config);
+  m_ssl_socket->setSslConfiguration(config);
 }
 
 /**
@@ -251,7 +250,7 @@ void SyncingClient::setSSLConfiguration(QSslConfiguration config) {
  * @return QSslConfiguration
  */
 QSslConfiguration SyncingClient::getSSLConfiguration() const {
-  return m_ssl_socket.sslConfiguration();
+  return m_ssl_socket->sslConfiguration();
 }
 
 /**
@@ -261,8 +260,7 @@ QSslConfiguration SyncingClient::getSSLConfiguration() const {
  * @param host Host address
  * @param port Port number
  */
-void SyncingClient::onServerFound(
-    QPair<QHostAddress, quint16> server) {
+void SyncingClient::onServerFound(QPair<QHostAddress, quint16> server) {
   // current timestamp in milliseconds
   const auto current = QDateTime::currentMSecsSinceEpoch();
 

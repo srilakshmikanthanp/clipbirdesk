@@ -11,17 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
  * with parent as QWidget
  * @param parent parent object
  */
-Status::Status(QWidget* parent) : QWidget(parent) {
-  // create a layout to align the widgets
-  auto root = new QHBoxLayout(this);
-
-  // add the widgets to the layout
-  root->addWidget(circle);
-  root->addWidget(status);
-
-  // set the layout to the widget
-  this->setLayout(root);
-
+Status::Status(QWidget* parent) : Label(parent) {
   // set the Style to the widget
   this->setStyleSheet(style);
 }
@@ -33,22 +23,18 @@ Status::Status(QWidget* parent) : QWidget(parent) {
 void Status::setStatus(Value val) {
   // set the text of the status
   switch (val) {
-    case Value::Disconnected:
-      status->setText("Disconnected");
-      circle->setColor(Qt::red);
-      break;
-    case Value::Connected:
-      status->setText("Connected");
-      circle->setColor(Qt::green);
-      break;
-    case Value::Active:
-      status->setText("Active");
-      circle->setColor(Qt::green);
-      break;
-    case Value::Inactive:
-      status->setText("Inactive");
-      circle->setColor(Qt::red);
-      break;
+  case Value::Disconnected:
+    this->setText("Disconnected");
+    break;
+  case Value::Connected:
+    this->setText("Connected");
+    break;
+  case Value::Active:
+    this->setText("Active");
+    break;
+  case Value::Inactive:
+    this->setText("Inactive");
+    break;
   }
 }
 

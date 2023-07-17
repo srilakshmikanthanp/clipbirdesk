@@ -14,4 +14,4 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 Button::Button(QWidget *parent) : QPushButton(parent) {
   setStyleSheet(style);
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

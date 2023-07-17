@@ -54,27 +54,31 @@ class SyncingClient : public discovery::DiscoveryClient {
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
 
  private:  // just for Qt
+
   /// @brief Qt meta object
   Q_OBJECT
 
  private:  // disable copy and move
+
   /// @brief Disable copy and move
   Q_DISABLE_COPY_MOVE(SyncingClient)
 
  private:  // Member variables
+
   /// @brief List of Found servers and timestamp
   QList<std::tuple<QHostAddress, quint16, qint64>> m_servers;
 
   /// @brief SSL socket
-  QSslSocket m_ssl_socket;
+  QSslSocket* m_ssl_socket = new QSslSocket(this);
 
   /// @brief Timer to update the server list
-  QTimer m_timer;
+  QTimer* m_timer          = new QTimer(this);
 
   /// @brief Threshold times
   const qint64 m_threshold = 10000;
 
  private:  // private functions
+
   /**
    * @brief Create the packet and send it to the client
    *
@@ -82,7 +86,7 @@ class SyncingClient : public discovery::DiscoveryClient {
    */
   template <typename Packet>
   void sendPacket(const Packet& pack) {
-    m_ssl_socket.write(utility::functions::toQByteArray(pack));
+    m_ssl_socket->write(utility::functions::toQByteArray(pack));
   }
 
   /**
@@ -115,6 +119,7 @@ class SyncingClient : public discovery::DiscoveryClient {
   void processReadyRead();
 
  public:
+
   /**
    * @brief Construct a new Syncing Client object
    * and connect the signals and slots and start
@@ -180,6 +185,7 @@ class SyncingClient : public discovery::DiscoveryClient {
   QSslConfiguration getSSLConfiguration() const;
 
  protected:  // abstract functions from the base class
+
   /**
    * @brief On server found function that That Called by the
    * discovery client when the server is found

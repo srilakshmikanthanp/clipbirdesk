@@ -11,8 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::discovery {
  * @brief Process the packet and return the packet
  * with server Information
  */
-void DiscoveryServer::processDiscoveryPacket(
-    const packets::DiscoveryPacket& packet) {
+void DiscoveryServer::processDiscoveryPacket(const packets::DiscoveryPacket& packet) {
   // response type of the packet is response
   const auto pakType = packets::DiscoveryPacket::PacketType::Response;
 
@@ -51,12 +50,12 @@ void DiscoveryServer::processDiscoveryPacket(
  * from the socket
  */
 void DiscoveryServer::processDatagrams() {
-  while (m_socket.hasPendingDatagrams()) {
+  while (m_socket->hasPendingDatagrams()) {
     // Read the data from the socket
-    QByteArray data(m_socket.pendingDatagramSize(), Qt::Uninitialized);
+    QByteArray data(m_socket->pendingDatagramSize(), Qt::Uninitialized);
     QHostAddress addr;
     quint16 port;
-    m_socket.readDatagram(data.data(), data.size(), &addr, &port);
+    m_socket->readDatagram(data.data(), data.size(), &addr, &port);
 
     // Using the ipconv namespace to convert the IP address
     using utility::functions::createPacket;
@@ -65,8 +64,7 @@ void DiscoveryServer::processDatagrams() {
     // try to parse the packet if it
     // fails then continue to next
     try {
-      this->processDiscoveryPacket(
-          fromQByteArray<packets::DiscoveryPacket>(data));
+      this->processDiscoveryPacket(fromQByteArray<packets::DiscoveryPacket>(data));
       continue;
     } catch (MalformedPacket& e) {
       const auto pakType = packets::InvalidRequest::PacketType::RequestFailed;
@@ -87,13 +85,13 @@ void DiscoveryServer::processDatagrams() {
  *
  * @param parent Parent object
  */
-DiscoveryServer::DiscoveryServer(QObject* parent): QObject(parent) {
+DiscoveryServer::DiscoveryServer(QObject* parent) : QObject(parent) {
   // Connect the socket to the callback function that
   // process the datagrams when the socket is ready
   // to read so the listener can be notified
   const auto signal = &QUdpSocket::readyRead;
-  const auto slot = &DiscoveryServer::processDatagrams;
-  QObject::connect(&m_socket, signal, this, slot);
+  const auto slot   = &DiscoveryServer::processDatagrams;
+  QObject::connect(m_socket, signal, this, slot);
 }
 
 /**
@@ -103,11 +101,13 @@ void DiscoveryServer::startServer() {
   const auto mode = QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint;
   const auto port = 0;
   const auto host = QHostAddress::AnyIPv4;
-  m_socket.bind(host, port, mode);
+  m_socket->bind(host, port, mode);
 }
 
 /**
  * @brief Stop the server
  */
-void DiscoveryServer::stopServer() { m_socket.close(); }
+void DiscoveryServer::stopServer() {
+  m_socket->close();
+}
 }  // namespace srilakshmikanthanp::clipbirdesk::network::discovery

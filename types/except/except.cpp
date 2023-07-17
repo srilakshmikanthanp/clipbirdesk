@@ -16,13 +16,15 @@ const char* MalformedPacket::what() const noexcept {
 }
 
 // get Code
-std::uint8_t MalformedPacket::getCode() const noexcept { return code; }
-
+std::uint8_t MalformedPacket::getCode() const noexcept {
+  return code;
+}
 
 // Constructor
-NotSupported::NotSupported(const std::string& message) noexcept
-    : message(message) {}
+NotSupported::NotSupported(const std::string& message) noexcept : message(message) {}
 
 // get message
-const char* NotSupported::what() const noexcept { return message.c_str(); }
+const char* NotSupported::what() const noexcept {
+  return message.c_str();
+}
 }  // namespace srilakshmikanthanp::clipbirdesk::types::except

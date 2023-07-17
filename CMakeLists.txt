@@ -27,17 +27,6 @@ find_package(Qt6 REQUIRED COMPONENTS
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
 
-# set qt version for singleapplication
-set(QT_DEFAULT_MAJOR_VERSION 6)
-
-# SingleApplication Librray Fetch from github
-FetchContent_Declare(SingleApplication
-  URL https://github.com/itay-grudev/SingleApplication/archive/refs/tags/v3.4.0.zip
-)
-
-# Fetch content
-FetchContent_MakeAvailable(SingleApplication)
-
 # Configure config.hpp
 configure_file(
   ${PROJECT_SOURCE_DIR}/config/config.hpp.in
@@ -54,7 +43,6 @@ qt_add_executable(clipbird
 
 # Link libraries
 target_link_libraries(clipbird
-  PRIVATE SingleApplication::SingleApplication
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL

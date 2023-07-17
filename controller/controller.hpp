@@ -23,6 +23,7 @@
 namespace srilakshmikanthanp::clipbirdesk::controller {
 class Controller : public QObject {
  private:  // typedefs for this class
+
   using Authenticator = std::function<bool(QPair<QHostAddress, quint16>)>;
   using SyncingServer = network::syncing::SyncingServer;
   using SyncingClient = network::syncing::SyncingClient;
@@ -51,8 +52,7 @@ class Controller : public QObject {
 
  signals:  // signals
   /// @brief On client state changed (From Server)
-  void OnCLientStateChanged(QPair<QHostAddress, quint16> client,
-                            bool connected);
+  void OnCLientStateChanged(QPair<QHostAddress, quint16> client, bool connected);
 
  signals:  // signals for this class
   /// @brief On Server state changed (From Server)
@@ -63,15 +63,18 @@ class Controller : public QObject {
   void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
 
  private:  // just for Qt
+
   Q_OBJECT
 
  private:  // Member variable
+
   std::variant<SyncingServer, SyncingClient> m_host;
   QSslConfiguration m_sslConfig;
   clipboard::Clipboard m_clipboard;
   Authenticator m_authenticator = nullptr;
 
  public:  // slots
+
   /**
    * @brief set the host as server and start listening
    * to accept the client
@@ -84,6 +87,7 @@ class Controller : public QObject {
   void setCurrentHostAsClient();
 
  public:  // Member functions
+
   /**
    * @brief Construct a new Controller object and manage
    * the clipboard, server and client

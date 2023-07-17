@@ -13,14 +13,13 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
  */
 Host::Host(QWidget *parent) : QWidget(parent) {
   // connect the button signal to this signal
-  QObject::connect(actBtn, &Button::clicked,
-                   [this]() { emit onAction(this->getHost()); });
+  QObject::connect(actBtn, &Button::clicked, [this]() { emit onAction(this->getHost()); });
 
   // create a layout to align the widgets
   QHBoxLayout *layout = new QHBoxLayout();
 
   // create a vertical layout
-  QVBoxLayout *left = new QVBoxLayout();
+  QVBoxLayout *left   = new QVBoxLayout();
 
   // add the hostname and ip
   left->addWidget(this->hostName);
@@ -50,9 +49,9 @@ Host::Host(QWidget *parent) : QWidget(parent) {
  */
 void Host::setHost(Host::Value host) {
   // set the address and port
-  this->address = std::get<0>(host);
-  this->port = std::get<1>(host);
-  this->action = std::get<2>(host);
+  this->address   = std::get<0>(host);
+  this->port      = std::get<1>(host);
+  this->action    = std::get<2>(host);
 
   // get the host info
   const auto info = QHostInfo::fromName(address.toString());

@@ -25,12 +25,14 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
  */
 class SyncingItem {
  private:
+
   qint32 mimeLength;
   QByteArray mimeType;
   qint32 payloadLength;
   QByteArray payload;
 
  public:
+
   /**
    * @brief Set the Mime Length object
    */
@@ -114,16 +116,19 @@ class SyncingItem {
  */
 class SyncingPacket {
  private:  // private members
+
   quint8 packetType = 0x03;
   qint32 packetLength;
   qint32 itemCount;
   QVector<SyncingItem> items;
 
  public:
+
   /// @brief Allowed Packet Types
   enum PacketType : quint8 { SyncPacket = 0x03 };
 
  public:
+
   /**
    * @brief Set the Packet Type object
    *

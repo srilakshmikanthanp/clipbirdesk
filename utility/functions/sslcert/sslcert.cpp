@@ -94,13 +94,13 @@ inline QSslConfiguration getQSslConfiguration(int bits) {
   std::shared_ptr<EVP_PKEY> pkey = internal::generateRSAKey(bits);
 
   // Generate the certificate
-  std::shared_ptr<X509> x509 = internal::generateX509(pkey);
+  std::shared_ptr<X509> x509     = internal::generateX509(pkey);
 
   // using the defer as in golang
-  using Defer = std::shared_ptr<void>;
+  using Defer                    = std::shared_ptr<void>;
 
   // Write the key to buffer
-  BIO *pkey_buffer = BIO_new(BIO_s_mem());
+  BIO *pkey_buffer               = BIO_new(BIO_s_mem());
 
   // Free the memory
   Defer defer_pkey_buffer(pkey_buffer, BIO_free_all);

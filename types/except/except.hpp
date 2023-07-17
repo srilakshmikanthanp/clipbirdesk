@@ -14,10 +14,12 @@ namespace srilakshmikanthanp::clipbirdesk::types::except {
  */
 class MalformedPacket : public std::exception {
  private:
+
   std::string message;
   std::uint8_t code;
 
  public:
+
   // Constructor
   MalformedPacket(std::uint8_t code, const std::string& message) noexcept;
 
@@ -36,9 +38,11 @@ class MalformedPacket : public std::exception {
  */
 class NotSupported : public std::exception {
  private:
+
   std::string message;
 
  public:
+
   // Constructor
   NotSupported(const std::string& message) noexcept;
 

@@ -26,9 +26,9 @@ void HostsList::setHosts(QList<Host::Value> hosts) {
 /**
  * @brief Get the All Hosts from the list
  */
-QList<std::tuple<QHostAddress, quint16, HostsList::Action>> HostsList::getAllHosts() {
-  // cast the widget to host view
-  #define CAST(x) dynamic_cast<components::Host *>(x)
+QList<components::Host::Value> HostsList::getAllHosts() {
+// cast the widget to host view
+#define CAST(x) dynamic_cast<components::Host *>(x)
 
   // create a list of hosts
   QList<Host::Value> hosts;
@@ -43,8 +43,8 @@ QList<std::tuple<QHostAddress, quint16, HostsList::Action>> HostsList::getAllHos
   // return the list of hosts
   return hosts;
 
-  // undefine the cast macro
-  #undef CAST
+// undefine the cast macro
+#undef CAST
 }
 
 /**
@@ -58,8 +58,7 @@ void HostsList::addHost(Host::Value host) {
   hostView->setHost(host);
 
   // connect the host view signal to this signal
-  QObject::connect(hostView, &Host::onAction,
-                   [&](auto h) { emit onAction(h); });
+  QObject::connect(hostView, &Host::onAction, [&](auto h) { emit onAction(h); });
 
   // add the host view to the layout
   verticalLayout->addWidget(hostView);
@@ -69,8 +68,8 @@ void HostsList::addHost(Host::Value host) {
  * @brief Remove a Host from the list
  */
 void HostsList::removeHost(Host::Value host) {
-  // cast the widget to host view
-  #define CAST(x) dynamic_cast<components::Host *>(x)
+// cast the widget to host view
+#define CAST(x) dynamic_cast<components::Host *>(x)
 
   // iterate over the layout
   for (int i = 0; i < verticalLayout->count(); i++) {
@@ -80,16 +79,16 @@ void HostsList::removeHost(Host::Value host) {
     verticalLayout->removeWidget(hostView);
   }
 
-  // undefine the cast macro
-  #undef CAST
+// undefine the cast macro
+#undef CAST
 }
 
 /**
  * @brief Remove all Hosts from the list
  */
 void HostsList::removeAllHosts() {
-  // cast the widget to host view
-  #define CAST(x) dynamic_cast<components::Host *>(x)
+// cast the widget to host view
+#define CAST(x) dynamic_cast<components::Host *>(x)
 
   // iterate over the layout
   for (int i = 0; i < verticalLayout->count(); i++) {
@@ -98,7 +97,7 @@ void HostsList::removeAllHosts() {
     verticalLayout->removeWidget(hostView);
   }
 
-  // undefine the cast macro
-  #undef CAST
+// undefine the cast macro
+#undef CAST
 }
-}
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

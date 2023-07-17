@@ -1,4 +1,4 @@
-#pragma once // Header guard see https://en.wikipedia.org/wiki/Include_guard
+#pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
@@ -8,12 +8,13 @@
 // Qt header
 #include <QByteArray>
 #include <QClipboard>
+#include <QList>
 #include <QMimeData>
 #include <QObject>
-#include <QString>
 #include <QPair>
-#include <QList>
+#include <QString>
 #include <QVector>
+
 
 // project header
 #include "types/except/except.hpp"
@@ -24,7 +25,7 @@ namespace srilakshmikanthanp::clipbirdesk::clipboard {
  * set and notify the clipboard change
  */
 class Clipboard : public QObject {
- signals:   // signals
+ signals:  // signals
   /**
    * @brief Signal to notify the clipboard change occurrence use
    * the parameter or get method to get the clipboard data
@@ -32,17 +33,21 @@ class Clipboard : public QObject {
    */
   void OnClipboardChange(QVector<QPair<QString, QByteArray>>);
 
- private:   // members
+ private:  // members
+
   QClipboard* m_clipboard = nullptr;
 
- private:   // just for Qt
+ private:  // just for Qt
+
   /// @brief Qt meta object
   Q_OBJECT
 
- private: // disable copy and move
+ private:  // disable copy and move
+
   Q_DISABLE_COPY_MOVE(Clipboard)
 
- public:   // constructor
+ public:  // constructor
+
   /**
    * @brief Construct a new Clipboard object and manage
    * the clipboard that is passed via the constructor

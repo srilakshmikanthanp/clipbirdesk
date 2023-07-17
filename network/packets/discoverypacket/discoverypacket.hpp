@@ -24,6 +24,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
  */
 class DiscoveryPacket {
  private:
+
   quint8 packetType;
   qint32 packetLength;
   quint8 ipType;
@@ -31,10 +32,12 @@ class DiscoveryPacket {
   qint16 hostPort;
 
  public:
+
   /// @brief Allowed Packet Types
   enum PacketType : quint8 { Request = 0x01, Response = 0x02 };
 
  public:
+
   /**
    * @brief Set the Packet Type object
    *

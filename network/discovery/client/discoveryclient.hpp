@@ -34,13 +34,15 @@ namespace srilakshmikanthanp::clipbirdesk::network::discovery {
  */
 class DiscoveryClient : public QObject {
  private:  // private members variables
+
   /// @brief Udp socket
-  QUdpSocket m_socket = QUdpSocket(this);
+  QUdpSocket* m_socket = new QUdpSocket(this);
 
   /// @brief Timer to send the broadcast message
-  QTimer m_timer = QTimer(this);
+  QTimer* m_timer      = new QTimer(this);
 
  private:  // Just for Qt
+
   Q_OBJECT
 
  signals:  // signals for this class
@@ -48,9 +50,11 @@ class DiscoveryClient : public QObject {
   void OnErrorOccurred(QString error);
 
  private:  // disable copy and move
+
   Q_DISABLE_COPY_MOVE(DiscoveryClient)
 
  private:  // private functions
+
   /**
    * @brief Create the packet and send it to the client
    *
@@ -60,7 +64,7 @@ class DiscoveryClient : public QObject {
    */
   template <typename Packet>
   void sendPacket(const Packet& pack, const QHostAddress& host, quint16 port) {
-    m_socket.writeDatagram(utility::functions::toQByteArray(pack), host, port);
+    m_socket->writeDatagram(utility::functions::toQByteArray(pack), host, port);
   }
 
   /**
@@ -87,6 +91,7 @@ class DiscoveryClient : public QObject {
   void sendBroadcastMessage();
 
  public:
+
   /**
    * @brief Construct a new Discovery Client object
    *
@@ -113,6 +118,7 @@ class DiscoveryClient : public QObject {
   void stopDiscovery();
 
  protected:  // abstract functions
+
   /**
    * @brief On server found abstract function that
    * is called when the server is found

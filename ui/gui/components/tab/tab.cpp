@@ -14,4 +14,4 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 Tab::Tab(QWidget *parent) : QTabWidget(parent) {
   setStyleSheet(style);
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

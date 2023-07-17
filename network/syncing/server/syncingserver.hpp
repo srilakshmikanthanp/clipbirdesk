@@ -46,31 +46,38 @@ class SyncingServer : public discovery::DiscoveryServer {
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
 
  private:  // just for Qt
+
   /// @brief Qt meta object
   Q_OBJECT
 
  private:  // disable copy and move
+
   Q_DISABLE_COPY_MOVE(SyncingServer)
 
  public:  // Authenticator Type
+
   /// @brief Authenticator
   using Authenticator = std::function<bool(QPair<QHostAddress, quint16>)>;
 
  private:  // members of the class
+
   /// @brief SSL server
-  QSslServer m_ssl_server = QSslServer(this);
+  QSslServer* m_ssl_server = new QSslServer(this);
 
   /// @brief List of clients
   QList<QSslSocket*> m_clients;
 
  private:  // Authenticator Instance
+
   /// @brief Authenticator
   Authenticator m_authenticator = nullptr;
 
  private:  // some typedefs
+
   using MalformedPacket = types::except::MalformedPacket;
 
  private:  // member functions
+
   /**
    * @brief Create the packet and send it to the client
    *
@@ -118,6 +125,7 @@ class SyncingServer : public discovery::DiscoveryServer {
   void processDisconnection();
 
  public:  // constructors and destructors
+
   /**
    * @brief Construct a new Syncing Server object and
    * bind to any available port and any available
@@ -205,6 +213,7 @@ class SyncingServer : public discovery::DiscoveryServer {
   void stopServer() override;
 
  protected:  // override functions from the base class
+
   /**
    * @brief Get the IP Type of the SyncingServer it can be IPv4 or
    * IPv6 the IP type is used to determine the length of the IP address

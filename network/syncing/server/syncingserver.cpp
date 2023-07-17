@@ -36,7 +36,7 @@ void SyncingServer::processSyncingPacket(const packets::SyncingPacket &packet) {
  */
 void SyncingServer::processReadyRead() {
   // Get the client that was ready to read
-  auto client = qobject_cast<QSslSocket *>(sender());
+  auto client     = qobject_cast<QSslSocket *>(sender());
 
   // Get the data from the client
   const auto data = client->readAll();
@@ -66,9 +66,9 @@ void SyncingServer::processReadyRead() {
  * @brief Process the connections that are pending
  */
 void SyncingServer::processConnections() {
-  while (m_ssl_server.hasPendingConnections()) {
+  while (m_ssl_server->hasPendingConnections()) {
     // Get the client that has been connected
-    auto client_tcp = (m_ssl_server.nextPendingConnection());
+    auto client_tcp = (m_ssl_server->nextPendingConnection());
 
     // Convert the client to SSL client
     auto client_tls = qobject_cast<QSslSocket *>(client_tcp);
@@ -79,8 +79,8 @@ void SyncingServer::processConnections() {
     // If the client is not SSL client then disconnect
     if (client_tls == nullptr) {
       const auto packType = packets::InvalidRequest::PacketType::RequestFailed;
-      const auto code = types::enums::ErrorCode::SSLError;
-      const auto message = "Client is not SSL client";
+      const auto code     = types::enums::ErrorCode::SSLError;
+      const auto message  = "Client is not SSL client";
       this->sendPacket(client_tcp, createPacket({packType, code, message}));
       client_tcp->disconnectFromHost();
       continue;
@@ -96,19 +96,19 @@ void SyncingServer::processConnections() {
     // the disconnection when the client is disconnected
     // so the listener can be notified
     const auto signal_d = &QSslSocket::disconnected;
-    const auto slot_d = &SyncingServer::processDisconnection;
+    const auto slot_d   = &SyncingServer::processDisconnection;
     QObject::connect(client_tls, signal_d, this, slot_d);
 
     // Connect the socket to the callback function that
     // process the ready read when the socket is ready
     // to read so the listener can be notified
     const auto signal_r = &QSslSocket::readyRead;
-    const auto slot_r = &SyncingServer::processReadyRead;
+    const auto slot_r   = &SyncingServer::processReadyRead;
     QObject::connect(client_tls, signal_r, this, slot_r);
 
     // convert to QPair<QHostAddress, quint16>
-    auto client_info = QPair<QHostAddress, quint16>(client_tls->peerAddress(),
-                                                    client_tls->peerPort());
+    auto client_info =
+        QPair<QHostAddress, quint16>(client_tls->peerAddress(), client_tls->peerPort());
 
     // Notify the listeners that the client is connected
     emit OnCLientStateChanged(client_info, true);
@@ -126,11 +126,10 @@ void SyncingServer::processConnections() {
  */
 void SyncingServer::processDisconnection() {
   // Get the client that was disconnected
-  auto client = qobject_cast<QSslSocket *>(sender());
+  auto client      = qobject_cast<QSslSocket *>(sender());
 
   // convert to QPair<QHostAddress, quint16>
-  auto client_info =
-      QPair<QHostAddress, quint16>(client->peerAddress(), client->peerPort());
+  auto client_info = QPair<QHostAddress, quint16>(client->peerAddress(), client->peerPort());
 
   // Notify the listeners that the client is disconnected
   emit OnCLientStateChanged(client_info, false);
@@ -150,13 +149,13 @@ void SyncingServer::processDisconnection() {
  * @param config SSL configuration
  * @param parent Parent object
  */
-SyncingServer::SyncingServer(QObject *p): DiscoveryServer(p) {
+SyncingServer::SyncingServer(QObject *p) : DiscoveryServer(p) {
   // Connect the socket to the callback function that
   // process the connections when the socket is ready
   // to read so the listener can be notified
   const auto signal_c = &QSslServer::pendingConnectionAvailable;
-  const auto slot_c = &SyncingServer::processConnections;
-  QObject::connect(&m_ssl_server, signal_c, this, slot_c);
+  const auto slot_c   = &SyncingServer::processConnections;
+  QObject::connect(m_ssl_server, signal_c, this, slot_c);
 }
 
 /**
@@ -174,8 +173,7 @@ void SyncingServer::syncItems(QVector<QPair<QString, QByteArray>> items) {
  *
  * @return QList<QSslSocket*> List of clients
  */
-QList<QPair<QHostAddress, quint16>> SyncingServer::getConnectedClientsList()
-    const {
+QList<QPair<QHostAddress, quint16>> SyncingServer::getConnectedClientsList() const {
   QList<QPair<QHostAddress, quint16>> list;
   for (auto client : m_clients) {
     list.append({client->peerAddress(), client->peerPort()});
@@ -211,7 +209,7 @@ void SyncingServer::disconnectAllClients() {
  * @return QPair<QHostAddress, quint16>
  */
 QPair<QHostAddress, quint16> SyncingServer::getServerInfo() const {
-  return {m_ssl_server.serverAddress(), m_ssl_server.serverPort()};
+  return {m_ssl_server->serverAddress(), m_ssl_server->serverPort()};
 }
 
 /**
@@ -220,7 +218,7 @@ QPair<QHostAddress, quint16> SyncingServer::getServerInfo() const {
  * @param config SSL Configuration
  */
 void SyncingServer::setSSLConfiguration(QSslConfiguration config) {
-  m_ssl_server.setSslConfiguration(config);
+  m_ssl_server->setSslConfiguration(config);
 }
 
 /**
@@ -229,7 +227,7 @@ void SyncingServer::setSSLConfiguration(QSslConfiguration config) {
  * @return QSslConfiguration
  */
 QSslConfiguration SyncingServer::getSSLConfiguration() const {
-  return m_ssl_server.sslConfiguration();
+  return m_ssl_server->sslConfiguration();
 }
 
 /**
@@ -255,7 +253,7 @@ SyncingServer::Authenticator SyncingServer::getAuthenticator() const {
  */
 void SyncingServer::startServer() {
   // check if the SSL configuration is set
-  if (m_ssl_server.sslConfiguration().isNull()) {
+  if (m_ssl_server->sslConfiguration().isNull()) {
     throw std::runtime_error("SSL Configuration is not set");
   }
 
@@ -265,7 +263,7 @@ void SyncingServer::startServer() {
   }
 
   // start the server
-  if (!m_ssl_server.listen()) {
+  if (!m_ssl_server->listen()) {
     throw std::runtime_error("Failed to start the server");
   }
 
@@ -284,7 +282,7 @@ void SyncingServer::stopServer() {
   DiscoveryServer::stopServer();
 
   // stop the server
-  m_ssl_server.close();
+  m_ssl_server->close();
 
   // Notify the listeners
   emit OnServerStateChanged(false);
@@ -315,7 +313,7 @@ types::enums::IPType SyncingServer::getIPType() const {
  * @throw Any Exception If any error occurs
  */
 quint16 SyncingServer::getPort() const {
-  return m_ssl_server.serverPort();
+  return m_ssl_server->serverPort();
 }
 
 /**
@@ -327,6 +325,6 @@ quint16 SyncingServer::getPort() const {
  * @throw Any Exception If any error occurs
  */
 QHostAddress SyncingServer::getIPAddress() const {
-  return m_ssl_server.serverAddress();
+  return m_ssl_server->serverAddress();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

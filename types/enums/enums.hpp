@@ -17,6 +17,6 @@ enum class IPType : quint8 {
 /// @brief Allowed Error Codes
 enum ErrorCode : quint8 {
   CodingError = 0x01,
-  SSLError = 0x02,
+  SSLError    = 0x02,
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::types::enums

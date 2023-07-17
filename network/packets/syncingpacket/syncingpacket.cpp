@@ -10,14 +10,18 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
  * @brief Set the Mime Length object
  */
-void SyncingItem::setMimeLength(qint32 length) { this->mimeLength = length; }
+void SyncingItem::setMimeLength(qint32 length) {
+  this->mimeLength = length;
+}
 
 /**
  * @brief Get the Mime Length object
  *
  * @return qint32
  */
-qint32 SyncingItem::getMimeLength() const noexcept { return this->mimeLength; }
+qint32 SyncingItem::getMimeLength() const noexcept {
+  return this->mimeLength;
+}
 
 /**
  * @brief Set the Mime Type object
@@ -37,7 +41,9 @@ void SyncingItem::setMimeType(const QByteArray& type) {
  *
  * @return QByteArray
  */
-QByteArray SyncingItem::getMimeType() const noexcept { return this->mimeType; }
+QByteArray SyncingItem::getMimeType() const noexcept {
+  return this->mimeType;
+}
 
 /**
  * @brief Set the Payload Length object
@@ -75,7 +81,9 @@ void SyncingItem::setPayload(const QByteArray& payload) {
  *
  * @return QByteArray
  */
-QByteArray SyncingItem::getPayload() const noexcept { return this->payload; }
+QByteArray SyncingItem::getPayload() const noexcept {
+  return this->payload;
+}
 
 /**
  * @brief Get the size of the packet
@@ -83,8 +91,10 @@ QByteArray SyncingItem::getPayload() const noexcept { return this->payload; }
  * @return size_t
  */
 size_t SyncingItem::size() const noexcept {
-  return (sizeof(this->mimeLength) + this->mimeType.size() +
-          sizeof(this->payloadLength) + this->payload.size());
+  return (
+      sizeof(this->mimeLength) + this->mimeType.size() + sizeof(this->payloadLength) +
+      this->payload.size()
+  );
 }
 
 /**
@@ -132,8 +142,9 @@ QDataStream& operator>>(QDataStream& in, SyncingItem& payload) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError,
-                                         "Invalid Mime Length");
+    throw types::except::MalformedPacket(
+        types::enums::ErrorCode::CodingError, "Invalid Mime Length"
+    );
   }
 
   // resize the mime type
@@ -144,8 +155,7 @@ QDataStream& operator>>(QDataStream& in, SyncingItem& payload) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError,
-                                         "Invalid Mime Type");
+    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Mime Type");
   }
 
   // read the payload length
@@ -153,8 +163,9 @@ QDataStream& operator>>(QDataStream& in, SyncingItem& payload) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError,
-                                         "Invalid Payload Length");
+    throw types::except::MalformedPacket(
+        types::enums::ErrorCode::CodingError, "Invalid Payload Length"
+    );
   }
 
   // resize the payload
@@ -165,8 +176,9 @@ QDataStream& operator>>(QDataStream& in, SyncingItem& payload) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError,
-                                         "Invalid Payload Attempt");
+    throw types::except::MalformedPacket(
+        types::enums::ErrorCode::CodingError, "Invalid Payload Attempt"
+    );
   }
 
   // return the stream
@@ -218,14 +230,18 @@ qint32 SyncingPacket::getPacketLength() const noexcept {
  *
  * @param count
  */
-void SyncingPacket::setItemCount(qint32 count) { this->itemCount = count; }
+void SyncingPacket::setItemCount(qint32 count) {
+  this->itemCount = count;
+}
 
 /**
  * @brief Get the Item Count object
  *
  * @return qint32
  */
-qint32 SyncingPacket::getItemCount() const noexcept { return this->itemCount; }
+qint32 SyncingPacket::getItemCount() const noexcept {
+  return this->itemCount;
+}
 
 /**
  * @brief Set the Payloads object
@@ -255,8 +271,7 @@ QVector<SyncingItem> SyncingPacket::getItems() const noexcept {
  * @return size_t
  */
 size_t SyncingPacket::size() const noexcept {
-  size_t size = sizeof(this->packetType) + sizeof(this->packetLength) +
-                sizeof(this->itemCount);
+  size_t size = sizeof(this->packetType) + sizeof(this->packetLength) + sizeof(this->itemCount);
 
   for (const auto& payload : this->items) {
     size += payload.size();
@@ -307,14 +322,16 @@ QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError,
-                                         "Invalid Packet Type");
+    throw types::except::MalformedPacket(
+        types::enums::ErrorCode::CodingError, "Invalid Packet Type"
+    );
   }
 
   // check the packet type
   if (packet.packetType != SyncingPacket::PacketType::SyncPacket) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError,
-                                         "Invalid Packet Type");
+    throw types::except::MalformedPacket(
+        types::enums::ErrorCode::CodingError, "Invalid Packet Type"
+    );
   }
 
   // read the packet length
@@ -322,8 +339,9 @@ QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError,
-                                         "Invalid Packet Length");
+    throw types::except::MalformedPacket(
+        types::enums::ErrorCode::CodingError, "Invalid Packet Length"
+    );
   }
 
   // read the item count
@@ -331,8 +349,9 @@ QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError,
-                                         "Invalid Item Count");
+    throw types::except::MalformedPacket(
+        types::enums::ErrorCode::CodingError, "Invalid Item Count"
+    );
   }
 
   // read the payloads
@@ -346,8 +365,7 @@ QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError,
-                                         "Invalid Payloads");
+    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Payloads");
   }
 
   // return the stream

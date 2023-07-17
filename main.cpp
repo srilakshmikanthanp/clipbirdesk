@@ -5,12 +5,13 @@
 
 // Qt Headers
 #include <QApplication>
-#include <QApplication>
+#include <QScreen>
 
 // C++ Headers
 
 // Project Headers
 #include "config/config.hpp"
+#include "ui/gui/trayicon/trayicon.hpp"
 #include "ui/gui/window/window.hpp"
 
 /**
@@ -26,9 +27,14 @@
 auto main(int argc, char **argv) -> int {
   // create SingleApplication instance
   QApplication app(argc, argv);
-  auto c = new srilakshmikanthanp::clipbirdesk::controller::Controller(QApplication::clipboard());
-  srilakshmikanthanp::clipbirdesk::ui::gui::Window window(c);
-  window.show();
-  // return status code
+
+  // using Window
+  using srilakshmikanthanp::clipbirdesk::ui::gui::Window;
+
+  // Sample
+  auto window = new Window();
+  window->show();
+
+  // return the status code of the app
   return app.exec();
 }

@@ -19,9 +19,9 @@ Clipboard::Clipboard(QClipboard* clipboard, QObject* parent)
     : QObject(parent), m_clipboard(clipboard) {
   // connect the clipboard change signal to the slot
   // that is used to notify the listeners
-  const auto func = &Clipboard::OnClipboardChange;
+  const auto func   = &Clipboard::OnClipboardChange;
   const auto signal = &QClipboard::changed;
-  const auto slot = [this, func] { emit(this->*func)(get()); };
+  const auto slot   = [this, func] { emit(this->*func)(get()); };
   QObject::connect(m_clipboard, signal, this, slot);
 }
 
@@ -53,7 +53,9 @@ QVector<QPair<QString, QByteArray>> Clipboard::get() {
 /**
  * @brief Clear the clipboard content
  */
-void Clipboard::clear() { m_clipboard->clear(); }
+void Clipboard::clear() {
+  m_clipboard->clear();
+}
 
 /**
  * @brief Set the clipboard data to the clipboard

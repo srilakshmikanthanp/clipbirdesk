@@ -9,14 +9,17 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class Tab : public QTabWidget {
- private:          // Constants
+ private:  // Constants
+
   static constexpr const char *const style = R"(
   )";
 
  private:  // just for Qt
+
   Q_OBJECT
 
  public:
+
   /**
    * @brief Construct a new Tab object
    * with parent as QTabWidget
@@ -30,4 +33,4 @@ class Tab : public QTabWidget {
    */
   ~Tab() override = default;
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::individual
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

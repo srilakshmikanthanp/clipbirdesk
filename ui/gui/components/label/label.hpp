@@ -9,14 +9,17 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class Label : public QLabel {
- private:          // Constants
+ private:  // Constants
+
   static constexpr const char *const style = R"(
   )";
 
  private:  // just for Qt
+
   Q_OBJECT
 
  public:
+
   /**
    * @brief Construct a new Label object
    * with parent as QLabel
@@ -31,6 +34,7 @@ class Label : public QLabel {
   ~Label() override = default;
 
  private:  // disable copy and move
+
   Q_DISABLE_COPY_MOVE(Label)
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

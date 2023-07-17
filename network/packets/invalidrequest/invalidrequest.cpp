@@ -62,7 +62,9 @@ void InvalidRequest::setErrorCode(quint8 code) {
  *
  * @return quint8
  */
-quint8 InvalidRequest::getErrorCode() const noexcept { return this->errorCode; }
+quint8 InvalidRequest::getErrorCode() const noexcept {
+  return this->errorCode;
+}
 
 /**
  * @brief Set the Error Message object
@@ -88,8 +90,7 @@ QByteArray InvalidRequest::getErrorMessage() const noexcept {
  * @return std::size_t
  */
 std::size_t InvalidRequest::size() const noexcept {
-  return (sizeof(packetType) + sizeof(packetLength) + sizeof(errorCode) +
-          errorMessage.size());
+  return (sizeof(packetType) + sizeof(packetLength) + sizeof(errorCode) + errorMessage.size());
 }
 
 /**
@@ -112,8 +113,7 @@ QDataStream& operator<<(QDataStream& stream, const InvalidRequest packet) {
   // check the error message size
   if (packet.errorMessage.size() !=
       packet.packetLength -
-          (sizeof(packet.packetType) + sizeof(packet.packetLength) +
-           sizeof(packet.errorCode))) {
+          (sizeof(packet.packetType) + sizeof(packet.packetLength) + sizeof(packet.errorCode))) {
     throw std::invalid_argument("Invalid Error Message");
   }
 
@@ -137,14 +137,12 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid Packet Type");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Type");
   }
 
   // check the packet type
   if (packet.packetType != 0x00) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid Packet Type");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Type");
   }
 
   // read the packet length
@@ -152,8 +150,7 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid Packet Length");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Length");
   }
 
   // read the error code
@@ -161,20 +158,17 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid Error Code");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Error Code");
   }
 
   // check the error code
   if (packet.errorCode != 0x01) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid Error Code");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Error Code");
   }
 
   // Extract the error message length
-  auto msgLen = packet.packetLength -
-                (sizeof(packet.packetType) + sizeof(packet.packetLength) +
-                 sizeof(packet.errorCode));
+  auto msgLen = packet.packetLength - (sizeof(packet.packetType) + sizeof(packet.packetLength) +
+                                       sizeof(packet.errorCode));
 
   // resize the error message
   packet.errorMessage.resize(msgLen);
@@ -184,8 +178,7 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid Error Message");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Error Message");
   }
 
   // return the stream

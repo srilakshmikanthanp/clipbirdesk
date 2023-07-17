@@ -20,8 +20,8 @@
  */
 TEST(SyncingPacket, TestingSyncingPacket) {
   // using the ClipboardSyncPacket
-  using srilakshmikanthanp::clipbirdesk::network::packets::SyncingPacket;
   using srilakshmikanthanp::clipbirdesk::network::packets::SyncingItem;
+  using srilakshmikanthanp::clipbirdesk::network::packets::SyncingPacket;
 
   // using functions namespace
   using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
@@ -31,9 +31,9 @@ TEST(SyncingPacket, TestingSyncingPacket) {
 
   // constant values
   const auto packetType = SyncingPacket::PacketType::SyncPacket;
-  const auto itemCount = 2;
-  const auto mimeType = QByteArray("text/plain", 10);
-  const auto payload = QByteArray("Hello World", 11);
+  const auto itemCount  = 2;
+  const auto mimeType   = QByteArray("text/plain", 10);
+  const auto payload    = QByteArray("Hello World", 11);
   QVector<SyncingItem> items;
 
   // creating the items

@@ -53,8 +53,7 @@ qint32 DiscoveryPacket::getPacketLength() const noexcept {
  */
 void DiscoveryPacket::setIpType(types::enums::IPType type) {
   // check the ip type
-  if (type != types::enums::IPType::IPv4 &&
-      type != types::enums::IPType::IPv6) {
+  if (type != types::enums::IPType::IPv4 && type != types::enums::IPType::IPv6) {
     throw std::invalid_argument("Invalid ip type");
   }
 
@@ -105,21 +104,27 @@ void DiscoveryPacket::setHostIp(QByteArray ip) {
  *
  * @return const quint8*
  */
-QByteArray DiscoveryPacket::getHostIp() const noexcept { return this->hostIp; }
+QByteArray DiscoveryPacket::getHostIp() const noexcept {
+  return this->hostIp;
+}
 
 /**
  * @brief Set the Client Port object
  *
  * @param port
  */
-void DiscoveryPacket::setHostPort(qint16 port) { this->hostPort = port; }
+void DiscoveryPacket::setHostPort(qint16 port) {
+  this->hostPort = port;
+}
 
 /**
  * @brief Get the Client Port object
  *
  * @return qint16
  */
-qint16 DiscoveryPacket::getHostPort() const noexcept { return this->hostPort; }
+qint16 DiscoveryPacket::getHostPort() const noexcept {
+  return this->hostPort;
+}
 
 /**
  * @brief Get the Size of the Packet
@@ -127,8 +132,9 @@ qint16 DiscoveryPacket::getHostPort() const noexcept { return this->hostPort; }
  * @return std::size_t
  */
 std::size_t DiscoveryPacket::size() const noexcept {
-  return (sizeof(packetType) + sizeof(packetLength) + sizeof(ipType) +
-          sizeof(hostPort) + hostIp.size());
+  return (
+      sizeof(packetType) + sizeof(packetLength) + sizeof(ipType) + sizeof(hostPort) + hostIp.size()
+  );
 }
 
 /**
@@ -176,14 +182,12 @@ QDataStream& operator>>(QDataStream& stream, DiscoveryPacket& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid Packet Type");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Type");
   }
 
   // check the packet type
   if (packet.packetType != 0x01 && packet.packetType != 0x02) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid Packet Type");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Type");
   }
 
   // read the packet length
@@ -191,8 +195,7 @@ QDataStream& operator>>(QDataStream& stream, DiscoveryPacket& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid Packet Length");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Length");
   }
 
   // read the ip type
@@ -200,14 +203,12 @@ QDataStream& operator>>(QDataStream& stream, DiscoveryPacket& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid IP Type");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid IP Type");
   }
 
   // check the ip type
   if (packet.ipType != 0x04 && packet.ipType != 0x06) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid IP Type");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid IP Type");
   }
 
   // resize the ip
@@ -218,8 +219,7 @@ QDataStream& operator>>(QDataStream& stream, DiscoveryPacket& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid IP");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid IP");
   }
 
   // read the port
@@ -227,8 +227,7 @@ QDataStream& operator>>(QDataStream& stream, DiscoveryPacket& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError,
-                                         "Invalid Port");
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Port");
   }
 
   // return the stream

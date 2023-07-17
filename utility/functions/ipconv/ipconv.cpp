@@ -54,7 +54,7 @@ QByteArray toIPV4QByteArray(const QHostAddress& host) {
   const auto address = host.toIPv4Address();
 
   // get cast
-  const auto cast = reinterpret_cast<const char*>(&address);
+  const auto cast    = reinterpret_cast<const char*>(&address);
 
   // convert the IP address to QByteArray
   return QByteArray(cast, sizeof(address));
@@ -70,7 +70,7 @@ QByteArray toIPV6QByteArray(const QHostAddress& host) {
   const auto address = host.toIPv6Address();
 
   // get cast
-  const auto cast = reinterpret_cast<const char*>(&address);
+  const auto cast    = reinterpret_cast<const char*>(&address);
 
   // convert the IP address to QByteArray
   return QByteArray(cast, sizeof(address));

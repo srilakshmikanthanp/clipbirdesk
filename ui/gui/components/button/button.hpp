@@ -10,13 +10,16 @@
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class Button : public QPushButton {
  private:  // Constants
+
   static constexpr const char *const style = R"(
   )";
 
  private:  // just for Qt
+
   Q_OBJECT
 
  public:
+
   /**
    * @brief Construct a new Button object
    * with parent as QButton
@@ -31,6 +34,7 @@ class Button : public QPushButton {
   ~Button() override = default;
 
  private:  // disable copy and move
+
   Q_DISABLE_COPY_MOVE(Button)
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

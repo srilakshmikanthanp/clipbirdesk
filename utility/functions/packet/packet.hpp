@@ -68,8 +68,7 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions {
  *
  * @return DiscoveryPacket
  */
-network::packets::DiscoveryPacket createPacket(
-    internals::DiscoveryPacketParams params);
+network::packets::DiscoveryPacket createPacket(internals::DiscoveryPacketParams params);
 
 /**
  * @brief Create the ErrorMessage
@@ -80,8 +79,7 @@ network::packets::DiscoveryPacket createPacket(
  *
  * @return ErrorMessage
  */
-network::packets::InvalidRequest createPacket(
-    internals::InvalidPacketParams params);
+network::packets::InvalidRequest createPacket(internals::InvalidPacketParams params);
 
 /**
  * @brief Create the SyncingItem
@@ -91,8 +89,17 @@ network::packets::InvalidRequest createPacket(
  *
  * @return SyncingItem
  */
-network::packets::SyncingItem createPacket(
-    internals::SyncingItemParams params);
+network::packets::SyncingItem createPacket(internals::SyncingItemParams params);
+
+/**
+ * @brief Create the SyncingPacket
+ *
+ * @param packetType
+ * @param items
+ *
+ * @return SyncingPacket
+ */
+network::packets::SyncingPacket createPacket(internals::SyncingPacketParams params);
 
 /**
  * @brief Create the SyncingPacket
@@ -103,16 +110,6 @@ network::packets::SyncingItem createPacket(
  * @return SyncingPacket
  */
 network::packets::SyncingPacket createPacket(
-    internals::SyncingPacketParams params);
-
-/**
- * @brief Create the SyncingPacket
- *
- * @param packetType
- * @param items
- *
- * @return SyncingPacket
- */
-network::packets::SyncingPacket createPacket(
-    quint8 packetType, QVector<QPair<QString, QByteArray>> items);
+    quint8 packetType, QVector<QPair<QString, QByteArray>> items
+);
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

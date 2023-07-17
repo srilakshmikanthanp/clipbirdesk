@@ -1,4 +1,4 @@
-#pragma once // Header guard see https://en.wikipedia.org/wiki/Include_guard
+#pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
@@ -25,16 +25,19 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
  */
 class InvalidRequest {
  private:
-  quint8     packetType = 0x00;
-  qint32     packetLength;
-  quint8     errorCode;
+
+  quint8 packetType = 0x00;
+  qint32 packetLength;
+  quint8 errorCode;
   QByteArray errorMessage;
 
  public:
+
   /// @brief Allowed Packet Types
   enum PacketType : quint8 { RequestFailed = 0x00 };
 
  public:
+
   /**
    * @brief Set the Packet Type object
    *
@@ -107,7 +110,6 @@ class InvalidRequest {
    */
   friend QDataStream& operator<<(QDataStream& stream, const InvalidRequest packet);
 
-
   /**
    * @brief Output stream operator for QDataStream
    *
@@ -117,4 +119,4 @@ class InvalidRequest {
    */
   friend QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet);
 };
-} // namespace srilakshmikanthanp::clipbirdesk::network::packets
+}  // namespace srilakshmikanthanp::clipbirdesk::network::packets

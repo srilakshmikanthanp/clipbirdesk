@@ -1,4 +1,4 @@
-#pragma once // Header guard see https://en.wikipedia.org/wiki/Include_guard
+#pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
@@ -18,5 +18,4 @@ namespace srilakshmikanthanp::clipbirdesk::logging {
  * @return message handler
  */
 QMessageLogger createFileMessageHandler(const QString &file);
-
 }  // namespace srilakshmikanthanp::clipbirdesk::logging

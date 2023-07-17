@@ -65,4 +65,4 @@ Packet fromQByteArray(const QByteArray& data) {
   // return the packet
   return packet;
 }
-} // namespace srilakshmikanthanp::clipbirdesk::utility::functions
+}  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

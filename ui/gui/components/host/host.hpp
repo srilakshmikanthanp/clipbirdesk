@@ -18,35 +18,43 @@
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class Host : public QWidget {
  private:  // constant values for text
+
   const QString connect = "Connect", disconnect = "Disconnect";
 
  private:  // Constants for style
+
   static constexpr const char *const style = R"(
   )";
 
- public:   // enum for action
+ public:  // enum for action
+
   enum class Action { Connect, Disconnect };
 
- public:   // typedefs
+ public:  // typedefs
+
   using Value = std::tuple<QHostAddress, quint16, Action>;
 
  signals:  // Signals
   void onAction(std::tuple<QHostAddress, quint16, Action>);
 
  private:  // Member variable
+
   QHostAddress address;
   quint16 port;
   Action action;
 
  private:  // Member variable
+
   Label *hostName = new Label(this);
-  Label *ip = new Label(this);
-  Button *actBtn = new Button(this);
+  Label *ip       = new Label(this);
+  Button *actBtn  = new Button(this);
 
  private:  // just for Qt meta object
+
   Q_OBJECT
 
  public:  // public Member functions
+
   /**
    * @brief Construct a new HostView object
    * with parent as QWidget
@@ -69,6 +77,7 @@ class Host : public QWidget {
   Value getHost() const;
 
  private:  // disable copy and move
+
   Q_DISABLE_COPY_MOVE(Host)
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

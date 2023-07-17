@@ -12,12 +12,15 @@
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 class TrayIcon : public QSystemTrayIcon {
  private:  // Disable copy constructor and copy assignment operator
+
   Q_DISABLE_COPY_MOVE(TrayIcon)
 
  private:  // Member variable
+
   QMenu* menu;
 
  private:  // just for Qt Object Macro
+
   Q_OBJECT
 
  signals:  // signals
@@ -29,7 +32,8 @@ class TrayIcon : public QSystemTrayIcon {
  signals:  // signals
   void OnExitClicked();
 
- public:   // Member function
+ public:  // Member function
+
   /**
    * @brief Construct a new Sys Tray object
    *

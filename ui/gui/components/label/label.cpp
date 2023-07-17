@@ -14,4 +14,4 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 Label::Label(QWidget *parent) : QLabel(parent) {
   setStyleSheet(style);
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components::core
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

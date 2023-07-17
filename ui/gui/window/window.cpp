@@ -11,13 +11,16 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 /**
  * @brief handle the host action from the window
  */
-void Window::handleHostAction(Tabs t,
-                              std::tuple<QHostAddress, quint16, Action> h) {
+void Window::handleHostAction(Tabs t, components::Host::Value h) {
   if (t == Tabs::Server && std::get<2>(h) == Action::Disconnect) {
     controller->disconnectFromServer({std::get<0>(h), std::get<1>(h)});
-  } else if (t == Tabs::Client && std::get<2>(h) == Action::Connect) {
+  }
+
+  if (t == Tabs::Client && std::get<2>(h) == Action::Connect) {
     controller->connectToServer({std::get<0>(h), std::get<1>(h)});
-  } else if (t == Tabs::Client && std::get<2>(h) == Action::Disconnect) {
+  }
+
+  if (t == Tabs::Client && std::get<2>(h) == Action::Disconnect) {
     controller->disconnectFromServer({std::get<0>(h), std::get<1>(h)});
   }
 }
@@ -59,10 +62,9 @@ void Window::handleTabChangeForServer(Tabs tab) {
 /**
  * @brief Handle the Client List Item Clicked
  */
-void Window::handleClientListChange(
-    QList<QPair<QHostAddress, quint16>> clients) {
+void Window::handleClientListChange(QList<QPair<QHostAddress, quint16>> clients) {
   // Create a list of tuple with Action
-  QList<std::tuple<QHostAddress, quint16, Action>> clients_m;
+  QList<components::Host::Value> clients_m;
 
   // Add the clients to the list
   for (auto c : clients) {
@@ -92,13 +94,12 @@ void Window::handleServerStateChange(bool isStarted) {
 /**
  * @brief Handle the Server List Item Clicked
  */
-void Window::handleServerListChange(
-    QList<QPair<QHostAddress, quint16>> servers) {
+void Window::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers) {
   // Create a list of tuple with Action
-  QList<std::tuple<QHostAddress, quint16, Action>> servers_m;
+  QList<components::Host::Value> servers_m;
 
   // get the connected server
-  const auto server = controller->getConnectedServer();
+  const auto server    = controller->getConnectedServer();
 
   // get the action for the server
   const auto getAction = [&server](const auto& s) {
@@ -132,19 +133,51 @@ void Window::handleServerStatusChange(bool status) {
  * @brief Construct a new Window object
  * with parent as QWidget
  */
-Window::Window(Controller* controller, QWidget* parent)
-    : QWidget(parent), controller(controller) {
+Window::Window(QWidget* parent) : QWidget(parent) {
+  // set no taskbar icon & no window Frame
+  setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+
+  // create all the components
+  this->hostStatus.first  = new components::Label(this);
+  this->hostStatus.second = new components::Status(this);
+
+  this->serverName.first  = new components::Label(this);
+  this->serverName.second = new components::Label(this);
+
+  this->serverIp.first    = new components::Label(this);
+  this->serverIp.second   = new components::Label(this);
+
+  this->hostCount.first   = new components::Label(this);
+  this->hostCount.second  = new components::Label(this);
+
+  // set Alignment
+  this->hostStatus.first->setAlignment(Qt::AlignLeft);
+  this->hostStatus.second->setAlignment(Qt::AlignRight);
+
+  this->serverName.first->setAlignment(Qt::AlignLeft);
+  this->serverName.second->setAlignment(Qt::AlignRight);
+
+  this->serverIp.first->setAlignment(Qt::AlignLeft);
+  this->serverIp.second->setAlignment(Qt::AlignRight);
+
+  this->hostCount.first->setAlignment(Qt::AlignLeft);
+  this->hostCount.second->setAlignment(Qt::AlignRight);
+
   // create the root layout
   auto root = new QVBoxLayout(this);
 
   // create the top layout
-  auto top = new QVBoxLayout();
+  auto top  = new QFormLayout();
 
   // add top layout components
-  top->addWidget(hostStatus);
-  top->addWidget(serverName);
-  top->addWidget(serverIP);
-  top->addWidget(hostCount);
+  top->addRow(this->hostStatus.first, this->hostStatus.second);
+  top->addRow(this->serverName.first, this->serverName.second);
+  top->addRow(this->serverIp.first, this->serverIp.second);
+  top->addRow(this->hostCount.first, this->hostCount.second);
+
+  // set top layout alignment
+  top->setLabelAlignment(Qt::AlignLeft);
+  top->setFormAlignment(Qt::AlignRight);
 
   // add top layout to root layout
   root->addLayout(top);
@@ -171,14 +204,10 @@ Window::Window(Controller* controller, QWidget* parent)
   });
 
   // server list slot
-  auto serverListSlot = [&](auto host) {
-    emit onHostAction(Tabs::Server, host);
-  };
+  auto serverListSlot = [&](auto host) { emit onHostAction(Tabs::Server, host); };
 
   // client list slot
-  auto clientListSlot = [&](auto host) {
-    emit onHostAction(Tabs::Client, host);
-  };
+  auto clientListSlot = [&](auto host) { emit onHostAction(Tabs::Client, host); };
 
   // connect server list signal
   connect(serverList, &HostsList::onAction, serverListSlot);
@@ -188,38 +217,41 @@ Window::Window(Controller* controller, QWidget* parent)
 
   // Connect the signal and slot for client list change
   const auto signal_cl = &Controller::OnClientListChanged;
-  const auto slot_cl = &Window::handleClientListChange;
+  const auto slot_cl   = &Window::handleClientListChange;
   connect(controller, signal_cl, this, slot_cl);
 
   // Connect the signal and slot for server list change
   const auto signal_sl = &Controller::OnServerListChanged;
-  const auto slot_sl = &Window::handleServerListChange;
+  const auto slot_sl   = &Window::handleServerListChange;
   connect(controller, signal_sl, this, slot_sl);
 
   // Connect the signal and slot for server status change
   const auto signal_ss = &Controller::OnServerStateChanged;
-  const auto slot_ss = &Window::handleServerStatusChange;
+  const auto slot_ss   = &Window::handleServerStatusChange;
   connect(controller, signal_ss, this, slot_ss);
 
   // Connect the signal and slot for server status change
   const auto signal_sc = &Controller::OnServerStateChanged;
-  const auto slot_sc = &Window::handleServerStateChange;
+  const auto slot_sc   = &Window::handleServerStateChange;
   connect(controller, signal_sc, this, slot_sc);
 
   // Connect the signal and slot for host action
   const auto signal_ha = &Window::onHostAction;
-  const auto slot_ha = &Window::handleHostAction;
+  const auto slot_ha   = &Window::handleHostAction;
   connect(this, signal_ha, this, slot_ha);
 
   // Connect the signal and slot for tab change(client)
   const auto signal_tc = &Window::onTabChanged;
-  const auto slot_tc = &Window::handleTabChangeForClient;
+  const auto slot_tc   = &Window::handleTabChangeForClient;
   connect(this, signal_tc, this, slot_tc);
 
   // Connect the signal and slot for tab change(server)
   const auto signal_ts = &Window::onTabChanged;
-  const auto slot_ts = &Window::handleTabChangeForServer;
+  const auto slot_ts   = &Window::handleTabChangeForServer;
   connect(this, signal_ts, this, slot_ts);
+
+  // Initialize the Tab as Client
+  tab->setCurrentIndex(1);
 
   // set the style sheet
   setStyleSheet(style);
@@ -229,104 +261,60 @@ Window::Window(Controller* controller, QWidget* parent)
  * @brief Set the Status object
  */
 void Window::setStatus(const QString& key, components::Status::Value val) {
-  // create the components of the class
-  auto label = new components::Label(this);
-  auto status = new components::Status(this);
-
-  // set the values
-  label->setText(key);
-  status->setStatus(val);
-
-  // set the status
-  hostStatus->set(label, status);
+  this->hostStatus.first->setText(key);
+  this->hostStatus.second->setStatus(val);
 }
 
 /**
  * @brief Get the Host Status object
  */
 QPair<QString, components::Status::Value> Window::getStatus() {
-  using components::Label;
-  using components::Status;
-
-  const auto status = qobject_cast<Status*>(hostStatus->get().second);
-  const auto label = qobject_cast<Label*>(hostStatus->get().first);
-
-  return {label->text(), status->getStatus()};
+  return {this->hostStatus.first->text(), this->hostStatus.second->getStatus()};
 }
 
 /**
  * @brief Set the Server Name object
  */
 void Window::setServerName(const QString& key, const QString& val) {
-  auto label = new components::Label(this);
-  auto info = new components::Label(this);
-
-  label->setText(key);
-  info->setText(val);
-
-  serverName->set(label, info);
+  this->serverName.first->setText(key);
+  this->serverName.second->setText(val);
 }
 
 /**
  * @brief Get the Server Name object
  */
 QPair<QString, QString> Window::getServerName() {
-  using components::Label;
-
-  const auto label = qobject_cast<Label*>(serverName->get().first);
-  const auto info = qobject_cast<Label*>(serverName->get().second);
-
-  return {label->text(), info->text()};
+  return {this->serverName.first->text(), this->serverName.second->text()};
 }
 
 /**
  * @brief Set the Server Ip object
  */
 void Window::setServerIp(const QString& key, const QString& val) {
-  auto label = new components::Label(this);
-  auto info = new components::Label(this);
-
-  label->setText(key);
-  info->setText(val);
-
-  serverIP->set(label, info);
+  this->serverIp.first->setText(key);
+  this->serverIp.second->setText(val);
 }
 
 /**
  * @brief Get the Server Ip object
  */
 QPair<QString, QString> Window::getServerIp() {
-  using components::Label;
-
-  const auto label = qobject_cast<Label*>(serverIP->get().first);
-  const auto info = qobject_cast<Label*>(serverIP->get().second);
-
-  return {label->text(), info->text()};
+  return {this->serverIp.first->text(), this->serverIp.second->text()};
 }
 
 /**
  * @brief Set the Hosts object
  */
 void Window::setHostCount(const QString& key, int val) {
-  auto label = new components::Label(this);
-  auto info = new components::Label(this);
-
-  label->setText(key);
-  info->setText(QString::number(val));
-
-  hostCount->set(label, info);
+  this->hostCount.first->setText(key);
+  this->hostCount.second->setText(QString::number(val));
 }
 
 /**
  * @brief Get the Hosts object
  */
 QPair<QString, int> Window::getHostCount() {
-  using components::Label;
-
-  const auto label = qobject_cast<Label*>(hostCount->get().first);
-  const auto info = qobject_cast<Label*>(hostCount->get().second);
-
-  return {label->text(), info->text().toInt()};
+  return {this->hostCount.first->text(), this->hostCount.second->text().toInt()};
 }
 
 //---------------------- Server Tab ----------------------//
@@ -334,73 +322,72 @@ QPair<QString, int> Window::getHostCount() {
 /**
  * @brief Set the Server List object
  */
-void Window::setClientList(
-    QList<std::tuple<QHostAddress, quint16, Action>> hosts) {
+void Window::setClientList(QList<components::Host::Value> hosts) {
   serverList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List object
  */
-QList<std::tuple<QHostAddress, quint16, Window::Action>>
-Window::getClientList() {
+QList<components::Host::Value> Window::getClientList() {
   return serverList->getAllHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
-void Window::addClient(std::tuple<QHostAddress, quint16, Action> host) {
+void Window::addClient(components::Host::Value host) {
   serverList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
-void Window::removeClient(std::tuple<QHostAddress, quint16, Action> host) {
+void Window::removeClient(components::Host::Value host) {
   serverList->removeHost(host);
 }
 
 /**
  * @brief Remove all servers from the list
  */
-void Window::removeAllClient() { serverList->removeAllHosts(); }
+void Window::removeAllClient() {
+  serverList->removeAllHosts();
+}
 
 //---------------------- Client Tab ----------------------//
 
 /**
  * @brief Set the Server List object
  */
-void Window::setServerList(
-    QList<std::tuple<QHostAddress, quint16, Action>> hosts) {
+void Window::setServerList(QList<components::Host::Value> hosts) {
   clientList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List from the tab
  */
-QList<std::tuple<QHostAddress, quint16, Window::Action>>
-Window::getServerList() {
+QList<components::Host::Value> Window::getServerList() {
   return clientList->getAllHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
-void Window::addServer(std::tuple<QHostAddress, quint16, Action> host) {
+void Window::addServer(components::Host::Value host) {
   clientList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
-void Window::removeServer(
-    std::tuple<QHostAddress, quint16, Window::Action> host) {
+void Window::removeServer(components::Host::Value host) {
   clientList->removeHost(host);
 }
 
 /**
  * @brief Remove all servers from the list
  */
-void Window::removeAllServers() { clientList->removeAllHosts(); }
+void Window::removeAllServers() {
+  clientList->removeAllHosts();
+}
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

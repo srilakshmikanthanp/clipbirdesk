@@ -17,22 +17,28 @@ class HostsList : public QWidget {
   void onAction(Host::Value host);
 
  private:  // Constants for style
+
   static constexpr const char *const style = R"(
   )";
 
  private:  // disable copy and move
+
   Q_DISABLE_COPY_MOVE(HostsList)
 
  private:  // just for Qt
+
   Q_OBJECT
 
  public:  // Type alias
+
   using Action = components::Host::Action;
 
  private:  // Member Variables
+
   QVBoxLayout *verticalLayout = new QVBoxLayout(this);
 
  public:  // Member Functions
+
   explicit HostsList(QWidget *parent = nullptr);
 
   /**
