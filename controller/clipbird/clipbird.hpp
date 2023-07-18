@@ -17,12 +17,13 @@
 
 // project headers
 #include "clipboard/clipboard.hpp"
+#include "network/syncing/client/client.hpp"
+#include "network/syncing/server/server.hpp"
 #include "types/callback/callback.hpp"
-#include "network/syncing/client/syncingclient.hpp"
-#include "network/syncing/server/syncingserver.hpp"
+
 
 namespace srilakshmikanthanp::clipbirdesk::controller {
-class Controller : public QObject {
+class ClipBird : public QObject {
   //----------------------- client Signals -------------------------//
 
  signals:  // signals for this class
@@ -59,9 +60,9 @@ class Controller : public QObject {
 
  private:  // typedefs for this class
 
-  using SyncingServer = network::syncing::SyncingServer;
+  using Server        = network::syncing::Server;
   using Authenticator = types::callback::Authenticator;
-  using SyncingClient = network::syncing::SyncingClient;
+  using Client        = network::syncing::Client;
 
  private:  // just for Qt
 
@@ -69,7 +70,7 @@ class Controller : public QObject {
 
  private:  // Member variable
 
-  std::variant<SyncingServer, SyncingClient> m_host;
+  std::variant<Server, Client> m_host;
   QSslConfiguration m_sslConfig;
   clipboard::Clipboard m_clipboard;
   Authenticator m_authenticator = nullptr;
@@ -82,18 +83,18 @@ class Controller : public QObject {
  public:  // Member functions
 
   /**
-   * @brief Construct a new Controller object and manage
+   * @brief Construct a new ClipBird object and manage
    * the clipboard, server and client
    *
    * @param board  clipboard that is managed
    * @param parent parent object
    */
-  Controller(QClipboard* board, QObject* parent = nullptr);
+  ClipBird(QClipboard* board, QObject* parent = nullptr);
 
   /**
-   * @brief Destroy the Controller object
+   * @brief Destroy the ClipBird object
    */
-  virtual ~Controller() = default;
+  virtual ~ClipBird() = default;
 
   //---------------------- public slots ----------------------//
 

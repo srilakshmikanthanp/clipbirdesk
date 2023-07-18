@@ -10,18 +10,20 @@
 #include <QSystemTrayIcon>
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
-class TrayIcon : public QSystemTrayIcon {
+class TrayMenu : public QMenu {
  private:  // Disable copy constructor and copy assignment operator
 
-  Q_DISABLE_COPY_MOVE(TrayIcon)
-
- private:  // Member variable
-
-  QMenu* menu;
+  Q_DISABLE_COPY_MOVE(TrayMenu)
 
  private:  // just for Qt Object Macro
 
   Q_OBJECT
+
+ private:  // Constants for style sheet
+
+  static constexpr auto styleSheet = R"(
+
+  )";
 
  signals:  // signals
   void OnAboutClicked();
@@ -38,11 +40,11 @@ class TrayIcon : public QSystemTrayIcon {
    *
    * @param parent
    */
-  TrayIcon(QWidget* parent = nullptr);
+  TrayMenu(QWidget* parent = nullptr);
 
   /**
    * @brief Destroy the Sys Tray object
    */
-  virtual ~TrayIcon() = default;
+  virtual ~TrayMenu() = default;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

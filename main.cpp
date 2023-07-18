@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 /**
- * This is is not set with basic statements to start the
+ * This File is set with basic statements to start the
  * app as desired. Later it will be updated with features
  * such single instance application, etc.
  */
@@ -12,11 +12,12 @@
 // Qt Headers
 #include <QApplication>
 #include <QScreen>
+#include <QSystemTrayIcon>
 
 // Project Headers
 #include "constants/constants.hpp"
-#include "controller/controller.hpp"
-#include "ui/gui/trayicon/trayicon.hpp"
+#include "controller/clipbird/clipbird.hpp"
+#include "ui/gui/traymenu/traymenu.hpp"
 #include "ui/gui/utilities/utilities.hpp"
 #include "ui/gui/window/window.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
@@ -38,7 +39,7 @@ auto main(int argc, char **argv) -> int {
   QApplication app(argc, argv);
 
   // create the controller
-  auto controller = controller::Controller(QApplication::clipboard());
+  auto controller = controller::ClipBird(QApplication::clipboard());
 
   // Create the SSL Config
   auto sslConfig  = utility::functions::getQSslConfiguration();
@@ -53,7 +54,10 @@ auto main(int argc, char **argv) -> int {
   auto window   = ui::gui::Window(&controller);
 
   // create the tray icon
-  auto trayIcon = ui::gui::TrayIcon();
+  auto trayIcon = QSystemTrayIcon(&window);
+
+  // create the tray menu
+  auto trayMenu = ui::gui::TrayMenu(&window);
 
   // set the window Ratio
   window.setSizeRatio(constants::getAppWindowRatio());
@@ -61,12 +65,14 @@ auto main(int argc, char **argv) -> int {
   // set the icon to tray
   trayIcon.setIcon(QIcon(constants::getAppLogo().c_str()));
 
+  // set the tray menu
+  trayIcon.setContextMenu(&trayMenu);
+
   // using some classes
-  using ui::gui::TrayIcon;
   using ui::gui::Window;
 
   // set activated action
-  QObject::connect(&trayIcon, &TrayIcon::activated, &window, &Window::show);
+  QObject::connect(&trayIcon, &QSystemTrayIcon::activated, &window, &Window::show);
 
   // show the tray icon
   trayIcon.show();

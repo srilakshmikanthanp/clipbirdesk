@@ -129,7 +129,7 @@ void Window::handleServerStatusChange(bool status) {
  * @brief Construct a new Window object
  * with parent as QWidget
  */
-Window::Window(Window::Controller* controller, QWidget* parent)
+Window::Window(Window::ClipBird* controller, QWidget* parent)
     : QWidget(parent), controller(controller) {
   // set no taskbar icon & no window Frame
   setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
@@ -213,22 +213,22 @@ Window::Window(Window::Controller* controller, QWidget* parent)
   connect(clientList, &HostsList::onAction, clientListSlot);
 
   // Connect the signal and slot for client list change
-  const auto signal_cl = &Controller::OnClientListChanged;
+  const auto signal_cl = &ClipBird::OnClientListChanged;
   const auto slot_cl   = &Window::handleClientListChange;
   connect(controller, signal_cl, this, slot_cl);
 
   // Connect the signal and slot for server list change
-  const auto signal_sl = &Controller::OnServerListChanged;
+  const auto signal_sl = &ClipBird::OnServerListChanged;
   const auto slot_sl   = &Window::handleServerListChange;
   connect(controller, signal_sl, this, slot_sl);
 
   // Connect the signal and slot for server status change
-  const auto signal_ss = &Controller::OnServerStateChanged;
+  const auto signal_ss = &ClipBird::OnServerStateChanged;
   const auto slot_ss   = &Window::handleServerStateChange;
   connect(controller, signal_ss, this, slot_ss);
 
   // Connect the signal and slot for server status change
-  const auto signal_sc = &Controller::OnServerStatusChanged;
+  const auto signal_sc = &ClipBird::OnServerStatusChanged;
   const auto slot_sc   = &Window::handleServerStatusChange;
   connect(controller, signal_sc, this, slot_sc);
 

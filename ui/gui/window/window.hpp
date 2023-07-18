@@ -22,7 +22,7 @@
 #include <variant>
 
 // project headers
-#include "controller/controller.hpp"
+#include "controller/clipbird/clipbird.hpp"
 #include "ui/gui/components/button/button.hpp"
 #include "ui/gui/components/host/host.hpp"
 #include "ui/gui/components/hostlist/hostslist.hpp"
@@ -46,7 +46,7 @@ class Window : public QWidget {
 
  private:  // typedefs used in this class
 
-  using Controller = controller::Controller;
+  using ClipBird = controller::ClipBird;
 
  public:  // typedefs used in this class
 
@@ -77,7 +77,7 @@ class Window : public QWidget {
  private:  // Member Variables
 
   QSize ratio = QSize(3, 3);
-  Controller* controller;
+  ClipBird* controller;
 
  signals:  // signals
   void onHostAction(Tabs tab, std::tuple<QHostAddress, quint16, Action>);
@@ -148,7 +148,7 @@ class Window : public QWidget {
    * @brief Construct a new Window object
    * with parent as QWidget
    */
-  explicit Window(Controller* controller, QWidget *parent = nullptr);
+  explicit Window(ClipBird* controller, QWidget* parent = nullptr);
 
   /**
    * @brief Set the Status object
