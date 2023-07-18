@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "discoveryserver.hpp"
+#include "server.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::discovery {
 
@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::discovery {
  * @brief Process the packet and return the packet
  * with server Information
  */
-void DiscoveryServer::processDiscoveryPacket(const packets::DiscoveryPacket& packet) {
+void Server::processDiscoveryPacket(const packets::DiscoveryPacket& packet) {
   // response type of the packet is response
   const auto pakType = packets::DiscoveryPacket::PacketType::Response;
 
@@ -49,7 +49,7 @@ void DiscoveryServer::processDiscoveryPacket(const packets::DiscoveryPacket& pac
  * @brief Process the datagrams that are received
  * from the socket
  */
-void DiscoveryServer::processDatagrams() {
+void Server::processDatagrams() {
   while (m_socket->hasPendingDatagrams()) {
     // Read the data from the socket
     QByteArray data(m_socket->pendingDatagramSize(), Qt::Uninitialized);
@@ -85,19 +85,19 @@ void DiscoveryServer::processDatagrams() {
  *
  * @param parent Parent object
  */
-DiscoveryServer::DiscoveryServer(QObject* parent) : QObject(parent) {
+Server::Server(QObject* parent) : QObject(parent) {
   // Connect the socket to the callback function that
   // process the datagrams when the socket is ready
   // to read so the listener can be notified
   const auto signal = &QUdpSocket::readyRead;
-  const auto slot   = &DiscoveryServer::processDatagrams;
+  const auto slot   = &Server::processDatagrams;
   QObject::connect(m_socket, signal, this, slot);
 }
 
 /**
  * @brief Start the server
  */
-void DiscoveryServer::startServer() {
+void Server::startServer() {
   const auto mode = QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint;
   const auto port = 0;
   const auto host = QHostAddress::AnyIPv4;
@@ -107,7 +107,7 @@ void DiscoveryServer::startServer() {
 /**
  * @brief Stop the server
  */
-void DiscoveryServer::stopServer() {
+void Server::stopServer() {
   m_socket->close();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::discovery

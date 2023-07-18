@@ -21,7 +21,6 @@
 #include "network/syncing/server/server.hpp"
 #include "types/callback/callback.hpp"
 
-
 namespace srilakshmikanthanp::clipbirdesk::controller {
 class ClipBird : public QObject {
   //----------------------- client Signals -------------------------//

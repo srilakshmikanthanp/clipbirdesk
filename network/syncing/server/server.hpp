@@ -13,7 +13,7 @@
 #include <QSslSocket>
 #include <QVector>
 
-#include "network/discovery/server/discoveryserver.hpp"
+#include "network/discovery/server/server.hpp"
 #include "types/callback/callback.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
@@ -25,7 +25,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing server that syncs the clipboard data between
  * the clients
  */
-class SyncingServer : public discovery::DiscoveryServer {
+class Server : public discovery::Server {
  signals:  // signals
   /// @brief On client state changed
   void OnCLientStateChanged(QPair<QHostAddress, quint16>, bool connected);
@@ -53,7 +53,7 @@ class SyncingServer : public discovery::DiscoveryServer {
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(SyncingServer)
+  Q_DISABLE_COPY_MOVE(Server)
 
  public:  // Authenticator Type
 
@@ -135,12 +135,12 @@ class SyncingServer : public discovery::DiscoveryServer {
    * @param config SSL configuration
    * @param parent Parent object
    */
-  explicit SyncingServer(QObject* p = nullptr);
+  explicit Server(QObject* p = nullptr);
 
   /**
    * @brief Destroy the Syncing Server object
    */
-  virtual ~SyncingServer() = default;
+  virtual ~Server() = default;
 
   /**
    * @brief Request the clients to sync the clipboard items
@@ -216,12 +216,12 @@ class SyncingServer : public discovery::DiscoveryServer {
  protected:  // override functions from the base class
 
   /**
-   * @brief Get the IP Type of the SyncingServer it can be IPv4 or
+   * @brief Get the IP Type of the Server it can be IPv4 or
    * IPv6 the IP type is used to determine the length of the IP address
    * if the IP type is IPv4 then the IP address is 4 bytes long if
    * the IP type is IPv6 then the IP address is 16 bytes long
    *
-   * @note The IP Type used in SyncingServer is IPv4
+   * @note The IP Type used in Server is IPv4
    *
    * @return types::IPType IP type
    * @throw Any Exception If any error occurs
@@ -229,7 +229,7 @@ class SyncingServer : public discovery::DiscoveryServer {
   virtual types::enums::IPType getIPType() const override;
 
   /**
-   * @brief Get the Port number of the SyncingServer it can be any port
+   * @brief Get the Port number of the Server it can be any port
    * number from 0 to 65535 but the port number should be greater than 1024
    * because the port number less than 1024 are reserved for the system
    * services
@@ -240,7 +240,7 @@ class SyncingServer : public discovery::DiscoveryServer {
   virtual quint16 getPort() const override;
 
   /**
-   * @brief Get the IP Address of the SyncingServer it can be IPv4 or
+   * @brief Get the IP Address of the Server it can be IPv4 or
    * IPv6 if the IP type is IPv4 then the IP address is 4 bytes long if
    * the IP type is IPv6 then the IP address is 16 bytes long
    *

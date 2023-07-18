@@ -14,6 +14,9 @@
 #include <QScreen>
 #include <QSystemTrayIcon>
 
+// C++ Headers
+#include <csignal>
+
 // Project Headers
 #include "constants/constants.hpp"
 #include "controller/clipbird/clipbird.hpp"
@@ -53,17 +56,21 @@ auto main(int argc, char **argv) -> int {
   // create window
   auto window   = ui::gui::Window(&controller);
 
-  // create the tray icon
-  auto trayIcon = QSystemTrayIcon(&window);
+  // // create the tray icon
+  auto trayIcon = QSystemTrayIcon();
 
   // create the tray menu
-  auto trayMenu = ui::gui::TrayMenu(&window);
+  auto trayMenu = ui::gui::TrayMenu();
 
   // set the window Ratio
   window.setSizeRatio(constants::getAppWindowRatio());
 
-  // set the icon to tray
+  // // set the icon to tray
   trayIcon.setIcon(QIcon(constants::getAppLogo().c_str()));
+
+  signal(SIGTERM, [](int sig) { qApp->quit(); });
+  signal(SIGABRT, [](int sig) { qApp->quit(); });
+  signal(SIGINT, [](int sig) { qApp->quit(); });
 
   // set the tray menu
   trayIcon.setContextMenu(&trayMenu);
@@ -74,7 +81,7 @@ auto main(int argc, char **argv) -> int {
   // set activated action
   QObject::connect(&trayIcon, &QSystemTrayIcon::activated, &window, &Window::show);
 
-  // show the tray icon
+  // // show the tray icon
   trayIcon.show();
 
   // return the status code of the app

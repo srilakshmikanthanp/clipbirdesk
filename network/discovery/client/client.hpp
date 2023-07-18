@@ -32,7 +32,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::discovery {
  * to the server and listen for the response if any server
  * is found then the callback function is called
  */
-class DiscoveryClient : public QObject {
+class Client : public QObject {
  private:  // private members variables
 
   /// @brief Udp socket
@@ -51,7 +51,7 @@ class DiscoveryClient : public QObject {
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(DiscoveryClient)
+  Q_DISABLE_COPY_MOVE(Client)
 
  private:  // private functions
 
@@ -97,12 +97,12 @@ class DiscoveryClient : public QObject {
    *
    * @param parent Parent object
    */
-  explicit DiscoveryClient(QObject* parent = nullptr);
+  explicit Client(QObject* parent = nullptr);
 
   /**
    * @brief Destroy the Discovery Client object
    */
-  ~DiscoveryClient() = default;
+  ~Client() = default;
 
   /**
    * @brief Starts the discovery client by sending the

@@ -21,7 +21,7 @@
 #include <utility>
 
 // Local headers
-#include "network/discovery/client/discoveryclient.hpp"
+#include "network/discovery/client/client.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
@@ -32,7 +32,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing client that syncs the clipboard data between
  * client and server
  */
-class SyncingClient : public discovery::DiscoveryClient {
+class Client : public discovery::Client {
  signals:  // signals for this class
   /// @brief On Server List Changed
   void OnServerListChanged(QList<QPair<QHostAddress, quint16>> servers);
@@ -61,7 +61,7 @@ class SyncingClient : public discovery::DiscoveryClient {
  private:  // disable copy and move
 
   /// @brief Disable copy and move
-  Q_DISABLE_COPY_MOVE(SyncingClient)
+  Q_DISABLE_COPY_MOVE(Client)
 
  private:  // Member variables
 
@@ -128,12 +128,12 @@ class SyncingClient : public discovery::DiscoveryClient {
    * @param th threshold
    * @param parent Parent
    */
-  SyncingClient(QObject* parent = nullptr);
+  Client(QObject* parent = nullptr);
 
   /**
    * @brief Destroy the Syncing Client object
    */
-  ~SyncingClient() override = default;
+  ~Client() override = default;
 
   /**
    * @brief Send the items to the server to sync the

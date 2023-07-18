@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "syncingserver.hpp"
+#include "server.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 
@@ -12,7 +12,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  *
  * @param packet SyncingPacket
  */
-void SyncingServer::processSyncingPacket(const packets::SyncingPacket &packet) {
+void Server::processSyncingPacket(const packets::SyncingPacket &packet) {
   // Make the vector of QPair<QString, QByteArray>
   QVector<QPair<QString, QByteArray>> items;
 
@@ -32,7 +32,7 @@ void SyncingServer::processSyncingPacket(const packets::SyncingPacket &packet) {
  * @brief Callback function that process the ready
  * read from the client
  */
-void SyncingServer::processReadyRead() {
+void Server::processReadyRead() {
   // Get the client that was ready to read
   auto client     = qobject_cast<QSslSocket *>(sender());
 
@@ -63,7 +63,7 @@ void SyncingServer::processReadyRead() {
 /**
  * @brief Process the connections that are pending
  */
-void SyncingServer::processConnections() {
+void Server::processConnections() {
   while (m_ssl_server->hasPendingConnections()) {
     // Get the client that has been connected
     auto client_tcp = (m_ssl_server->nextPendingConnection());
@@ -98,14 +98,14 @@ void SyncingServer::processConnections() {
     // the disconnection when the client is disconnected
     // so the listener can be notified
     const auto signal_d = &QSslSocket::disconnected;
-    const auto slot_d   = &SyncingServer::processDisconnection;
+    const auto slot_d   = &Server::processDisconnection;
     QObject::connect(client_tls, signal_d, this, slot_d);
 
     // Connect the socket to the callback function that
     // process the ready read when the socket is ready
     // to read so the listener can be notified
     const auto signal_r = &QSslSocket::readyRead;
-    const auto slot_r   = &SyncingServer::processReadyRead;
+    const auto slot_r   = &Server::processReadyRead;
     QObject::connect(client_tls, signal_r, this, slot_r);
 
     // convert to QPair<QHostAddress, quint16>
@@ -125,7 +125,7 @@ void SyncingServer::processConnections() {
 /**
  * @brief Process the disconnection from the client
  */
-void SyncingServer::processDisconnection() {
+void Server::processDisconnection() {
   // Get the client that was disconnected
   auto client      = qobject_cast<QSslSocket *>(sender());
 
@@ -150,13 +150,18 @@ void SyncingServer::processDisconnection() {
  * @param config SSL configuration
  * @param parent Parent object
  */
-SyncingServer::SyncingServer(QObject *p) : DiscoveryServer(p) {
+Server::Server(QObject *p) : discovery::Server(p) {
   // Connect the socket to the callback function that
   // process the connections when the socket is ready
   // to read so the listener can be notified
   const auto signal_c = &QSslServer::pendingConnectionAvailable;
-  const auto slot_c   = &SyncingServer::processConnections;
+  const auto slot_c   = &Server::processConnections;
   QObject::connect(m_ssl_server, signal_c, this, slot_c);
+
+  // connect OnErrorOccurred to from base class
+  const auto signal_e = &discovery::Server::OnErrorOccurred;
+  const auto slot_e   = &Server::OnErrorOccurred;
+  QObject::connect(this, signal_e, this, slot_e);
 }
 
 /**
@@ -164,7 +169,7 @@ SyncingServer::SyncingServer(QObject *p) : DiscoveryServer(p) {
  *
  * @param data QVector<QPair<QString, QByteArray>>
  */
-void SyncingServer::syncItems(QVector<QPair<QString, QByteArray>> items) {
+void Server::syncItems(QVector<QPair<QString, QByteArray>> items) {
   const auto packType = packets::SyncingPacket::PacketType::SyncPacket;
   this->sendPacket(utility::functions::createPacket(packType, items));
 }
@@ -174,7 +179,7 @@ void SyncingServer::syncItems(QVector<QPair<QString, QByteArray>> items) {
  *
  * @return QList<QSslSocket*> List of clients
  */
-QList<QPair<QHostAddress, quint16>> SyncingServer::getConnectedClientsList() const {
+QList<QPair<QHostAddress, quint16>> Server::getConnectedClientsList() const {
   QList<QPair<QHostAddress, quint16>> list;
   for (auto client : m_clients) {
     list.append({client->peerAddress(), client->peerPort()});
@@ -188,7 +193,7 @@ QList<QPair<QHostAddress, quint16>> SyncingServer::getConnectedClientsList() con
  *
  * @param client Client to disconnect
  */
-void SyncingServer::disconnectClient(QPair<QHostAddress, quint16> client) {
+void Server::disconnectClient(QPair<QHostAddress, quint16> client) {
   for (auto c : m_clients) {
     if (c->peerAddress() == client.first && c->peerPort() == client.second) {
       c->disconnectFromHost();
@@ -200,7 +205,7 @@ void SyncingServer::disconnectClient(QPair<QHostAddress, quint16> client) {
 /**
  * @brief Disconnect the all the clients from the server
  */
-void SyncingServer::disconnectAllClients() {
+void Server::disconnectAllClients() {
   for (auto client : m_clients) client->disconnectFromHost();
 }
 
@@ -209,7 +214,7 @@ void SyncingServer::disconnectAllClients() {
  *
  * @return QPair<QHostAddress, quint16>
  */
-QPair<QHostAddress, quint16> SyncingServer::getServerInfo() const {
+QPair<QHostAddress, quint16> Server::getServerInfo() const {
   return {m_ssl_server->serverAddress(), m_ssl_server->serverPort()};
 }
 
@@ -218,7 +223,7 @@ QPair<QHostAddress, quint16> SyncingServer::getServerInfo() const {
  *
  * @param config SSL Configuration
  */
-void SyncingServer::setSSLConfiguration(QSslConfiguration config) {
+void Server::setSSLConfiguration(QSslConfiguration config) {
   m_ssl_server->setSslConfiguration(config);
 }
 
@@ -227,7 +232,7 @@ void SyncingServer::setSSLConfiguration(QSslConfiguration config) {
  *
  * @return QSslConfiguration
  */
-QSslConfiguration SyncingServer::getSSLConfiguration() const {
+QSslConfiguration Server::getSSLConfiguration() const {
   return m_ssl_server->sslConfiguration();
 }
 
@@ -236,7 +241,7 @@ QSslConfiguration SyncingServer::getSSLConfiguration() const {
  *
  * @param auth Authenticator
  */
-void SyncingServer::setAuthenticator(Authenticator auth) {
+void Server::setAuthenticator(Authenticator auth) {
   m_authenticator = auth;
 }
 
@@ -245,14 +250,14 @@ void SyncingServer::setAuthenticator(Authenticator auth) {
  *
  * @return Authenticator
  */
-SyncingServer::Authenticator SyncingServer::getAuthenticator() const {
+Server::Authenticator Server::getAuthenticator() const {
   return m_authenticator;
 }
 
 /**
  * @brief Start the server
  */
-void SyncingServer::startServer() {
+void Server::startServer() {
   // check if the SSL configuration is set
   if (m_ssl_server->sslConfiguration().isNull()) {
     throw std::runtime_error("SSL Configuration is not set");
@@ -269,7 +274,7 @@ void SyncingServer::startServer() {
   }
 
   // start the discovery server
-  DiscoveryServer::startServer();
+  discovery::Server::startServer();
 
   // Notify the listeners that the server is started
   emit OnServerStateChanged(true);
@@ -278,9 +283,9 @@ void SyncingServer::startServer() {
 /**
  * @brief Stop the server
  */
-void SyncingServer::stopServer() {
+void Server::stopServer() {
   // stop the discovery server
-  DiscoveryServer::stopServer();
+  discovery::Server::stopServer();
 
   // stop the server
   m_ssl_server->close();
@@ -290,22 +295,22 @@ void SyncingServer::stopServer() {
 }
 
 /**
- * @brief Get the IP Type of the SyncingServer it can be IPv4 or
+ * @brief Get the IP Type of the Server it can be IPv4 or
  * IPv6 the IP type is used to determine the length of the IP address
  * if the IP type is IPv4 then the IP address is 4 bytes long if
  * the IP type is IPv6 then the IP address is 16 bytes long
  *
- * @note The IP Type used in SyncingServer is IPv4
+ * @note The IP Type used in Server is IPv4
  *
  * @return types::IPType IP type
  * @throw Any Exception If any error occurs
  */
-types::enums::IPType SyncingServer::getIPType() const {
+types::enums::IPType Server::getIPType() const {
   return types::enums::IPType::IPv4;
 }
 
 /**
- * @brief Get the Port number of the SyncingServer it can be any port
+ * @brief Get the Port number of the Server it can be any port
  * number from 0 to 65535 but the port number should be greater than 1024
  * because the port number less than 1024 are reserved for the system
  * services
@@ -313,19 +318,19 @@ types::enums::IPType SyncingServer::getIPType() const {
  * @return types::Port Port number
  * @throw Any Exception If any error occurs
  */
-quint16 SyncingServer::getPort() const {
+quint16 Server::getPort() const {
   return m_ssl_server->serverPort();
 }
 
 /**
- * @brief Get the IP Address of the SyncingServer it can be IPv4 or
+ * @brief Get the IP Address of the Server it can be IPv4 or
  * IPv6 if the IP type is IPv4 then the IP address is 4 bytes long if
  * the IP type is IPv6 then the IP address is 16 bytes long
  *
  * @return types::IPAddress IP address
  * @throw Any Exception If any error occurs
  */
-QHostAddress SyncingServer::getIPAddress() const {
+QHostAddress Server::getIPAddress() const {
   return m_ssl_server->serverAddress();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

@@ -33,7 +33,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::discovery {
  * getIpType(), getIPAddress() and getPort() functions to return the
  * IP type, IP address and port number respectively
  */
-class DiscoveryServer : public QObject {
+class Server : public QObject {
  private:  // typedefs for this class
 
   using MalformedPacket = types::except::MalformedPacket;
@@ -53,7 +53,7 @@ class DiscoveryServer : public QObject {
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(DiscoveryServer)
+  Q_DISABLE_COPY_MOVE(Server)
 
  private:  // private functions
 
@@ -88,14 +88,14 @@ class DiscoveryServer : public QObject {
    *
    * @param parent Parent object
    */
-  explicit DiscoveryServer(QObject* parent = nullptr);
+  explicit Server(QObject* parent = nullptr);
 
  protected:  // protected functions
 
   /**
    * @brief Destroy the Discovery Server object
    */
-  virtual ~DiscoveryServer()                     = default;
+  virtual ~Server()                     = default;
 
   /**
    * @brief Get the IP Type of the server it can be IPv4 or IPv6

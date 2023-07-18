@@ -3,13 +3,13 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "discoveryclient.hpp"
+#include "client.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::discovery {
 /**
  * @brief Process the invalid packet
  */
-void DiscoveryClient::processInvalidPacket(const packets::InvalidRequest& packet) {
+void Client::processInvalidPacket(const packets::InvalidRequest& packet) {
   emit OnErrorOccurred(packet.getErrorMessage());
 }
 
@@ -17,7 +17,7 @@ void DiscoveryClient::processInvalidPacket(const packets::InvalidRequest& packet
  * @brief Process the packet and return the packet
  * with server Information
  */
-void DiscoveryClient::processDiscoveryPacket(const packets::DiscoveryPacket& packet) {
+void Client::processDiscoveryPacket(const packets::DiscoveryPacket& packet) {
   // Using the functions namespace
   using utility::functions::createPacket;
   using utility::functions::toIPV4QHostAddress;
@@ -43,7 +43,7 @@ void DiscoveryClient::processDiscoveryPacket(const packets::DiscoveryPacket& pac
  * @brief Process the datagrams that are received
  * from the socket
  */
-void DiscoveryClient::processDatagrams() {
+void Client::processDatagrams() {
   while (m_socket->hasPendingDatagrams()) {
     // Read the data from the socket
     QByteArray data(m_socket->pendingDatagramSize(), Qt::Uninitialized);
@@ -93,7 +93,7 @@ void DiscoveryClient::processDatagrams() {
  * @brief Send the broadcast message to the local
  * network to find the server
  */
-void DiscoveryClient::sendBroadcastMessage() {
+void Client::sendBroadcastMessage() {
   // make the necessary details to send the packet
   const auto pakT = packets::DiscoveryPacket::PacketType::Request;
   const auto host = m_socket->localAddress();
@@ -114,12 +114,12 @@ void DiscoveryClient::sendBroadcastMessage() {
  *
  * @param parent Parent object
  */
-DiscoveryClient::DiscoveryClient(QObject* parent) : QObject(parent) {
+Client::Client(QObject* parent) : QObject(parent) {
   // Connect the socket to the callback function that
   // process the datagrams when the socket is ready
   // to read so the listener can be notified
   const auto signal_u = &QUdpSocket::readyRead;
-  const auto slot_u   = &DiscoveryClient::processDatagrams;
+  const auto slot_u   = &Client::processDatagrams;
   QObject::connect(m_socket, signal_u, this, slot_u);
 
   // Bind the socket to listen for the broadcast message
@@ -133,7 +133,7 @@ DiscoveryClient::DiscoveryClient(QObject* parent) : QObject(parent) {
   // Connect the timer to the callback function that
   // sends the broadcast message
   const auto signal_t = &QTimer::timeout;
-  const auto slot_t   = &DiscoveryClient::sendBroadcastMessage;
+  const auto slot_t   = &Client::sendBroadcastMessage;
   QObject::connect(m_timer, signal_t, this, slot_t);
 }
 
@@ -143,14 +143,14 @@ DiscoveryClient::DiscoveryClient(QObject* parent) : QObject(parent) {
  *
  * @param interval Interval between each broadcast
  */
-void DiscoveryClient::startDiscovery(quint32 interval) {
+void Client::startDiscovery(quint32 interval) {
   m_timer->start(interval);
 }
 
 /**
  * @brief Stops the discovery client
  */
-void DiscoveryClient::stopDiscovery() {
+void Client::stopDiscovery() {
   m_timer->stop();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::discovery
