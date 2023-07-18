@@ -33,9 +33,9 @@ void Window::handleTabChangeForClient(Tabs tab) {
 
   // initialize the client Window
   this->setStatus(c_statusKey, Status::Disconnected);
-  this->setServerName(c_nameKey, "-");
-  this->setServerIp(c_ipKey, "-");
-  this->setHostCount(c_hostsKey, 0);
+  this->setServerHostName(c_hostNameKey, "-");
+  this->setServerIpPort(c_ipPortKey, "-");
+  this->setHostCount(c_serversKey, 0);
 
   // notify the controller
   controller->setCurrentHostAsClient();
@@ -49,9 +49,9 @@ void Window::handleTabChangeForServer(Tabs tab) {
 
   // initialize the server Window
   this->setStatus(s_statusKey, Status::Inactive);
-  this->setServerName(s_nameKey, "-");
-  this->setServerIp(s_ipKey, "-");
-  this->setHostCount(s_hostsKey, 0);
+  this->setServerHostName(s_hostNameKey, "-");
+  this->setServerIpPort(s_ipPortKey, "-");
+  this->setHostCount(s_clientsKey, 0);
 
   // notify the controller
   controller->setCurrentHostAsServer();
@@ -75,14 +75,25 @@ void Window::handleClientListChange(QList<QPair<QHostAddress, quint16>> clients)
   this->setClientList(clients_m);
 
   // set the host count
-  this->setHostCount(s_hostsKey, clients_m.size());
+  this->setHostCount(s_clientsKey, clients_m.size());
 }
 
 /**
  * @brief Handle the Server State Change
  */
 void Window::handleServerStateChange(bool isStarted) {
-  this->setStatus(s_statusKey, isStarted ? Status::Active : Status::Inactive);
+  const auto status_m   = isStarted ? Status::Active : Status::Inactive;
+  const auto serverInfo = controller->getServerInfo();
+  const auto serverIp   = serverInfo.first.toString();
+  const auto serverPort = serverInfo.second;
+  const auto IpPort     = QString("%1:%2").arg(serverIp).arg(serverPort);
+  const auto serverName = QHostInfo::fromName(serverIp).hostName();
+  const auto clients    = controller->getConnectedClientsList();
+
+  this->setServerHostName(s_hostNameKey, serverName);
+  this->setStatus(s_statusKey, status_m);
+  this->setServerIpPort(s_ipPortKey, IpPort);
+  this->setHostCount(s_clientsKey, clients.size());
 }
 
 //----------------------------- slots for Client --------------------------//
@@ -111,7 +122,7 @@ void Window::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers)
   this->setServerList(servers_m);
 
   // set the host count
-  this->setHostCount(c_hostsKey, servers_m.size());
+  this->setHostCount(c_serversKey, servers_m.size());
 }
 
 /**
@@ -119,10 +130,19 @@ void Window::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers)
  */
 void Window::handleServerStatusChange(bool status) {
   // infer the status from the server state
-  const auto status_m = status ? Status::Connected : Status::Disconnected;
+  const auto status_m   = status ? Status::Connected : Status::Disconnected;
+  const auto server     = controller->getConnectedServer();
+  const auto serverIp   = server.first.toString();
+  const auto serverPort = server.second;
+  const auto IpPort     = QString("%1:%2").arg(serverIp).arg(serverPort);
+  const auto serverName = QHostInfo::fromName(serverIp).hostName();
+  const auto servers    = controller->getServerList();
 
   // set the server status
+  this->setServerHostName(c_hostNameKey, serverName);
   this->setStatus(c_statusKey, status_m);
+  this->setServerIpPort(c_ipPortKey, IpPort);
+  this->setHostCount(c_serversKey, servers.size());
 }
 
 /**
@@ -250,6 +270,9 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   // Initialize the Tab as Client
   tab->setCurrentIndex(1);
 
+  // set focus policy
+  setFocusPolicy(Qt::StrongFocus);
+
   // set the style sheet
   setStyleSheet(style);
 }
@@ -272,7 +295,7 @@ QPair<QString, components::Status::Value> Window::getStatus() {
 /**
  * @brief Set the Server Name object
  */
-void Window::setServerName(const QString& key, const QString& val) {
+void Window::setServerHostName(const QString& key, const QString& val) {
   this->serverName.first->setText(key);
   this->serverName.second->setText(val);
 }
@@ -280,14 +303,14 @@ void Window::setServerName(const QString& key, const QString& val) {
 /**
  * @brief Get the Server Name object
  */
-QPair<QString, QString> Window::getServerName() {
+QPair<QString, QString> Window::getServerHostName() {
   return {this->serverName.first->text(), this->serverName.second->text()};
 }
 
 /**
  * @brief Set the Server Ip object
  */
-void Window::setServerIp(const QString& key, const QString& val) {
+void Window::setServerIpPort(const QString& key, const QString& val) {
   this->serverIp.first->setText(key);
   this->serverIp.second->setText(val);
 }
@@ -295,7 +318,7 @@ void Window::setServerIp(const QString& key, const QString& val) {
 /**
  * @brief Get the Server Ip object
  */
-QPair<QString, QString> Window::getServerIp() {
+QPair<QString, QString> Window::getServerIpPort() {
   return {this->serverIp.first->text(), this->serverIp.second->text()};
 }
 
@@ -436,4 +459,23 @@ void Window::setVisible(bool visible) {
   QWidget::setVisible(visible);
 }
 
+/**
+ * @brief On Show Event
+ */
+void Window::showEvent(QShowEvent* event) {
+  QWidget::showEvent(event);
+  QWidget::setFocus();
+  QWidget::activateWindow();
+  QWidget::raise();
+}
+
+/**
+ * @brief Override the focusOutEvent
+ *
+ * @param event
+ */
+void Window::focusOutEvent(QFocusEvent* event) {
+  QWidget::focusOutEvent(event);
+  Window::setVisible(false);
+}
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

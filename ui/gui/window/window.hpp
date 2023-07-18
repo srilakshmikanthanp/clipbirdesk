@@ -7,10 +7,12 @@
 
 // Qt headers
 #include <QApplication>
+#include <QFocusEvent>
 #include <QFormLayout>
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHostAddress>
+#include <QHostInfo>
 #include <QScreen>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -87,17 +89,17 @@ class Window : public QWidget {
 
  private:  // constant for keys (Server)
 
-  static constexpr const char* const s_statusKey = "Server Status";
-  static constexpr const char* const s_ipKey     = "Server IP";
-  static constexpr const char* const s_nameKey   = "Server Name";
-  static constexpr const char* const s_hostsKey  = "Clients";
+  static constexpr const char* const s_statusKey   = "Server Status";
+  static constexpr const char* const s_hostNameKey = "Server HostName";
+  static constexpr const char* const s_ipPortKey   = "Server IP:Port";
+  static constexpr const char* const s_clientsKey  = "Clients";
 
  private:  // constant for keys (Client)
 
-  static constexpr const char* const c_statusKey = "Connection Status";
-  static constexpr const char* const c_ipKey     = "Server IP";
-  static constexpr const char* const c_nameKey   = "Server Name";
-  static constexpr const char* const c_hostsKey  = "servers";
+  static constexpr const char* const c_statusKey   = "Connection Status";
+  static constexpr const char* const c_hostNameKey = "Server HostName";
+  static constexpr const char* const c_ipPortKey   = "Server IP:Port";
+  static constexpr const char* const c_serversKey  = "servers";
 
  private:  // private slots
 
@@ -163,22 +165,22 @@ class Window : public QWidget {
   /**
    * @brief Set the Server Name object
    */
-  void setServerName(const QString& key, const QString& val);
+  void setServerHostName(const QString& key, const QString& val);
 
   /**
    * @brief Get the Server Name object
    */
-  QPair<QString, QString> getServerName();
+  QPair<QString, QString> getServerHostName();
 
   /**
    * @brief Set the Server Ip object
    */
-  void setServerIp(const QString& key, const QString& val);
+  void setServerIpPort(const QString& key, const QString& val);
 
   /**
    * @brief Get the Server Ip object
    */
-  QPair<QString, QString> getServerIp();
+  QPair<QString, QString> getServerIpPort();
 
   /**
    * @brief Set the Hosts object
@@ -256,9 +258,21 @@ class Window : public QWidget {
    */
   QSize getSizeRatio();
 
+protected:  // protected functions
+
   /**
    * @brief Override the setVisible function
    */
   void setVisible(bool visible) override;
+
+  /**
+   * @brief On Show Event
+   */
+  void showEvent(QShowEvent* event) override;
+
+  /**
+   * @brief Focus lost event
+   */
+  void focusOutEvent(QFocusEvent* event) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui
