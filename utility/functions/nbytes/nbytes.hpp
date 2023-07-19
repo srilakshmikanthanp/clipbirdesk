@@ -6,7 +6,6 @@
 // https://opensource.org/licenses/MIT
 
 // Local header files
-#include "network/packets/discoverypacket/discoverypacket.hpp"
 #include "network/packets/invalidrequest/invalidrequest.hpp"
 #include "network/packets/syncingpacket/syncingpacket.hpp"
 

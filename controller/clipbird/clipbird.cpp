@@ -298,18 +298,14 @@ void ClipBird::disconnectFromServer(QPair<QHostAddress, quint16> host) {
     return i.first == host.first && i.second == host.second;
   };
 
-  // Get the list of servers
-  auto servers = this->getServerList();
+  // get the connected server
+  auto server = getConnectedServer();
 
-  // find the server
-  auto it      = std::find_if(servers.begin(), servers.end(), match);
-
-  // if the server is not found then throw error
-  if (it == servers.end()) {
+  // if the server is found then disconnect
+  if (match(server)) {
+    std::get<Client>(m_host).disconnectFromServer();
+  } else {
     throw std::runtime_error("Server not found");
   }
-
-  // disconnect from the server
-  std::get<Client>(m_host).disconnectFromServer();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::controller
