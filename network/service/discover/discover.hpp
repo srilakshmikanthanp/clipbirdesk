@@ -18,21 +18,16 @@
 #include <QtLogging>
 
 // Local headers
-#include "network/packets/discoverypacket/discoverypacket.hpp"
-#include "network/packets/invalidrequest/invalidrequest.hpp"
 #include "types/enums/enums.hpp"
-#include "types/except/except.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
-#include "utility/functions/nbytes/nbytes.hpp"
-#include "utility/functions/packet/packet.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::discovery {
+namespace srilakshmikanthanp::clipbirdesk::network::service {
 /**
  * @brief Discovery client that sends the broadcast message
  * to the server and listen for the response if any server
  * is found then the callback function is called
  */
-class Client : public QObject {
+class Discover : public QObject {
  private:  // private members variables
 
   /// @brief Udp socket
@@ -51,58 +46,23 @@ class Client : public QObject {
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(Client)
+  Q_DISABLE_COPY_MOVE(Discover)
 
  private:  // private functions
-
-  /**
-   * @brief Create the packet and send it to the client
-   *
-   * @param packet Packet to send
-   * @param host Host address
-   * @param port Port number
-   */
-  template <typename Packet>
-  void sendPacket(const Packet& pack, const QHostAddress& host, quint16 port) {
-    m_socket->writeDatagram(utility::functions::toQByteArray(pack), host, port);
-  }
-
-  /**
-   * @brief Process the invalid packet
-   */
-  void processInvalidPacket(const packets::InvalidRequest& packet);
-
-  /**
-   * @brief Process the packet and return the packet
-   * with server Information
-   */
-  void processDiscoveryPacket(const packets::DiscoveryPacket& packet);
-
-  /**
-   * @brief Process the datagrams that are received
-   * from the socket
-   */
-  void processDatagrams();
-
-  /**
-   * @brief Send the broadcast message to the local
-   * network to find the server
-   */
-  void sendBroadcastMessage();
 
  public:
 
   /**
-   * @brief Construct a new Discovery Client object
+   * @brief Construct a new Discovery Discover object
    *
    * @param parent Parent object
    */
-  explicit Client(QObject* parent = nullptr);
+  explicit Discover(QObject* parent = nullptr);
 
   /**
-   * @brief Destroy the Discovery Client object
+   * @brief Destroy the Discovery Discover object
    */
-  ~Client() = default;
+  ~Discover();
 
   /**
    * @brief Starts the discovery client by sending the
@@ -110,7 +70,7 @@ class Client : public QObject {
    *
    * @param interval Interval between each broadcast
    */
-  void startDiscovery(quint32 interval = 1000);
+  void startDiscovery();
 
   /**
    * @brief Stops the discovery client
@@ -126,6 +86,15 @@ class Client : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServerFound(QPair<QHostAddress, quint16>) = 0;
+  virtual void onServerAdded(QPair<QHostAddress, quint16>) = 0;
+
+  /**
+   * @brief On Server Removed abstract function that
+   * is called when the server is removed
+   *
+   * @param host Host address
+   * @param port Port number
+   */
+  virtual void onServerRemoved(QPair<QHostAddress, quint16>) = 0;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::discovery

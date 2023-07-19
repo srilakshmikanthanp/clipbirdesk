@@ -14,22 +14,13 @@
 #include <QtTypes>
 
 // Local header files
-#include "network/packets/discoverypacket/discoverypacket.hpp"
 #include "network/packets/invalidrequest/invalidrequest.hpp"
+#include "network/packets/syncingitem/syncingitem.hpp"
 #include "network/packets/syncingpacket/syncingpacket.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions::internals {
-/**
- * @brief Parameters for the DiscoveryPacket
- */
-struct DiscoveryPacketParams {
-  quint8 packetType;
-  types::enums::IPType ipType;
-  const QHostAddress& ipaddr;
-  quint16 port;
-};
 
 /**
  * @brief Parameters for the ErrorMessage
@@ -58,17 +49,6 @@ struct SyncingPacketParams {
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions::internals
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions {
-/**
- * @brief Create the DiscoveryPacket
- *
- * @param packetType
- * @param ipType
- * @param ipaddr
- * @param port
- *
- * @return DiscoveryPacket
- */
-network::packets::DiscoveryPacket createPacket(internals::DiscoveryPacketParams params);
 
 /**
  * @brief Create the ErrorMessage

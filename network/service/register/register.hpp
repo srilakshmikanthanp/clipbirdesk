@@ -18,25 +18,19 @@
 #include <QtLogging>
 
 // Local headers
-#include "network/packets/discoverypacket/discoverypacket.hpp"
-#include "network/packets/invalidrequest/invalidrequest.hpp"
 #include "types/enums/enums.hpp"
-#include "types/except/except.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
-#include "utility/functions/nbytes/nbytes.hpp"
-#include "utility/functions/packet/packet.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::discovery {
+namespace srilakshmikanthanp::clipbirdesk::network::service {
 /**
  * @brief Abstract Discovery server that Listens for the client that send
  * the broadcast message The user of this class should implement the
  * getIpType(), getIPAddress() and getPort() functions to return the
  * IP type, IP address and port number respectively
  */
-class Server : public QObject {
+class Register : public QObject {
  private:  // typedefs for this class
 
-  using MalformedPacket = types::except::MalformedPacket;
   using IPType          = types::enums::IPType;
 
  private:  // Just for Qt
@@ -45,57 +39,31 @@ class Server : public QObject {
 
  private:  // variables
 
-  QUdpSocket* m_socket = new QUdpSocket(this);
-
  signals:  // signals for this class
   /// @brief On Error Occurred
   void OnErrorOccurred(QString error);
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(Server)
+  Q_DISABLE_COPY_MOVE(Register)
 
  private:  // private functions
-
-  /**
-   * @brief Create the packet and send it to the client
-   *
-   * @param packet Packet to send
-   * @param host Host address
-   * @param port Port number
-   */
-  template <typename Packet>
-  void sendPacket(const Packet& pack, const QHostAddress& host, quint16 port) {
-    m_socket->writeDatagram(utility::functions::toQByteArray(pack), host, port);
-  }
-
-  /**
-   * @brief Process the packet and return the packet
-   * with server Information
-   */
-  void processDiscoveryPacket(const packets::DiscoveryPacket& packet);
-
-  /**
-   * @brief Process the datagrams that are received
-   * from the socket
-   */
-  void processDatagrams();
 
  public:  // public functions
 
   /**
-   * @brief Construct a new Discovery Server object
+   * @brief Construct a new Discovery Register object
    *
    * @param parent Parent object
    */
-  explicit Server(QObject* parent = nullptr);
+  explicit Register(QObject* parent = nullptr);
 
  protected:  // protected functions
 
   /**
-   * @brief Destroy the Discovery Server object
+   * @brief Destroy the Discovery Register object
    */
-  virtual ~Server()                     = default;
+  virtual ~Register()                     = default;
 
   /**
    * @brief Get the IP Type of the server it can be IPv4 or IPv6
@@ -134,10 +102,11 @@ class Server : public QObject {
   /**
    * @brief Start the server
    */
-  virtual void startServer();
+  virtual void registerService();
+
   /**
    * @brief Stop the server
    */
-  virtual void stopServer();
+  virtual void unregisterService();
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::discovery

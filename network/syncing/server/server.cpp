@@ -150,7 +150,7 @@ void Server::processDisconnection() {
  * @param config SSL configuration
  * @param parent Parent object
  */
-Server::Server(QObject *p) : discovery::Server(p) {
+Server::Server(QObject *p) : service::Register(p) {
   // Connect the socket to the callback function that
   // process the connections when the socket is ready
   // to read so the listener can be notified
@@ -159,7 +159,7 @@ Server::Server(QObject *p) : discovery::Server(p) {
   QObject::connect(m_ssl_server, signal_c, this, slot_c);
 
   // connect OnErrorOccurred to from base class
-  const auto signal_e = &discovery::Server::OnErrorOccurred;
+  const auto signal_e = &service::Register::OnErrorOccurred;
   const auto slot_e   = &Server::OnErrorOccurred;
   QObject::connect(this, signal_e, this, slot_e);
 }
@@ -274,7 +274,7 @@ void Server::startServer() {
   }
 
   // start the discovery server
-  discovery::Server::startServer();
+  service::Register::registerService();
 
   // Notify the listeners that the server is started
   emit OnServerStateChanged(true);
@@ -285,7 +285,7 @@ void Server::startServer() {
  */
 void Server::stopServer() {
   // stop the discovery server
-  discovery::Server::stopServer();
+  service::Register::unregisterService();
 
   // stop the server
   m_ssl_server->close();

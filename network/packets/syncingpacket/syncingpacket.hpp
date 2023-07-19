@@ -16,101 +16,11 @@
 #include <QtTypes>
 
 // Local header files
+#include "network/packets/syncingitem/syncingitem.hpp"
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
-/**
- * @brief Clipboard Sync Packet's Payload
- */
-class SyncingItem {
- private:
-
-  qint32 mimeLength;
-  QByteArray mimeType;
-  qint32 payloadLength;
-  QByteArray payload;
-
- public:
-
-  /**
-   * @brief Set the Mime Length object
-   */
-  void setMimeLength(qint32 length);
-
-  /**
-   * @brief Get the Mime Length object
-   *
-   * @return qint32
-   */
-  qint32 getMimeLength() const noexcept;
-
-  /**
-   * @brief Set the Mime Type object
-   *
-   * @param type
-   */
-  void setMimeType(const QByteArray& type);
-
-  /**
-   * @brief Get the Mime Type object
-   *
-   * @return QByteArray
-   */
-  QByteArray getMimeType() const noexcept;
-
-  /**
-   * @brief Set the Payload Length object
-   *
-   * @param length
-   */
-  void setPayloadLength(qint32 length);
-
-  /**
-   * @brief Get the Payload Length object
-   *
-   * @return qint32
-   */
-  qint32 getPayloadLength() const noexcept;
-
-  /**
-   * @brief Set the Payload object
-   *
-   * @param payload
-   */
-  void setPayload(const QByteArray& payload);
-
-  /**
-   * @brief Get the Payload object
-   *
-   * @return QByteArray
-   */
-  QByteArray getPayload() const noexcept;
-
-  /**
-   * @brief Get the size of the packet
-   *
-   * @return size_t
-   */
-  size_t size() const noexcept;
-
-  /**
-   * @brief Overloaded operator<< for QDataStream
-   *
-   * @param out
-   * @param payload
-   */
-  friend QDataStream& operator<<(QDataStream& out, const SyncingItem& payload);
-
-  /**
-   * @brief Overloaded operator>> for QDataStream
-   *
-   * @param in
-   * @param payload
-   */
-  friend QDataStream& operator>>(QDataStream& in, SyncingItem& payload);
-};
-
 /**
  * @brief Clipboard Sync Packet
  */
