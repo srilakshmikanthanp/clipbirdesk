@@ -90,7 +90,9 @@ QVector<SyncingItem> SyncingPacket::getItems() const noexcept {
  * @return size_t
  */
 size_t SyncingPacket::size() const noexcept {
-  size_t size = sizeof(this->packetType) + sizeof(this->packetLength) + sizeof(this->itemCount);
+  size_t size = (
+    sizeof(this->packetType) + sizeof(this->packetLength) + sizeof(this->itemCount)
+  );
 
   for (const auto& payload : this->items) {
     size += payload.size();
@@ -184,7 +186,9 @@ QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Payloads");
+    throw types::except::MalformedPacket(
+      types::enums::ErrorCode::CodingError, "Invalid Payloads"
+    );
   }
 
   // return the stream

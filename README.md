@@ -79,16 +79,54 @@ Clipbird Software is a versatile tool designed to synchronize the clipboard acro
 
 ### Built With
 
-* OpenSSL
+* ECM from KDE
 * C++
 * Qt6
+* OpenSSL
+* KDNSSD
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Clipbird is in the development stage if the project succeeds in the future, we will release the binaries to use.
+Clipbird is in the development stage if the project succeeds in the future, we will release the binaries to use. However you can build the project from source.
+
+### Prerequisites
+
+* ECM from KDE
+* C++
+* Qt6
+* OpenSSL
+* KDNSSD
+
+# Env Variables
+
+* `QT_CMAKE_DIR` - Qt6 installation directory
+* `ECM_DIR` - ECM installation directory
+* `KDNSSD_DIR` - KDNSSD installation directory
+
+# To Install ECM
+
+```sh
+git clone git://anongit.kde.org/extra-cmake-modules
+cd extra-cmake-modules
+git checkout v5.108.0
+mkdir build && cd build    
+cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH=/path/to/qt -DQT_MAJOR_VERSION=6 -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -S ..
+make && make install
+```
+
+# To Install KDNSSD
+
+```sh
+git clone https://github.com/KDE/kdnssd.git
+cd kdnssd
+git checkout v5.108.0
+mkdir build && cd build
+cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH=/path/to/qt;path/to/bonjour -DQT_MAJOR_VERSION=6 -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -S ..
+make && make install
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -134,9 +172,17 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
+* ECM from KDE
+* C++
+* Qt6
+* OpenSSL
+* KDNSSD
+
+* [ECM from KDE](https://api.kde.org/ecm/)
 * [OpenSSL](https://www.openssl.org/)
 * [Qt](https://www.qt.io/)
 * [C++](https://www.cplusplus.com/)
+* [KDNSSD](https://api.kde.org/frameworks/kdnssd/html/index.html)
 
 <!-- Contributors -->
 ## Contributors

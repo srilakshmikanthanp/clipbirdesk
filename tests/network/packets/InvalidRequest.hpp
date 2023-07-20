@@ -14,6 +14,7 @@
 #include "network/packets//invalidrequest/invalidrequest.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
+#include "utility/functions/packet/packet.hpp"
 
 /**
  * @brief testing the MalformedPacket
@@ -37,16 +38,7 @@ TEST(InvalidPacketTest, TestingInvalidPacket) {
   const auto errorMessage = QByteArray("Hello", 5);
 
   // setting the packet type
-  packet_send.setPacketType(packetType);
-
-  // setting the packet length
-  packet_send.setErrorCode(errorCode);
-
-  // setting the message
-  packet_send.setErrorMessage(errorMessage);
-
-  // setting the packet length
-  packet_send.setPacketLength(packet_send.size());
+  packet_send = createPacket({ packetType, errorCode, errorMessage});
 
   // load the packet from network byte order
   packet_recv = fromQByteArray<InvalidRequest>(toQByteArray(packet_send));

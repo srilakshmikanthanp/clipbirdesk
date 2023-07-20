@@ -91,8 +91,10 @@ QByteArray SyncingItem::getPayload() const noexcept {
  */
 size_t SyncingItem::size() const noexcept {
   return (
-      sizeof(this->mimeLength) + this->mimeType.size() + sizeof(this->payloadLength) +
-      this->payload.size()
+    sizeof(this->mimeLength) +
+    this->mimeType.size() +
+    sizeof(this->payloadLength) +
+    this->payload.size()
   );
 }
 

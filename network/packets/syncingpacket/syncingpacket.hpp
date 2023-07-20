@@ -27,7 +27,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
 class SyncingPacket {
  private:  // private members
 
-  quint8 packetType = 0x03;
+  quint8 packetType = 0x01;
   qint32 packetLength;
   qint32 itemCount;
   QVector<SyncingItem> items;
@@ -35,7 +35,7 @@ class SyncingPacket {
  public:
 
   /// @brief Allowed Packet Types
-  enum PacketType : quint8 { SyncPacket = 0x03 };
+  enum PacketType : quint8 { SyncPacket = 0x01 };
 
  public:
 

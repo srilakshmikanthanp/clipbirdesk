@@ -17,19 +17,15 @@ void ClipBird::handleServerStatusChanged(bool isConnected) {
     throw std::runtime_error("Host is not client");
   }
 
-  // get the client
-  auto *client = &std::get<Client>(m_host);
+  // get the client and disconnect the signals
+  const auto signal = &clipboard::Clipboard::OnClipboardChange;
+  auto *client      = &std::get<Client>(m_host);
+  const auto slot   = &Client::syncItems;
 
   // if the client is connected then connect the signals
   if (isConnected) {
-    // Connect the onClipboardChange signal to the client
-    const auto signal = &clipboard::Clipboard::OnClipboardChange;
-    const auto slot   = &Client::syncItems;
     connect(&m_clipboard, signal, client, slot);
   } else {
-    // Disconnect the onClipboardChange signal to the client
-    const auto signal = &clipboard::Clipboard::OnClipboardChange;
-    const auto slot   = &Client::syncItems;
     disconnect(&m_clipboard, signal, client, slot);
   }
 }

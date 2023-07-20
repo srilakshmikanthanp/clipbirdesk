@@ -102,45 +102,4 @@ network::packets::SyncingPacket createPacket(internals::SyncingPacketParams para
   // return the packet
   return packet;
 }
-
-/**
- * @brief Create the SyncingPacket
- *
- * @param packetType
- * @param items
- *
- * @return SyncingPacket
- */
-network::packets::SyncingPacket createPacket(
-    quint8 packetType, QVector<QPair<QString, QByteArray>> items
-) {
-  // create the packet
-  network::packets::SyncingPacket packet;
-
-  // set the packet type
-  packet.setPacketType(packetType);
-
-  // set the item count
-  packet.setItemCount(items.size());
-
-  // Convert the items to SyncingItem
-  QVector<network::packets::SyncingItem> syncItems;
-
-  // reserve the memory
-  syncItems.reserve(items.size());
-
-  // convert the items
-  for (const auto& [mime, payload] : items) {
-    syncItems.push_back(createPacket({mime, payload}));
-  }
-
-  // set the items
-  packet.setItems(syncItems);
-
-  // set the packet length
-  packet.setPacketLength(packet.size());
-
-  // return the packet
-  return packet;
-}
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

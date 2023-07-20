@@ -171,7 +171,7 @@ Server::Server(QObject *p) : service::Register(p) {
  */
 void Server::syncItems(QVector<QPair<QString, QByteArray>> items) {
   const auto packType = packets::SyncingPacket::PacketType::SyncPacket;
-  this->sendPacket(utility::functions::createPacket(packType, items));
+  this->sendPacket(utility::functions::createPacket({packType, items}));
 }
 
 /**

@@ -15,6 +15,7 @@
 #include "network/packets/syncingpacket/syncingpacket.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
+#include "utility/functions/packet/packet.hpp"
 
 /**
  * @brief testing the ServiceDiscoveryPacket
@@ -35,40 +36,17 @@ TEST(SyncingPacket, TestingSyncingPacket) {
   const auto itemCount  = 2;
   const auto mimeType   = QByteArray("text/plain", 10);
   const auto payload    = QByteArray("Hello World", 11);
-  QVector<SyncingItem> items;
+
+  // create items
+  QVector<QPair<QString, QByteArray>> items;
 
   // creating the items
   for (auto i = 0; i < itemCount; i++) {
-    // creating the payload
-    SyncingItem item;
-
-    // setting the mime length
-    item.setMimeLength(mimeType.size());
-
-    // setting the mime type
-    item.setMimeType(mimeType);
-
-    // setting the payload length
-    item.setPayloadLength(payload.size());
-
-    // setting the payload
-    item.setPayload(payload);
-
-    // adding the payload
-    items.push_back(item);
+    items.push_back({mimeType, payload});
   }
 
   // setting the packet type
-  packet_send.setPacketType(packetType);
-
-  // setting the item count
-  packet_send.setItemCount(itemCount);
-
-  // setting the items
-  packet_send.setItems(items);
-
-  // setting the packet length
-  packet_send.setPacketLength(packet_send.size());
+  packet_send = createPacket({packetType, items});
 
   // load the packet from network byte order
   packet_recv = fromQByteArray<SyncingPacket>(toQByteArray(packet_send));

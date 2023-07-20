@@ -80,16 +80,4 @@ network::packets::SyncingItem createPacket(internals::SyncingItemParams params);
  * @return SyncingPacket
  */
 network::packets::SyncingPacket createPacket(internals::SyncingPacketParams params);
-
-/**
- * @brief Create the SyncingPacket
- *
- * @param packetType
- * @param items
- *
- * @return SyncingPacket
- */
-network::packets::SyncingPacket createPacket(
-    quint8 packetType, QVector<QPair<QString, QByteArray>> items
-);
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

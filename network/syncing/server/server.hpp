@@ -206,12 +206,12 @@ class Server : public service::Register {
   /**
    * @brief Start the server
    */
-  void startServer() override;
+  void startServer();
 
   /**
    * @brief Stop the server
    */
-  void stopServer() override;
+  void stopServer();
 
  protected:  // override functions from the base class
 

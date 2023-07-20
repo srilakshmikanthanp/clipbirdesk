@@ -17,7 +17,11 @@
 #include <QUdpSocket>
 #include <QtLogging>
 
+// KDE headers
+#include <KDNSSD/ServiceBrowser>
+
 // Local headers
+#include "constants/constants.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
@@ -48,7 +52,18 @@ class Discover : public QObject {
 
   Q_DISABLE_COPY_MOVE(Discover)
 
+ private:  // private Variables
+
+  /// @brief Service Browser
+  KDNSSD::ServiceBrowser* m_browser;
+
  private:  // private functions
+
+  /// @brief On Service Found
+  void OnServiceFound(KDNSSD::RemoteService::Ptr service);
+
+  /// @brief On Service Removed
+  void OnServiceRemoved(KDNSSD::RemoteService::Ptr service);
 
  public:
 
@@ -62,7 +77,7 @@ class Discover : public QObject {
   /**
    * @brief Destroy the Discovery Discover object
    */
-  ~Discover();
+  ~Discover() = default;
 
   /**
    * @brief Starts the discovery client by sending the
@@ -71,11 +86,6 @@ class Discover : public QObject {
    * @param interval Interval between each broadcast
    */
   void startDiscovery();
-
-  /**
-   * @brief Stops the discovery client
-   */
-  void stopDiscovery();
 
  protected:  // abstract functions
 

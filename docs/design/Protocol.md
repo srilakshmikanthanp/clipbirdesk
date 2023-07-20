@@ -73,7 +73,7 @@ The **SyncingPacket** is used to transfer clipboard data between the client and 
 
 #### Header
 
-- **Packet Type**: This field specifies the type of packet, which is set to 0x03 for the SyncingPacket.
+- **Packet Type**: This field specifies the type of packet, which is set to 0x01 for the SyncingPacket.
 - **Packet Length**: This field specifies the length of the packet, for SyncingPacket it is length of clipboard data and type of clipboard data.
 
 #### Body
@@ -88,7 +88,7 @@ The **SyncingPacket** is used to transfer clipboard data between the client and 
 
 | Field           | Bytes | value |
 |-----------------|-------| ----- |
-| Packet Type     | 1     | 0x03  |
+| Packet Type     | 1     | 0x01  |
 | Packet Length   | 4     |       |
 | itemCount       | 4     |       |
 | MimeLength      | 4     |       |
