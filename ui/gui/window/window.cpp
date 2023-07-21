@@ -254,47 +254,14 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   // set no taskbar icon & no window Frame
   // setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
-  // create all the components
-  this->hostStatus.first  = new components::Label(this);
-  this->hostStatus.second = new components::Status(this);
-
-  this->serverName.first  = new components::Label(this);
-  this->serverName.second = new components::Label(this);
-
-  this->serverIp.first    = new components::Label(this);
-  this->serverIp.second   = new components::Label(this);
-
-  this->hostCount.first   = new components::Label(this);
-  this->hostCount.second  = new components::Label(this);
-
-  // set Alignment
-  this->hostStatus.first->setAlignment(Qt::AlignLeft);
-  this->hostStatus.second->setAlignment(Qt::AlignRight);
-
-  this->serverName.first->setAlignment(Qt::AlignLeft);
-  this->serverName.second->setAlignment(Qt::AlignRight);
-
-  this->serverIp.first->setAlignment(Qt::AlignLeft);
-  this->serverIp.second->setAlignment(Qt::AlignRight);
-
-  this->hostCount.first->setAlignment(Qt::AlignLeft);
-  this->hostCount.second->setAlignment(Qt::AlignRight);
-
   // create the root layout
   auto root = new QVBoxLayout(this);
 
   // create the top layout
-  auto top  = new QFormLayout();
-
-  // add top layout components
-  top->addRow(this->hostStatus.first, this->hostStatus.second);
-  top->addRow(this->serverName.first, this->serverName.second);
-  top->addRow(this->serverIp.first, this->serverIp.second);
-  top->addRow(this->hostCount.first, this->hostCount.second);
+  auto top  = new QHBoxLayout();
 
   // set top layout alignment
-  top->setLabelAlignment(Qt::AlignLeft);
-  top->setFormAlignment(Qt::AlignRight);
+  top->addWidget(this->deviceInfo);
 
   // add top layout to root layout
   root->addLayout(top);
@@ -389,60 +356,57 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
  * @brief Set the Status object
  */
 void Window::setStatus(const QString& key, components::Status::Value val) {
-  this->hostStatus.first->setText(key);
-  this->hostStatus.second->setStatus(val);
+  this->deviceInfo->setHostStatus({key, val});
 }
 
 /**
  * @brief Get the Host Status object
  */
 QPair<QString, components::Status::Value> Window::getStatus() {
-  return {this->hostStatus.first->text(), this->hostStatus.second->getStatus()};
+  return this->deviceInfo->getHostStatus();
 }
 
 /**
  * @brief Set the Server Name object
  */
 void Window::setServerHostName(const QString& key, const QString& val) {
-  this->serverName.first->setText(key);
-  this->serverName.second->setText(val);
+  this->deviceInfo->setServerName({key, val});
 }
 
 /**
  * @brief Get the Server Name object
  */
 QPair<QString, QString> Window::getServerHostName() {
-  return {this->serverName.first->text(), this->serverName.second->text()};
+  return this->deviceInfo->getServerName();
 }
 
 /**
  * @brief Set the Server Ip object
  */
 void Window::setServerIpPort(const QString& key, const QString& val) {
-  this->serverIp.first->setText(key);
-  this->serverIp.second->setText(val);
+  this->deviceInfo->setServerIpPort({key, val});
 }
 
 /**
  * @brief Get the Server Ip object
  */
 QPair<QString, QString> Window::getServerIpPort() {
-  return {this->serverIp.first->text(), this->serverIp.second->text()};
+  return this->deviceInfo->getServerIpPort();
 }
 
 /**
  * @brief Set the Hosts object
  */
 void Window::setHostCount(const QString& key, int val) {
-  this->hostCount.first->setText(key);
-  this->hostCount.second->setText(QString::number(val));
+  this->deviceInfo->setHostCount({key, QString::number(val)});
 }
 
 /**
  * @brief Get the Hosts object
  */
 QPair<QString, int> Window::getHostCount() {
-  return {this->hostCount.first->text(), this->hostCount.second->text().toInt()};
+  const auto hostCount = this->deviceInfo->getHostCount();
+  return {hostCount.first, hostCount.second.toInt()};
 }
 
 //---------------------- Server Tab ----------------------//

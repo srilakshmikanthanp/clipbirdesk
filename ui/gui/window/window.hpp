@@ -31,6 +31,7 @@
 #include "ui/gui/components/label/label.hpp"
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/components/tab/tab.hpp"
+#include "ui/gui/window/deviceinfo/deviceinfo.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::internal {
 class HostsList : public QWidget {
@@ -98,10 +99,7 @@ class Window : public QWidget {
 
  private:  // Member variable
 
-  QPair<components::Label*, components::Status*> hostStatus;
-  QPair<components::Label*, components::Label*> serverName;
-  QPair<components::Label*, components::Label*> serverIp;
-  QPair<components::Label*, components::Label*> hostCount;
+  window::DeviceInfo* deviceInfo = new window::DeviceInfo(this);
 
  private:  // typedefs used in this class
 
