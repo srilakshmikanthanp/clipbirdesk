@@ -101,13 +101,13 @@ Clipbird is in the development stage if the project succeeds in the future, we w
 * OpenSSL
 * KDNSSD
 
-# Env Variables
+### Env Variables
 
 * `QT_CMAKE_DIR` - Qt6 installation directory
 * `ECM_DIR` - ECM installation directory
 * `KDNSSD_DIR` - KDNSSD installation directory
 
-# To Install ECM
+### To Install Extra CMake Modules
 
 ```sh
 git clone git://anongit.kde.org/extra-cmake-modules
@@ -118,7 +118,7 @@ cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH=/path/to/qt -DQT_MAJOR_VERSION=6 
 make && make install
 ```
 
-# To Install KDNSSD
+### To Install KDNSSD
 
 ```sh
 git clone https://github.com/KDE/kdnssd.git
