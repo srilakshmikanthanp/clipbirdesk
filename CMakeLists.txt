@@ -42,8 +42,6 @@ find_package(OpenSSL REQUIRED)
 # Find KDE DNS-SD Framework
 find_package(KF5DNSSD REQUIRED)
 
-find_package(DNSSD)
-
 # Configure config.hpp
 configure_file(
   ${PROJECT_SOURCE_DIR}/config/config.hpp.in

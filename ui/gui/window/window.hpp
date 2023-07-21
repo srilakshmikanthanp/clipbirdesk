@@ -27,17 +27,73 @@
 #include "controller/clipbird/clipbird.hpp"
 #include "ui/gui/components/button/button.hpp"
 #include "ui/gui/components/host/host.hpp"
-#include "ui/gui/components/hostlist/hostslist.hpp"
 #include "ui/gui/components/label/label.hpp"
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/components/tab/tab.hpp"
+
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::internal {
+class HostsList : public QWidget {
+ signals:  // Signals
+  void onAction(components::Host::Value host);
+
+ private:  // Constants for style
+
+  static constexpr const char* const style = R"(
+  )";
+
+ private:  // just for Qt
+
+  Q_OBJECT
+
+ private:  // disable copy and move
+
+  Q_DISABLE_COPY_MOVE(HostsList)
+
+ public:  // Type alias
+
+  using Action = components::Host::Action;
+
+ private:  // Member Variables
+
+  QVBoxLayout* verticalLayout = new QVBoxLayout(this);
+
+ public:  // Member Functions
+
+  explicit HostsList(QWidget* parent = nullptr);
+
+  /**
+   * @brief Set the Hosts to the list
+   */
+  void setHosts(QList<components::Host::Value> hosts);
+
+  /**
+   * @brief Get the All Hosts from the list
+   */
+  QList<components::Host::Value> getAllHosts();
+
+  /**
+   * @brief Remove all Hosts from the list
+   */
+  void removeAllHosts();
+
+  /**
+   * @brief Add Host to the list
+   */
+  void addHost(components::Host::Value host);
+
+  /**
+   * @brief Remove a Host from the list
+   */
+  void removeHost(components::Host::Value host);
+};
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::internal
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 class Window : public QWidget {
  private:  // Member variable (Tabs)
 
-  components::HostsList* clientList = new components::HostsList(this);  // Server Tab
-  components::HostsList* serverList = new components::HostsList(this);  // Client Tab
+  internal::HostsList* clientList = new internal::HostsList(this);  // Server Tab
+  internal::HostsList* serverList = new internal::HostsList(this);  // Client Tab
 
  private:  // Member variable
 
@@ -258,7 +314,7 @@ class Window : public QWidget {
    */
   QSize getSizeRatio();
 
-protected:  // protected functions
+ protected:  // protected functions
 
   /**
    * @brief Override the setVisible function
