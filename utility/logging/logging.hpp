@@ -17,5 +17,5 @@ namespace srilakshmikanthanp::clipbirdesk::logging {
  *
  * @return message handler
  */
-QMessageLogger createFileMessageHandler(const QString &file);
+void createFileMessageHandler(const QString &file);
 }  // namespace srilakshmikanthanp::clipbirdesk::logging

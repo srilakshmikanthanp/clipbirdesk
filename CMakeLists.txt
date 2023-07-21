@@ -2,8 +2,17 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 project(clipbird VERSION 1.0.0 LANGUAGES CXX)
 
+# set c++ standard 17
+set(CMAKE_CXX_STANDARD 17)
+
+# set c++ standard required
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # include cmake modules
 include(FetchContent)
+
+# For MSVX
+set(protobuf_MSVC_STATIC_RUNTIME OFF)
 
 # Set the logo.png path variable
 set(APPLICATION_LOGO_PATH "${PROJECT_SOURCE_DIR}/assets/logo.png")
@@ -74,6 +83,9 @@ target_include_directories(clipbird
 FetchContent_Declare(googletest
   URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
+
+# Prevent overriding the parent project's compiler/linker settings on Windows
+SET(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 # Make Available googletest
 FetchContent_MakeAvailable(googletest)

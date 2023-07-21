@@ -13,6 +13,7 @@
 #include <QHBoxLayout>
 #include <QHostAddress>
 #include <QHostInfo>
+#include <QScrollArea>
 #include <QScreen>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -253,7 +254,7 @@ class Window : public QWidget {
   /**
    * @brief Set the Server List object
    */
-  void setClientList(QList<std::tuple<QHostAddress, quint16, Action>> hosts);
+  void setClientList(const QList<std::tuple<QHostAddress, quint16, Action>>& hosts);
 
   /**
    * @brief Get the Server List object
@@ -280,7 +281,7 @@ class Window : public QWidget {
   /**
    * @brief Set the Server List object
    */
-  void setServerList(QList<std::tuple<QHostAddress, quint16, Action>> hosts);
+  void setServerList(const QList<std::tuple<QHostAddress, quint16, Action>>& hosts);
 
   /**
    * @brief Get the Server List from the tab

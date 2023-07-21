@@ -12,8 +12,10 @@
 // Qt headers
 #include <QByteArray>
 #include <QHostAddress>
+#include <QHostInfo>
 #include <QObject>
 #include <QTimer>
+#include <QtTypes>
 #include <QUdpSocket>
 #include <QtLogging>
 

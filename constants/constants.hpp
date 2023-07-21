@@ -6,7 +6,7 @@
 // https://opensource.org/licenses/MIT
 
 // Qt headers
-#include <QHostInfo>
+#include <QSysInfo>
 #include <QSize>
 
 // C++ headers

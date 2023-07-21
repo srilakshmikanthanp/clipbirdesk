@@ -190,7 +190,7 @@ QList<QPair<QHostAddress, quint16>> ClipBird::getConnectedClientsList() const {
  * @param host ip address of the client
  * @param ip port number of the client
  */
-void ClipBird::disconnectClient(QPair<QHostAddress, quint16> client) {
+void ClipBird::disconnectClient(const QPair<QHostAddress, quint16> &client) {
   // if the host is not server then throw
   if (!std::holds_alternative<Server>(m_host)) {
     throw std::runtime_error("Host is not server");
@@ -259,7 +259,7 @@ QList<QPair<QHostAddress, quint16>> ClipBird::getServerList() const {
  * @param host Host address
  * @param port Port number
  */
-void ClipBird::connectToServer(QPair<QHostAddress, quint16> host) {
+void ClipBird::connectToServer(const QPair<QHostAddress, quint16> &host) {
   if (std::holds_alternative<Client>(m_host)) {
     std::get<Client>(m_host).connectToServer(host);
   } else {
@@ -283,7 +283,7 @@ QPair<QHostAddress, quint16> ClipBird::getConnectedServer() const {
 /**
  * @brief Disconnect from the server
  */
-void ClipBird::disconnectFromServer(QPair<QHostAddress, quint16> host) {
+void ClipBird::disconnectFromServer(const QPair<QHostAddress, quint16> &host) {
   // if the host is not client then throw error
   if (!std::holds_alternative<Client>(m_host)) {
     throw std::runtime_error("Host is not client");

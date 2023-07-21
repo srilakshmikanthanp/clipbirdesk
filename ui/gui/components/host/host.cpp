@@ -7,6 +7,19 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 /**
+ * @brief Called when host is resolved
+ *
+ * @param info
+ */
+void Host::onHostResolved(const QHostInfo &info) {
+  if (info.error() != QHostInfo::NoError) {
+    this->hostName->setText("Unknown");
+  }
+
+  this->hostName->setText(info.hostName());
+}
+
+/**
  * @brief Construct a new Host object
  * with parent as QWidget
  * @param parent parent object
@@ -18,27 +31,16 @@ Host::Host(QWidget *parent) : QWidget(parent) {
   // create a layout to align the widgets
   QHBoxLayout *layout = new QHBoxLayout();
 
-  // create a vertical layout
-  QVBoxLayout *left   = new QVBoxLayout();
+  // Ad the host name to left
+  layout->addWidget(hostName, 0, Qt::AlignLeft);
 
-  // add the hostname and ip
-  left->addWidget(this->hostName);
-  left->addWidget(this->ip);
+  // add the button to right
+  layout->addWidget(actBtn, 0, Qt::AlignRight);
 
-  // create a vertical layout
-  QVBoxLayout *right = new QVBoxLayout();
+  // set the layout
+  this->setLayout(layout);
 
-  // add the action to the right layout
-  right->addWidget(this->actBtn);
-
-  // add the left and right layout
-  layout->addLayout(left);
-  layout->addLayout(right);
-
-  // align the left and right layout
-  layout->setAlignment(left, Qt::AlignLeft);
-  layout->setAlignment(right, Qt::AlignRight);
-
+  // set the style sheet
   this->setStyleSheet(style);
 }
 
@@ -53,20 +55,17 @@ void Host::setHost(Host::Value host) {
   this->port      = std::get<1>(host);
   this->action    = std::get<2>(host);
 
-  // get the host info
-  const auto info = QHostInfo::fromName(address.toString());
-
   // set the host name
-  this->hostName->setText(info.hostName());
-
-  // set the ip
-  this->ip->setText(address.toString());
+  this->hostName->setText("...");
 
   // action text to set
   const auto a = action == Action::Disconnect ? disconnect : connect;
 
   // set the action
   this->actBtn->setText(a);
+
+  // lookup the host name and change
+  QHostInfo::lookupHost(address.toString(), this, &Host::onHostResolved);
 }
 
 /**

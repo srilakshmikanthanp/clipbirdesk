@@ -36,7 +36,15 @@ namespace srilakshmikanthanp::clipbirdesk::network::service {
 class Register : public QObject {
  private:  // typedefs for this class
 
-  using IPType          = types::enums::IPType;
+  using IPType = types::enums::IPType;
+
+ signals:  // signals for this class
+  /// @brief On Error Occurred
+  void OnErrorOccurred(QString error);
+
+ signals:  // signals for this class
+  /// @brief On Service Registered
+  void OnServiceRegistered();
 
  private:  // Just for Qt
 
@@ -44,11 +52,7 @@ class Register : public QObject {
 
  private:  // variables
 
-  KDNSSD::PublicService *service;
-
- signals:  // signals for this class
-  /// @brief On Error Occurred
-  void OnErrorOccurred(QString error);
+  KDNSSD::PublicService* service;
 
  private:  // disable copy and move
 
@@ -70,7 +74,7 @@ class Register : public QObject {
   /**
    * @brief Destroy the Discovery Register object
    */
-  virtual ~Register()                     = default;
+  virtual ~Register()                            = default;
 
   /**
    * @brief Get the IP Type of the server it can be IPv4 or IPv6
@@ -109,13 +113,16 @@ class Register : public QObject {
  public:
 
   /**
-   * @brief Start the server
+   * @brief Register the service
+   *
+   * @param callback Callback function to be called
+   * when service Registered
    */
-  virtual void registerService();
+  virtual void registerServiceAsync();
 
   /**
    * @brief Stop the server
    */
   virtual void unregisterService();
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::network::discovery
+}  // namespace srilakshmikanthanp::clipbirdesk::network::service

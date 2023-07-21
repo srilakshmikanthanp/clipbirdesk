@@ -252,7 +252,7 @@ void Window::handleServerStatusChange(bool status) {
 Window::Window(Window::ClipBird* controller, QWidget* parent)
     : QWidget(parent), controller(controller) {
   // set no taskbar icon & no window Frame
-  setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+  // setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
   // create all the components
   this->hostStatus.first  = new components::Label(this);
@@ -302,11 +302,19 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   // create tab widget
   auto tab = new components::Tab(this);
 
+  // Create QScrollArea
+  auto serverArea = new QScrollArea(this);
+  auto clientArea = new QScrollArea(this);
+
+  // set the widget to scroll area
+  serverArea->setWidget(this->serverList);
+  clientArea->setWidget(this->clientList);
+
   // add server list to tab
-  tab->addTab(serverList, "Server");
+  tab->addTab(clientArea, "Server");
 
   // add client list to tab
-  tab->addTab(clientList, "Client");
+  tab->addTab(serverArea, "Client");
 
   // add tab to root layout
   root->addWidget(tab);
@@ -442,36 +450,36 @@ QPair<QString, int> Window::getHostCount() {
 /**
  * @brief Set the Server List object
  */
-void Window::setClientList(QList<components::Host::Value> hosts) {
-  serverList->setHosts(hosts);
+void Window::setClientList(const QList<components::Host::Value> &hosts) {
+  clientList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List object
  */
 QList<components::Host::Value> Window::getClientList() {
-  return serverList->getAllHosts();
+  return clientList->getAllHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
 void Window::addClient(components::Host::Value host) {
-  serverList->addHost(host);
+  clientList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
 void Window::removeClient(components::Host::Value host) {
-  serverList->removeHost(host);
+  clientList->removeHost(host);
 }
 
 /**
  * @brief Remove all servers from the list
  */
 void Window::removeAllClient() {
-  serverList->removeAllHosts();
+  clientList->removeAllHosts();
 }
 
 //---------------------- Client Tab ----------------------//
@@ -479,36 +487,36 @@ void Window::removeAllClient() {
 /**
  * @brief Set the Server List object
  */
-void Window::setServerList(QList<components::Host::Value> hosts) {
-  clientList->setHosts(hosts);
+void Window::setServerList(const QList<components::Host::Value> &hosts) {
+  serverList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List from the tab
  */
 QList<components::Host::Value> Window::getServerList() {
-  return clientList->getAllHosts();
+  return serverList->getAllHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
 void Window::addServer(components::Host::Value host) {
-  clientList->addHost(host);
+  serverList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
 void Window::removeServer(components::Host::Value host) {
-  clientList->removeHost(host);
+  serverList->removeHost(host);
 }
 
 /**
  * @brief Remove all servers from the list
  */
 void Window::removeAllServers() {
-  clientList->removeAllHosts();
+  serverList->removeAllHosts();
 }
 
 //---------------------- general ----------------------//

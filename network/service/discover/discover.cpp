@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 #include "discover.hpp"
+#include <iostream>
 
 namespace srilakshmikanthanp::clipbirdesk::network::service {
 /**
@@ -18,38 +19,64 @@ Discover::Discover(QObject* parent) : QObject(parent) {
 
 /// @brief On Service Found
 void Discover::OnServiceFound(KDNSSD::RemoteService::Ptr service) {
-  const auto myDevice = constants::getMDnsServiceName().c_str();
+  const auto myDevice = QString::fromStdString(constants::getMDnsServiceName());
+  const auto callback = [&, service](const QHostInfo& info) {
+    if (info.error() != QHostInfo::NoError) {
+      emit this->OnErrorOccurred("Unable to resolve service");
+      return;
+    }
+
+    if (info.addresses().isEmpty()) {
+      emit this->OnErrorOccurred("Unable to resolve service");
+      return;
+    }
+
+    auto host = info.addresses().first();
+    auto port = quint16(service->port());
+    this->onServerAdded({host, port});
+  };
+
+  if (!service->resolve()) {
+    emit this->OnErrorOccurred("Unable to resolve service");
+    return;
+  }
 
   if (service->serviceName() == myDevice) {
     return;
   }
 
-  if ( !service->resolve() ) {
-    emit this->OnErrorOccurred("Unable to resolve service");
-    return;
-  }
-
-  auto host = QHostAddress(service->hostName());
-  auto port = quint16(service->port());
-  this->onServerAdded({host, port});
+  QHostInfo::lookupHost(service->hostName(), callback);
 }
 
 /// @brief On Service Removed
 void Discover::OnServiceRemoved(KDNSSD::RemoteService::Ptr service) {
-  const auto myDevice = constants::getMDnsServiceName().c_str();
+  const auto myDevice = QString::fromStdString(constants::getMDnsServiceName());
+  const auto callback = [&, service](const QHostInfo& info) {
+    if (info.error() != QHostInfo::NoError) {
+      emit this->OnErrorOccurred("Unable to resolve service");
+      return;
+    }
+
+    if (info.addresses().isEmpty()) {
+      emit this->OnErrorOccurred("Unable to resolve service");
+      return;
+    }
+
+    auto host = info.addresses().first();
+    auto port = quint16(service->port());
+    this->onServerRemoved({host, port});
+  };
+
+  if (!service->resolve()) {
+    emit this->OnErrorOccurred("Unable to resolve service");
+    return;
+  }
 
   if (service->serviceName() == myDevice) {
     return;
   }
 
-  if ( !service->resolve() ) {
-    emit this->OnErrorOccurred("Unable to resolve service");
-    return;
-  }
-
-  auto host = QHostAddress(service->hostName());
-  auto port = quint16(service->port());
-  this->onServerRemoved({host, port});
+  QHostInfo::lookupHost(service->hostName(), callback);
 }
 
 /**
@@ -60,14 +87,14 @@ void Discover::OnServiceRemoved(KDNSSD::RemoteService::Ptr service) {
  */
 void Discover::startDiscovery() {
   // connect the browser signal to the slot of this class
-  const auto signal_a = &KDNSSD::ServiceBrowser::serviceAdded;
-  const auto slot_a   = &Discover::OnServiceFound;
-  connect(this->m_browser, signal_a, this, slot_a);
-
-  // connect the browser signal to the slot of this class
   const auto signal_r = &KDNSSD::ServiceBrowser::serviceRemoved;
   const auto slot_r   = &Discover::OnServiceRemoved;
   connect(this->m_browser, signal_r, this, slot_r);
+
+  // connect the browser signal to the slot of this class
+  const auto signal_a = &KDNSSD::ServiceBrowser::serviceAdded;
+  const auto slot_a   = &Discover::OnServiceFound;
+  connect(this->m_browser, signal_a, this, slot_a);
 
   // start the browser
   this->m_browser->startBrowse();

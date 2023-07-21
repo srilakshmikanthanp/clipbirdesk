@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 #include "constants.hpp"
+#include <iostream>
 
 
 namespace srilakshmikanthanp::clipbirdesk::constants {
@@ -69,7 +70,8 @@ auto getAppWindowRatio() -> QSize {
  * @return std::string
  */
 std::string getMDnsServiceName() {
-  return QHostInfo::localHostName().toUtf8().toStdString();
+  std::cout << QSysInfo::machineHostName().toStdString() << std::endl;
+  return QSysInfo::machineHostName().toStdString();
 }
 
 /**

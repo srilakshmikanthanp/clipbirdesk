@@ -1,6 +1,6 @@
 {
   "C_Cpp.clang_format_fallbackStyle": "Google",
-  "cmake.generator": "MinGW Makefiles",
+  "cmake.generator": "Visual Studio 17 2022",
   "grammarly.files.exclude": [
     "**/CMakeLists.txt"
   ],
@@ -136,6 +136,10 @@
     "semaphore": "cpp",
     "span": "cpp",
     "charconv": "cpp",
-    "qstringlist": "cpp"
+    "qstringlist": "cpp",
+    "coroutine": "cpp",
+    "resumable": "cpp",
+    "filesystem": "cpp",
+    "format": "cpp"
   },
 }

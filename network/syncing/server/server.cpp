@@ -6,7 +6,6 @@
 #include "server.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
-
 /**
  * @brief Process the SyncingPacket from the client
  *
@@ -26,38 +25,6 @@ void Server::processSyncingPacket(const packets::SyncingPacket &packet) {
 
   // send the packet to all the clients
   this->sendPacket(packet);
-}
-
-/**
- * @brief Callback function that process the ready
- * read from the client
- */
-void Server::processReadyRead() {
-  // Get the client that was ready to read
-  auto client     = qobject_cast<QSslSocket *>(sender());
-
-  // Get the data from the client
-  const auto data = client->readAll();
-
-  // using the fromQByteArray from namespace
-  using utility::functions::createPacket;
-  using utility::functions::fromQByteArray;
-
-  // Deserialize the data to SyncingPacket
-  try {
-    this->processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
-    return;
-  } catch (const types::except::MalformedPacket &e) {
-    const auto type = packets::InvalidRequest::PacketType::RequestFailed;
-    this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
-    return;
-  } catch (const std::exception &e) {
-    emit OnErrorOccurred(e.what());
-    return;
-  } catch (...) {
-    emit OnErrorOccurred("Unknown Error");
-    return;
-  }
 }
 
 /**
@@ -123,6 +90,38 @@ void Server::processConnections() {
 }
 
 /**
+ * @brief Callback function that process the ready
+ * read from the client
+ */
+void Server::processReadyRead() {
+  // Get the client that was ready to read
+  auto client     = qobject_cast<QSslSocket *>(sender());
+
+  // Get the data from the client
+  const auto data = client->readAll();
+
+  // using the fromQByteArray from namespace
+  using utility::functions::createPacket;
+  using utility::functions::fromQByteArray;
+
+  // Deserialize the data to SyncingPacket
+  try {
+    this->processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
+    return;
+  } catch (const types::except::MalformedPacket &e) {
+    const auto type = packets::InvalidRequest::PacketType::RequestFailed;
+    this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
+    return;
+  } catch (const std::exception &e) {
+    emit OnErrorOccurred(e.what());
+    return;
+  } catch (...) {
+    emit OnErrorOccurred("Unknown Error");
+    return;
+  }
+}
+
+/**
  * @brief Process the disconnection from the client
  */
 void Server::processDisconnection() {
@@ -140,6 +139,13 @@ void Server::processDisconnection() {
 
   // Notify the listeners that the client list is changed
   emit OnClientListChanged(getConnectedClientsList());
+}
+
+/**
+ * @brief Called when the service is registered
+ */
+void Server::OnServiceRegistered() {
+  emit OnServerStateChanged(true);
 }
 
 /**
@@ -162,6 +168,11 @@ Server::Server(QObject *p) : service::Register(p) {
   const auto signal_e = &service::Register::OnErrorOccurred;
   const auto slot_e   = &Server::OnErrorOccurred;
   QObject::connect(this, signal_e, this, slot_e);
+
+  // Notify the listeners that the server is started
+  const auto signal = &service::Register::OnServiceRegistered;
+  const auto slot   = &Server::OnServiceRegistered;
+  QObject::connect(this, signal, this, slot);
 }
 
 /**
@@ -274,10 +285,7 @@ void Server::startServer() {
   }
 
   // start the discovery server
-  service::Register::registerService();
-
-  // Notify the listeners that the server is started
-  emit OnServerStateChanged(true);
+  service::Register::registerServiceAsync();
 }
 
 /**
@@ -286,6 +294,9 @@ void Server::startServer() {
 void Server::stopServer() {
   // stop the discovery server
   service::Register::unregisterService();
+
+  // disconnect all the clients
+  this->disconnectAllClients();
 
   // stop the server
   m_ssl_server->close();

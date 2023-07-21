@@ -107,28 +107,6 @@ Clipbird is in the development stage if the project succeeds in the future, we w
 * `ECM_DIR` - ECM installation directory
 * `KDNSSD_DIR` - KDNSSD installation directory
 
-### To Install Extra CMake Modules
-
-```sh
-git clone git://anongit.kde.org/extra-cmake-modules
-cd extra-cmake-modules
-git checkout v5.108.0
-mkdir build && cd build    
-cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH=/path/to/qt -DQT_MAJOR_VERSION=6 -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -S ..
-make && make install
-```
-
-### To Install KDNSSD
-
-```sh
-git clone https://github.com/KDE/kdnssd.git
-cd kdnssd
-git checkout v5.108.0
-mkdir build && cd build
-cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH=/path/to/qt;path/to/bonjour -DQT_MAJOR_VERSION=6 -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -S ..
-make && make install
-```
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ROADMAP -->

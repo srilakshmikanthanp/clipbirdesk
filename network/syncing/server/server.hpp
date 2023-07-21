@@ -28,7 +28,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 class Server : public service::Register {
  signals:  // signals
   /// @brief On client state changed
-  void OnCLientStateChanged(QPair<QHostAddress, quint16>, bool connected);
+  void OnCLientStateChanged(const QPair<QHostAddress, quint16>&, bool connected);
 
  signals:  // signals for this class
   /// @brief On Error Occurred
@@ -38,13 +38,13 @@ class Server : public service::Register {
   /// @brief On Server State Changed
   void OnServerStateChanged(bool started);
 
- signals:  // signals for this class
-  /// @brief On Sync Request
-  void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
-
  signals:  // signals
   /// @brief On Sync Request
-  void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
+  void OnSyncRequest(const QVector<QPair<QString, QByteArray>>& items);
+
+ signals:  // signals for this class
+  /// @brief On Sync Request
+  void OnClientListChanged(const QList<QPair<QHostAddress, quint16>>& clients);
 
  private:  // just for Qt
 
@@ -111,19 +111,25 @@ class Server : public service::Register {
   void processSyncingPacket(const packets::SyncingPacket& packet);
 
   /**
+   * @brief Process the connections that are pending
+   */
+  void processConnections();
+
+  /**
    * @brief Callback function that process the ready
    * read from the client
    */
   void processReadyRead();
 
   /**
-   * @brief Process the connections that are pending
-   */
-  void processConnections();
-  /**
    * @brief Process the disconnection from the client
    */
   void processDisconnection();
+
+  /**
+   * @brief On Service Registered
+   */
+  void OnServiceRegistered();
 
  public:  // constructors and destructors
 

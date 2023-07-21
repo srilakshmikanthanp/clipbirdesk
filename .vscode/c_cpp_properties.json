@@ -1,8 +1,7 @@
 {
   "configurations": [
     {
-      "windowsSdkVersion": "10.0.19041.0",
-      "compilerPath": "C:/TDM-GCC-64/bin/g++.exe",
+      "compilerPath": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.33.31629/bin/Hostx64/x64/cl.exe",
       "name": "Win32",
       "includePath": [
         "C:/Program Files/OpenSSL-Win64/include/**",
@@ -15,14 +14,10 @@
         "${workspaceFolder}/build",
         "C:/kderoot/include/KF6/KDNSSD"
       ],
-      "defines": [
-        "_DEBUG",
-        "UNICODE",
-        "_UNICODE"
-      ],
+      "defines": [ "_UNICODE", "_DEBUG", "UNICODE" ],
       "cStandard": "c17",
-      "cppStandard": "c++20",
-      "intelliSenseMode": "windows-gcc-x64",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "msvc-x64",
       "configurationProvider": "ms-vscode.cpptools"
     }
   ],

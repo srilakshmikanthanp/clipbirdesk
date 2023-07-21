@@ -15,22 +15,27 @@ namespace srilakshmikanthanp::clipbirdesk::network::service {
 Register::Register(QObject* parent) : QObject(parent) {
   this->service = new KDNSSD::PublicService();
   this->service->setParent(this);
+
+  // connect the signals to the slots
+  const auto signal_r = &KDNSSD::PublicService::published;
+  const auto slot_r   = &Register::OnServiceRegistered;
+  connect(this->service, signal_r, this, slot_r);
 }
 
 /**
- * @brief Start the server
+ * @brief Register the service
+ *
+ * @param callback Callback function to be called
+ * when service Registered
  */
-void Register::registerService() {
+void Register::registerServiceAsync() {
   // Set the service name & other details
   this->service->setServiceName(constants::getMDnsServiceName().c_str());
   this->service->setType(constants::getMDnsServiceType().c_str());
   this->service->setPort(this->getPort());
-  this->service->setDomain("local");
 
-  // Try to publish the service
-  if (!this->service->publish()) {
-    throw std::runtime_error("Unable to publish service");
-  }
+  // publish the service Asynchronously
+  this->service->publishAsync();
 }
 
 /**

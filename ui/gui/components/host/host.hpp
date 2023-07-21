@@ -5,13 +5,17 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// Qt Headers
 #include <QHBoxLayout>
 #include <QHostAddress>
 #include <QHostInfo>
 #include <QVBoxLayout>
 #include <QWidget>
+
+// C++ Headers
 #include <tuple>
 
+// Project Headers
 #include "ui/gui/components/button/button.hpp"
 #include "ui/gui/components/label/label.hpp"
 
@@ -37,6 +41,10 @@ class Host : public QWidget {
  signals:  // Signals
   void onAction(std::tuple<QHostAddress, quint16, Action>);
 
+ private:  // Private Functions
+
+  void onHostResolved(const QHostInfo &info);
+
  private:  // Member variable
 
   QHostAddress address;
@@ -46,7 +54,6 @@ class Host : public QWidget {
  private:  // Member variable
 
   Label *hostName = new Label(this);
-  Label *ip       = new Label(this);
   Button *actBtn  = new Button(this);
 
  private:  // just for Qt meta object

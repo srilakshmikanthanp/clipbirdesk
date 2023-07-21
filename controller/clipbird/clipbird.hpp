@@ -27,11 +27,11 @@ class ClipBird : public QObject {
 
  signals:  // signals for this class
   /// @brief On Server List Changed (From Client)
-  void OnServerListChanged(QList<QPair<QHostAddress, quint16>> servers);
+  void OnServerListChanged(const QList<QPair<QHostAddress, quint16>> &servers);
 
  signals:  // signals for this class
   /// @brief On Server Found  (From Client)
-  void OnServerFound(QPair<QHostAddress, quint16> server);
+  void OnServerFound(const QPair<QHostAddress, quint16> &server);
 
  signals:  // signals for this class
   /// @brief On Server state changed (From Client)
@@ -47,7 +47,7 @@ class ClipBird : public QObject {
 
  signals:  // signals
   /// @brief On client state changed (From Server)
-  void OnCLientStateChanged(QPair<QHostAddress, quint16> client, bool connected);
+  void OnCLientStateChanged(const QPair<QHostAddress, quint16> &client, bool connected);
 
  signals:  // signals for this class
   /// @brief On Server state changed (From Server)
@@ -55,7 +55,7 @@ class ClipBird : public QObject {
 
  signals:  // signals for this class
   /// @brief On Sync Request  (From Server)
-  void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
+  void OnClientListChanged(const QList<QPair<QHostAddress, quint16>>& clients);
 
  private:  // typedefs for this class
 
@@ -153,7 +153,7 @@ class ClipBird : public QObject {
    * @param host ip address of the client
    * @param ip port number of the client
    */
-  void disconnectClient(QPair<QHostAddress, quint16> client);
+  void disconnectClient(const QPair<QHostAddress, quint16> &client);
 
   /**
    * @brief Disconnect the all the clients from the server
@@ -181,7 +181,7 @@ class ClipBird : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  void connectToServer(QPair<QHostAddress, quint16> host);
+  void connectToServer(const QPair<QHostAddress, quint16> &host);
 
   /**
    * @brief get the connected server address and port
@@ -193,6 +193,6 @@ class ClipBird : public QObject {
   /**
    * @brief Disconnect from the server
    */
-  void disconnectFromServer(QPair<QHostAddress, quint16> host);
+  void disconnectFromServer(const QPair<QHostAddress, quint16> &host);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::controller
