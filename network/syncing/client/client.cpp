@@ -37,35 +37,6 @@ void Client::processInvalidPacket(const packets::InvalidRequest& packet) {
 }
 
 /**
- * @brief Updates the server list by removing the
- * server that that has exceeded the threshold
- * and emit the signal
- */
-void Client::updateServerList() {
-  // current timestamp in milliseconds
-  const auto current   = QDateTime::currentMSecsSinceEpoch();
-
-  // candidate for removal
-  const auto candidate = [&](auto element) -> bool {
-    return (current - std::get<2>(element)) > m_threshold;
-  };
-
-  // remove the server that has exceeded the threshold
-  const auto start = m_servers.begin();
-  const auto end   = m_servers.end();
-  const auto it    = std::remove_if(start, end, candidate);
-
-  // if No change return
-  if (it == end) return;
-
-  // Remove the server from the list
-  m_servers.erase(it, end);
-
-  // emit the signal if changed
-  emit OnServerListChanged(getServerList());
-}
-
-/**
  * @brief Process the packet that has been received
  * from the server
  */
@@ -118,10 +89,10 @@ void Client::processReadyRead() {
  * @param th threshold
  * @param parent Parent
  */
-Client::Client(QObject* parent) : discovery::Client(parent) {
+Client::Client(QObject* parent) : service::Discover (parent) {
   // connect the signal to emit the signal for
   // OnErrorOccurred from the base class
-  const auto signal_e = &discovery::Client::OnErrorOccurred;
+  const auto signal_e = &service::Discover::OnErrorOccurred;
   const auto slot_e   = &Client::OnErrorOccurred;
   connect(this, signal_e, this, slot_e);
 
@@ -136,15 +107,6 @@ Client::Client(QObject* parent) : discovery::Client(parent) {
   const auto signal_r = &QSslSocket::readyRead;
   const auto slot_r   = &Client::processReadyRead;
   connect(m_ssl_socket, signal_r, this, slot_r);
-
-  // connect the signal to emit the signal for
-  // timer to update the server list
-  const auto signal_t = &QTimer::timeout;
-  const auto slot_t   = &Client::updateServerList;
-  connect(m_timer, signal_t, this, slot_t);
-
-  // start the timer to update the server list
-  m_timer->start(m_threshold);
 
   // disconnected signal to emit the signal for
   // server state changed
@@ -186,7 +148,7 @@ QList<QPair<QHostAddress, quint16>> Client::getServerList() const {
   QList<QPair<QHostAddress, quint16>> list;
 
   // iterate and add the server
-  for (auto& [host, port, _] : m_servers) {
+  for (auto& [host, port] : m_servers) {
     list.append({host, port});
   }
 
@@ -260,15 +222,27 @@ QSslConfiguration Client::getSSLConfiguration() const {
  * @param host Host address
  * @param port Port number
  */
-void Client::onServerFound(QPair<QHostAddress, quint16> server) {
-  // current timestamp in milliseconds
-  const auto current = QDateTime::currentMSecsSinceEpoch();
-
-  // emit the signal
+void Client::onServerAdded(QPair<QHostAddress, quint16> server) {
+  // emit the signal for server found event
   emit OnServerFound(server);
 
   // add the server to the list
-  m_servers.append({server.first, server.second, current});
+  m_servers.append({server.first, server.second});
+
+  // emit the signal
+  emit OnServerListChanged(getServerList());
+}
+
+/**
+ * @brief
+ *
+ */
+void Client::onServerRemoved(QPair<QHostAddress, quint16> server) {
+  // emit the signal for server gone event
+  emit OnServerGone(server);
+
+  // remove the server from the list
+  m_servers.removeAll({server.first, server.second});
 
   // emit the signal
   emit OnServerListChanged(getServerList());

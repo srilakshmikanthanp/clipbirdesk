@@ -1,5 +1,6 @@
 <!-- Improved compatibility of back-to-top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <!-- markdownlint-disable MD033 -->
+<!-- markdownlint-disable MD041 -->
 <a name="readme-top"></a>
 <!--
 *** Thanks for checking out the Best-README-Template. If you have a suggestion*** That would make this better, please fork the repo and create a pull request
@@ -73,22 +74,60 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Clipbird Software is a versatile tool designed to synchronize the clipboard across various devices within your local network. It supports multiple operating systems, ensuring seamless compatibility. This cross-platform software enables the effortless sharing of clipboard content, allowing users to easily copy and paste text, images, and other data between devices. With Clipbird, you can conveniently access and transfer clipboard information across different platforms, enhancing productivity and streamlining workflow in a connected environment.
+Clipbird Software Helps you to sync your clipboard data between devices connected to a local network. It is a cross-platform software that works on various platforms. It is free and open-source software that is licensed under the MIT License.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
-* OpenSSL
+* ECM from KDE
 * C++
 * Qt6
+* OpenSSL
+* KDNSSD
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Clipbird is in the development stage if the project succeeds in the future, we will release the binaries to use.
+Clipbird is in the development stage if the project succeeds in the future, we will release the binaries to use. However, you can build the project from the source.
+
+### Prerequisites
+
+* ECM from KDE
+* C++
+* Qt6
+* OpenSSL
+* KDNSSD
+
+# Env Variables
+
+* `QT_CMAKE_DIR` - Qt6 installation directory
+* `ECM_DIR` - ECM installation directory
+* `KDNSSD_DIR` - KDNSSD installation directory
+
+# To Install ECM
+
+```sh
+git clone git://anongit.kde.org/extra-cmake-modules
+cd extra-cmake-modules
+git checkout v5.108.0
+mkdir build && cd build    
+cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH=/path/to/qt -DQT_MAJOR_VERSION=6 -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -S ..
+make && make install
+```
+
+# To Install KDNSSD
+
+```sh
+git clone https://github.com/KDE/kdnssd.git
+cd kdnssd
+git checkout v5.108.0
+mkdir build && cd build
+cmake -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH=/path/to/qt;path/to/bonjour -DQT_MAJOR_VERSION=6 -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -S ..
+make && make install
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -134,9 +173,11 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
+* [ECM from KDE](https://api.kde.org/ecm/)
 * [OpenSSL](https://www.openssl.org/)
 * [Qt](https://www.qt.io/)
 * [C++](https://www.cplusplus.com/)
+* [KDNSSD](https://api.kde.org/frameworks/kdnssd/html/index.html)
 
 <!-- Contributors -->
 ## Contributors

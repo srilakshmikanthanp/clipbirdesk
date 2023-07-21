@@ -13,6 +13,7 @@
 #include <QApplication>
 #include <QScreen>
 #include <QSystemTrayIcon>
+#include <QPushButton>
 
 // C++ Headers
 #include <csignal>

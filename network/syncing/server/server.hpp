@@ -13,7 +13,7 @@
 #include <QSslSocket>
 #include <QVector>
 
-#include "network/discovery/server/server.hpp"
+#include "network/service/register/register.hpp"
 #include "types/callback/callback.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
@@ -25,7 +25,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing server that syncs the clipboard data between
  * the clients
  */
-class Server : public discovery::Server {
+class Server : public service::Register {
  signals:  // signals
   /// @brief On client state changed
   void OnCLientStateChanged(QPair<QHostAddress, quint16>, bool connected);
@@ -206,12 +206,12 @@ class Server : public discovery::Server {
   /**
    * @brief Start the server
    */
-  void startServer() override;
+  void startServer();
 
   /**
    * @brief Stop the server
    */
-  void stopServer() override;
+  void stopServer();
 
  protected:  // override functions from the base class
 

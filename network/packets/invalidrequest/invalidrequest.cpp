@@ -110,10 +110,15 @@ QDataStream& operator<<(QDataStream& stream, const InvalidRequest packet) {
   // write the error code
   stream << packet.errorCode;
 
+  // Msg Len
+  auto msgLen = packet.packetLength - (
+    sizeof(packet.packetType) +
+    sizeof(packet.packetLength) +
+    sizeof(packet.errorCode)
+  );
+
   // check the error message size
-  if (packet.errorMessage.size() !=
-      packet.packetLength -
-          (sizeof(packet.packetType) + sizeof(packet.packetLength) + sizeof(packet.errorCode))) {
+  if (packet.errorMessage.size() != msgLen) {
     throw std::invalid_argument("Invalid Error Message");
   }
 
@@ -167,8 +172,11 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
   }
 
   // Extract the error message length
-  auto msgLen = packet.packetLength - (sizeof(packet.packetType) + sizeof(packet.packetLength) +
-                                       sizeof(packet.errorCode));
+  auto msgLen = packet.packetLength - (
+    sizeof(packet.packetType) +
+    sizeof(packet.packetLength) +
+    sizeof(packet.errorCode)
+  );
 
   // resize the error message
   packet.errorMessage.resize(msgLen);

@@ -12,7 +12,8 @@
         "C:/Qt/6.5.1/mingw_64/include/QtGui",
         "${workspaceFolder}/build/_deps/singleapplication-src",
         "C:/Qt/6.5.1/mingw_64/include/QtCore",
-        "${workspaceFolder}/build"
+        "${workspaceFolder}/build",
+        "C:/kderoot/include/KF6/KDNSSD"
       ],
       "defines": [
         "_DEBUG",

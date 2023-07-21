@@ -6,42 +6,6 @@
 #include "packet.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions {
-/**
- * @brief Create the DiscoveryPacket
- *
- * @param packetType
- * @param ipType
- * @param ipaddr
- * @param port
- *
- * @return DiscoveryPacket
- */
-network::packets::DiscoveryPacket createPacket(internals::DiscoveryPacketParams params) {
-  // create the packet
-  network::packets::DiscoveryPacket packet;
-
-  // set the packet type
-  packet.setPacketType(params.packetType);
-
-  // set the ip type
-  packet.setIpType(params.ipType);
-
-  // set the ip address
-  if (params.ipType == types::enums::IPType::IPv4) {
-    packet.setHostIp(toIPV4QByteArray(params.ipaddr));
-  } else {
-    packet.setHostIp(toIPV6QByteArray(params.ipaddr));
-  }
-
-  // set the port
-  packet.setHostPort(params.port);
-
-  // set the packet length
-  packet.setPacketLength(packet.size());
-
-  // return the packet
-  return packet;
-}
 
 /**
  * @brief Create the ErrorMessage
@@ -131,47 +95,6 @@ network::packets::SyncingPacket createPacket(internals::SyncingPacketParams para
 
   // set the items
   packet.setItems(items);
-
-  // set the packet length
-  packet.setPacketLength(packet.size());
-
-  // return the packet
-  return packet;
-}
-
-/**
- * @brief Create the SyncingPacket
- *
- * @param packetType
- * @param items
- *
- * @return SyncingPacket
- */
-network::packets::SyncingPacket createPacket(
-    quint8 packetType, QVector<QPair<QString, QByteArray>> items
-) {
-  // create the packet
-  network::packets::SyncingPacket packet;
-
-  // set the packet type
-  packet.setPacketType(packetType);
-
-  // set the item count
-  packet.setItemCount(items.size());
-
-  // Convert the items to SyncingItem
-  QVector<network::packets::SyncingItem> syncItems;
-
-  // reserve the memory
-  syncItems.reserve(items.size());
-
-  // convert the items
-  for (const auto& [mime, payload] : items) {
-    syncItems.push_back(createPacket({mime, payload}));
-  }
-
-  // set the items
-  packet.setItems(syncItems);
 
   // set the packet length
   packet.setPacketLength(packet.size());

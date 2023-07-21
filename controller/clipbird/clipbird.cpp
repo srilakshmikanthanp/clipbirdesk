@@ -17,19 +17,15 @@ void ClipBird::handleServerStatusChanged(bool isConnected) {
     throw std::runtime_error("Host is not client");
   }
 
-  // get the client
-  auto *client = &std::get<Client>(m_host);
+  // get the client and disconnect the signals
+  const auto signal = &clipboard::Clipboard::OnClipboardChange;
+  auto *client      = &std::get<Client>(m_host);
+  const auto slot   = &Client::syncItems;
 
   // if the client is connected then connect the signals
   if (isConnected) {
-    // Connect the onClipboardChange signal to the client
-    const auto signal = &clipboard::Clipboard::OnClipboardChange;
-    const auto slot   = &Client::syncItems;
     connect(&m_clipboard, signal, client, slot);
   } else {
-    // Disconnect the onClipboardChange signal to the client
-    const auto signal = &clipboard::Clipboard::OnClipboardChange;
-    const auto slot   = &Client::syncItems;
     disconnect(&m_clipboard, signal, client, slot);
   }
 }
@@ -298,18 +294,14 @@ void ClipBird::disconnectFromServer(QPair<QHostAddress, quint16> host) {
     return i.first == host.first && i.second == host.second;
   };
 
-  // Get the list of servers
-  auto servers = this->getServerList();
+  // get the connected server
+  auto server = getConnectedServer();
 
-  // find the server
-  auto it      = std::find_if(servers.begin(), servers.end(), match);
-
-  // if the server is not found then throw error
-  if (it == servers.end()) {
+  // if the server is found then disconnect
+  if (match(server)) {
+    std::get<Client>(m_host).disconnectFromServer();
+  } else {
     throw std::runtime_error("Server not found");
   }
-
-  // disconnect from the server
-  std::get<Client>(m_host).disconnectFromServer();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::controller

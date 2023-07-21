@@ -21,7 +21,7 @@
 #include <utility>
 
 // Local headers
-#include "network/discovery/client/client.hpp"
+#include "network/service/discover/discover.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
@@ -32,7 +32,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing client that syncs the clipboard data between
  * client and server
  */
-class Client : public discovery::Client {
+class Client : public service::Discover {
  signals:  // signals for this class
   /// @brief On Server List Changed
   void OnServerListChanged(QList<QPair<QHostAddress, quint16>> servers);
@@ -40,6 +40,10 @@ class Client : public discovery::Client {
  signals:  // signals for this class
   /// @brief On Server Found
   void OnServerFound(QPair<QHostAddress, quint16>);
+
+ signals:  // signals for this class
+  /// @brief On Server Gone
+  void OnServerGone(QPair<QHostAddress, quint16>);
 
  signals:  // signals for this class
   /// @brief On Error Occurred
@@ -66,7 +70,7 @@ class Client : public discovery::Client {
  private:  // Member variables
 
   /// @brief List of Found servers and timestamp
-  QList<std::tuple<QHostAddress, quint16, qint64>> m_servers;
+  QList<std::tuple<QHostAddress, quint16>> m_servers;
 
   /// @brief SSL socket
   QSslSocket* m_ssl_socket = new QSslSocket(this);
@@ -193,6 +197,14 @@ class Client : public discovery::Client {
    * @param host Host address
    * @param port Port number
    */
-  void onServerFound(QPair<QHostAddress, quint16> server) override;
+  void onServerAdded(QPair<QHostAddress, quint16> server) override;
+
+  /**
+   * @brief On server removed function that That Called by the
+   * discovery client when the server is removed
+   *
+   * @param server
+   */
+  void onServerRemoved(QPair<QHostAddress, quint16> server) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing
