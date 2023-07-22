@@ -12,6 +12,11 @@ class Label : public QLabel {
  private:  // Constants
 
   static constexpr const char *const style = R"(
+    QLabel {
+      color: #ffffff;
+      padding: 5px;
+      font-family: sans-serif;
+    }
   )";
 
  private:  // just for Qt

@@ -18,6 +18,12 @@ class Status : public Label {
  private:  // Constants for style
 
   static constexpr const char* const style = R"(
+    QHBoxLayout > QLabel {
+      color: #ffffff;
+      font-family: sans-serif;
+      padding: 5px;
+      font-size: 20px;
+    }
   )";
 
  private:  // disable copy and move for this class

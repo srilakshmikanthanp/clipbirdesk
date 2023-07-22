@@ -12,6 +12,20 @@ class Button : public QPushButton {
  private:  // Constants
 
   static constexpr const char *const style = R"(
+    QPushButton {
+      background-color: #2b2a3c;
+      border: 1px solid #2b2a3c;
+      border-radius: 10px;
+      color: #ffffff;
+      padding: 10px;
+      font-size: 12px;
+    }
+
+    // Hover
+    QPushButton:hover {
+      background-color: #58576f;
+      border: 1px solid #2b2a3c;
+    }
   )";
 
  private:  // just for Qt

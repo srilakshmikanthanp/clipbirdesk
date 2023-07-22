@@ -19,6 +19,12 @@ class DeviceList : public QWidget {
  private:  // Constants for style
 
   static constexpr const char* const style = R"(
+    QWidget {
+      background-color: #1f1e2c;
+      border: none;
+      padding: 5px;
+      margin: 5px;
+    }
   )";
 
  private:  // just for Qt

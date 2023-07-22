@@ -12,6 +12,33 @@ class Scroll : public QScrollArea {
  private:  // Constants
 
   static constexpr const char *const style = R"(
+    QScrollArea {
+      background-color: #1f1e2c;
+      border: none;
+      padding: 5px;
+    }
+
+    QScrollArea > QWidget > QWidget {
+      background-color: #1f1e2c;
+    }
+
+    QScrollBar:vertical {
+      border: none;
+      background: #2a2a2a;
+      width: 5px;
+      margin: 0px 0px 0px 0px;
+    }
+
+    QScrollBar::handle:vertical {
+      background-color: #5b5b5b;
+      min-height: 0px;
+    }
+
+    QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+      width: 0px;
+      border: none;
+      background: none;
+    }
   )";
 
  private:  // just for Qt
