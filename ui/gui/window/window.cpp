@@ -5,106 +5,6 @@
 
 #include "window.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::internal {
-HostsList::HostsList(QWidget* parent) : QWidget(parent) {
-  // set the root layout for this widget
-  this->setLayout(verticalLayout);
-
-  // set the style
-  this->setStyleSheet(style);
-}
-
-/**
- * @brief Set the Hosts to the list
- */
-void HostsList::setHosts(QList<components::Host::Value> hosts) {
-  // remove & add all the hosts
-  removeAllHosts();
-  for (auto host : hosts) addHost(host);
-}
-
-/**
- * @brief Get the All Hosts from the list
- */
-QList<components::Host::Value> HostsList::getAllHosts() {
-  // cast the widget to host view
-  #define CAST(x) dynamic_cast<components::Host*>(x)
-
-  // create a list of hosts
-  QList<components::Host::Value> hosts;
-
-  // iterate over the layout
-  for (int i = 0; i < verticalLayout->count(); i++) {
-    auto currItem = verticalLayout->itemAt(i)->widget();
-    auto hostView = CAST(currItem);
-    hosts.append(hostView->getHost());
-  }
-
-  // return the list of hosts
-  return hosts;
-
-  // undefine the cast macro
-  #undef CAST
-}
-
-/**
- * @brief Remove all Hosts from the list
- */
-void HostsList::removeAllHosts() {
-  // cast the widget to host view
-  #define CAST(x) dynamic_cast<components::Host*>(x)
-
-  // iterate over the layout
-  for (int i = 0; i < verticalLayout->count(); i++) {
-    auto currItem = verticalLayout->itemAt(i)->widget();
-    auto hostView = CAST(currItem);
-    verticalLayout->removeWidget(hostView);
-  }
-
-  // undefine the cast macro
-  #undef CAST
-}
-
-/**
- * @brief Add Host to the list
- */
-void HostsList::addHost(components::Host::Value host) {
-  // create a new host view
-  auto hostView = new components::Host(this);
-
-  // set the host
-  hostView->setHost(host);
-
-  // slot
-  const auto slot = [&]() { emit onAction(host); };
-
-  // connect the host view signal to this signal
-  QObject::connect(hostView, &components::Host::onAction, slot);
-
-  // add the host view to the layout
-  verticalLayout->addWidget(hostView);
-}
-
-/**
- * @brief Remove a Host from the list
- */
-void HostsList::removeHost(components::Host::Value host) {
-  // cast the widget to host view
-  #define CAST(x) dynamic_cast<components::Host*>(x)
-
-  // iterate over the layout
-  for (int i = 0; i < verticalLayout->count(); i++) {
-    auto currItem = verticalLayout->itemAt(i)->widget();
-    auto hostView = CAST(currItem);
-    if (hostView->getHost() != host) continue;
-    verticalLayout->removeWidget(hostView);
-  }
-
-  // undefine the cast macro
-  #undef CAST
-}
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::internal
-
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 //------------------------------ slots for Window -------------------------//
 
@@ -254,44 +154,41 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   // set no taskbar icon & no window Frame
   // setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
-  // create the root layout
-  auto root = new QVBoxLayout(this);
+  // create the  layout
+  auto root = new QVBoxLayout();
 
-  // create the top layout
-  auto top  = new QHBoxLayout();
-
-  // set top layout alignment
-  top->addWidget(this->deviceInfo);
-
-  // add top layout to root layout
-  root->addLayout(top);
+  // add top layout to  layout
+  root->addWidget(this->deviceInfo);
 
   // create tab widget
-  auto tab = new components::Tab(this);
+  auto tab = new components::Tab();
 
   // Create QScrollArea
-  auto serverArea = new QScrollArea(this);
-  auto clientArea = new QScrollArea(this);
+  auto serverListArea = new components::Scroll();
+  auto clientListArea = new components::Scroll();
+
+  // set the widget as Resizable
+  serverListArea->setWidgetResizable(true);
+  clientListArea->setWidgetResizable(true);
 
   // set the widget to scroll area
-  serverArea->setWidget(this->serverList);
-  clientArea->setWidget(this->clientList);
+  serverListArea->setWidget(this->serverList);
+  clientListArea->setWidget(this->clientList);
 
   // add server list to tab
-  tab->addTab(clientArea, "Server");
+  tab->addTab(clientListArea, "Server");
 
   // add client list to tab
-  tab->addTab(serverArea, "Client");
+  tab->addTab(serverListArea, "Client");
 
-  // add tab to root layout
+  // add tab to  layout
   root->addWidget(tab);
 
-  // using some components
-  using components::Tab;
-  using internal::HostsList;
+  // add  layout to this
+  this->setLayout(root);
 
   // connect tab changed signal
-  connect(tab, &Tab::currentChanged, [&](int index) {
+  connect(tab, &components::Tab::currentChanged, [&](int index) {
     emit onTabChanged((currentTab = static_cast<Tabs>(index)));
   });
 
@@ -302,10 +199,10 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   auto clientListSlot = [&](auto host) { emit onHostAction(Tabs::Client, host); };
 
   // connect server list signal
-  connect(serverList, &HostsList::onAction, serverListSlot);
+  connect(serverList, &window::DeviceList::onAction, serverListSlot);
 
   // connect client list signal
-  connect(clientList, &HostsList::onAction, clientListSlot);
+  connect(clientList, &window::DeviceList::onAction, clientListSlot);
 
   // Connect the signal and slot for client list change
   const auto signal_cl = &ClipBird::OnClientListChanged;
@@ -422,7 +319,7 @@ void Window::setClientList(const QList<components::Host::Value> &hosts) {
  * @brief Get the Server List object
  */
 QList<components::Host::Value> Window::getClientList() {
-  return clientList->getAllHosts();
+  return clientList->getHosts();
 }
 
 /**
@@ -443,7 +340,7 @@ void Window::removeClient(components::Host::Value host) {
  * @brief Remove all servers from the list
  */
 void Window::removeAllClient() {
-  clientList->removeAllHosts();
+  clientList->removeHosts();
 }
 
 //---------------------- Client Tab ----------------------//
@@ -459,7 +356,7 @@ void Window::setServerList(const QList<components::Host::Value> &hosts) {
  * @brief Get the Server List from the tab
  */
 QList<components::Host::Value> Window::getServerList() {
-  return serverList->getAllHosts();
+  return serverList->getHosts();
 }
 
 /**
@@ -480,7 +377,7 @@ void Window::removeServer(components::Host::Value host) {
  * @brief Remove all servers from the list
  */
 void Window::removeAllServers() {
-  serverList->removeAllHosts();
+  serverList->removeHosts();
 }
 
 //---------------------- general ----------------------//
@@ -547,7 +444,12 @@ void Window::showEvent(QShowEvent* event) {
  * @param event
  */
 void Window::focusOutEvent(QFocusEvent* event) {
-  QWidget::focusOutEvent(event);
-  Window::setVisible(false);
+  // QWidget::focusOutEvent(event);
+
+  // /// if child of this window has focus
+  // /// then return
+  // if (this->hasFocus()) return;
+
+  // Window::setVisible(false);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

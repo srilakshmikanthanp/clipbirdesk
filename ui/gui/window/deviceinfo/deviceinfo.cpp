@@ -11,19 +11,19 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
  *
  * @param parent
  */
-DeviceInfo::DeviceInfo(QWidget* parent) {
+DeviceInfo::DeviceInfo(QWidget* parent) : QWidget(parent) {
   // create all the components
-  this->hostStatus.first  = new components::Label(this);
-  this->hostStatus.second = new components::Status(this);
+  this->hostStatus.first  = new components::Label();
+  this->hostStatus.second = new components::Status();
 
-  this->serverName.first  = new components::Label(this);
-  this->serverName.second = new components::Label(this);
+  this->serverName.first  = new components::Label();
+  this->serverName.second = new components::Label();
 
-  this->serverIp.first    = new components::Label(this);
-  this->serverIp.second   = new components::Label(this);
+  this->serverIp.first    = new components::Label();
+  this->serverIp.second   = new components::Label();
 
-  this->hostCount.first   = new components::Label(this);
-  this->hostCount.second  = new components::Label(this);
+  this->hostCount.first   = new components::Label();
+  this->hostCount.second  = new components::Label();
 
   // set Alignment
   this->hostStatus.first->setAlignment(Qt::AlignLeft);
