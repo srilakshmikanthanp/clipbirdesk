@@ -5,9 +5,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include <QInputDialog>
-#include <QPair>
 #include <QHostAddress>
+#include <QMessageBox>
+#include <QPair>
+#include <QIcon>
+
+#include "constants/constants.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 /**
@@ -22,4 +25,4 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui {
  * @return false if user rejects the connection
  */
 bool authenticator(QPair<QHostAddress, quint16> host);
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::utility
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

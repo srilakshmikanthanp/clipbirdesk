@@ -10,10 +10,6 @@ DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
   // set the root layout for this widget
   this->setLayout(verticalLayout);
 
-  for ( int i = 0 ; i < 5 ; i++ ) {
-    this->addHost({QHostAddress::LocalHost, 45, Action::Disconnect});
-  }
-
   // set the style
   this->setStyleSheet(style);
 }
@@ -22,33 +18,41 @@ DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
  * @brief Set the Hosts to the list
  */
 void DeviceList::setHosts(QList<components::Host::Value> hosts) {
-  // remove & add all the hosts
-  removeHosts();
-  for (auto host : hosts) addHost(host);
+  // get All Hosts from the list and compare with the given list
+  auto currHosts = getHosts();
+
+  // remove the hosts which are not in the list
+  for (auto host : currHosts) {
+    if (!hosts.contains(host)) {
+      removeHost(host);
+    }
+  }
+
+  // add the hosts which are not in the list
+  for (auto host : hosts) {
+    if (!currHosts.contains(host)) {
+      addHost(host);
+    }
+  }
+
+  // Redraw the widget
+  this->update();
 }
 
 /**
  * @brief Get the All Hosts from the list
  */
 QList<components::Host::Value> DeviceList::getHosts() {
-  // cast the widget to host view
-  #define CAST(x) dynamic_cast<components::Host*>(x)
-
   // create a list of hosts
   QList<components::Host::Value> hosts;
 
   // iterate over the layout
   for (int i = 0; i < verticalLayout->count(); i++) {
-    auto currItem = verticalLayout->itemAt(i)->widget();
-    auto hostView = CAST(currItem);
-    hosts.append(hostView->getHost());
+    hosts.append(dynamic_cast<components::Host*>(verticalLayout->itemAt(i)->widget())->getHost());
   }
 
   // return the list of hosts
   return hosts;
-
-  // undefine the cast macro
-  #undef CAST
 }
 
 /**
@@ -77,11 +81,10 @@ void DeviceList::addHost(components::Host::Value host) {
   // set the host
   hostView->setHost(host);
 
-  // slot
-  const auto slot = [&]() { emit onAction(host); };
-
   // connect the host view signal to this signal
-  QObject::connect(hostView, &components::Host::onAction, slot);
+  const auto signal = &components::Host::onAction;
+  const auto slot   = [&]() { emit onAction(host); };
+  QObject::connect(hostView, signal, slot);
 
   // add the host view to the layout
   verticalLayout->addWidget(hostView);
@@ -91,24 +94,16 @@ void DeviceList::addHost(components::Host::Value host) {
 }
 
 /**
- * @brief Remove a Host from the list
+ * @brief Remove All the Host as same as the given host
  */
 void DeviceList::removeHost(components::Host::Value host) {
-  // cast the widget to host view
-  #define CAST(x) dynamic_cast<components::Host*>(x)
-
-  // iterate over the layout
+  // iterate over the layout and remove all the host as same as the given host
   for (int i = 0; i < verticalLayout->count(); i++) {
-    auto currItem = verticalLayout->itemAt(i);
-    auto hostView = CAST(currItem->widget());
+    auto hostView = dynamic_cast<components::Host*>(verticalLayout->itemAt(i)->widget());
     if (hostView->getHost() == host) {
-      verticalLayout->removeItem(currItem);
-      delete currItem->widget();
-      delete currItem;
+      verticalLayout->removeWidget(hostView);
+      delete hostView;
     }
   }
-
-  // undefine the cast macro
-  #undef CAST
 }
-} // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window

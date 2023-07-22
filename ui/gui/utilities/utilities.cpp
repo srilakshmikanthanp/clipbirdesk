@@ -19,29 +19,36 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui {
  */
 bool authenticator(QPair<QHostAddress, quint16> host) {
   // get the message to show
-  auto message = QString("Host: %1\nPort: %2\n\nAccept?").arg(
-      host.first.toString(), QString::number(host.second));
-
-  // title of the dialog
-  auto title = "New Client Connection!";
+  auto message = QString(
+    "A client is trying to connect to the server\n"
+    "Host: %1:%2\n"
+    "Accept the connection?"
+  ).arg(
+    host.first.toString(), QString::number(host.second)
+  );
 
   // get the user input
-  auto dialog = QInputDialog();
+  auto dialog = QMessageBox();
 
-  // Set the dialog properties
-  dialog.setWindowFlags(Qt::WindowStaysOnTopHint);
-  dialog.setWindowModality(Qt::ApplicationModal);
-  dialog.setFixedSize(dialog.sizeHint());
+  // set the icon
+  dialog.setWindowIcon(QIcon(constants::getAppLogo().c_str()));
 
-  // set the dialog message
-  dialog.setWindowTitle(title);
-  dialog.setLabelText(message);
+  // set the title
+  dialog.setWindowTitle("Clipbird");
 
-  // set the dialog buttons
-  dialog.setOkButtonText("Accept");
-  dialog.setCancelButtonText("Reject");
+  // set the message
+  dialog.setText(message);
 
-  // show the dialog and return the status
-  return dialog.exec() == QDialog::Accepted;
+  // set the buttons
+  dialog.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+  // set the default button
+  dialog.setDefaultButton(QMessageBox::No);
+
+  // show the dialog
+  dialog.exec();
+
+  // return the result
+  return dialog.result() == QMessageBox::Yes;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::utility

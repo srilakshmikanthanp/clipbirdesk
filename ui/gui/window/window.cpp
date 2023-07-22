@@ -151,8 +151,8 @@ void Window::handleServerStatusChange(bool status) {
  */
 Window::Window(Window::ClipBird* controller, QWidget* parent)
     : QWidget(parent), controller(controller) {
-  // set no taskbar icon & no window Frame
-  // setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+  // set no taskbar icon & no window Frame & always on top
+  setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
   // create the  layout
   auto root = new QVBoxLayout();
@@ -166,6 +166,10 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   // Create QScrollArea
   auto serverListArea = new components::Scroll();
   auto clientListArea = new components::Scroll();
+
+  // Focus Policy
+  serverListArea->setFocusPolicy(Qt::NoFocus);
+  clientListArea->setFocusPolicy(Qt::NoFocus);
 
   // set the widget as Resizable
   serverListArea->setWidgetResizable(true);
@@ -444,12 +448,7 @@ void Window::showEvent(QShowEvent* event) {
  * @param event
  */
 void Window::focusOutEvent(QFocusEvent* event) {
-  // QWidget::focusOutEvent(event);
-
-  // /// if child of this window has focus
-  // /// then return
-  // if (this->hasFocus()) return;
-
-  // Window::setVisible(false);
+  QWidget::focusOutEvent(event);
+  Window::setVisible(false);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui
