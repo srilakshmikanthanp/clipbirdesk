@@ -163,7 +163,7 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 <!-- Contributors -->
 ## Contributors
 
-* [suryanarayanan](https://github.com/suryanarayanandv)
+* [Suryanarayanan](https://github.com/suryanarayanandv)
 * [Dharun RK](https://github.com/grindelwaldx)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
