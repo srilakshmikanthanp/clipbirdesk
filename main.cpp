@@ -10,7 +10,7 @@
  */
 
 // Qt Headers
-#include <QApplication>
+#include <SingleApplication>
 #include <QScreen>
 #include <QSystemTrayIcon>
 #include <QPushButton>
@@ -40,7 +40,7 @@ using namespace srilakshmikanthanp::clipbirdesk;
  */
 auto main(int argc, char **argv) -> int {
   // create SingleApplication instance
-  QApplication app(argc, argv);
+  SingleApplication app(argc, argv);
 
   // create the controller
   auto controller = controller::ClipBird(QApplication::clipboard());
