@@ -52,13 +52,13 @@ void Client::processReadyRead() {
     processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    OnErrorOccurred(e.what());
+    emit OnErrorOccurred(e.what());
     return;
   } catch (const std::exception& e) {
-    OnErrorOccurred(e.what());
+    emit OnErrorOccurred(e.what());
     return;
   } catch (...) {
-    OnErrorOccurred("Unknown Error");
+    emit OnErrorOccurred("Unknown Error");
     return;
   }
 
@@ -67,13 +67,13 @@ void Client::processReadyRead() {
     processInvalidPacket(fromQByteArray<packets::InvalidRequest>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    OnErrorOccurred(e.what());
+    emit OnErrorOccurred(e.what());
     return;
   } catch (const std::exception& e) {
-    OnErrorOccurred(e.what());
+    emit OnErrorOccurred(e.what());
     return;
   } catch (...) {
-    OnErrorOccurred("Unknown Error");
+    emit OnErrorOccurred("Unknown Error");
     return;
   }
 

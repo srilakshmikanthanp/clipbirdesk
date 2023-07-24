@@ -11,6 +11,7 @@
 
 // C++ headers
 #include <filesystem>
+#include <QDir>
 #include <string>
 
 // project headers
@@ -52,6 +53,11 @@ std::string getAppLogo();
  * @return std::string
  */
 std::string getAppHome();
+
+/**
+ * @brief Get App Log File
+ */
+std::string getAppLogFile();
 
 /**
  * @brief Get the App Window Ratio
