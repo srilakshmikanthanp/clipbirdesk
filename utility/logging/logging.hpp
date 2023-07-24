@@ -12,6 +12,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
+#include <QMutex>
 #include <QObject>
 #include <QtLogging>
 
@@ -29,9 +30,13 @@ class Logger {
   };
 
   /// @brief log file to log the messages
-  inline static QFile *logs   = Q_NULLPTR;
+  inline static QFile *logs = Q_NULLPTR;
+
+  /// @brief mutex to lock the file
+  inline static QMutex mutex;
 
  public:
+
   /**
    * @brief Custom Logger message handler for Qt
    */
