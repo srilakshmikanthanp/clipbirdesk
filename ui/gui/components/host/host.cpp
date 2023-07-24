@@ -64,6 +64,9 @@ void Host::setHost(Host::Value host) {
   // set the action
   this->actBtn->setText(a);
 
+  // set the object name to identify
+  this->actBtn->setObjectName(a);
+
   // lookup the host name and change
   QHostInfo::lookupHost(address.toString(), this, &Host::onHostResolved);
 }
