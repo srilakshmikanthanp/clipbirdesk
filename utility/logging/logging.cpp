@@ -16,7 +16,7 @@ void Logger::handler(QtMsgType type, const QMessageLogContext &context, const QS
                   .arg(QDateTime::currentDateTime().toString("dd-MM-yyyy hh:mm:ss"))
                   .arg(Logger::contextNames.value(type))
                   .arg(context.line)
-                  .arg(QString(context.file).section('\\', -1))
+                  .arg(QFileInfo(QString(file)).baseName())
                   .arg(QString(context.function))
                   .arg(msg)
                   .toLocal8Bit());
