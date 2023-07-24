@@ -16,11 +16,6 @@ class DeviceList : public QWidget {
  signals:  // Signals
   void onAction(components::Host::Value host);
 
- private:  // Constants for style
-
-  static constexpr const char* const style = R"(
-  )";
-
  private:  // just for Qt
 
   Q_OBJECT

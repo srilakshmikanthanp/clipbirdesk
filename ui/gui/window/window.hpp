@@ -15,9 +15,11 @@
 #include <QHostInfo>
 #include <QScrollArea>
 #include <QScreen>
+#include <QTabBar>
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QFrame>
 
 // standard headers
 #include <algorithm>
@@ -26,17 +28,13 @@
 
 // project headers
 #include "controller/clipbird/clipbird.hpp"
-#include "ui/gui/components/button/button.hpp"
 #include "ui/gui/components/host/host.hpp"
-#include "ui/gui/components/label/label.hpp"
 #include "ui/gui/components/status/status.hpp"
-#include "ui/gui/components/scroll/scroll.hpp"
-#include "ui/gui/components/tab/tab.hpp"
 #include "ui/gui/window/deviceinfo/deviceinfo.hpp"
 #include "ui/gui/window/devicelist/devicelist.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
-class Window : public QWidget {
+class Window : public QFrame {
  private:  // Member variable
 
   window::DeviceInfo* deviceInfo = new window::DeviceInfo();  // Device Info
@@ -59,11 +57,6 @@ class Window : public QWidget {
 
   Q_DISABLE_COPY_MOVE(Window)
 
- private:  // Constants for style
-
-  static constexpr const char* const style = R"(
-  )";
-
  public:  // enum for this class
 
   enum class Tabs { Server = 0, Client = 1 };
@@ -78,7 +71,6 @@ class Window : public QWidget {
 
  private:  // Member Variables
 
-  QSize ratio = QSize(3, 3);
   ClipBird* controller;
 
  signals:  // signals
@@ -90,14 +82,14 @@ class Window : public QWidget {
  private:  // constant for keys (Server)
 
   static constexpr const char* const s_statusKey   = "Server Status";
-  static constexpr const char* const s_hostNameKey = "Server HostName";
+  static constexpr const char* const s_hostNameKey = "Server Hostname";
   static constexpr const char* const s_ipPortKey   = "Server IP:Port";
   static constexpr const char* const s_clientsKey  = "Clients";
 
  private:  // constant for keys (Client)
 
   static constexpr const char* const c_statusKey   = "Connection Status";
-  static constexpr const char* const c_hostNameKey = "Server HostName";
+  static constexpr const char* const c_hostNameKey = "Server Hostname";
   static constexpr const char* const c_ipPortKey   = "Server IP:Port";
   static constexpr const char* const c_serversKey  = "servers";
 
@@ -245,34 +237,5 @@ class Window : public QWidget {
    * @brief Remove all servers from the list
    */
   void removeAllServers();
-
-  //---------------------- General ----------------------//
-
-  /**
-   * @brief Set the Size Ratio object
-   */
-  void setSizeRatio(QSize r);
-
-  /**
-   * @brief Get the Size Ratio object
-   */
-  QSize getSizeRatio();
-
- protected:  // protected functions
-
-  /**
-   * @brief Override the setVisible function
-   */
-  void setVisible(bool visible) override;
-
-  /**
-   * @brief On Show Event
-   */
-  void showEvent(QShowEvent* event) override;
-
-  /**
-   * @brief Focus lost event
-   */
-  void focusOutEvent(QFocusEvent* event) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

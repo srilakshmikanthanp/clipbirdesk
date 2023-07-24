@@ -11,9 +11,8 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
  * with parent as QWidget
  * @param parent parent object
  */
-Status::Status(QWidget* parent) : Label(parent) {
-  // set the Style to the widget
-  this->setStyleSheet(style);
+Status::Status(QWidget* parent) : QLabel(parent) {
+
 }
 
 /**
@@ -24,15 +23,19 @@ void Status::setStatus(Value val) {
   // set the text of the status
   switch (val) {
   case Value::Disconnected:
+    this->setStyleSheet("color: red");
     this->setText("Disconnected");
     break;
   case Value::Connected:
+    this->setStyleSheet("color: green");
     this->setText("Connected");
     break;
   case Value::Active:
+    this->setStyleSheet("color: green");
     this->setText("Active");
     break;
   case Value::Inactive:
+    this->setStyleSheet("color: red");
     this->setText("Inactive");
     break;
   }

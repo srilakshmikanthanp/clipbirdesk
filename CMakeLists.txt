@@ -14,8 +14,11 @@ include(FetchContent)
 # For MSVX
 set(protobuf_MSVC_STATIC_RUNTIME OFF)
 
+# set the main.qss path variable
+set(APPLICATION_MAIN_QSS_PATH "${PROJECT_SOURCE_DIR}/assets/styles/main.qss")
+
 # Set the logo.png path variable
-set(APPLICATION_LOGO_PATH "${PROJECT_SOURCE_DIR}/assets/logo.png")
+set(APPLICATION_LOGO_PATH "${PROJECT_SOURCE_DIR}/assets/images/logo.png")
 
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
@@ -30,6 +33,21 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{KDNSSD_DIR})
 set(QT_MAJOR_VERSION 6)
 
 # --------------------------------- Main Project ---------------------------------#
+# Fetch SingleApplication from github
+FetchContent_Declare(SingleApplication
+  GIT_REPOSITORY https://github.com/itay-grudev/SingleApplication.git
+  GIT_TAG        v3.4.0
+)
+
+# set QT_DEFAULT_MAJOR_VERSION to QT_MAJOR_VERSION
+set(QT_DEFAULT_MAJOR_VERSION ${QT_MAJOR_VERSION})
+
+# Set the QApplication class
+set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
+
+# Make Available SingleApplication
+FetchContent_MakeAvailable(SingleApplication)
+
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
 
@@ -67,6 +85,7 @@ qt_add_executable(clipbird
 
 # Link libraries
 target_link_libraries(clipbird
+  PRIVATE SingleApplication::SingleApplication
   PRIVATE Qt6::Widgets
   PRIVATE KF5::DNSSD
   PRIVATE Qt6::Network

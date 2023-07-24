@@ -49,11 +49,26 @@ std::string getAppLogo() {
 }
 
 /**
+ * @brief Get the Application QSS File
+ * @return std::string
+ */
+std::string getAppQSS() {
+  return std::string(CLIPBIRDESK_QSS);
+}
+
+/**
  * @brief Get App Home Directory
  * @return std::string
  */
 std::string getAppHome() {
-  return (std::filesystem::path(getenv("HOME")) / ("." + getAppName())).string();
+  return (std::filesystem::path(QDir::homePath().toStdString()) / ("." + getAppName())).string();
+}
+
+/**
+ * @brief Get App Log File
+ */
+std::string getAppLogFile() {
+  return (std::filesystem::path(getAppHome()) / "clipbird.log").string();
 }
 
 /**

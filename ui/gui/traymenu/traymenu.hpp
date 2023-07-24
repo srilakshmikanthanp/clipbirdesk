@@ -19,12 +19,6 @@ class TrayMenu : public QMenu {
 
   Q_OBJECT
 
- private:  // Constants for style sheet
-
-  static constexpr auto styleSheet = R"(
-
-  )";
-
  signals:  // signals
   void OnAboutClicked();
 

@@ -8,8 +8,8 @@
 #include <QFormLayout>
 #include <QPair>
 #include <QWidget>
+#include <QLabel>
 
-#include "ui/gui/components/label/label.hpp"
 #include "ui/gui/components/status/status.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
@@ -17,14 +17,32 @@ class DeviceInfo : public QWidget {
  private:  // Constants for style
 
   static constexpr const char* const style = R"(
+    QWidget {
+      background-color: #1f1e2c;
+      border: none;
+      padding: 5px;
+      margin: 5px;
+    }
+
+    QFormLayout {
+      margin: 0px;
+      padding: 0px;
+    }
+
+    QLabel {
+      font-size: 20px;
+      color: #ffffff;
+      padding: 5px;
+      font-family: sans-serif;
+    }
   )";
 
  private:  // Member Variables
 
-  QPair<components::Label*, components::Status*> hostStatus;
-  QPair<components::Label*, components::Label*> serverName;
-  QPair<components::Label*, components::Label*> serverIp;
-  QPair<components::Label*, components::Label*> hostCount;
+  QPair<QLabel*, components::Status*> hostStatus;
+  QPair<QLabel*, QLabel*> serverName;
+  QPair<QLabel*, QLabel*> serverIp;
+  QPair<QLabel*, QLabel*> hostCount;
 
  private:  // just for Qt
 
