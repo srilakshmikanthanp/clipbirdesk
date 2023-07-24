@@ -124,11 +124,20 @@ class ClipbirdApplication : public SingleApplication {
 auto main(int argc, char **argv) -> int {
   // using ClipbirdApplication class
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
+  using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
   using srilakshmikanthanp::clipbirdesk::ClipbirdApplication;
 
+  // make app home directory if not exists
+  if (!QDir(getAppHome().c_str()).exists()) {
+    QDir().mkdir(getAppHome().c_str());
+  }
+
+  // log file to record the logs
+  QFile logfile(QString::fromStdString(getAppLogFile()));
+
   // Set the log file
-  Logger::setLogFile(&QFile(getAppLogFile().c_str()));
+  Logger::setLogFile(&logfile);
 
   // Set the custom message handler
   qInstallMessageHandler(Logger::handler);
