@@ -17,7 +17,7 @@ void Logger::handler(QtMsgType type, const QMessageLogContext &context, const QS
                   .arg(Logger::contextNames.value(type))
                   .arg(context.line)
                   .arg(QFileInfo(QString(file)).baseName())
-                  .arg(QString(context.function))
+                  .arg(QString(function))
                   .arg(msg)
                   .toLocal8Bit());
 }
