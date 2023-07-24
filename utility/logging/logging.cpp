@@ -24,9 +24,9 @@ void Logger::handler(QtMsgType type, const QMessageLogContext &context, const QS
                      .arg(msg)
                      .toLocal8Bit();
 
-  mutex.lock();         // lock the file
+  mutex.lock();         // lock the file so another thread can't write to it
   logs->write(message); // write the message
-  mutex.unlock();       // unlock the file
+  mutex.unlock();       // unlock the file so another thread can write to it
 }
 
 /**
