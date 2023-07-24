@@ -7,15 +7,25 @@
 
 namespace srilakshmikanthanp::clipbirdesk::logging {
 /**
- * @brief Create Qt Logging Message Handler for Logging thar
- * Redirects to Qt Logging to Given File
- *
- * @param file
- *
- * @return message handler
+ * @brief Custom Logger message handler for Qt
  */
-void createFileMessageHandler(const QString &file) {
-  // TODO: implement
+void Logger::handler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+  auto *function = context.function ? context.function : "";
+  auto *file     = context.file ? context.file : "";
+  logs->write(QObject::tr("%1 | %2 | at line : %3 : %4 : %5()-> %6\n")
+                  .arg(QDateTime::currentDateTime().toString("dd-MM-yyyy hh:mm:ss"))
+                  .arg(Logger::contextNames.value(type))
+                  .arg(context.line)
+                  .arg(QString(context.file).section('\\', -1))
+                  .arg(QString(context.function))
+                  .arg(msg)
+                  .toLocal8Bit());
 }
 
+/**
+ * @brief Set the log file
+ */
+void Logger::setLogFile(QFile *file) {
+  Logger::logs = file;
+}
 }  // namespace srilakshmikanthanp::clipbirdesk::logging

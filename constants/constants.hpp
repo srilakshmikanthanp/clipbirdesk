@@ -48,6 +48,11 @@ std::string getAppName();
 std::string getAppLogo();
 
 /**
+ * @brief Get App Log File
+ */
+std::string getAppLogFile();
+
+/**
  * @brief Get App Home Directory
  * @return std::string
  */

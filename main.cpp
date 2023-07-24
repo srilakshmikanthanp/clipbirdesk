@@ -6,6 +6,7 @@
 // Qt Headers
 #include <QSystemTrayIcon>
 #include <SingleApplication>
+#include <QFile>
 
 // C++ Headers
 #include <csignal>
@@ -17,6 +18,7 @@
 #include "ui/gui/utilities/utilities.hpp"
 #include "ui/gui/window/window.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
+#include "utility/logging/logging.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk {
 /**
@@ -121,12 +123,18 @@ class ClipbirdApplication : public SingleApplication {
  */
 auto main(int argc, char **argv) -> int {
   // using ClipbirdApplication class
+  using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
+  using srilakshmikanthanp::clipbirdesk::logging::Logger;
   using srilakshmikanthanp::clipbirdesk::ClipbirdApplication;
+
+  // Set the log file
+  Logger::setLogFile(&QFile(getAppLogFile().c_str()));
+
+  // Set the custom message handler
+  qInstallMessageHandler(Logger::handler);
 
   // create the application
   ClipbirdApplication app(argc, argv);
-
-  // TODO: Set the Logger Handler
 
   // start application and return status code
   return app.exec();
