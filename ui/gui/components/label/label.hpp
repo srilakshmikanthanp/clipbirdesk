@@ -16,6 +16,7 @@ class Label : public QLabel {
       color: #ffffff;
       padding: 5px;
       font-family: sans-serif;
+      font-size: 15px;
     }
   )";
 
