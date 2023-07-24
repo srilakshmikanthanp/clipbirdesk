@@ -10,6 +10,11 @@ DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
   // set the root layout for this widget
   this->setLayout(verticalLayout);
 
+  // add some dummy widgets
+  for (int i = 0; i < 5; i++) {
+    addHost({QHostAddress::LocalHost, 8080, Action::Connect});
+  }
+
   // set the style
   this->setStyleSheet(style);
 }

@@ -12,6 +12,7 @@ class Button : public QPushButton {
  private:  // Constants
 
   static constexpr const char *const style = R"(
+    // Base Style for Button
     QPushButton {
       background-color: #2b2a3c;
       border: 1px solid #2b2a3c;
