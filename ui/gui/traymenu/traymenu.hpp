@@ -19,41 +19,6 @@ class TrayMenu : public QMenu {
 
   Q_OBJECT
 
- private:  // Constants for style sheet
-
-  static constexpr auto styleSheet = R"(
-
-    QMenu {
-      background-color: #2b2a3c;
-      border: 1px solid #2b2a3c;
-      color: #ffffff;
-    }
-
-    QMenu::item {
-      background-color: #2b2a3c;
-      font-size: 12px;
-      margin-left: 15px;
-      margin-right: 15px;
-      padding-left: 15px;
-      padding-right: 15px;
-      padding-top: 5px;
-      padding-bottom: 5px;
-    }
-
-    QMenu::item:hover {
-      background-color: #3e3e3e;
-    }
-
-    QMenu::separator {
-      height: 1px;
-    }
-
-    QMenu::item:selected {
-      background-color: #0375ef;
-      border: 1px solid #0375ef;
-    }
-  )";
-
  signals:  // signals
   void OnAboutClicked();
 

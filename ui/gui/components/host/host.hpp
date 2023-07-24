@@ -9,15 +9,14 @@
 #include <QHBoxLayout>
 #include <QHostAddress>
 #include <QHostInfo>
+#include <QLabel>
+#include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
 
+
 // C++ Headers
 #include <tuple>
-
-// Project Headers
-#include "ui/gui/components/button/button.hpp"
-#include "ui/gui/components/label/label.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class Host : public QWidget {
@@ -53,8 +52,8 @@ class Host : public QWidget {
 
  private:  // Member variable
 
-  Label *hostName = new Label(this);
-  Button *actBtn  = new Button(this);
+  QLabel *hostName = new QLabel(this);
+  QPushButton *actBtn  = new QPushButton(this);
 
  private:  // just for Qt meta object
 

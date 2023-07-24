@@ -140,6 +140,8 @@
     "coroutine": "cpp",
     "resumable": "cpp",
     "filesystem": "cpp",
-    "format": "cpp"
+    "format": "cpp",
+    "qlabel": "cpp",
+    "qtabwidget": "cpp"
   },
 }

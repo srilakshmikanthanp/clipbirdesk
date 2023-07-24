@@ -150,7 +150,7 @@ void Window::handleServerStatusChange(bool status) {
  * with parent as QWidget
  */
 Window::Window(Window::ClipBird* controller, QWidget* parent)
-    : QWidget(parent), controller(controller) {
+    : QFrame(parent), controller(controller) {
   // set no taskbar icon & no window Frame & always on top
   setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
@@ -161,15 +161,15 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   root->addWidget(this->deviceInfo);
 
   // create tab widget
-  auto tab = new components::Tab();
+  auto tab = new QTabWidget();
+
+  // Set the Expanding & Document Mode
+  tab->tabBar()->setExpanding(true);
+  tab->tabBar()->setDocumentMode(true);
 
   // Create QScrollArea
-  auto serverListArea = new components::Scroll();
-  auto clientListArea = new components::Scroll();
-
-  // Focus Policy
-  serverListArea->setFocusPolicy(Qt::NoFocus);
-  clientListArea->setFocusPolicy(Qt::NoFocus);
+  auto serverListArea = new QScrollArea();
+  auto clientListArea = new QScrollArea();
 
   // set the widget as Resizable
   serverListArea->setWidgetResizable(true);
@@ -192,7 +192,7 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   this->setLayout(root);
 
   // connect tab changed signal
-  connect(tab, &components::Tab::currentChanged, [&](int index) {
+  connect(tab, &QTabWidget::currentChanged, [&](int index) {
     emit onTabChanged((currentTab = static_cast<Tabs>(index)));
   });
 
@@ -248,9 +248,6 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
 
   // set focus policy
   setFocusPolicy(Qt::StrongFocus);
-
-  // set the style sheet
-  setStyleSheet(style);
 }
 
 /**
@@ -383,72 +380,4 @@ void Window::removeServer(components::Host::Value host) {
 void Window::removeAllServers() {
   serverList->removeHosts();
 }
-
-//---------------------- general ----------------------//
-
-/**
- * @brief Set the Size Ratio object
- */
-void Window::setSizeRatio(QSize r) {
-  this->ratio = r;
-}
-
-/**
- * @brief Get the Size Ratio object
- */
-QSize Window::getSizeRatio() {
-  return this->ratio;
-}
-
-/**
- * @brief Override the setVisiblity
- */
-void Window::setVisible(bool visible) {
-  // if visible
-  if (!visible) return QWidget::setVisible(visible);
-
-  // Get the Primary Screen
-  auto screen  = QGuiApplication::primaryScreen();
-
-  // get the screen size
-  auto sc_siz  = screen->availableGeometry();
-
-  // Calculate the window size from ratio
-  auto win_siz = QSize();
-
-  // calc the Height
-  win_siz.setHeight(sc_siz.height() / ratio.height());
-
-  // calc the Width
-  win_siz.setWidth(sc_siz.width() / ratio.width());
-
-  // set the window size
-  setFixedSize(win_siz);
-
-  // move the window to center
-  move(screen->geometry().center() - rect().center());
-
-  // show the window
-  QWidget::setVisible(visible);
-}
-
-/**
- * @brief On Show Event
- */
-void Window::showEvent(QShowEvent* event) {
-  QWidget::showEvent(event);
-  QWidget::setFocus();
-  QWidget::activateWindow();
-  QWidget::raise();
-}
-
-/**
- * @brief Override the focusOutEvent
- *
- * @param event
- */
-void Window::focusOutEvent(QFocusEvent* event) {
-  QWidget::focusOutEvent(event);
-  Window::setVisible(false);
-}
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui
+} // namespace srilakshmikanthanp::clipbirdesk::ui::gui

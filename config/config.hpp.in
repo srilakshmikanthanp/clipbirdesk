@@ -13,5 +13,8 @@
 // Application Name
 #define CLIPBIRDESK_NAME          "@CMAKE_PROJECT_NAME@"
 
+// Application main.qss file
+#define CLIPBIRDESK_QSS           "@APPLICATION_MAIN_QSS_PATH@"
+
 // Application Logo
 #define CLIPBIRDESK_LOGO          "@APPLICATION_LOGO_PATH@"

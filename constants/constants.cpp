@@ -49,6 +49,14 @@ std::string getAppLogo() {
 }
 
 /**
+ * @brief Get the Application QSS File
+ * @return std::string
+ */
+std::string getAppQSS() {
+  return std::string(CLIPBIRDESK_QSS);
+}
+
+/**
  * @brief Get App Home Directory
  * @return std::string
  */

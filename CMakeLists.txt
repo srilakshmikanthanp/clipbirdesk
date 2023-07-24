@@ -14,8 +14,11 @@ include(FetchContent)
 # For MSVX
 set(protobuf_MSVC_STATIC_RUNTIME OFF)
 
+# set the main.qss path variable
+set(APPLICATION_MAIN_QSS_PATH "${PROJECT_SOURCE_DIR}/assets/styles/main.qss")
+
 # Set the logo.png path variable
-set(APPLICATION_LOGO_PATH "${PROJECT_SOURCE_DIR}/assets/logo.png")
+set(APPLICATION_LOGO_PATH "${PROJECT_SOURCE_DIR}/assets/images/logo.png")
 
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})

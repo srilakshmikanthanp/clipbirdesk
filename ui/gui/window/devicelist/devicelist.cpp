@@ -14,9 +14,6 @@ DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
   for (int i = 0; i < 5; i++) {
     addHost({QHostAddress::LocalHost, 8080, Action::Connect});
   }
-
-  // set the style
-  this->setStyleSheet(style);
 }
 
 /**

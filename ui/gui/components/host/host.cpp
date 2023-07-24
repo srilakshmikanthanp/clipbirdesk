@@ -26,7 +26,10 @@ void Host::onHostResolved(const QHostInfo &info) {
  */
 Host::Host(QWidget *parent) : QWidget(parent) {
   // connect the button signal to this signal
-  QObject::connect(actBtn, &Button::clicked, [this]() { emit onAction(this->getHost()); });
+  QObject::connect(actBtn, &QPushButton::clicked, [this]() { emit onAction(this->getHost()); });
+
+  // vertical alignment of the labels as center
+  this->hostName->setAlignment(Qt::AlignVCenter);
 
   // create a layout to align the widgets
   QHBoxLayout *layout = new QHBoxLayout();
@@ -39,9 +42,6 @@ Host::Host(QWidget *parent) : QWidget(parent) {
 
   // set the layout
   this->setLayout(layout);
-
-  // set the style sheet
-  this->setStyleSheet(style);
 }
 
 /**

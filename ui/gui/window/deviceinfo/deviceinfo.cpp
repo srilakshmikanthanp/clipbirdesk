@@ -13,17 +13,17 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
  */
 DeviceInfo::DeviceInfo(QWidget* parent) : QWidget(parent) {
   // create all the components
-  this->hostStatus.first  = new components::Label();
+  this->hostStatus.first  = new QLabel();
   this->hostStatus.second = new components::Status();
 
-  this->serverName.first  = new components::Label();
-  this->serverName.second = new components::Label();
+  this->serverName.first  = new QLabel();
+  this->serverName.second = new QLabel();
 
-  this->serverIp.first    = new components::Label();
-  this->serverIp.second   = new components::Label();
+  this->serverIp.first    = new QLabel();
+  this->serverIp.second   = new QLabel();
 
-  this->hostCount.first   = new components::Label();
-  this->hostCount.second  = new components::Label();
+  this->hostCount.first   = new QLabel();
+  this->hostCount.second  = new QLabel();
 
   // set Alignment
   this->hostStatus.first->setAlignment(Qt::AlignLeft);

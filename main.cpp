@@ -4,9 +4,10 @@
 // https://opensource.org/licenses/MIT
 
 // Qt Headers
+#include <QFile>
+#include <QGraphicsDropShadowEffect>
 #include <QSystemTrayIcon>
 #include <SingleApplication>
-#include <QFile>
 
 // C++ Headers
 #include <csignal>
@@ -14,6 +15,7 @@
 // Project Headers
 #include "constants/constants.hpp"
 #include "controller/clipbird/clipbird.hpp"
+#include "ui/gui/guimain/guimain.hpp"
 #include "ui/gui/traymenu/traymenu.hpp"
 #include "ui/gui/utilities/utilities.hpp"
 #include "ui/gui/window/window.hpp"
@@ -33,10 +35,29 @@ class ClipbirdApplication : public SingleApplication {
   ui::gui::Window *window;
   QSystemTrayIcon *trayIcon;
   ui::gui::TrayMenu *trayMenu;
+  ui::gui::GuiMain *guiMain;
 
  private:  // Disable Copy, Move and Assignment
 
   Q_DISABLE_COPY_MOVE(ClipbirdApplication);
+
+ private:  // private Functions
+
+  /**
+   * @brief Set the Focus Policy Recursively No Focus
+   * to all the children of the widget
+   *
+   * @param widget
+   */
+  void setFocusPolicyRecursively(QWidget *widget) {
+    // set the focus policy
+    widget->setFocusPolicy(Qt::NoFocus);
+
+    // iterate over all the children
+    for (auto child : widget->findChildren<QWidget *>()) {
+      setFocusPolicyRecursively(child);
+    }
+  }
 
  public:  // Constructors and Destructors
 
@@ -53,11 +74,21 @@ class ClipbirdApplication : public SingleApplication {
     window     = new ui::gui::Window(controller);
     trayIcon   = new QSystemTrayIcon();
     trayMenu   = new ui::gui::TrayMenu();
+    guiMain    = new ui::gui::GuiMain();
 
     // set the signal handler for all os
     signal(SIGTERM, [](int sig) { qApp->quit(); });
     signal(SIGINT, [](int sig) { qApp->quit(); });
     signal(SIGABRT, [](int sig) { qApp->quit(); });
+
+    // QFile to read the qss file
+    QFile qssFile(QString::fromStdString(constants::getAppQSS()));
+
+    // open the qss file
+    qssFile.open(QFile::ReadOnly);
+
+    // set the style sheet
+    qApp->setStyleSheet(qssFile.readAll());
 
 #ifdef Q_OS_LINUX
     // set the signal handler for linux
@@ -70,11 +101,28 @@ class ClipbirdApplication : public SingleApplication {
     // set the ssl config
     controller->setSSLConfiguration(sslConfig);
 
+    // BackDrop Shadow
+    auto shadow = new QGraphicsDropShadowEffect();
+
+    // set the shadow Properties
+    shadow->setBlurRadius(5);
+    shadow->setOffset(5, 5);
+    shadow->setColor(QColor(0, 0, 0, 100));
+
+    // set the shadow to window
+    window->setGraphicsEffect(shadow);
+
+    // set no focus for window
+    this->setFocusPolicyRecursively(window);
+
     // set the window Ratio
-    window->setSizeRatio(constants::getAppWindowRatio());
+    guiMain->setSizeRatio(constants::getAppWindowRatio());
+
+    // set the window
+    guiMain->setCentralWidget(window);
 
     // set the icon to window
-    window->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+    guiMain->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
 
     // set the icon to tray
     trayIcon->setIcon(QIcon(constants::getAppLogo().c_str()));
@@ -88,12 +136,12 @@ class ClipbirdApplication : public SingleApplication {
     // set activated action to show the window
     const auto signal_a = &QSystemTrayIcon::activated;
     const auto slot_a   = &Window::show;
-    QObject::connect(trayIcon, signal_a, window, slot_a);
+    QObject::connect(trayIcon, signal_a, guiMain, slot_a);
 
     // set the signal for instance Started
     const auto signal_s = &SingleApplication::instanceStarted;
     const auto slot_s   = &Window::show;
-    QObject::connect(this, signal_s, window, slot_s);
+    QObject::connect(this, signal_s, guiMain, slot_s);
 
     // show the tray icon
     trayIcon->show();
@@ -123,10 +171,10 @@ class ClipbirdApplication : public SingleApplication {
  */
 auto main(int argc, char **argv) -> int {
   // using ClipbirdApplication class
-  using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
-  using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
-  using srilakshmikanthanp::clipbirdesk::logging::Logger;
   using srilakshmikanthanp::clipbirdesk::ClipbirdApplication;
+  using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
+  using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
+  using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
   // make app home directory if not exists
   if (!QDir(getAppHome().c_str()).exists()) {
@@ -135,6 +183,9 @@ auto main(int argc, char **argv) -> int {
 
   // log file to record the logs
   QFile logfile(QString::fromStdString(getAppLogFile()));
+
+  // open the log file
+  logfile.open(QIODevice::WriteOnly | QIODevice::Append);
 
   // Set the log file
   Logger::setLogFile(&logfile);

@@ -6,25 +6,13 @@
 // https://opensource.org/licenses/MIT
 
 #include <QHBoxLayout>
-
-#include "ui/gui/components/label/label.hpp"
+#include <QLabel>
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
-class Status : public Label {
+class Status : public QLabel {
  public:  // enum for this class
 
   enum class Value { Connected, Disconnected, Active, Inactive };
-
- private:  // Constants for style
-
-  static constexpr const char* const style = R"(
-    QHBoxLayout > QLabel {
-      color: #ffffff;
-      font-family: sans-serif;
-      padding: 5px;
-      font-size: 20px;
-    }
-  )";
 
  private:  // disable copy and move for this class
 
