@@ -17,14 +17,28 @@ class Button : public QPushButton {
       border: 1px solid #2b2a3c;
       border-radius: 10px;
       color: #ffffff;
-      padding: 10px;
-      font-size: 12px;
+      font-size: 10px;
     }
 
-    // Hover
-    QPushButton:hover {
-      background-color: #58576f;
-      border: 1px solid #2b2a3c;
+    QPushButton#Connect {
+      padding-left: 11px;
+      padding-right: 11px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
+
+    QPushButton#Connect:hover {
+      background-color: #0375ef;
+      border: 1px solid #0375ef;
+    }
+
+    QPushButton#Disconnect {
+      padding: 5px;
+    }
+    
+    QPushButton#Disconnect:hover {
+      background-color: #e06666;
+      border: 1px solid #e06666;
     }
   )";
 
