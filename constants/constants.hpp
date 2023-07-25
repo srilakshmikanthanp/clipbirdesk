@@ -66,6 +66,20 @@ std::string getAppHome();
 std::string getAppLogFile();
 
 /**
+ * @brief Get the App Home Page
+ *
+ * @return std::string
+ */
+std::string getAppHomePage();
+
+/**
+ * @brief Get the App Issue Page
+ *
+ * @return std::string
+ */
+std::string getAppIssuePage();
+
+/**
  * @brief Get the App Window Ratio
  * @return QSize
  */

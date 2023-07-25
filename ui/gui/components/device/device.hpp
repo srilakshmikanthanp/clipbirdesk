@@ -19,15 +19,10 @@
 #include <tuple>
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
-class Host : public QWidget {
+class Device : public QWidget {
  private:  // constant values for text
 
   const QString connect = "Connect", disconnect = "Disconnect";
-
- private:  // Constants for style
-
-  static constexpr const char *const style = R"(
-  )";
 
  public:  // enum for action
 
@@ -38,7 +33,7 @@ class Host : public QWidget {
   using Value = std::tuple<QHostAddress, quint16, Action>;
 
  signals:  // Signals
-  void onAction(std::tuple<QHostAddress, quint16, Action>);
+  void onAction(const std::tuple<QHostAddress, quint16, Action>&);
 
  private:  // Private Functions
 
@@ -66,7 +61,7 @@ class Host : public QWidget {
    * with parent as QWidget
    * @param parent parent object
    */
-  explicit Host(QWidget *parent = nullptr);
+  explicit Device(QWidget *parent = nullptr);
 
   /**
    * @brief Set the Host
@@ -84,6 +79,6 @@ class Host : public QWidget {
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(Host)
+  Q_DISABLE_COPY_MOVE(Device)
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

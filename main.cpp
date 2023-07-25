@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 // Qt Headers
+#include <QDesktopServices>
 #include <QFile>
 #include <QGraphicsDropShadowEffect>
 #include <QSystemTrayIcon>
@@ -57,6 +58,20 @@ class ClipbirdApplication : public SingleApplication {
     for (auto child : widget->findChildren<QWidget *>()) {
       setFocusPolicyRecursively(child);
     }
+  }
+
+  /**
+   * @brief On About Clicked
+   */
+  void onAboutClicked() {
+    QDesktopServices::openUrl(QUrl(constants::getAppHomePage().c_str()));
+  }
+
+  /**
+   * @brief On Issue Clicked
+   */
+  void onIssueClicked() {
+    QDesktopServices::openUrl(QUrl(constants::getAppIssuePage().c_str()));
   }
 
  public:  // Constructors and Destructors
@@ -132,6 +147,21 @@ class ClipbirdApplication : public SingleApplication {
 
     // using some classes
     using ui::gui::Window;
+
+    // set the signal for menus About click
+    const auto signal_ab = &ui::gui::TrayMenu::OnAboutClicked;
+    const auto slot_ab   = &ClipbirdApplication::onAboutClicked;
+    QObject::connect(trayMenu, signal_ab, this, slot_ab);
+
+    // set the signal for menus Issue click
+    const auto signal_i = &ui::gui::TrayMenu::OnIssueClicked;
+    const auto slot_i   = &ClipbirdApplication::onIssueClicked;
+    QObject::connect(trayMenu, signal_i, this, slot_i);
+
+    // set the signal for menus Quit click
+    const auto signal_q = &ui::gui::TrayMenu::OnExitClicked;
+    const auto slot_q   = []{ qApp->quit(); };
+    QObject::connect(trayMenu, signal_q, this, slot_q);
 
     // set activated action to show the window
     const auto signal_a = &QSystemTrayIcon::activated;

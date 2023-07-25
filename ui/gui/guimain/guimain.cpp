@@ -18,6 +18,9 @@ GuiMain::GuiMain(QWidget* parent) : QMainWindow(parent) {
 
   // set padding as 20px
   this->setContentsMargins(20, 20, 20, 20);
+
+  // set the object name
+  this->setObjectName("guimain");
 }
 
 /**

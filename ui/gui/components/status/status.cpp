@@ -12,7 +12,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
  * @param parent parent object
  */
 Status::Status(QWidget* parent) : QLabel(parent) {
-
+  this->setObjectName("status");
 }
 
 /**

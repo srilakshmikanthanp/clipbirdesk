@@ -10,16 +10,23 @@ DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
   // set the root layout for this widget
   this->setLayout(verticalLayout);
 
-  // add some dummy widgets
-  for (int i = 0; i < 5; i++) {
-    addHost({QHostAddress::LocalHost, 8080, Action::Connect});
-  }
+  // set alignment from start
+  verticalLayout->setAlignment(Qt::AlignTop);
+
+  // set alignment as center
+  label->setAlignment(Qt::AlignCenter);
+
+  // set object name
+  label->setObjectName("no-host-label");
+
+  // set the object name
+  this->setObjectName("devicelist");
 }
 
 /**
  * @brief Set the Hosts to the list
  */
-void DeviceList::setHosts(QList<components::Host::Value> hosts) {
+void DeviceList::setHosts(QList<components::Device::Value> hosts) {
   // get All Hosts from the list and compare with the given list
   auto currHosts = getHosts();
 
@@ -44,13 +51,13 @@ void DeviceList::setHosts(QList<components::Host::Value> hosts) {
 /**
  * @brief Get the All Hosts from the list
  */
-QList<components::Host::Value> DeviceList::getHosts() {
+QList<components::Device::Value> DeviceList::getHosts() {
   // create a list of hosts
-  QList<components::Host::Value> hosts;
+  QList<components::Device::Value> hosts;
 
   // iterate over the layout
   for (int i = 0; i < verticalLayout->count(); i++) {
-    hosts.append(dynamic_cast<components::Host*>(verticalLayout->itemAt(i)->widget())->getHost());
+    hosts.append(dynamic_cast<components::Device*>(verticalLayout->itemAt(i)->widget())->getHost());
   }
 
   // return the list of hosts
@@ -74,18 +81,18 @@ void DeviceList::removeHosts() {
 }
 
 /**
- * @brief Add Host to the list
+ * @brief Add Device to the list
  */
-void DeviceList::addHost(components::Host::Value host) {
+void DeviceList::addHost(components::Device::Value host) {
   // create a new host view
-  auto hostView = new components::Host();
+  auto hostView = new components::Device();
 
   // set the host
   hostView->setHost(host);
 
   // connect the host view signal to this signal
-  const auto signal = &components::Host::onAction;
-  const auto slot   = [&]() { emit onAction(host); };
+  const auto signal = &components::Device::onAction;
+  const auto slot   = [&](auto h) { emit onAction(h); };
   QObject::connect(hostView, signal, slot);
 
   // add the host view to the layout
@@ -96,16 +103,37 @@ void DeviceList::addHost(components::Host::Value host) {
 }
 
 /**
- * @brief Remove All the Host as same as the given host
+ * @brief Remove All the Device as same as the given host
  */
-void DeviceList::removeHost(components::Host::Value host) {
+void DeviceList::removeHost(components::Device::Value host) {
   // iterate over the layout and remove all the host as same as the given host
   for (int i = 0; i < verticalLayout->count(); i++) {
-    auto hostView = dynamic_cast<components::Host*>(verticalLayout->itemAt(i)->widget());
+    auto hostView = dynamic_cast<components::Device*>(verticalLayout->itemAt(i)->widget());
     if (hostView->getHost() == host) {
       verticalLayout->removeWidget(hostView);
       delete hostView;
     }
   }
+
+  // Redraw the widget
+  this->update();
+}
+
+/**
+ * @brief Override the showEvent
+ */
+void DeviceList::showEvent(QShowEvent* event) {
+  // call the base class
+  QWidget::showEvent(event);
+
+  // if the vertical layout is empty then add a label
+  if (verticalLayout->count() == 0) {
+    verticalLayout->addWidget(label);
+  } else {
+    verticalLayout->removeWidget(label);
+  }
+
+  // Redraw the widget
+  this->update();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window

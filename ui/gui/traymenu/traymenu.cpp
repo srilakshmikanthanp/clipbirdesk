@@ -17,5 +17,8 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   this->addAction("Issue", this, &TrayMenu::OnIssueClicked);
   this->addSeparator();
   this->addAction("Exit", this, &TrayMenu::OnExitClicked);
+
+  // set the object name for styling
+  this->setObjectName("traymenu");
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

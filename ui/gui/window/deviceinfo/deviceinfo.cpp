@@ -53,6 +53,9 @@ DeviceInfo::DeviceInfo(QWidget* parent) : QWidget(parent) {
 
   // set top layout to this
   this->setLayout(top);
+
+  // set object name for styling
+  this->setObjectName("deviceinfo");
 }
 
 /**

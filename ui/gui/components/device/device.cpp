@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "host.hpp"
+#include "device.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 /**
@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
  *
  * @param info
  */
-void Host::onHostResolved(const QHostInfo &info) {
+void Device::onHostResolved(const QHostInfo &info) {
   if (info.error() != QHostInfo::NoError) {
     this->hostName->setText("Unknown");
   }
@@ -20,13 +20,15 @@ void Host::onHostResolved(const QHostInfo &info) {
 }
 
 /**
- * @brief Construct a new Host object
+ * @brief Construct a new Device object
  * with parent as QWidget
  * @param parent parent object
  */
-Host::Host(QWidget *parent) : QWidget(parent) {
+Device::Device(QWidget *parent) : QWidget(parent) {
   // connect the button signal to this signal
-  QObject::connect(actBtn, &QPushButton::clicked, [this]() { emit onAction(this->getHost()); });
+  QObject::connect(actBtn, &QPushButton::clicked, [this]() {
+    emit onAction({address, port, action});
+  });
 
   // vertical alignment of the labels as center
   this->hostName->setAlignment(Qt::AlignVCenter);
@@ -42,14 +44,17 @@ Host::Host(QWidget *parent) : QWidget(parent) {
 
   // set the layout
   this->setLayout(layout);
+
+  // set id for styling
+  this->setObjectName("host");
 }
 
 /**
- * @brief Set the Host
+ * @brief Set the Device
  *
  * @param QPair<QHostAddress, quint16>
  */
-void Host::setHost(Host::Value host) {
+void Device::setHost(Device::Value host) {
   // set the address and port
   this->address   = std::get<0>(host);
   this->port      = std::get<1>(host);
@@ -68,15 +73,15 @@ void Host::setHost(Host::Value host) {
   this->actBtn->setObjectName(a);
 
   // lookup the host name and change
-  QHostInfo::lookupHost(address.toString(), this, &Host::onHostResolved);
+  QHostInfo::lookupHost(address.toString(), this, &Device::onHostResolved);
 }
 
 /**
- * @brief Get the Host
+ * @brief Get the Device
  *
  * @return QPair<QHostAddress, quint16>
  */
-Host::Value Host::getHost() const {
+Device::Value Device::getHost() const {
   return std::make_tuple(address, port, action);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

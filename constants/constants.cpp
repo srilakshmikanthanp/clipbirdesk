@@ -80,6 +80,24 @@ auto getAppWindowRatio() -> QSize {
 }
 
 /**
+ * @brief Get the App Home Page
+ *
+ * @return std::string
+ */
+std::string getAppHomePage() {
+  return std::string(CLIPBIRDESK_HOMEPAGE);
+}
+
+/**
+ * @brief Get the App Issue Page
+ *
+ * @return std::string
+ */
+std::string getAppIssuePage() {
+  return std::string(CLIPBIRDESK_ISSUEPAGE);
+}
+
+/**
  * @brief Get the MDns Service Name
  *
  * @return std::string

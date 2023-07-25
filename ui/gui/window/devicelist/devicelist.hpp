@@ -9,12 +9,12 @@
 #include <QWidget>
 
 // Project headers
-#include "ui/gui/components/host/host.hpp"
+#include "ui/gui/components/device/device.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
 class DeviceList : public QWidget {
  signals:  // Signals
-  void onAction(components::Host::Value host);
+  void onAction(components::Device::Value host);
 
  private:  // just for Qt
 
@@ -26,11 +26,12 @@ class DeviceList : public QWidget {
 
  public:  // Type alias
 
-  using Action = components::Host::Action;
+  using Action = components::Device::Action;
 
  private:  // Member Variables
 
   QVBoxLayout* verticalLayout = new QVBoxLayout();
+  QLabel *label = new QLabel("No Hosts");
 
  public:  // Member Functions
 
@@ -39,12 +40,12 @@ class DeviceList : public QWidget {
   /**
    * @brief Set the Hosts to the list
    */
-  void setHosts(QList<components::Host::Value> hosts);
+  void setHosts(QList<components::Device::Value> hosts);
 
   /**
    * @brief Get the All Hosts from the list
    */
-  QList<components::Host::Value> getHosts();
+  QList<components::Device::Value> getHosts();
 
   /**
    * @brief Remove all Hosts from the list
@@ -52,13 +53,20 @@ class DeviceList : public QWidget {
   void removeHosts();
 
   /**
-   * @brief Add Host to the list
+   * @brief Add Device to the list
    */
-  void addHost(components::Host::Value host);
+  void addHost(components::Device::Value host);
 
   /**
-   * @brief Remove a Host from the list
+   * @brief Remove a Device from the list
    */
-  void removeHost(components::Host::Value host);
+  void removeHost(components::Device::Value host);
+
+ protected:  // Member Functions
+
+  /**
+   * @brief Override teh show event
+   */
+  void showEvent(QShowEvent* event) override;
 };
 } // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window

@@ -28,7 +28,7 @@
 
 // project headers
 #include "controller/clipbird/clipbird.hpp"
-#include "ui/gui/components/host/host.hpp"
+#include "ui/gui/components/device/device.hpp"
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/window/deviceinfo/deviceinfo.hpp"
 #include "ui/gui/window/devicelist/devicelist.hpp"
@@ -51,7 +51,7 @@ class Window : public QFrame {
  public:  // typedefs used in this class
 
   using Status = components::Status::Value;
-  using Action = components::Host::Action;
+  using Action = components::Device::Action;
 
  private:  // Disable copy and move
 

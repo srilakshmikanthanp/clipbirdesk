@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 /**
  * @brief handle the host action from the window
  */
-void Window::handleHostAction(Tabs t, components::Host::Value h) {
+void Window::handleHostAction(Tabs t, components::Device::Value h) {
   if (t == Tabs::Server && std::get<2>(h) == Action::Disconnect) {
     controller->disconnectFromServer({std::get<0>(h), std::get<1>(h)});
   }
@@ -64,7 +64,7 @@ void Window::handleTabChangeForServer(Tabs tab) {
  */
 void Window::handleClientListChange(QList<QPair<QHostAddress, quint16>> clients) {
   // Create a list of tuple with Action
-  QList<components::Host::Value> clients_m;
+  QList<components::Device::Value> clients_m;
 
   // Add the clients to the list
   for (auto c : clients) {
@@ -103,7 +103,7 @@ void Window::handleServerStateChange(bool isStarted) {
  */
 void Window::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers) {
   // Create a list of tuple with Action
-  QList<components::Host::Value> servers_m;
+  QList<components::Device::Value> servers_m;
 
   // get the connected server
   const auto server    = controller->getConnectedServer();
@@ -197,10 +197,14 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   });
 
   // server list slot
-  auto serverListSlot = [&](auto host) { emit onHostAction(Tabs::Server, host); };
+  auto serverListSlot = [&](const auto& host) {
+    emit onHostAction(Tabs::Client, host);
+  };
 
   // client list slot
-  auto clientListSlot = [&](auto host) { emit onHostAction(Tabs::Client, host); };
+  auto clientListSlot = [&](const auto& host) {
+    emit onHostAction(Tabs::Server, host);
+  };
 
   // connect server list signal
   connect(serverList, &window::DeviceList::onAction, serverListSlot);
@@ -246,8 +250,8 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   // Initialize the Tab as Client
   tab->setCurrentIndex(1);
 
-  // set focus policy
-  setFocusPolicy(Qt::StrongFocus);
+  // set the object name
+  this->setObjectName("window");
 }
 
 /**
@@ -312,28 +316,28 @@ QPair<QString, int> Window::getHostCount() {
 /**
  * @brief Set the Server List object
  */
-void Window::setClientList(const QList<components::Host::Value> &hosts) {
+void Window::setClientList(const QList<components::Device::Value> &hosts) {
   clientList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List object
  */
-QList<components::Host::Value> Window::getClientList() {
+QList<components::Device::Value> Window::getClientList() {
   return clientList->getHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
-void Window::addClient(components::Host::Value host) {
+void Window::addClient(components::Device::Value host) {
   clientList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
-void Window::removeClient(components::Host::Value host) {
+void Window::removeClient(components::Device::Value host) {
   clientList->removeHost(host);
 }
 
@@ -349,28 +353,28 @@ void Window::removeAllClient() {
 /**
  * @brief Set the Server List object
  */
-void Window::setServerList(const QList<components::Host::Value> &hosts) {
+void Window::setServerList(const QList<components::Device::Value> &hosts) {
   serverList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List from the tab
  */
-QList<components::Host::Value> Window::getServerList() {
+QList<components::Device::Value> Window::getServerList() {
   return serverList->getHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
-void Window::addServer(components::Host::Value host) {
+void Window::addServer(components::Device::Value host) {
   serverList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
-void Window::removeServer(components::Host::Value host) {
+void Window::removeServer(components::Device::Value host) {
   serverList->removeHost(host);
 }
 

@@ -18,3 +18,9 @@
 
 // Application Logo
 #define CLIPBIRDESK_LOGO          "@APPLICATION_LOGO_PATH@"
+
+// Application Home page
+#define CLIPBIRDESK_HOMEPAGE      "@APPLICATION_HOMEPAGE@"
+
+// Application Issue page
+#define CLIPBIRDESK_ISSUEPAGE     "@APPLICATION_ISSUEPAGE@"

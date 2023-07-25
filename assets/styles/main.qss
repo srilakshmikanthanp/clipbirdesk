@@ -5,6 +5,8 @@
  * https://opensource.org/licenses/MIT
  */
 
+/*********************** Common to All ************************/
+
 QFrame, QWidget {
   background: #1e1e2c;
   color: #ffffff;
@@ -28,6 +30,10 @@ QPushButton {
   border: none;
   border-radius: 5px;
   padding: 6px;
+}
+
+QPushButton:hover {
+  background-color: #0277fa;
 }
 
 QTabWidget::pane {
@@ -91,10 +97,6 @@ QScrollBar::sub-page:vertical {
   background: none;
 }
 
-/*
-QMenu
-*/
-
 QMenu {
   background-color: #1e1e2c;
   border: none;
@@ -119,4 +121,11 @@ QMenu::item:selected {
 QMenu::item:disabled {
   background-color: #2a2a3b;
   color: #ffffff;
+}
+
+
+/*********************** Object Specified ************************/
+
+QWidget#devicelist > QLabel#no-host-label {
+  color: gray;
 }
