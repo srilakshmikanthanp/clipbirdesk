@@ -33,7 +33,7 @@ class Device : public QWidget {
   using Value = std::tuple<QHostAddress, quint16, Action>;
 
  signals:  // Signals
-  void onAction(const std::tuple<QHostAddress, quint16, Action>&);
+  void onAction(std::tuple<QHostAddress, quint16, Action>);
 
  private:  // Private Functions
 

@@ -37,44 +37,8 @@ void ClipBird::handleServerStatusChanged(bool isConnected) {
  * @param board  clipboard that is managed
  * @param parent parent object
  */
-ClipBird::ClipBird(QClipboard *board, QObject *parent)
-    : QObject(parent), m_clipboard(board, this) {}
-
-/**
- * @brief set the authenticator
- *
- * @param authenticator authenticator function
- */
-void ClipBird::setAuthenticator(Authenticator authenticator) {
-  m_authenticator = authenticator;
-}
-
-/**
- * @brief get the authenticator
- *
- * @return Authenticator authenticator function
- */
-ClipBird::Authenticator ClipBird::getAuthenticator() const {
-  return m_authenticator;
-}
-
-/**
- * @brief set the ssl configuration
- *
- * @param sslConfig ssl configuration
- */
-void ClipBird::setSSLConfiguration(QSslConfiguration sslConfig) {
-  m_sslConfig = sslConfig;
-}
-
-/**
- * @brief get the ssl configuration
- *
- * @return QSslConfiguration ssl configuration
- */
-QSslConfiguration ClipBird::getSSLConfiguration() const {
-  return m_sslConfig;
-}
+ClipBird::ClipBird(QClipboard *board, QSslConfiguration config, QObject *parent)
+    : QObject(parent), m_clipboard(board, this), m_sslConfig(config) {}
 
 //---------------------- public slots -----------------------//
 
@@ -86,11 +50,6 @@ void ClipBird::setCurrentHostAsServer() {
   // Emplace the server into the m_host variant variable
   auto *server = &m_host.emplace<Server>(this);
 
-  // if the authenticator is not set then throw error
-  if (m_authenticator != nullptr) {
-    server->setAuthenticator(m_authenticator);
-  }
-
   // Set the QSslConfiguration
   server->setSSLConfiguration(m_sslConfig);
 
@@ -98,6 +57,11 @@ void ClipBird::setCurrentHostAsServer() {
   const auto signal_s = &Server::OnCLientStateChanged;
   const auto slot_s   = &ClipBird::OnCLientStateChanged;
   connect(server, signal_s, this, slot_s);
+
+  // Connect the onNewHostConnected signal to the signal
+  const auto signal_n = &Server::OnNewHostConnected;
+  const auto slot_n   = &ClipBird::OnNewHostConnected;
+  connect(server, signal_n, this, slot_n);
 
   // Connect the onSyncRequest signal to the clipboard
   const auto signal_c = &Server::OnSyncRequest;
@@ -221,6 +185,33 @@ void ClipBird::disconnectClient(const QPair<QHostAddress, quint16> &client) {
 void ClipBird::disconnectAllClients() {
   if (std::holds_alternative<Server>(m_host)) {
     std::get<Server>(m_host).disconnectAllClients();
+  } else {
+    throw std::runtime_error("Host is not server");
+  }
+}
+
+/**
+ * @brief The function that is called when the client is authenticated
+ *
+ * @param client the client that is currently processed
+ */
+void ClipBird::authSuccess(const QPair<QHostAddress, quint16> &client) {
+  if (std::holds_alternative<Server>(m_host)) {
+    std::get<Server>(m_host).authSuccess(client);
+  } else {
+    throw std::runtime_error("Host is not server");
+  }
+}
+
+/**
+ * @brief The function that is called when the client it not
+ * authenticated
+ *
+ * @param client the client that is currently processed
+ */
+void ClipBird::authFailed(const QPair<QHostAddress, quint16> &client) {
+  if (std::holds_alternative<Server>(m_host)) {
+    std::get<Server>(m_host).authFailed(client);
   } else {
     throw std::runtime_error("Host is not server");
   }

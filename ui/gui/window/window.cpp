@@ -13,7 +13,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui {
  */
 void Window::handleHostAction(Tabs t, components::Device::Value h) {
   if (t == Tabs::Server && std::get<2>(h) == Action::Disconnect) {
-    controller->disconnectFromServer({std::get<0>(h), std::get<1>(h)});
+    controller->disconnectClient({std::get<0>(h), std::get<1>(h)});
   }
 
   if (t == Tabs::Client && std::get<2>(h) == Action::Connect) {
@@ -37,6 +37,9 @@ void Window::handleTabChangeForClient(Tabs tab) {
   this->setServerIpPort(c_ipPortKey, "-");
   this->setHostCount(c_serversKey, 0);
 
+  // reset the device list
+  this->removeAllClient();
+
   // notify the controller
   controller->setCurrentHostAsClient();
 }
@@ -52,6 +55,9 @@ void Window::handleTabChangeForServer(Tabs tab) {
   this->setServerHostName(s_hostNameKey, "-");
   this->setServerIpPort(s_ipPortKey, "-");
   this->setHostCount(s_clientsKey, 0);
+
+  // reset the device list
+  this->removeAllServers();
 
   // notify the controller
   controller->setCurrentHostAsServer();
@@ -94,6 +100,55 @@ void Window::handleServerStateChange(bool isStarted) {
   this->setStatus(s_statusKey, status_m);
   this->setServerIpPort(s_ipPortKey, IpPort);
   this->setHostCount(s_clientsKey, clients.size());
+}
+
+/**
+ * @brief On New Host Connected
+ *
+ * @param client
+ */
+void Window::handleNewHostConnected(const QPair<QHostAddress, quint16>& client) {
+  // get the message to show
+  auto message = QString("A client is trying to connect to the server\n"
+                         "Host: %1:%2\n"
+                         "Accept the connection?")
+                     .arg(client.first.toString(), QString::number(client.second));
+
+  // get the user input
+  auto dialog = new QMessageBox();
+
+  // set the icon
+  dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+
+  // set the title
+  dialog->setWindowTitle("Clipbird");
+
+  // set the message
+  dialog->setText(message);
+
+  // set the buttons
+  dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+  // set the default button
+  dialog->setDefaultButton(QMessageBox::No);
+
+  // set delete on close
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+  // show the dialog
+  dialog->show();
+
+  // connect the dialog to window AuthSuccess signal
+  const auto signal_s = &QMessageBox::accepted;
+  const auto slot_s   = [&] { controller->authSuccess(client); };
+  connect(dialog, signal_s, slot_s);
+
+  // connect the dialog to window AuthFail signal
+  const auto signal_f = &QMessageBox::rejected;
+  const auto slot_f   = [&] { controller->authFailed(client); };
+  connect(dialog, signal_f, slot_f);
+
+  controller->authSuccess(client);
 }
 
 //----------------------------- slots for Client --------------------------//
@@ -197,14 +252,10 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   });
 
   // server list slot
-  auto serverListSlot = [&](const auto& host) {
-    emit onHostAction(Tabs::Client, host);
-  };
+  auto serverListSlot = [&](const auto& host) { emit onHostAction(Tabs::Client, host); };
 
   // client list slot
-  auto clientListSlot = [&](const auto& host) {
-    emit onHostAction(Tabs::Server, host);
-  };
+  auto clientListSlot = [&](const auto& host) { emit onHostAction(Tabs::Server, host); };
 
   // connect server list signal
   connect(serverList, &window::DeviceList::onAction, serverListSlot);
@@ -246,6 +297,11 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   const auto signal_ts = &Window::onTabChanged;
   const auto slot_ts   = &Window::handleTabChangeForServer;
   connect(this, signal_ts, this, slot_ts);
+
+  // set the signal for on new Host
+  const auto signal_h = &controller::ClipBird::OnNewHostConnected;
+  const auto slot_h   = &Window::handleNewHostConnected;
+  QObject::connect(controller, signal_h, this, slot_h);
 
   // Initialize the Tab as Client
   tab->setCurrentIndex(1);
@@ -316,7 +372,7 @@ QPair<QString, int> Window::getHostCount() {
 /**
  * @brief Set the Server List object
  */
-void Window::setClientList(const QList<components::Device::Value> &hosts) {
+void Window::setClientList(const QList<components::Device::Value>& hosts) {
   clientList->setHosts(hosts);
 }
 
@@ -353,7 +409,7 @@ void Window::removeAllClient() {
 /**
  * @brief Set the Server List object
  */
-void Window::setServerList(const QList<components::Device::Value> &hosts) {
+void Window::setServerList(const QList<components::Device::Value>& hosts) {
   serverList->setHosts(hosts);
 }
 
@@ -384,4 +440,4 @@ void Window::removeServer(components::Device::Value host) {
 void Window::removeAllServers() {
   serverList->removeHosts();
 }
-} // namespace srilakshmikanthanp::clipbirdesk::ui::gui
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

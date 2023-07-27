@@ -82,6 +82,18 @@ void Client::processReadyRead() {
 }
 
 /**
+ * @brief Process the SSL error and emit the signal
+ *
+ * @param errors List of SSL errors
+ */
+void Client::processSslError(const QList<QSslError>& errors) {
+  for (auto& error : errors) {
+    std::cout << error.errorString().toStdString();
+    emit OnErrorOccurred(error.errorString());
+  }
+}
+
+/**
  * @brief Construct a new Syncing Client object
  * and connect the signals and slots and start
  * the timer and Service discovery
@@ -107,6 +119,13 @@ Client::Client(QObject* parent) : service::Discover (parent) {
   const auto signal_r = &QSslSocket::readyRead;
   const auto slot_r   = &Client::processReadyRead;
   connect(m_ssl_socket, signal_r, this, slot_r);
+
+  // connect the signals and slots for the socket
+  // sslErrors signal to emit the signal for
+  // OnErrorOccurred
+  const auto signal_s = &QSslSocket::sslErrors;
+  const auto slot_s   = &Client::processSslError;
+  connect(m_ssl_socket, signal_s, this, slot_s);
 
   // disconnected signal to emit the signal for
   // server state changed
@@ -180,6 +199,11 @@ void Client::connectToServer(QPair<QHostAddress, quint16> client) {
 
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
+
+  // wait for the connection
+  if (!m_ssl_socket->waitForEncrypted()) {
+    std::cout << m_ssl_socket->errorString().toStdString() << std::endl;
+  }
 }
 
 /**

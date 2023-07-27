@@ -6,7 +6,10 @@
 // https://opensource.org/licenses/MIT
 
 // Qt headers
+#include <QStackedLayout>
+#include <QVBoxLayout>
 #include <QWidget>
+
 
 // Project headers
 #include "ui/gui/components/device/device.hpp"
@@ -30,8 +33,9 @@ class DeviceList : public QWidget {
 
  private:  // Member Variables
 
+  QStackedLayout* stackLayout = new QStackedLayout();
+  QVBoxLayout* labelLayout    = new QVBoxLayout();
   QVBoxLayout* verticalLayout = new QVBoxLayout();
-  QLabel *label = new QLabel("No Hosts");
 
  public:  // Member Functions
 
@@ -69,4 +73,4 @@ class DeviceList : public QWidget {
    */
   void showEvent(QShowEvent* event) override;
 };
-} // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window

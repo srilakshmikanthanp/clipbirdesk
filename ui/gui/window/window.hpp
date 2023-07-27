@@ -13,6 +13,7 @@
 #include <QHBoxLayout>
 #include <QHostAddress>
 #include <QHostInfo>
+#include <QMessageBox>
 #include <QScrollArea>
 #include <QScreen>
 #include <QTabBar>
@@ -76,7 +77,7 @@ class Window : public QFrame {
  signals:  // signals
   void onHostAction(Tabs tab, std::tuple<QHostAddress, quint16, Action>);
 
- signals:                       // signals
+ signals:  // signals
   void onTabChanged(Tabs tab);  // emit when tab changed
 
  private:  // constant for keys (Server)
@@ -123,6 +124,13 @@ class Window : public QFrame {
    * @brief Handle the Server State Change
    */
   void handleServerStateChange(bool isStarted);
+
+  /**
+   * @brief On New Host Connected
+   *
+   * @param client
+   */
+  void handleNewHostConnected(const QPair<QHostAddress, quint16> &client);
 
   //----------------------------- slots for Client --------------------------//
 

@@ -7,20 +7,47 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
 DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
-  // set the root layout for this widget
-  this->setLayout(verticalLayout);
-
   // set alignment from start
   verticalLayout->setAlignment(Qt::AlignTop);
 
+  // set alignment from start
+  labelLayout->setAlignment(Qt::AlignTop);
+
+  // create a label
+  QLabel *label = new QLabel("No Hosts");
+
   // set alignment as center
   label->setAlignment(Qt::AlignCenter);
+
+  // add label to labellayout
+  labelLayout->addWidget(label);
 
   // set object name
   label->setObjectName("no-host-label");
 
   // set the object name
   this->setObjectName("devicelist");
+
+  // A Widget for the label Layout
+  QWidget* labelWidget = new QWidget();
+
+  // set the layout
+  labelWidget->setLayout(labelLayout);
+
+  // add the layout to the stack layout
+  this->stackLayout->addWidget(labelWidget);
+
+  // A Widget for the vertical Layout
+  QWidget* verticalWidget = new QWidget();
+
+  // set the layout
+  verticalWidget->setLayout(verticalLayout);
+
+  // add the layout to the stack layout
+  this->stackLayout->addWidget(verticalWidget);
+
+  // set the layout
+  this->setLayout(this->stackLayout);
 }
 
 /**
@@ -123,17 +150,17 @@ void DeviceList::removeHost(components::Device::Value host) {
  * @brief Override the showEvent
  */
 void DeviceList::showEvent(QShowEvent* event) {
-  // call the base class
-  QWidget::showEvent(event);
-
   // if the vertical layout is empty then add a label
   if (verticalLayout->count() == 0) {
-    verticalLayout->addWidget(label);
+    this->stackLayout->setCurrentIndex(0);
   } else {
-    verticalLayout->removeWidget(label);
+    this->stackLayout->setCurrentIndex(1);
   }
 
   // Redraw the widget
   this->update();
+
+  // call the base class
+  QWidget::showEvent(event);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window

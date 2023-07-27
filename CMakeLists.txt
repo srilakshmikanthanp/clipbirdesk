@@ -104,10 +104,10 @@ target_include_directories(clipbird
   PUBLIC ${PROJECT_BINARY_DIR})
 
 # set target properties
-set_target_properties(clipbird PROPERTIES
-  WIN32_EXECUTABLE TRUE
-  MACOSX_BUNDLE TRUE
-)
+# set_target_properties(clipbird PROPERTIES
+#   WIN32_EXECUTABLE TRUE
+#   MACOSX_BUNDLE TRUE
+# )
 
 # --------------------------------- Unit Tests ---------------------------------#
 # Download and unpack googletest for unit testing

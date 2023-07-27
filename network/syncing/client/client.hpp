@@ -122,6 +122,11 @@ class Client : public service::Discover {
    */
   void processReadyRead();
 
+  /**
+   * @brief Process the ssl error
+   */
+  void processSslError(const QList<QSslError>& errors);
+
  public:
 
   /**

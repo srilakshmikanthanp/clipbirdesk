@@ -84,8 +84,13 @@ void GuiMain::showEvent(QShowEvent* event) {
  *
  * @param event
  */
-void GuiMain::focusOutEvent(QFocusEvent* event) {
-  QWidget::focusOutEvent(event);
-  GuiMain::setVisible(false);
+bool GuiMain::event(QEvent* event) {
+  // if event is window deactivation
+  if (event->type() == QEvent::WindowDeactivate) {
+    this->hide();
+  }
+
+  // call the base class event
+  return QWidget::event(event);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

@@ -14,7 +14,6 @@
 #include <QVector>
 
 #include "network/service/register/register.hpp"
-#include "types/callback/callback.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
@@ -28,7 +27,11 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 class Server : public service::Register {
  signals:  // signals
   /// @brief On client state changed
-  void OnCLientStateChanged(const QPair<QHostAddress, quint16>&, bool connected);
+  void OnCLientStateChanged(QPair<QHostAddress, quint16>, bool connected);
+
+ signals:  // signals for this class
+  /// @brief On New Host Connected
+  void OnNewHostConnected(QPair<QHostAddress, quint16>);
 
  signals:  // signals for this class
   /// @brief On Error Occurred
@@ -40,11 +43,12 @@ class Server : public service::Register {
 
  signals:  // signals
   /// @brief On Sync Request
-  void OnSyncRequest(const QVector<QPair<QString, QByteArray>>& items);
+  void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
 
  signals:  // signals for this class
   /// @brief On Sync Request
-  void OnClientListChanged(const QList<QPair<QHostAddress, quint16>>& clients);
+  void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
+
 
  private:  // just for Qt
 
@@ -55,23 +59,16 @@ class Server : public service::Register {
 
   Q_DISABLE_COPY_MOVE(Server)
 
- public:  // Authenticator Type
-
-  /// @brief Authenticator
-  using Authenticator = types::callback::Authenticator;
-
  private:  // members of the class
 
   /// @brief SSL server
   QSslServer* m_ssl_server = new QSslServer(this);
 
-  /// @brief List of clients
-  QList<QSslSocket*> m_clients;
+  /// @brief List of clients unauthenticated
+  QList<QSslSocket*> m_un_authed_clients;
 
- private:  // Authenticator Instance
-
-  /// @brief Authenticator
-  Authenticator m_authenticator = nullptr;
+  /// @brief List of clients Authenticated
+  QList<QSslSocket*> m_authed_clients;
 
  private:  // some typedefs
 
@@ -98,7 +95,7 @@ class Server : public service::Register {
    */
   template <typename Packet>
   void sendPacket(const Packet& pack) {
-    for (auto client : m_clients) {
+    for (auto client : m_authed_clients) {
       this->sendPacket(client, pack);
     }
   }
@@ -196,18 +193,19 @@ class Server : public service::Register {
   QSslConfiguration getSSLConfiguration() const;
 
   /**
-   * @brief Set the Authenticator object
+   * @brief The function that is called when the client is authenticated
    *
-   * @param auth Authenticator
+   * @param client the client that is currently processed
    */
-  void setAuthenticator(Authenticator auth);
+  void authSuccess(const QPair<QHostAddress, quint16>&);
 
   /**
-   * @brief Get the Authenticator object
+   * @brief The function that is called when the client it not
+   * authenticated
    *
-   * @return Authenticator
+   * @param client the client that is currently processed
    */
-  Authenticator getAuthenticator() const;
+  void authFailed(const QPair<QHostAddress, quint16>&);
 
   /**
    * @brief Start the server

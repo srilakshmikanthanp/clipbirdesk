@@ -58,6 +58,6 @@ class GuiMain : public QMainWindow {
   /**
    * @brief Focus lost event
    */
-  void focusOutEvent(QFocusEvent* event) override;
+  bool event(QEvent* event) override;
 };  // class GuiMain
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

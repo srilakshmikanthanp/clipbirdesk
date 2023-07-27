@@ -14,29 +14,6 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
 class DeviceInfo : public QWidget {
- private:  // Constants for style
-
-  static constexpr const char* const style = R"(
-    QWidget {
-      background-color: #1f1e2c;
-      border: none;
-      padding: 5px;
-      margin: 5px;
-    }
-
-    QFormLayout {
-      margin: 0px;
-      padding: 0px;
-    }
-
-    QLabel {
-      font-size: 20px;
-      color: #ffffff;
-      padding: 5px;
-      font-family: sans-serif;
-    }
-  )";
-
  private:  // Member Variables
 
   QPair<QLabel*, components::Status*> hostStatus;
