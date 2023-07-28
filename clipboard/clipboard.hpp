@@ -7,12 +7,16 @@
 
 // Qt header
 #include <QByteArray>
+#include <QBuffer>
 #include <QClipboard>
+#include <QIODevice>
+#include <QImage>
 #include <QList>
 #include <QMimeData>
 #include <QObject>
 #include <QPair>
 #include <QString>
+#include <QUrl>
 #include <QVector>
 
 
@@ -50,6 +54,14 @@ class Clipboard : public QObject {
 
   /// @brief Slot to notify the clipboard change
   void onClipboardChangeImpl();
+
+ private: // mime types
+
+  const QString MIME_TYPE_TEXT = "text/plain";
+  const QString MIME_TYPE_URL = "text/uri-list";
+  const QString MIME_TYPE_IMAGE = "image/img";
+  const QString MIME_TYPE_COLOR = "application/x-color";
+  const QString MIME_TYPE_HTML = "text/html";
 
  public:  // constructor
 

@@ -37,14 +37,18 @@ Once the server has been identified, clipboard data is transmitted between the c
 
 Finally we have **InvalidRequest** which is used to indicate that the packet sent by client is invalid so it provides a way to indicate that the packet status. This packet should only sent from server to client not from client to server.
 
+#### Packet Length
+
+The **Packet Length** field specifies the length of the packet, which is the sum of the length of the header and the length of the body. This field is used to determine the size of the packet, allowing for efficient and organized data transmission within the application. This field is First field in all of the packets.
+
 ### InvalidRequest
 
 The **InvalidRequest** is used to indicate that the packet is invalid. This packet contains the following fields:
 
 #### Header
 
-- **Packet Type**: This field specifies the type of packet, which is set to 0x00 for the Invalid Packet.
 - **Packet Length**: This field specifies the length of the packet, for invalid packet it is length of error code and error message.
+- **Packet Type**: This field specifies the type of packet, which is set to 0x00 for the Invalid Packet.
 
 #### Body
 
@@ -53,12 +57,12 @@ The **InvalidRequest** is used to indicate that the packet is invalid. This pack
 
 #### Structure
 
-| Field           | Bytes | value |
-|-----------------|-------| ----- |
-| Packet Type     | 1     | 0x00  |
-| Packet Length   | 4     |       |
-| Error Code      | 1     |       |
-| Error Message   | varies|       |
+| Field           | Bytes  | value |
+|-----------------|--------| ----- |
+| Packet Length   | 4      |       |
+| Packet Type     | 1      | 0x00  |
+| Error Code      | 1      |       |
+| Error Message   | varies |       |
 
 #### Possible Error Codes
 
@@ -67,14 +71,37 @@ The **InvalidRequest** is used to indicate that the packet is invalid. This pack
 | 0x01       | Coding Error  |
 | 0x02       | TLS Error     |
 
+### AuthInfoPacket
+
+The **AuthRespPacket** is used to initiate the authentication process to the client. This packet contains the following fields:
+
+#### Header
+
+- **Packet Length**: This field specifies the length of the packet, for AuthPacket it is length of the auth token.
+- **Packet Type**: This field specifies the type of packet, which is set to 0x01 for the AuthPacket.
+
+#### Body
+
+- **AuthStatus**: This field specifies the status of the authentication process. it can be one of the following values.
+  - 0x00: Auth Failed
+  - 0x01: Auth Success
+
+#### Structure
+
+| Field           | Bytes | value |
+|-----------------|-------| ----- |
+| Packet Length   | 4     |       |
+| Packet Type     | 1     | 0x01  |
+| AuthStatus      | 1     |       |
+
 ### SyncingPacket
 
 The **SyncingPacket** is used to transfer clipboard data between the client and the server. This packet contains the following fields:
 
 #### Header
 
-- **Packet Type**: This field specifies the type of packet, which is set to 0x01 for the SyncingPacket.
 - **Packet Length**: This field specifies the length of the packet, for SyncingPacket it is length of clipboard data and type of clipboard data.
+- **Packet Type**: This field specifies the type of packet, which is set to 0x02 for the SyncingPacket.
 
 #### Body
 
@@ -88,8 +115,8 @@ The **SyncingPacket** is used to transfer clipboard data between the client and 
 
 | Field           | Bytes | value |
 |-----------------|-------| ----- |
-| Packet Type     | 1     | 0x01  |
 | Packet Length   | 4     |       |
+| Packet Type     | 1     | 0x02  |
 | itemCount       | 4     |       |
 | MimeLength      | 4     |       |
 | MimeType        | varies|       |
@@ -100,3 +127,13 @@ The **SyncingPacket** is used to transfer clipboard data between the client and 
 | PayloadLength   | 4     |       |
 | Payload         | varies|       |
 | ...             | ...   | ...   |
+
+#### Possible MimeTypes
+
+| Mime Type           | Description |
+|---------------------|-------------|
+| text/plain          | Text        |
+| image/img           | Image       |
+| text/uri-list       | URL's       |
+| application/x-color | Color       |
+| text/html           | HTML        |

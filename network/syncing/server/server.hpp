@@ -84,7 +84,31 @@ class Server : public service::Register {
    */
   template <typename Client, typename Packet>
   void sendPacket(Client* client, const Packet& pack) {
-    client->write(utility::functions::toQByteArray(pack));
+    // Convert the packet to QByteArray
+    const auto data = utility::functions::toQByteArray(pack);
+
+    // create the QDataStream
+    QDataStream stream(client);
+
+    // write the data to the stream
+    auto wrote = 0;
+
+    // write the packet length
+    while (wrote < data.size()) {
+      // try to write the data
+      auto start = data.data() + wrote;
+      auto size  = data.size() - wrote;
+      auto bytes = stream.writeRawData(start, size);
+
+      // if error occurred
+      if (bytes == -1) {
+        emit OnErrorOccurred(client->errorString());
+        return;
+      }
+
+      // update the wrote
+      wrote += bytes;
+    }
   }
 
   /**

@@ -26,8 +26,8 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
 class InvalidRequest {
  private:
 
-  quint8 packetType = 0x00;
   qint32 packetLength;
+  quint8 packetType = 0x00;
   quint8 errorCode;
   QByteArray errorMessage;
 
@@ -37,20 +37,6 @@ class InvalidRequest {
   enum PacketType : quint8 { RequestFailed = 0x00 };
 
  public:
-
-  /**
-   * @brief Set the Packet Type object
-   *
-   * @param type
-   */
-  void setPacketType(quint8 type);
-
-  /**
-   * @brief Get the Packet Type object
-   *
-   * @return quint8
-   */
-  quint8 getPacketType() const noexcept;
 
   /**
    * @brief Set the Packet Length object
@@ -65,6 +51,20 @@ class InvalidRequest {
    * @return qint32
    */
   qint32 getPacketLength() const noexcept;
+
+  /**
+   * @brief Set the Packet Type object
+   *
+   * @param type
+   */
+  void setPacketType(quint8 type);
+
+  /**
+   * @brief Get the Packet Type object
+   *
+   * @return quint8
+   */
+  quint8 getPacketType() const noexcept;
 
   /**
    * @brief Set the Error Code object
@@ -97,9 +97,9 @@ class InvalidRequest {
   /**
    * @brief Get the Size of the Packet
    *
-   * @return std::size_t
+   * @return qint32
    */
-  std::size_t size() const noexcept;
+  qint32 size() const noexcept;
 
   /**
    * @brief Input stream operator for QDataStream

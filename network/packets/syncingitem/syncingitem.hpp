@@ -92,7 +92,7 @@ class SyncingItem {
    *
    * @return size_t
    */
-  size_t size() const noexcept;
+  qint32 size() const noexcept;
 
   /**
    * @brief Overloaded operator<< for QDataStream

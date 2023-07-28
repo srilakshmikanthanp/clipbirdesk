@@ -41,18 +41,60 @@ void Client::processInvalidPacket(const packets::InvalidRequest& packet) {
  * from the server
  */
 void Client::processReadyRead() {
-  // Read All the data from the socket
-  const auto data = m_ssl_socket->readAll();
-
   // using fromQByteArray to parse the packet
   using utility::functions::fromQByteArray;
+
+  // get the first four bytes of the packet
+  QDataStream get(m_ssl_socket);
+
+  // QByteArray to store the data
+  QByteArray data;
+
+  /// uploader QDataStream
+  QDataStream put(data);
+
+  // start the transaction
+  get.startTransaction();
+
+  // get the packet length
+  qint32 packetLength;
+
+  // read the packet length
+  get >> packetLength;
+
+  // write the packet length
+  put << packetLength;
+
+  // infer the read size
+  auto toRead = packetLength - data.length();
+
+  // resize the data
+  data.resize(packetLength);
+
+  // read the data from the socket
+  while (toRead > 0) {
+    auto start = data.data() + data.size() - toRead;
+    auto bytes = get.readRawData(start, toRead);
+
+    if (bytes == -1) {
+      get.rollbackTransaction();
+      return;
+    }
+
+    toRead -= bytes;
+  }
+
+  // commit the transaction
+  if (!get.commitTransaction()) {
+    return;
+  }
 
   // try to parse the packet
   try {
     processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    emit OnErrorOccurred(e.what());
+    qInfo() << e.what();
     return;
   } catch (const std::exception& e) {
     emit OnErrorOccurred(e.what());
@@ -67,7 +109,7 @@ void Client::processReadyRead() {
     processInvalidPacket(fromQByteArray<packets::InvalidRequest>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    emit OnErrorOccurred(e.what());
+    qInfo() << e.what();
     return;
   } catch (const std::exception& e) {
     emit OnErrorOccurred(e.what());

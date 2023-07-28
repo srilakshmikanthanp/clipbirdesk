@@ -7,6 +7,24 @@
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
+ * @brief Set the Packet Length object
+ *
+ * @param length
+ */
+void InvalidRequest::setPacketLength(qint32 length) {
+  this->packetLength = length;
+}
+
+/**
+ * @brief Get the Packet Length object
+ *
+ * @return qint32
+ */
+qint32 InvalidRequest::getPacketLength() const noexcept {
+  return this->packetLength;
+}
+
+/**
  * @brief Set the Packet Type object
  *
  * @param type
@@ -24,24 +42,6 @@ void InvalidRequest::setPacketType(quint8 type) {
  */
 quint8 InvalidRequest::getPacketType() const noexcept {
   return this->packetType;
-}
-
-/**
- * @brief Set the Packet Length object
- *
- * @param length
- */
-void InvalidRequest::setPacketLength(qint32 length) {
-  this->packetLength = length;
-}
-
-/**
- * @brief Get the Packet Length object
- *
- * @return qint32
- */
-qint32 InvalidRequest::getPacketLength() const noexcept {
-  return this->packetLength;
 }
 
 /**
@@ -89,7 +89,7 @@ QByteArray InvalidRequest::getErrorMessage() const noexcept {
  *
  * @return std::size_t
  */
-std::size_t InvalidRequest::size() const noexcept {
+qint32 InvalidRequest::size() const noexcept {
   return (sizeof(packetType) + sizeof(packetLength) + sizeof(errorCode) + errorMessage.size());
 }
 
@@ -101,11 +101,11 @@ std::size_t InvalidRequest::size() const noexcept {
  * @return QDataStream&
  */
 QDataStream& operator<<(QDataStream& stream, const InvalidRequest packet) {
-  // write the packet type
-  stream << packet.packetType;
-
   // write the packet length
   stream << packet.packetLength;
+
+  // write the packet type
+  stream << packet.packetType;
 
   // write the error code
   stream << packet.errorCode;
@@ -137,6 +137,14 @@ QDataStream& operator<<(QDataStream& stream, const InvalidRequest packet) {
  * @return QDataStream&
  */
 QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
+  // read the packet length
+  stream >> packet.packetLength;
+
+  // is the stream status is bad
+  if (stream.status() != QDataStream::Ok) {
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Length");
+  }
+
   // read the packet type
   stream >> packet.packetType;
 
@@ -148,14 +156,6 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
   // check the packet type
   if (packet.packetType != 0x00) {
     throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Type");
-  }
-
-  // read the packet length
-  stream >> packet.packetLength;
-
-  // is the stream status is bad
-  if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Length");
   }
 
   // read the error code

@@ -6,6 +6,7 @@
  */
 
 #include "clipboard.hpp"
+#include <iostream>
 
 namespace srilakshmikanthanp::clipbirdesk::clipboard {
 /**
@@ -49,9 +50,38 @@ QVector<QPair<QString, QByteArray>> Clipboard::get() {
   // get the formats
   const auto formats = mimeData->formats();
 
-  // push the data to the vector
-  for (const auto& format : formats) {
-    items.push_back({format, mimeData->data(format)});
+  // has Color
+  if (mimeData->hasColor()) {
+    auto colors = qvariant_cast<QColor>(mimeData->colorData());
+    QByteArray data; QDataStream stream(&data, QIODevice::WriteOnly);
+    stream << colors;
+    items.append({MIME_TYPE_COLOR, data});
+  }
+
+  // has HTML
+  if (mimeData->hasHtml()) {
+    items.append({MIME_TYPE_HTML, mimeData->html().toUtf8()});
+  }
+
+  // has Image
+  if (mimeData->hasImage()) {
+    auto image = qvariant_cast<QImage>(mimeData->imageData());
+    QByteArray data; QBuffer buffer(&data);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer);
+    items.append({MIME_TYPE_IMAGE, data});
+  }
+
+  // has Text
+  if (mimeData->hasText()) {
+    items.append({MIME_TYPE_TEXT, mimeData->text().toUtf8()});
+  }
+
+  // has URLs
+  if (mimeData->hasUrls()) {
+    QByteArray data; QDataStream stream(&data, QIODevice::WriteOnly);
+    stream << mimeData->urls();
+    items.append({MIME_TYPE_URL, data});
   }
 
   // return the data
@@ -77,7 +107,36 @@ void Clipboard::set(const QVector<QPair<QString, QByteArray>> data) {
 
   // set the data
   for (const auto& [mime, data] : data) {
-    mimeData->setData(mime, data);
+    // has Image
+    if (mime == MIME_TYPE_IMAGE) {
+      mimeData->setImageData(QImage::fromData(data));
+    }
+
+    // has HTML
+    if (mime == MIME_TYPE_HTML) {
+      mimeData->setHtml(QString::fromUtf8(data));
+    }
+
+    // has Text
+    if (mime == MIME_TYPE_TEXT) {
+      mimeData->setText(QString::fromUtf8(data));
+    }
+
+    // has URLs
+    if (mime == MIME_TYPE_URL) {
+      QDataStream stream(data);
+      QList<QUrl> urls;
+      stream >> urls;
+      mimeData->setUrls(urls);
+    }
+
+    // has Color
+    if (mime == MIME_TYPE_COLOR) {
+      QDataStream stream(data);
+      QColor color;
+      stream >> color;
+      mimeData->setColorData(color);
+    }
   }
 
   // set the mime data

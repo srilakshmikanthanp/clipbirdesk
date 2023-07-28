@@ -10,17 +10,11 @@ DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
   // set alignment from start
   verticalLayout->setAlignment(Qt::AlignTop);
 
-  // set alignment from start
-  labelLayout->setAlignment(Qt::AlignTop);
-
   // create a label
-  QLabel *label = new QLabel("No Hosts");
+  QLabel *label = new QLabel("No Hosts Found");
 
   // set alignment as center
   label->setAlignment(Qt::AlignCenter);
-
-  // add label to labellayout
-  labelLayout->addWidget(label);
 
   // set object name
   label->setObjectName("no-host-label");
@@ -28,20 +22,11 @@ DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
   // set the object name
   this->setObjectName("devicelist");
 
-  // A Widget for the label Layout
-  QWidget* labelWidget = new QWidget();
-
-  // set the layout
-  labelWidget->setLayout(labelLayout);
-
   // add the layout to the stack layout
-  this->stackLayout->addWidget(labelWidget);
+  this->stackLayout->addWidget(label);
 
-  // A Widget for the vertical Layout
-  QWidget* verticalWidget = new QWidget();
-
-  // set the layout
-  verticalWidget->setLayout(verticalLayout);
+  // set the alignment
+  this->stackLayout->setAlignment(label, Qt::AlignCenter);
 
   // add the layout to the stack layout
   this->stackLayout->addWidget(verticalWidget);

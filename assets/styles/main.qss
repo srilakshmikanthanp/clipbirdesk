@@ -126,6 +126,6 @@ QMenu::item:disabled {
 
 /*********************** Object Specified ************************/
 
-QWidget#devicelist > QLabel#no-host-label {
+QLabel#no-host-label {
   color: gray;
 }

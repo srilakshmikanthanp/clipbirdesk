@@ -27,7 +27,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
 class SyncingPacket {
  private:  // private members
 
-  quint8 packetType = 0x01;
+  quint8 packetType = 0x02;
   qint32 packetLength;
   qint32 itemCount;
   QVector<SyncingItem> items;
@@ -35,23 +35,9 @@ class SyncingPacket {
  public:
 
   /// @brief Allowed Packet Types
-  enum PacketType : quint8 { SyncPacket = 0x01 };
+  enum PacketType : quint8 { SyncPacket = 0x02 };
 
  public:
-
-  /**
-   * @brief Set the Packet Type object
-   *
-   * @param type
-   */
-  void setPacketType(quint8 type);
-
-  /**
-   * @brief Get the Packet Type object
-   *
-   * @return quint8
-   */
-  quint8 getPacketType() const noexcept;
 
   /**
    * @brief Set the Packet Length object
@@ -66,6 +52,20 @@ class SyncingPacket {
    * @return qint32
    */
   qint32 getPacketLength() const noexcept;
+
+  /**
+   * @brief Set the Packet Type object
+   *
+   * @param type
+   */
+  void setPacketType(quint8 type);
+
+  /**
+   * @brief Get the Packet Type object
+   *
+   * @return quint8
+   */
+  quint8 getPacketType() const noexcept;
 
   /**
    * @brief Set the Item Count object
@@ -100,7 +100,7 @@ class SyncingPacket {
    *
    * @return size_t
    */
-  size_t size() const noexcept;
+  qint32 size() const noexcept;
 
   /**
    * @brief Overloaded operator<< for QDataStream

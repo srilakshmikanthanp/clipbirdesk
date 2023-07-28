@@ -70,12 +70,54 @@ void Server::processReadyRead() {
   // Get the client that was ready to read
   auto client = qobject_cast<QSslSocket *>(sender());
 
-  // Get the data from the client
-  auto data   = client->readAll();
-
   // using the fromQByteArray from namespace
   using utility::functions::createPacket;
   using utility::functions::fromQByteArray;
+
+  // get the first four bytes of the packet
+  QDataStream get(client);
+
+  // QByteArray to store the data
+  QByteArray data;
+
+  /// uploader QDataStream
+  QDataStream put(&data, QIODevice::WriteOnly);
+
+  // start the transaction
+  get.startTransaction();
+
+  // get the packet length
+  qint32 packetLength;
+
+  // read the packet length
+  get >> packetLength;
+
+  // write the packet length
+  put << packetLength;
+
+  // infer the read size
+  quint32 toRead = packetLength - data.size();
+
+  // resize the data
+  data.resize(packetLength);
+
+  // read the data from the socket
+  while (toRead > 0) {
+    auto start = data.data() + data.size() - toRead;
+    auto bytes = get.readRawData(start, toRead);
+
+    if (bytes == -1) {
+      get.rollbackTransaction();
+      return;
+    }
+
+    toRead -= bytes;
+  }
+
+  // commit the transaction
+  if (!get.commitTransaction()) {
+    return;
+  }
 
   // Deserialize the data to SyncingPacket
   try {

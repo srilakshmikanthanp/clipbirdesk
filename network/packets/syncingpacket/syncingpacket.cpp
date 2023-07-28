@@ -7,6 +7,24 @@
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
+ * @brief Set the Packet Length object
+ *
+ * @param length
+ */
+void SyncingPacket::setPacketLength(qint32 length) {
+  this->packetLength = length;
+}
+
+/**
+ * @brief Get the Packet Length object
+ *
+ * @return qint32
+ */
+qint32 SyncingPacket::getPacketLength() const noexcept {
+  return this->packetLength;
+}
+
+/**
  * @brief Set the Packet Type object
  *
  * @param type
@@ -24,24 +42,6 @@ void SyncingPacket::setPacketType(quint8 type) {
  */
 quint8 SyncingPacket::getPacketType() const noexcept {
   return this->packetType;
-}
-
-/**
- * @brief Set the Packet Length object
- *
- * @param length
- */
-void SyncingPacket::setPacketLength(qint32 length) {
-  this->packetLength = length;
-}
-
-/**
- * @brief Get the Packet Length object
- *
- * @return qint32
- */
-qint32 SyncingPacket::getPacketLength() const noexcept {
-  return this->packetLength;
 }
 
 /**
@@ -89,7 +89,7 @@ QVector<SyncingItem> SyncingPacket::getItems() const noexcept {
  *
  * @return size_t
  */
-size_t SyncingPacket::size() const noexcept {
+qint32 SyncingPacket::size() const noexcept {
   size_t size = (
     sizeof(this->packetType) + sizeof(this->packetLength) + sizeof(this->itemCount)
   );
@@ -108,11 +108,11 @@ size_t SyncingPacket::size() const noexcept {
  * @param packet
  */
 QDataStream& operator<<(QDataStream& out, const SyncingPacket& packet) {
-  // write the packet type
-  out << packet.packetType;
-
   // write the packet length
   out << packet.packetLength;
+
+  // write the packet type
+  out << packet.packetType;
 
   // write the item count
   out << packet.itemCount;
@@ -138,6 +138,16 @@ QDataStream& operator<<(QDataStream& out, const SyncingPacket& packet) {
  * @param packet
  */
 QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
+  // read the packet length
+  in >> packet.packetLength;
+
+  // check if stream is valid
+  if (in.status() != QDataStream::Ok) {
+    throw types::except::MalformedPacket(
+        types::enums::ErrorCode::CodingError, "Invalid Packet Length"
+    );
+  }
+
   // read the packet type
   in >> packet.packetType;
 
@@ -152,16 +162,6 @@ QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
   if (packet.packetType != SyncingPacket::PacketType::SyncPacket) {
     throw types::except::MalformedPacket(
         types::enums::ErrorCode::CodingError, "Invalid Packet Type"
-    );
-  }
-
-  // read the packet length
-  in >> packet.packetLength;
-
-  // check if stream is valid
-  if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(
-        types::enums::ErrorCode::CodingError, "Invalid Packet Length"
     );
   }
 

@@ -10,7 +10,6 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-
 // Project headers
 #include "ui/gui/components/device/device.hpp"
 
@@ -33,9 +32,9 @@ class DeviceList : public QWidget {
 
  private:  // Member Variables
 
-  QStackedLayout* stackLayout = new QStackedLayout();
-  QVBoxLayout* labelLayout    = new QVBoxLayout();
-  QVBoxLayout* verticalLayout = new QVBoxLayout();
+  QStackedLayout* stackLayout = new QStackedLayout(this);
+  QWidget* verticalWidget     = new QWidget(this);
+  QVBoxLayout* verticalLayout = new QVBoxLayout(verticalWidget);
 
  public:  // Member Functions
 
@@ -71,6 +70,6 @@ class DeviceList : public QWidget {
   /**
    * @brief Override teh show event
    */
-  void paintEvent(QPaintEvent *event) override;
+  void paintEvent(QPaintEvent* event) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window
