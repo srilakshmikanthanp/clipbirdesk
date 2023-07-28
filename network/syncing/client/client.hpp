@@ -110,13 +110,6 @@ class Client : public service::Discover {
   void processInvalidPacket(const packets::InvalidRequest& packet);
 
   /**
-   * @brief Updates the server list by removing the
-   * server that that has exceeded the threshold
-   * and emit the signal
-   */
-  void updateServerList();
-
-  /**
    * @brief Process the packet that has been received
    * from the server
    */
@@ -126,6 +119,16 @@ class Client : public service::Discover {
    * @brief Process the ssl error
    */
   void processSslError(const QList<QSslError>& errors);
+
+  /**
+   * @brief Handle client connected
+   */
+  void handleConnected();
+
+  /**
+   * @brief Handle client disconnected
+   */
+  void handleDisconnected();
 
  public:
 
@@ -180,18 +183,10 @@ class Client : public service::Discover {
   void disconnectFromServer();
 
   /**
-   * @brief Set the SSL Configuration object
-   *
-   * @param config SSL Configuration
+   * @brief Get the Connection Host and Port object Or Empty
+   * @return QPair<QHostAddress, quint16>
    */
-  void setSSLConfiguration(QSslConfiguration config);
-
-  /**
-   * @brief Get the SSL Configuration object
-   *
-   * @return QSslConfiguration
-   */
-  QSslConfiguration getSSLConfiguration() const;
+  QPair<QHostAddress, quint16> getConnectedServerOrEmpty() const;
 
  protected:  // abstract functions from the base class
 

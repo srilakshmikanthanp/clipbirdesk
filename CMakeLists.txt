@@ -18,10 +18,10 @@ set(protobuf_MSVC_STATIC_RUNTIME OFF)
 set(APPLICATION_ISSUEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk/issues")
 
 # set the main.qss path variable
-set(APPLICATION_MAIN_QSS_PATH "${PROJECT_SOURCE_DIR}/assets/styles/main.qss")
+set(APPLICATION_MAIN_QSS_PATH ":/styles/main.qss")
 
 # Set the logo.png path variable
-set(APPLICATION_LOGO_PATH "${PROJECT_SOURCE_DIR}/assets/images/logo.png")
+set(APPLICATION_LOGO_PATH ":/images/logo.png")
 
 # Set the APPLICATION_HOMEPAGE
 set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
@@ -84,9 +84,14 @@ configure_file(
 # set up project using Qt
 qt_standard_project_setup()
 
+# add resources to project
+qt_add_resources(RESOURCES
+  ${PROJECT_SOURCE_DIR}/assets/resources.qrc
+)
+
 # Add executable
 qt_add_executable(clipbird
-  ${main_cpp}
+  ${main_cpp} ${RESOURCES}
 )
 
 # Link libraries
@@ -104,10 +109,10 @@ target_include_directories(clipbird
   PUBLIC ${PROJECT_BINARY_DIR})
 
 # set target properties
-# set_target_properties(clipbird PROPERTIES
-#   WIN32_EXECUTABLE TRUE
-#   MACOSX_BUNDLE TRUE
-# )
+set_target_properties(clipbird PROPERTIES
+  WIN32_EXECUTABLE TRUE
+  MACOSX_BUNDLE TRUE
+)
 
 # --------------------------------- Unit Tests ---------------------------------#
 # Download and unpack googletest for unit testing

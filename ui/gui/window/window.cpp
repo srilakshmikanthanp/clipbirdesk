@@ -88,18 +88,29 @@ void Window::handleClientListChange(QList<QPair<QHostAddress, quint16>> clients)
  * @brief Handle the Server State Change
  */
 void Window::handleServerStateChange(bool isStarted) {
-  const auto status_m   = isStarted ? Status::Active : Status::Inactive;
-  const auto serverInfo = controller->getServerInfo();
-  const auto serverIp   = serverInfo.first.toString();
-  const auto serverPort = serverInfo.second;
-  const auto IpPort     = QString("%1:%2").arg(serverIp).arg(serverPort);
-  const auto serverName = QHostInfo::fromName(serverIp).hostName();
-  const auto clients    = controller->getConnectedClientsList();
+  // infer the status from the server state
+  auto status_m   = isStarted ? Status::Active : Status::Inactive;
+  auto serverName = QString("-");
+  auto ipPort     = QString("-");
+  auto clients    = controller->getConnectedClientsList();
 
+  // if the server is started
+  if (isStarted) {
+    auto info  = controller->getServerInfo();
+    auto ip    = info.first.toString();
+    auto port  = info.second;
+    serverName = QHostInfo::fromName(ip).hostName();
+    ipPort     = QString("%1:%2").arg(ip).arg(port);
+  }
+
+  // set the server status
   this->setServerHostName(s_hostNameKey, serverName);
   this->setStatus(s_statusKey, status_m);
-  this->setServerIpPort(s_ipPortKey, IpPort);
+  this->setServerIpPort(s_ipPortKey, ipPort);
   this->setHostCount(s_clientsKey, clients.size());
+
+  // update the client list
+  this->handleClientListChange(clients);
 }
 
 /**
@@ -107,12 +118,15 @@ void Window::handleServerStateChange(bool isStarted) {
  *
  * @param client
  */
-void Window::handleNewHostConnected(const QPair<QHostAddress, quint16>& client) {
+void Window::handleNewHostConnected(const QPair<QHostAddress, quint16> &client) {
   // get the message to show
-  auto message = QString("A client is trying to connect to the server\n"
-                         "Host: %1:%2\n"
-                         "Accept the connection?")
-                     .arg(client.first.toString(), QString::number(client.second));
+  // clang-format off
+  auto message = QString(
+    "A New client is trying to connect to the server\n"
+    "Host: %1:%2\n"
+    "Accept the connection?")
+  .arg(client.first.toString(), QString::number(client.second));
+  // clang-format on
 
   // get the user input
   auto dialog = new QMessageBox();
@@ -140,15 +154,13 @@ void Window::handleNewHostConnected(const QPair<QHostAddress, quint16>& client) 
 
   // connect the dialog to window AuthSuccess signal
   const auto signal_s = &QMessageBox::accepted;
-  const auto slot_s   = [&] { controller->authSuccess(client); };
+  const auto slot_s   = [=] { controller->authSuccess(client); };
   connect(dialog, signal_s, slot_s);
 
   // connect the dialog to window AuthFail signal
   const auto signal_f = &QMessageBox::rejected;
-  const auto slot_f   = [&] { controller->authFailed(client); };
+  const auto slot_f   = [=] { controller->authFailed(client); };
   connect(dialog, signal_f, slot_f);
-
-  controller->authSuccess(client);
 }
 
 //----------------------------- slots for Client --------------------------//
@@ -161,7 +173,7 @@ void Window::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers)
   QList<components::Device::Value> servers_m;
 
   // get the connected server
-  const auto server    = controller->getConnectedServer();
+  const auto server = controller->getConnectedServerOrEmpty();
 
   // get the action for the server
   const auto getAction = [&server](const auto& s) {
@@ -185,60 +197,71 @@ void Window::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers)
  */
 void Window::handleServerStatusChange(bool status) {
   // infer the status from the server state
-  const auto status_m   = status ? Status::Connected : Status::Disconnected;
-  const auto server     = controller->getConnectedServer();
-  const auto serverIp   = server.first.toString();
-  const auto serverPort = server.second;
-  const auto IpPort     = QString("%1:%2").arg(serverIp).arg(serverPort);
-  const auto serverName = QHostInfo::fromName(serverIp).hostName();
-  const auto servers    = controller->getServerList();
+  auto status_m   = status ? Status::Connected : Status::Disconnected;
+  auto ipPort     = QString("-");
+  auto serverName = QString("-");
+  auto servers    = controller->getServerList();
+
+  // if the client is connected to server
+  if (status) {
+    auto server = controller->getConnectedServer();
+    auto ip     = server.first.toString();
+    auto port   = server.second;
+    serverName  = QHostInfo::fromName(ip).hostName();
+    ipPort      = QString("%1:%2").arg(ip).arg(port);
+  }
 
   // set the server status
   this->setServerHostName(c_hostNameKey, serverName);
   this->setStatus(c_statusKey, status_m);
-  this->setServerIpPort(c_ipPortKey, IpPort);
+  this->setServerIpPort(c_ipPortKey, ipPort);
   this->setHostCount(c_serversKey, servers.size());
+
+  // update the server list
+  this->handleServerListChange(servers);
 }
 
 /**
  * @brief Construct a new Window object
  * with parent as QWidget
+ *
+ * @param c controller
+ * @param p parent
  */
-Window::Window(Window::ClipBird* controller, QWidget* parent)
-    : QFrame(parent), controller(controller) {
+Window::Window(Window::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   // set no taskbar icon & no window Frame & always on top
   setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
   // create the  layout
-  auto root = new QVBoxLayout();
+  QVBoxLayout* root = new QVBoxLayout();
 
   // add top layout to  layout
   root->addWidget(this->deviceInfo);
 
   // create tab widget
-  auto tab = new QTabWidget();
+  QTabWidget* tab = new QTabWidget();
 
   // Set the Expanding & Document Mode
   tab->tabBar()->setExpanding(true);
   tab->tabBar()->setDocumentMode(true);
 
   // Create QScrollArea
-  auto serverListArea = new QScrollArea();
-  auto clientListArea = new QScrollArea();
+  auto serverArea = new QScrollArea();
+  auto clientArea = new QScrollArea();
 
   // set the widget as Resizable
-  serverListArea->setWidgetResizable(true);
-  clientListArea->setWidgetResizable(true);
+  serverArea->setWidgetResizable(true);
+  clientArea->setWidgetResizable(true);
 
   // set the widget to scroll area
-  serverListArea->setWidget(this->serverList);
-  clientListArea->setWidget(this->clientList);
+  serverArea->setWidget(this->serverList);
+  clientArea->setWidget(this->clientList);
 
   // add server list to tab
-  tab->addTab(clientListArea, "Server");
+  tab->addTab(clientArea, "Server");
 
   // add client list to tab
-  tab->addTab(serverListArea, "Client");
+  tab->addTab(serverArea, "Client");
 
   // add tab to  layout
   root->addWidget(tab);
@@ -252,10 +275,14 @@ Window::Window(Window::ClipBird* controller, QWidget* parent)
   });
 
   // server list slot
-  auto serverListSlot = [&](const auto& host) { emit onHostAction(Tabs::Client, host); };
+  auto serverListSlot = [=](const auto& host) {
+    emit onHostAction(Tabs::Client, host);
+  };
 
   // client list slot
-  auto clientListSlot = [&](const auto& host) { emit onHostAction(Tabs::Server, host); };
+  auto clientListSlot = [=](const auto& host) {
+    emit onHostAction(Tabs::Server, host);
+  };
 
   // connect server list signal
   connect(serverList, &window::DeviceList::onAction, serverListSlot);

@@ -46,6 +46,11 @@ class Clipboard : public QObject {
 
   Q_DISABLE_COPY_MOVE(Clipboard)
 
+ private:  // private slots
+
+  /// @brief Slot to notify the clipboard change
+  void onClipboardChangeImpl();
+
  public:  // constructor
 
   /**

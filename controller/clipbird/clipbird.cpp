@@ -97,10 +97,7 @@ void ClipBird::setCurrentHostAsServer() {
  */
 void ClipBird::setCurrentHostAsClient() {
   // Emplace the client into the m_host variant variable
-  auto *client = &m_host.emplace<Client>(this);
-
-  // Set the SSL Configuration
-  client->setSSLConfiguration(m_sslConfig);
+  auto *client        = &m_host.emplace<Client>(this);
 
   // Connect the onServerListChanged signal to the signal
   const auto signal_s = &Client::OnServerListChanged;
@@ -115,7 +112,7 @@ void ClipBird::setCurrentHostAsClient() {
   // Connect the onServerStateChanged signal to the signal
   const auto signal_c = &Client::OnServerStatusChanged;
   const auto slot_c   = &ClipBird::handleServerStatusChanged;
-  const auto slot_d   = &ClipBird::handleServerStatusChanged;
+  const auto slot_d   = &ClipBird::OnServerStatusChanged;
   connect(client, signal_c, this, slot_c);
   connect(client, signal_c, this, slot_d);
 
@@ -293,6 +290,19 @@ void ClipBird::disconnectFromServer(const QPair<QHostAddress, quint16> &host) {
     std::get<Client>(m_host).disconnectFromServer();
   } else {
     throw std::runtime_error("Server not found");
+  }
+}
+
+/**
+ * @brief get the connected server address and port or empty
+ *
+ * @return QPair<QHostAddress, quint16> address and port
+ */
+QPair<QHostAddress, quint16> ClipBird::getConnectedServerOrEmpty() const {
+  if (std::holds_alternative<Client>(m_host)) {
+    return std::get<Client>(m_host).getConnectedServerOrEmpty();
+  } else {
+    throw std::runtime_error("Host is not client");
   }
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::controller

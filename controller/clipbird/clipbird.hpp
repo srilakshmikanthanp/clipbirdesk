@@ -180,5 +180,12 @@ class ClipBird : public QObject {
    * @brief Disconnect from the server
    */
   void disconnectFromServer(const QPair<QHostAddress, quint16> &host);
+
+  /**
+   * @brief get the connected server address and port or empty
+   *
+   * @return QPair<QHostAddress, quint16> address and port
+   */
+  QPair<QHostAddress, quint16> getConnectedServerOrEmpty() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::controller

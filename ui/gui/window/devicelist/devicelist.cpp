@@ -72,7 +72,7 @@ void DeviceList::setHosts(QList<components::Device::Value> hosts) {
   }
 
   // Redraw the widget
-  this->update();
+  this->repaint();
 }
 
 /**
@@ -104,7 +104,7 @@ void DeviceList::removeHosts() {
   }
 
   // Redraw the widget
-  this->update();
+  this->repaint();
 }
 
 /**
@@ -126,7 +126,7 @@ void DeviceList::addHost(components::Device::Value host) {
   verticalLayout->addWidget(hostView);
 
   // Redraw the widget
-  this->update();
+  this->repaint();
 }
 
 /**
@@ -143,13 +143,13 @@ void DeviceList::removeHost(components::Device::Value host) {
   }
 
   // Redraw the widget
-  this->update();
+  this->repaint();
 }
 
 /**
  * @brief Override the showEvent
  */
-void DeviceList::showEvent(QShowEvent* event) {
+void DeviceList::paintEvent(QPaintEvent *event) {
   // if the vertical layout is empty then add a label
   if (verticalLayout->count() == 0) {
     this->stackLayout->setCurrentIndex(0);
@@ -157,10 +157,7 @@ void DeviceList::showEvent(QShowEvent* event) {
     this->stackLayout->setCurrentIndex(1);
   }
 
-  // Redraw the widget
-  this->update();
-
   // call the base class
-  QWidget::showEvent(event);
+  QWidget::paintEvent(event);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window

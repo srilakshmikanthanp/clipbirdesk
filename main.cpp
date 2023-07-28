@@ -85,6 +85,13 @@ class ClipbirdApplication : public SingleApplication {
     signal(SIGINT, [](int sig) { qApp->quit(); });
     signal(SIGABRT, [](int sig) { qApp->quit(); });
 
+    // clang-format off
+    #ifdef Q_OS_LINUX
+    // set the signal handler for linux
+    signal(SIGKILL, [](int sig) { qApp->quit(); });
+    #endif
+    // clang-format on
+
     // QFile to read the qss file
     QFile qssFile(QString::fromStdString(constants::getAppQSS()));
 
@@ -96,11 +103,6 @@ class ClipbirdApplication : public SingleApplication {
 
     // set not to quit on last window closed
     qApp->setQuitOnLastWindowClosed(false);
-
-#ifdef Q_OS_LINUX
-    // set the signal handler for linux
-    signal(SIGKILL, [](int sig) { qApp->quit(); });
-#endif
 
     // BackDrop Shadow
     auto shadow = new QGraphicsDropShadowEffect();

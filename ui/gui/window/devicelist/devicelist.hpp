@@ -71,6 +71,6 @@ class DeviceList : public QWidget {
   /**
    * @brief Override teh show event
    */
-  void showEvent(QShowEvent* event) override;
+  void paintEvent(QPaintEvent *event) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window

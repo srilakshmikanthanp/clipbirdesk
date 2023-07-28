@@ -88,9 +88,22 @@ void Client::processReadyRead() {
  */
 void Client::processSslError(const QList<QSslError>& errors) {
   for (auto& error : errors) {
-    std::cout << error.errorString().toStdString();
     emit OnErrorOccurred(error.errorString());
   }
+}
+
+/**
+ * @brief Handle client connected
+ */
+void Client::handleConnected() {
+  emit OnServerStatusChanged(true);
+}
+
+/**
+ * @brief Handle client disconnected
+ */
+void Client::handleDisconnected() {
+  emit OnServerStatusChanged(false);
 }
 
 /**
@@ -101,7 +114,7 @@ void Client::processSslError(const QList<QSslError>& errors) {
  * @param th threshold
  * @param parent Parent
  */
-Client::Client(QObject* parent) : service::Discover (parent) {
+Client::Client(QObject* parent) : service::Discover(parent) {
   // connect the signal to emit the signal for
   // OnErrorOccurred from the base class
   const auto signal_e = &service::Discover::OnErrorOccurred;
@@ -111,7 +124,7 @@ Client::Client(QObject* parent) : service::Discover (parent) {
   // connected signal to emit the signal for
   // server state changed
   const auto signal_c = &QSslSocket::connected;
-  const auto slot_c   = [&]() { emit OnServerStatusChanged(true); };
+  const auto slot_c   = &Client::handleConnected;
   connect(m_ssl_socket, signal_c, this, slot_c);
 
   // connect the signals and slots for the socket
@@ -130,8 +143,11 @@ Client::Client(QObject* parent) : service::Discover (parent) {
   // disconnected signal to emit the signal for
   // server state changed
   const auto signal_d = &QSslSocket::disconnected;
-  const auto slot_d   = [&]() { emit OnServerStatusChanged(false); };
+  const auto slot_d   = &Client::handleDisconnected;
   connect(m_ssl_socket, signal_d, this, slot_d);
+
+  // set the peer verify mode to none
+  m_ssl_socket->setPeerVerifyMode(QSslSocket::VerifyNone);
 }
 
 /**
@@ -147,11 +163,11 @@ void Client::syncItems(QVector<QPair<QString, QByteArray>> items) {
   }
 
   // using createPacket to create the packet
+  using packets::SyncingPacket;
   using utility::functions::createPacket;
 
   // create the packet
-  packets::SyncingPacket packet =
-      createPacket({packets::SyncingPacket::PacketType::SyncPacket, items});
+  SyncingPacket packet = createPacket({SyncingPacket::PacketType::SyncPacket, items});
 
   // send the packet to the server
   this->sendPacket(packet);
@@ -199,11 +215,6 @@ void Client::connectToServer(QPair<QHostAddress, quint16> client) {
 
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
-
-  // wait for the connection
-  if (!m_ssl_socket->waitForEncrypted()) {
-    std::cout << m_ssl_socket->errorString().toStdString() << std::endl;
-  }
 }
 
 /**
@@ -211,6 +222,10 @@ void Client::connectToServer(QPair<QHostAddress, quint16> client) {
  * @return QPair<QHostAddress, quint16>
  */
 QPair<QHostAddress, quint16> Client::getConnectedServer() const {
+  if (this->m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
+    throw std::runtime_error("Socket is not connected");
+  }
+
   return {m_ssl_socket->peerAddress(), m_ssl_socket->peerPort()};
 }
 
@@ -222,21 +237,15 @@ void Client::disconnectFromServer() {
 }
 
 /**
- * @brief Set the SSL Configuration object
- *
- * @param config SSL Configuration
+ * @brief Get the Connection Host and Port object Or Empty
+ * @return QPair<QHostAddress, quint16>
  */
-void Client::setSSLConfiguration(QSslConfiguration config) {
-  m_ssl_socket->setSslConfiguration(config);
-}
-
-/**
- * @brief Get the SSL Configuration object
- *
- * @return QSslConfiguration
- */
-QSslConfiguration Client::getSSLConfiguration() const {
-  return m_ssl_socket->sslConfiguration();
+QPair<QHostAddress, quint16> Client::getConnectedServerOrEmpty() const {
+  try {
+    return this->getConnectedServer();
+  } catch (const std::exception&) {
+    return QPair<QHostAddress, quint16>();
+  }
 }
 
 /**

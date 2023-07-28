@@ -9,6 +9,15 @@
 
 namespace srilakshmikanthanp::clipbirdesk::clipboard {
 /**
+ * @brief Slot to notify the clipboard change
+ */
+void Clipboard::onClipboardChangeImpl() {
+  if (!this->m_clipboard->ownsClipboard()) {
+    emit OnClipboardChange(this->get());
+  }
+}
+
+/**
  * @brief Construct a new Clipboard object and manage
  * the clipboard that is passed via the constructor
  *
@@ -19,9 +28,8 @@ Clipboard::Clipboard(QClipboard* clipboard, QObject* parent)
     : QObject(parent), m_clipboard(clipboard) {
   // connect the clipboard change signal to the slot
   // that is used to notify the listeners
-  const auto func   = &Clipboard::OnClipboardChange;
   const auto signal = &QClipboard::changed;
-  const auto slot   = [this, func] { emit(this->*func)(get()); };
+  const auto slot   = &Clipboard::onClipboardChangeImpl;
   QObject::connect(m_clipboard, signal, this, slot);
 }
 

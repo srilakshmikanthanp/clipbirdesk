@@ -235,8 +235,6 @@ void Server::authSuccess(const QPair<QHostAddress, quint16> &client) {
   auto start = m_un_authed_clients.begin();
   auto end   = m_un_authed_clients.end();
 
-  auto size = m_un_authed_clients.size();
-
   // Get the client from the unauthenticated list and remove it
   auto client_itr = std::find_if(start, end, matcher);
 
@@ -288,7 +286,7 @@ void Server::authSuccess(const QPair<QHostAddress, quint16> &client) {
 void Server::authFailed(const QPair<QHostAddress, quint16> &client) {
   // Matcher Lambda Function to find the client
   const auto matcher = [&client](QSslSocket *c) {
-    return c->peerAddress() == client.first && c->peerPort() == client.second;
+    return (c->peerAddress() == client.first) && (c->peerPort() == client.second);
   };
 
   // Get the iterator to the start and end of the list

@@ -65,36 +65,20 @@ std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey) {
   // Allocate memory for the X509 structure.
   std::shared_ptr<X509> x509(X509_new(), X509_free);
 
+  // Expiry time
+  constexpr long expiry = 60 * 60 * 24 * 365;
+
   // if x509 is null then throw an error
   if (x509.get() == NULL) {
     throw std::runtime_error("Can't Create X509");
   }
 
-  // set the serial number
-  ASN1_INTEGER_set(X509_get_serialNumber(x509.get()), 1);
-
   // set Expiry date to 1 year
   X509_gmtime_adj(X509_get_notBefore(x509.get()), 0);
-  X509_gmtime_adj(X509_get_notAfter(x509.get()), 31536000L);
+  X509_gmtime_adj(X509_get_notAfter(x509.get()), expiry);
 
   // Set the public key for our certificate.
   X509_set_pubkey(x509.get(), pkey.get());
-
-  // We want to copy the subject name to the issuer name.
-  X509_NAME *name = X509_get_subject_name(x509.get());
-
-  // Make some parameters
-  auto con        = (const unsigned char *)"IN";
-  auto org        = (const unsigned char *)"ClipBird";
-  auto cn         = (const unsigned char *)"localhost";
-
-  // Set the country code and common name.
-  X509_NAME_add_entry_by_txt(name, "C", MBSTRING_ASC, con, -1, -1, 0);
-  X509_NAME_add_entry_by_txt(name, "O", MBSTRING_ASC, org, -1, -1, 0);
-  X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, cn, -1, -1, 0);
-
-  // Now set the issuer name
-  X509_set_issuer_name(x509.get(), name);
 
   // Actually sign the certificate with our key.
   if (!X509_sign(x509.get(), pkey.get(), EVP_sha1())) {
@@ -168,7 +152,7 @@ QSslConfiguration getQSslConfiguration(int bits) {
   QSslConfiguration sslConfig;
 
   // Add the certificate to the configuration
-  sslConfig.addCaCertificate(sslCert);
+  sslConfig.setLocalCertificate(sslCert);
 
   // Add the key to the configuration
   sslConfig.setPrivateKey(sslKey);
