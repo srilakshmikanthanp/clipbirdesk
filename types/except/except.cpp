@@ -6,6 +6,7 @@
 #include "except.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::types::except {
+//------------------------MalformedPacket------------------------//
 // Constructor
 MalformedPacket::MalformedPacket(std::uint8_t code, const std::string& message) noexcept
     : message(message), code(code) {}
@@ -19,6 +20,18 @@ const char* MalformedPacket::what() const noexcept {
 std::uint8_t MalformedPacket::getCode() const noexcept {
   return code;
 }
+
+//------------------------NotThisPacket------------------------//
+
+// Constructor
+NotThisPacket::NotThisPacket(const std::string& message) noexcept : message(message) {}
+
+// get message
+const char* NotThisPacket::what() const noexcept {
+  return message.c_str();
+}
+
+//------------------------NotSupported------------------------//
 
 // Constructor
 NotSupported::NotSupported(const std::string& message) noexcept : message(message) {}

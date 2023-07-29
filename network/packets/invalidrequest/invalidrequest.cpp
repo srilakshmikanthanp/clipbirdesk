@@ -154,8 +154,8 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
   }
 
   // check the packet type
-  if (packet.packetType != 0x00) {
-    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Type");
+  if (packet.packetType != InvalidRequest::PacketType::RequestFailed) {
+    throw types::except::NotThisPacket("Not Authentication Packet");
   }
 
   // read the error code
@@ -166,8 +166,11 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
     throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Error Code");
   }
 
+  // using some types
+  using types::enums::ErrorCode;
+
   // check the error code
-  if (packet.errorCode != 0x01) {
+  if (packet.errorCode != ErrorCode::CodingError && packet.errorCode != ErrorCode::SSLError) {
     throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Error Code");
   }
 

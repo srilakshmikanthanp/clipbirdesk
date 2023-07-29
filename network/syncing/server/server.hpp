@@ -13,6 +13,7 @@
 #include <QSslSocket>
 #include <QVector>
 
+#include "network/packets/authentication/authentication.hpp"
 #include "network/service/register/register.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
@@ -90,6 +91,9 @@ class Server : public service::Register {
     // create the QDataStream
     QDataStream stream(client);
 
+    // start the transaction
+    stream.startTransaction();
+
     // write the data to the stream
     auto wrote = 0;
 
@@ -100,15 +104,20 @@ class Server : public service::Register {
       auto size  = data.size() - wrote;
       auto bytes = stream.writeRawData(start, size);
 
-      // if error occurred
-      if (bytes == -1) {
-        emit OnErrorOccurred(client->errorString());
-        return;
+      // if no error occurred
+      if (bytes != -1) {
+        wrote += bytes; continue;
       }
 
-      // update the wrote
-      wrote += bytes;
+      // abort the transaction
+      stream.abortTransaction();
+
+      //  Notifies the error occurred
+      emit OnErrorOccurred(client->errorString());
     }
+
+    // commit the transaction
+    stream.commitTransaction();
   }
 
   /**

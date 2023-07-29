@@ -68,8 +68,8 @@ QVector<QPair<QString, QByteArray>> Clipboard::get() {
     auto image = qvariant_cast<QImage>(mimeData->imageData());
     QByteArray data; QBuffer buffer(&data);
     buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer);
-    items.append({MIME_TYPE_IMAGE, data});
+    image.save(&buffer, "PNG");
+    items.append({MIME_TYPE_PNG, data});
   }
 
   // has Text
@@ -107,9 +107,9 @@ void Clipboard::set(const QVector<QPair<QString, QByteArray>> data) {
 
   // set the data
   for (const auto& [mime, data] : data) {
-    // has Image
-    if (mime == MIME_TYPE_IMAGE) {
-      mimeData->setImageData(QImage::fromData(data));
+    // has Image png
+    if (mime == MIME_TYPE_PNG) {
+      mimeData->setImageData(QImage::fromData(data, "PNG"));
     }
 
     // has HTML

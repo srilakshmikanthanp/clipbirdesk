@@ -7,11 +7,11 @@
 
 namespace srilakshmikanthanp::clipbirdesk::controller {
 /**
- * @brief Handle On Server Status Changed (From client)
+ * @brief Handle On Server Authenticated the Client (From client)
  *
  * @param isConnected is connected to the server
  */
-void ClipBird::handleServerStatusChanged(bool isConnected) {
+void ClipBird::handleServerAuthentication(bool isSuccess) {
   // if the host is not client then throw error
   if (!std::holds_alternative<Client>(m_host)) {
     throw std::runtime_error("Host is not client");
@@ -20,13 +20,37 @@ void ClipBird::handleServerStatusChanged(bool isConnected) {
   // get the client and disconnect the signals
   const auto signal = &clipboard::Clipboard::OnClipboardChange;
   auto *client      = &std::get<Client>(m_host);
-  const auto slot   = &Client::syncItems;
+  const auto slot_n = &Client::syncItems;
+  const auto slot_l = &ClipBird::OnClipboardSent;
 
   // if the client is connected then connect the signals
-  if (isConnected) {
-    connect(&m_clipboard, signal, client, slot);
-  } else {
-    disconnect(&m_clipboard, signal, client, slot);
+  if (isSuccess) {
+    connect(&m_clipboard, signal, client, slot_n);
+    connect(&m_clipboard, signal, this, slot_l);
+  }
+}
+
+/**
+ * @brief Handle On Server Disconnect from Client (From client)
+ *
+ * @param isConnected is connected to the server
+ */
+void ClipBird::handleServerStatusChanged(bool status) {
+  // if the host is not client then throw error
+  if (!std::holds_alternative<Client>(m_host)) {
+    throw std::runtime_error("Host is not client");
+  }
+
+  // get the client and disconnect the signals
+  const auto signal = &clipboard::Clipboard::OnClipboardChange;
+  auto *client      = &std::get<Client>(m_host);
+  const auto slot_n = &Client::syncItems;
+  const auto slot_l = &ClipBird::OnClipboardSent;
+
+  // if the client is connected then connect the signals
+  if (!status) {
+    disconnect(&m_clipboard, signal, client, slot_n);
+    disconnect(&m_clipboard, signal, this, slot_l);
   }
 }
 
@@ -66,12 +90,16 @@ void ClipBird::setCurrentHostAsServer() {
   // Connect the onSyncRequest signal to the clipboard
   const auto signal_c = &Server::OnSyncRequest;
   const auto slot_c   = &clipboard::Clipboard::set;
+  const auto slot_g   = &ClipBird::OnClipboardRecv;
   connect(server, signal_c, &m_clipboard, slot_c);
+  connect(server, signal_c, this, slot_g);
 
   // connect the OnClipboardChange signal to the server
   const auto signal_b = &clipboard::Clipboard::OnClipboardChange;
   const auto slot_b   = &Server::syncItems;
+  const auto slot_x   = &ClipBird::OnClipboardSent;
   connect(&m_clipboard, signal_b, server, slot_b);
+  connect(&m_clipboard, signal_b, this, slot_x);
 
   // Connect the onErrorOccurred signal to the signal
   const auto signal_e = &Server::OnErrorOccurred;
@@ -97,34 +125,43 @@ void ClipBird::setCurrentHostAsServer() {
  */
 void ClipBird::setCurrentHostAsClient() {
   // Emplace the client into the m_host variant variable
-  auto *client        = &m_host.emplace<Client>(this);
+  auto *client         = &m_host.emplace<Client>(this);
 
   // Connect the onServerListChanged signal to the signal
-  const auto signal_s = &Client::OnServerListChanged;
-  const auto slot_s   = &ClipBird::OnServerListChanged;
-  connect(client, signal_s, this, slot_s);
+  const auto signal_sl = &Client::OnServerListChanged;
+  const auto slot_sl   = &ClipBird::OnServerListChanged;
+  connect(client, signal_sl, this, slot_sl);
 
   // Connect the onServerFound signal to the signal
-  const auto signal_f = &Client::OnServerFound;
-  const auto slot_f   = &ClipBird::OnServerFound;
-  connect(client, signal_f, this, slot_f);
+  const auto signal_fn = &Client::OnServerFound;
+  const auto slot_fn   = &ClipBird::OnServerFound;
+  connect(client, signal_fn, this, slot_fn);
 
   // Connect the onServerStateChanged signal to the signal
-  const auto signal_c = &Client::OnServerStatusChanged;
-  const auto slot_c   = &ClipBird::handleServerStatusChanged;
-  const auto slot_d   = &ClipBird::OnServerStatusChanged;
-  connect(client, signal_c, this, slot_c);
-  connect(client, signal_c, this, slot_d);
+  const auto slot_hc   = &ClipBird::handleServerStatusChanged;
+  const auto signal_sc = &Client::OnServerStatusChanged;
+  const auto slot_sc   = &ClipBird::OnServerStatusChanged;
+  connect(client, signal_sc, this, slot_sc);
+  connect(client, signal_sc, this, slot_hc);
+
+  // Connect the onServerAuthentication signal to the signal
+  const auto slot_ha   = &ClipBird::handleServerAuthentication;
+  const auto signal_au = &Client::OnServerAuthentication;
+  const auto slot_au   = &ClipBird::OnServerAuthentication;
+  connect(client, signal_au, this, slot_au);
+  connect(client, signal_au, this, slot_ha);
 
   // Connect the onErrorOccurred signal to the signal
-  const auto signal_e = &Client::OnErrorOccurred;
-  const auto slot_e   = &ClipBird::OnErrorOccurred;
-  connect(client, signal_e, this, slot_e);
+  const auto signal_er = &Client::OnErrorOccurred;
+  const auto slot_er   = &ClipBird::OnErrorOccurred;
+  connect(client, signal_er, this, slot_er);
 
   // Connect the onSyncRequest signal to the clipboard
-  const auto signal_r = &Client::OnSyncRequest;
-  const auto slot_r   = &clipboard::Clipboard::set;
-  connect(client, signal_r, &m_clipboard, slot_r);
+  const auto signal_rq = &Client::OnSyncRequest;
+  const auto slot_rq   = &clipboard::Clipboard::set;
+  const auto slot_g    = &ClipBird::OnClipboardRecv;
+  connect(client, signal_rq, &m_clipboard, slot_rq);
+  connect(client, signal_rq, this, slot_g);
 
   // Start the Discovery
   client->startDiscovery();
@@ -269,6 +306,19 @@ QPair<QHostAddress, quint16> ClipBird::getConnectedServer() const {
 }
 
 /**
+ * @brief get the connected server address and port or empty
+ *
+ * @return QPair<QHostAddress, quint16> address and port
+ */
+QPair<QHostAddress, quint16> ClipBird::getConnectedServerOrEmpty() const {
+  if (std::holds_alternative<Client>(m_host)) {
+    return std::get<Client>(m_host).getConnectedServerOrEmpty();
+  } else {
+    throw std::runtime_error("Host is not client");
+  }
+}
+
+/**
  * @brief Disconnect from the server
  */
 void ClipBird::disconnectFromServer(const QPair<QHostAddress, quint16> &host) {
@@ -294,13 +344,24 @@ void ClipBird::disconnectFromServer(const QPair<QHostAddress, quint16> &host) {
 }
 
 /**
- * @brief get the connected server address and port or empty
- *
- * @return QPair<QHostAddress, quint16> address and port
+ * @brief Get the Authed Server object
+ * @return QPair<QHostAddress, quint16>
  */
-QPair<QHostAddress, quint16> ClipBird::getConnectedServerOrEmpty() const {
+QPair<QHostAddress, quint16> ClipBird::getAuthedServer() const {
   if (std::holds_alternative<Client>(m_host)) {
-    return std::get<Client>(m_host).getConnectedServerOrEmpty();
+    return std::get<Client>(m_host).getAuthedServer();
+  } else {
+    throw std::runtime_error("Host is not client");
+  }
+}
+
+/**
+ * @brief Get the Authed Server object Or Empty
+ * @return QPair<QHostAddress, quint16>
+ */
+QPair<QHostAddress, quint16> ClipBird::getAuthedServerOrEmpty() const {
+  if (std::holds_alternative<Client>(m_host)) {
+    return std::get<Client>(m_host).getAuthedServerOrEmpty();
   } else {
     throw std::runtime_error("Host is not client");
   }

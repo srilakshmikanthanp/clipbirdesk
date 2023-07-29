@@ -6,7 +6,6 @@
 // https://opensource.org/licenses/MIT
 
 // Standard header files
-#include <iostream>
 #include <stdexcept>
 
 // Qt header files
@@ -16,26 +15,25 @@
 #include <QtTypes>
 
 // Local header files
-#include "syncingitem/syncingitem.hpp"
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
- * @brief Clipboard Sync Packet
+ * @brief Authentication Packet used to indicate the status
+ * of the authentication process
  */
-class SyncingPacket {
- private:  // private members
+class Authentication {
+ private:
 
-  quint8 packetType = 0x02;
   qint32 packetLength;
-  qint32 itemCount;
-  QVector<SyncingItem> items;
+  quint8 packetType = 0x00;
+  quint8 authStatus;
 
  public:
 
   /// @brief Allowed Packet Types
-  enum PacketType : quint8 { SyncPacket = 0x02 };
+  enum PacketType : quint8 { AuthStatus = 0x01 };
 
  public:
 
@@ -68,54 +66,42 @@ class SyncingPacket {
   quint8 getPacketType() const noexcept;
 
   /**
-   * @brief Set the Item Count object
+   * @brief Set the Auth Status object
    *
-   * @param count
+   * @param status
    */
-  void setItemCount(qint32 count);
+  void setAuthStatus(quint8 status);
 
   /**
-   * @brief Get the Item Count object
+   * @brief Get the Auth Status object
+   *
+   * @return quint8
+   */
+  quint8 getAuthStatus() const noexcept;
+
+  /**
+   * @brief Get the Size of the Packet
    *
    * @return qint32
-   */
-  qint32 getItemCount() const noexcept;
-
-  /**
-   * @brief Set the Payloads object
-   *
-   * @param payloads
-   */
-  void setItems(const QVector<SyncingItem>& payloads);
-
-  /**
-   * @brief Get the Payloads object
-   *
-   * @return QVector<Payload>
-   */
-  QVector<SyncingItem> getItems() const noexcept;
-
-  /**
-   * @brief Get the size of the packet
-   *
-   * @return size_t
    */
   qint32 size() const noexcept;
 
   /**
-   * @brief Overloaded operator<< for QDataStream
+   * @brief Input stream operator for QDataStream
    *
-   * @param out
+   * @param stream
    * @param packet
+   * @return QDataStream&
    */
-  friend QDataStream& operator<<(QDataStream& out, const SyncingPacket& packet);
+  friend QDataStream& operator<<(QDataStream& stream, const Authentication packet);
 
   /**
-   * @brief Overloaded operator>> for QDataStream
+   * @brief Output stream operator for QDataStream
    *
-   * @param in
+   * @param stream
    * @param packet
+   * @return QDataStream&
    */
-  friend QDataStream& operator>>(QDataStream& in, SyncingPacket& packet);
+  friend QDataStream& operator>>(QDataStream& stream, Authentication& packet);
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::network::packets
+} // namespace srilakshmikanthanp::clipbirdesk::network::packets

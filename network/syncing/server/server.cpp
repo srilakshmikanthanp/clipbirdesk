@@ -103,14 +103,17 @@ void Server::processReadyRead() {
 
   // read the data from the socket
   while (toRead > 0) {
+    // Try to read the data
     auto start = data.data() + data.size() - toRead;
     auto bytes = get.readRawData(start, toRead);
 
+    // if failed, then rollback
     if (bytes == -1) {
       get.rollbackTransaction();
       return;
     }
 
+    // if success, then update
     toRead -= bytes;
   }
 
@@ -127,6 +130,8 @@ void Server::processReadyRead() {
     const auto type = packets::InvalidRequest::PacketType::RequestFailed;
     this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
     return;
+  } catch (const types::except::NotThisPacket &e) {
+    qInfo() << e.what();
   } catch (const std::exception &e) {
     emit OnErrorOccurred(e.what());
     return;
@@ -134,6 +139,12 @@ void Server::processReadyRead() {
     emit OnErrorOccurred("Unknown Error");
     return;
   }
+
+  // if the packet is none of the above then send the invalid packet
+  const auto type = packets::InvalidRequest::PacketType::RequestFailed;
+  const auto code = types::enums::ErrorCode::InvalidPacket;
+  const auto msg  = "Invalid Packet";
+  this->sendPacket(client, createPacket({type, code, msg}));
 }
 
 /**
@@ -141,13 +152,13 @@ void Server::processReadyRead() {
  */
 void Server::processDisconnection() {
   // Get the client that was disconnected
-  auto client      = qobject_cast<QSslSocket *>(sender());
+  auto client = qobject_cast<QSslSocket *>(sender());
 
   // convert to QPair<QHostAddress, quint16>
-  auto client_info = QPair<QHostAddress, quint16>(client->peerAddress(), client->peerPort());
+  auto info   = QPair<QHostAddress, quint16>(client->peerAddress(), client->peerPort());
 
   // Notify the listeners that the client is disconnected
-  emit OnCLientStateChanged(client_info, false);
+  emit OnCLientStateChanged(info, false);
 
   // Remove the client from the list of clients
   m_authed_clients.removeOne(client);
@@ -274,8 +285,8 @@ void Server::authSuccess(const QPair<QHostAddress, quint16> &client) {
   };
 
   // Get the iterator to the start and end of the list
-  auto start = m_un_authed_clients.begin();
-  auto end   = m_un_authed_clients.end();
+  auto start      = m_un_authed_clients.begin();
+  auto end        = m_un_authed_clients.end();
 
   // Get the client from the unauthenticated list and remove it
   auto client_itr = std::find_if(start, end, matcher);
@@ -284,7 +295,7 @@ void Server::authSuccess(const QPair<QHostAddress, quint16> &client) {
   if (client_itr == m_un_authed_clients.end()) return;
 
   // Get the client from the iterator
-  auto client_tls     = *client_itr;
+  auto client_tls = *client_itr;
 
   // Remove the client from the unauthenticated list
   m_un_authed_clients.erase(client_itr);
@@ -318,6 +329,18 @@ void Server::authSuccess(const QPair<QHostAddress, quint16> &client) {
 
   // Notify the listeners that the client list is changed
   emit OnClientListChanged(getConnectedClientsList());
+
+  // using the create packet from namespace
+  using utility::functions::createPacket;
+
+  // create the Authentication packet
+  packets::Authentication packet = createPacket({
+      packets::Authentication::PacketType::AuthStatus,
+      types::enums::AuthStatus::AuthSuccess,
+  });
+
+  // send the packet to the client
+  this->sendPacket(client_tls, packet);
 }
 
 /**
@@ -332,8 +355,8 @@ void Server::authFailed(const QPair<QHostAddress, quint16> &client) {
   };
 
   // Get the iterator to the start and end of the list
-  auto start = m_un_authed_clients.begin();
-  auto end   = m_un_authed_clients.end();
+  auto start      = m_un_authed_clients.begin();
+  auto end        = m_un_authed_clients.end();
 
   // Get the client from the unauthenticated list and remove it
   auto client_itr = std::find_if(start, end, matcher);
@@ -347,8 +370,22 @@ void Server::authFailed(const QPair<QHostAddress, quint16> &client) {
   // Remove the client from the unauthenticated list
   m_un_authed_clients.erase(client_itr);
 
+  // using the create packet from namespace
+  using utility::functions::createPacket;
+
+  // create the Authentication packet
+  packets::Authentication packet = createPacket({
+      packets::Authentication::PacketType::AuthStatus,
+      types::enums::AuthStatus::AuthFailed,
+  });
+
+  // send the packet to the client
+  this->sendPacket(client_tls, packet);
+
   // disconnect and delete the client
   client_tls->disconnectFromHost();
+
+  // delete the client after the client is disconnected
   client_tls->deleteLater();
 }
 

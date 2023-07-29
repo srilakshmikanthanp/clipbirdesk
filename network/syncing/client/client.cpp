@@ -6,6 +6,18 @@
 #include "client.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
+/**
+ * @brief Process the Authentication Packet from the server
+ *
+ * @param packet Authentication
+ */
+void Client::processAuthentication(const packets::Authentication& packet) {
+  if (packet.getAuthStatus() == types::enums::AuthStatus::AuthSuccess) {
+    emit OnServerAuthentication((this->m_is_authed = true));
+  } else {
+    emit OnServerAuthentication((this->m_is_authed = false));
+  }
+}
 
 /**
  * @brief Process the packet that has been received
@@ -51,7 +63,7 @@ void Client::processReadyRead() {
   QByteArray data;
 
   /// uploader QDataStream
-  QDataStream put(data);
+  QDataStream put(&data, QIODevice::WriteOnly);
 
   // start the transaction
   get.startTransaction();
@@ -91,11 +103,30 @@ void Client::processReadyRead() {
 
   // try to parse the packet
   try {
+    processAuthentication(fromQByteArray<packets::Authentication>(data));
+    return;
+  } catch (const types::except::MalformedPacket& e) {
+    emit OnErrorOccurred(e.what());
+    return;
+  } catch (const types::except::NotThisPacket& e) {
+    qInfo() << e.what();
+  } catch (const std::exception& e) {
+    emit OnErrorOccurred(e.what());
+    return;
+  } catch (...) {
+    emit OnErrorOccurred("Unknown Error");
+    return;
+  }
+
+  // try to parse the packet
+  try {
     processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    qInfo() << e.what();
+    emit OnErrorOccurred(e.what());
     return;
+  } catch (const types::except::NotThisPacket& e) {
+    qInfo() << e.what();
   } catch (const std::exception& e) {
     emit OnErrorOccurred(e.what());
     return;
@@ -109,8 +140,10 @@ void Client::processReadyRead() {
     processInvalidPacket(fromQByteArray<packets::InvalidRequest>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    qInfo() << e.what();
+    emit OnErrorOccurred(e.what());
     return;
+  } catch (const types::except::NotThisPacket& e) {
+    qInfo() << e.what();
   } catch (const std::exception& e) {
     emit OnErrorOccurred(e.what());
     return;
@@ -272,6 +305,18 @@ QPair<QHostAddress, quint16> Client::getConnectedServer() const {
 }
 
 /**
+ * @brief Get the Connection Host and Port object Or Empty
+ * @return QPair<QHostAddress, quint16>
+ */
+QPair<QHostAddress, quint16> Client::getConnectedServerOrEmpty() const {
+  try {
+    return this->getConnectedServer();
+  } catch (const std::exception&) {
+    return QPair<QHostAddress, quint16>();
+  }
+}
+
+/**
  * @brief Disconnect from the server
  */
 void Client::disconnectFromServer() {
@@ -279,12 +324,28 @@ void Client::disconnectFromServer() {
 }
 
 /**
- * @brief Get the Connection Host and Port object Or Empty
+ * @brief Get the Authed Server object
  * @return QPair<QHostAddress, quint16>
  */
-QPair<QHostAddress, quint16> Client::getConnectedServerOrEmpty() const {
+QPair<QHostAddress, quint16> Client::getAuthedServer() const {
+  if (this->m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
+    throw std::runtime_error("Socket is not connected");
+  }
+
+  if (!this->m_is_authed) {
+    throw std::runtime_error("Socket is not authenticated");
+  }
+
+  return {m_ssl_socket->peerAddress(), m_ssl_socket->peerPort()};
+}
+
+/**
+ * @brief Get the Authed Server object Or Empty
+ * @return QPair<QHostAddress, quint16>
+ */
+QPair<QHostAddress, quint16> Client::getAuthedServerOrEmpty() const {
   try {
-    return this->getConnectedServer();
+    return this->getAuthedServer();
   } catch (const std::exception&) {
     return QPair<QHostAddress, quint16>();
   }

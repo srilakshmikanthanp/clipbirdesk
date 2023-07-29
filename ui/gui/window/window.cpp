@@ -32,10 +32,7 @@ void Window::handleTabChangeForClient(Tabs tab) {
   if (tab != Tabs::Client) return;  // if not client tab return
 
   // initialize the client Window
-  this->setStatus(c_statusKey, Status::Disconnected);
-  this->setServerHostName(c_hostNameKey, "-");
-  this->setServerIpPort(c_ipPortKey, "-");
-  this->setHostCount(c_serversKey, 0);
+  this->resetClientInfo();
 
   // reset the device list
   this->removeAllClient();
@@ -51,16 +48,27 @@ void Window::handleTabChangeForServer(Tabs tab) {
   if (tab != Tabs::Server) return;  // if not server tab return
 
   // initialize the server Window
-  this->setStatus(s_statusKey, Status::Inactive);
-  this->setServerHostName(s_hostNameKey, "-");
-  this->setServerIpPort(s_ipPortKey, "-");
-  this->setHostCount(s_clientsKey, 0);
+  this->resetServerInfo();
 
   // reset the device list
   this->removeAllServers();
 
   // notify the controller
   controller->setCurrentHostAsServer();
+}
+
+/**
+ * @brief Handle the clipboard sent
+ */
+void Window::handleClipboardSent() {
+  components::Toast::toast("Clipboard Sent", 3000);
+}
+
+/**
+ * @brief Handle the clipboard recv
+ */
+void Window::handleClipboardRecv() {
+  components::Toast::toast("Clipboard Recv", 3000);
 }
 
 //----------------------------- slots for Server --------------------------//
@@ -124,8 +132,10 @@ void Window::handleNewHostConnected(const QPair<QHostAddress, quint16> &client) 
   auto message = QString(
     "A New client is trying to connect to the server\n"
     "Host: %1:%2\n"
-    "Accept the connection?")
-  .arg(client.first.toString(), QString::number(client.second));
+    "Accept the connection?"
+  ).arg(
+    client.first.toString(), QString::number(client.second)
+  );
   // clang-format on
 
   // get the user input
@@ -173,7 +183,7 @@ void Window::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers)
   QList<components::Device::Value> servers_m;
 
   // get the connected server
-  const auto server = controller->getConnectedServerOrEmpty();
+  const auto server = controller->getAuthedServerOrEmpty();
 
   // get the action for the server
   const auto getAction = [&server](const auto& s) {
@@ -195,16 +205,25 @@ void Window::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers)
 /**
  * @brief Handle the server status change
  */
-void Window::handleServerStatusChange(bool status) {
+void Window::handleServerStatusChanged(bool status) {
+  const auto servers = controller->getServerList();
+  this->resetClientInfo();
+  this->handleServerListChange(servers);
+}
+
+/**
+ * @brief Handle the server status change
+ */
+void Window::handleServerAuthentication(bool isAuthed) {
   // infer the status from the server state
-  auto status_m   = status ? Status::Connected : Status::Disconnected;
+  auto status_m   = isAuthed ? Status::Connected : Status::Disconnected;
   auto ipPort     = QString("-");
   auto serverName = QString("-");
   auto servers    = controller->getServerList();
 
-  // if the client is connected to server
-  if (status) {
-    auto server = controller->getConnectedServer();
+  // if the client is Authed
+  if (isAuthed) {
+    auto server = controller->getAuthedServer();
     auto ip     = server.first.toString();
     auto port   = server.second;
     serverName  = QHostInfo::fromName(ip).hostName();
@@ -219,6 +238,28 @@ void Window::handleServerStatusChange(bool status) {
 
   // update the server list
   this->handleServerListChange(servers);
+}
+
+/**
+ * @brief Reset the Server Info
+ */
+void Window::resetServerInfo() {
+  // initialize the server Window
+  this->setStatus(s_statusKey, Status::Inactive);
+  this->setServerHostName(s_hostNameKey, "-");
+  this->setServerIpPort(s_ipPortKey, "-");
+  this->setHostCount(s_clientsKey, 0);
+}
+
+/**
+ * @brief Reset the Client Info
+ */
+void Window::resetClientInfo() {
+  // initialize the client Window
+  this->setStatus(c_statusKey, Status::Disconnected);
+  this->setServerHostName(c_hostNameKey, "-");
+  this->setServerIpPort(c_ipPortKey, "-");
+  this->setHostCount(c_serversKey, 0);
 }
 
 /**
@@ -307,8 +348,12 @@ Window::Window(Window::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
 
   // Connect the signal and slot for server status change
   const auto signal_sc = &ClipBird::OnServerStatusChanged;
-  const auto slot_sc   = &Window::handleServerStatusChange;
+  const auto slot_sc   = &Window::handleServerStatusChanged;
   connect(controller, signal_sc, this, slot_sc);
+
+  const auto signal_sa = &ClipBird::OnServerAuthentication;
+  const auto slot_sa   = &Window::handleServerAuthentication;
+  connect(controller, signal_sa, this, slot_sa);
 
   // Connect the signal and slot for host action
   const auto signal_ha = &Window::onHostAction;
@@ -329,6 +374,16 @@ Window::Window(Window::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto signal_h = &controller::ClipBird::OnNewHostConnected;
   const auto slot_h   = &Window::handleNewHostConnected;
   QObject::connect(controller, signal_h, this, slot_h);
+
+  // set the signal for on clipboard sent
+  const auto signal_cs = &controller::ClipBird::OnClipboardSent;
+  const auto slot_cs   = &Window::handleClipboardSent;
+  QObject::connect(controller, signal_cs, this, slot_cs);
+
+  // set the signal for on clipboard recv
+  const auto signal_cr = &controller::ClipBird::OnClipboardRecv;
+  const auto slot_cr   = &Window::handleClipboardRecv;
+  QObject::connect(controller, signal_cr, this, slot_cr);
 
   // Initialize the Tab as Client
   tab->setCurrentIndex(1);

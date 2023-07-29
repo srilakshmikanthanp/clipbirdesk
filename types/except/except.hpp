@@ -34,6 +34,23 @@ class MalformedPacket : public std::exception {
 };
 
 /**
+ * @brief NotThisPacket exception
+ */
+class NotThisPacket : public std::exception {
+ private:
+
+  std::string message;
+
+ public:
+
+  // Constructor
+  NotThisPacket(const std::string& message) noexcept;
+
+  // get message
+  const char* what() const noexcept override;
+};
+
+/**
  * @brief Exception for Not supported type
  */
 class NotSupported : public std::exception {

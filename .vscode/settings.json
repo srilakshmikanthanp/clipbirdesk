@@ -143,6 +143,7 @@
     "filesystem": "cpp",
     "format": "cpp",
     "qlabel": "cpp",
-    "qtabwidget": "cpp"
+    "qtabwidget": "cpp",
+    "qdatastream": "cpp"
   },
 }

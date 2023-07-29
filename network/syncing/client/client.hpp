@@ -54,6 +54,10 @@ class Client : public service::Discover {
   void OnServerStatusChanged(bool isConnected);
 
  signals:  // signals for this class
+  /// @brief On Server Auth Succeed
+  void OnServerAuthentication(bool isSuccessful);
+
+ signals:  // signals for this class
   /// @brief On Sync Request
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
 
@@ -75,11 +79,8 @@ class Client : public service::Discover {
   /// @brief SSL socket
   QSslSocket* m_ssl_socket = new QSslSocket(this);
 
-  /// @brief Timer to update the server list
-  QTimer* m_timer          = new QTimer(this);
-
-  /// @brief Threshold times
-  const qint64 m_threshold = 10000;
+  /// @brief is Server Authenticated Me
+  bool m_is_authed = false;
 
  private:  // private functions
 
@@ -96,6 +97,9 @@ class Client : public service::Discover {
     // create the QDataStream
     QDataStream stream(m_ssl_socket);
 
+    // start the transaction
+    stream.startTransaction();
+
     // write the data to the stream
     auto wrote = 0;
 
@@ -106,16 +110,28 @@ class Client : public service::Discover {
       auto size  = data.size() - wrote;
       auto bytes = stream.writeRawData(start, size);
 
-      // if error occurred
-      if (bytes == -1) {
-        emit OnErrorOccurred(m_ssl_socket->errorString());
-        return;
+      // if no error occurred
+      if (bytes != -1) {
+        wrote += bytes; continue;
       }
 
-      // update the wrote
-      wrote += bytes;
+      // abort the transaction
+      stream.abortTransaction();
+
+      //  Notifies the error occurred
+      emit OnErrorOccurred(m_ssl_socket->errorString());
     }
+
+    // commit the transaction
+    stream.commitTransaction();
   }
+
+  /**
+   * @brief Process the Authentication Packet from the server
+   *
+   * @param packet Authentication
+   */
+  void processAuthentication(const packets::Authentication& packet);
 
   /**
    * @brief Process the packet that has been received
@@ -202,15 +218,27 @@ class Client : public service::Discover {
   QPair<QHostAddress, quint16> getConnectedServer() const;
 
   /**
+   * @brief Get the Connection Host and Port object Or Empty
+   * @return QPair<QHostAddress, quint16>
+   */
+  QPair<QHostAddress, quint16> getConnectedServerOrEmpty() const;
+
+  /**
    * @brief Disconnect from the server
    */
   void disconnectFromServer();
 
   /**
-   * @brief Get the Connection Host and Port object Or Empty
+   * @brief Get the Authed Server object
    * @return QPair<QHostAddress, quint16>
    */
-  QPair<QHostAddress, quint16> getConnectedServerOrEmpty() const;
+  QPair<QHostAddress, quint16> getAuthedServer() const;
+
+  /**
+   * @brief Get the Authed Server object Or Empty
+   * @return QPair<QHostAddress, quint16>
+   */
+  QPair<QHostAddress, quint16> getAuthedServerOrEmpty() const;
 
  protected:  // abstract functions from the base class
 

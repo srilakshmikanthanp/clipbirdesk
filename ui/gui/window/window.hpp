@@ -31,6 +31,7 @@
 #include "controller/clipbird/clipbird.hpp"
 #include "ui/gui/components/device/device.hpp"
 #include "ui/gui/components/status/status.hpp"
+#include "ui/gui/components/toast/toast.hpp"
 #include "ui/gui/window/deviceinfo/deviceinfo.hpp"
 #include "ui/gui/window/devicelist/devicelist.hpp"
 
@@ -92,7 +93,7 @@ class Window : public QFrame {
   static constexpr const char* const c_statusKey   = "Connection Status";
   static constexpr const char* const c_hostNameKey = "Server Hostname";
   static constexpr const char* const c_ipPortKey   = "Server IP:Port";
-  static constexpr const char* const c_serversKey  = "servers";
+  static constexpr const char* const c_serversKey  = "Servers";
 
  private:  // private slots
 
@@ -112,6 +113,16 @@ class Window : public QFrame {
    * @brief On Tab Changed for Server
    */
   void handleTabChangeForServer(Tabs tab);
+
+  /**
+   * @brief Handle the clipboard sent
+   */
+  void handleClipboardSent();
+
+  /**
+   * @brief Handle the clipboard recv
+   */
+  void handleClipboardRecv();
 
   //----------------------------- slots for Server --------------------------//
 
@@ -142,7 +153,26 @@ class Window : public QFrame {
   /**
    * @brief Handle the server status change
    */
-  void handleServerStatusChange(bool status);
+  void handleServerStatusChanged(bool status);
+
+  /**
+   * @brief Handle the Server Authentication
+   *
+   * @param status
+   */
+  void handleServerAuthentication(bool isAuthed);
+
+ private: // private functions
+
+  /**
+   * @brief Reset the Server Info
+   */
+  void resetServerInfo();
+
+  /**
+   * @brief Reset the Client Info
+   */
+  void resetClientInfo();
 
  public:
 

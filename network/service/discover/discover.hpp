@@ -34,21 +34,13 @@ namespace srilakshmikanthanp::clipbirdesk::network::service {
  * is found then the callback function is called
  */
 class Discover : public QObject {
- private:  // private members variables
-
-  /// @brief Udp socket
-  QUdpSocket* m_socket = new QUdpSocket(this);
-
-  /// @brief Timer to send the broadcast message
-  QTimer* m_timer      = new QTimer(this);
+ signals:  // signals for this class
+  /// @brief On Error Occurred
+  void OnErrorOccurred(QString error);
 
  private:  // Just for Qt
 
   Q_OBJECT
-
- signals:  // signals for this class
-  /// @brief On Error Occurred
-  void OnErrorOccurred(QString error);
 
  private:  // disable copy and move
 

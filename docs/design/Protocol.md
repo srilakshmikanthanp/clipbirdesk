@@ -71,9 +71,9 @@ The **InvalidRequest** is used to indicate that the packet is invalid. This pack
 | 0x01       | Coding Error  |
 | 0x02       | TLS Error     |
 
-### AuthInfoPacket
+### Authentication
 
-The **AuthRespPacket** is used to initiate the authentication process to the client. This packet contains the following fields:
+The **Authentication** is used to indicate the authentication process to the client. This packet contains the following fields:
 
 #### Header
 
@@ -133,7 +133,7 @@ The **SyncingPacket** is used to transfer clipboard data between the client and 
 | Mime Type           | Description |
 |---------------------|-------------|
 | text/plain          | Text        |
-| image/img           | Image       |
+| image/png           | Image       |
 | text/uri-list       | URL's       |
 | application/x-color | Color       |
 | text/html           | HTML        |

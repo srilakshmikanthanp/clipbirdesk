@@ -129,3 +129,12 @@ QMenu::item:disabled {
 QLabel#no-host-label {
   color: gray;
 }
+
+QWidget#Toast {
+  background-color: #2a2a3b;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 6px;
+  margin: 2px;
+}

@@ -16,7 +16,14 @@ enum class IPType : quint8 {
 
 /// @brief Allowed Error Codes
 enum ErrorCode : quint8 {
-  CodingError = 0x01,
-  SSLError    = 0x02,
+  CodingError   = 0x01,
+  SSLError      = 0x02,
+  InvalidPacket = 0x03,
+};
+
+/// @brief Allowed Authentication Status
+enum AuthStatus : quint8 {
+  AuthFailed  = 0x00,
+  AuthSuccess = 0x01,
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::types::enums

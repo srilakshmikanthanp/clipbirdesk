@@ -46,7 +46,7 @@ Device::Device(QWidget *parent) : QWidget(parent) {
   this->setLayout(layout);
 
   // set id for styling
-  this->setObjectName("host");
+  this->setObjectName("Device");
 }
 
 /**

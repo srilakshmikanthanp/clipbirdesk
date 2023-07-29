@@ -160,9 +160,7 @@ QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
 
   // check the packet type
   if (packet.packetType != SyncingPacket::PacketType::SyncPacket) {
-    throw types::except::MalformedPacket(
-        types::enums::ErrorCode::CodingError, "Invalid Packet Type"
-    );
+    throw types::except::NotThisPacket("Not Authentication Packet");
   }
 
   // read the item count

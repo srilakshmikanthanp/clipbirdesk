@@ -36,11 +36,23 @@ class ClipBird : public QObject {
   /// @brief On Server state changed (From Client)
   void OnServerStatusChanged(bool isConnected);
 
+ signals:  // signals for this class
+  /// @brief On Server Auth Succeed (From Client)
+  void OnServerAuthentication(bool isSuccessful);
+
   //----------------------- general Signals -----------------------//
 
  signals:  // signals for this class
   /// @brief On Error Occurred (General)
   void OnErrorOccurred(QString error);
+
+ signals:  // signals for this class
+  /// @brief On Clipboard Sent (General)
+  void OnClipboardSent();
+
+signals:  // signals for this class
+  /// @brief On Clipboard Recv (General)
+  void OnClipboardRecv();
 
   //----------------------- server Signals ------------------------//
 
@@ -77,8 +89,11 @@ class ClipBird : public QObject {
 
  private:  // private slots
 
-  /// @brief Handle On Server Status Changed (From client)
-  void handleServerStatusChanged(bool isConnected);
+  /// @brief Handle On Server Authenticated the client (From client)
+  void handleServerAuthentication(bool isConnected);
+
+  /// @brief Handle On Server Disconnect from Client (From client)
+  void handleServerStatusChanged(bool status);
 
  public:  // Member functions
 
@@ -177,15 +192,27 @@ class ClipBird : public QObject {
   QPair<QHostAddress, quint16> getConnectedServer() const;
 
   /**
-   * @brief Disconnect from the server
-   */
-  void disconnectFromServer(const QPair<QHostAddress, quint16> &host);
-
-  /**
    * @brief get the connected server address and port or empty
    *
    * @return QPair<QHostAddress, quint16> address and port
    */
   QPair<QHostAddress, quint16> getConnectedServerOrEmpty() const;
+
+  /**
+   * @brief Disconnect from the server
+   */
+  void disconnectFromServer(const QPair<QHostAddress, quint16> &host);
+
+  /**
+   * @brief Get the Authed Server object
+   * @return QPair<QHostAddress, quint16>
+   */
+  QPair<QHostAddress, quint16> getAuthedServer() const;
+
+  /**
+   * @brief Get the Authed Server object Or Empty
+   * @return QPair<QHostAddress, quint16>
+   */
+  QPair<QHostAddress, quint16> getAuthedServerOrEmpty() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::controller
