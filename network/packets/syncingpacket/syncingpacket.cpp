@@ -138,14 +138,15 @@ QDataStream& operator<<(QDataStream& out, const SyncingPacket& packet) {
  * @param packet
  */
 QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
+  // using malformed packet exception
+  using types::except::MalformedPacket;
+
   // read the packet length
   in >> packet.packetLength;
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(
-        types::enums::ErrorCode::CodingError, "Invalid Packet Length"
-    );
+    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Packet Length");
   }
 
   // read the packet type
@@ -153,9 +154,7 @@ QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(
-        types::enums::ErrorCode::CodingError, "Invalid Packet Type"
-    );
+    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Packet Type");
   }
 
   // check the packet type
@@ -168,9 +167,7 @@ QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(
-        types::enums::ErrorCode::CodingError, "Invalid Item Count"
-    );
+    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Item Count");
   }
 
   // read the payloads
@@ -184,9 +181,7 @@ QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(
-      types::enums::ErrorCode::CodingError, "Invalid Payloads"
-    );
+    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Payloads");
   }
 
   // return the stream

@@ -47,8 +47,8 @@ class Device : public QWidget {
 
  private:  // Member variable
 
-  QLabel *hostName = new QLabel(this);
   QPushButton *actBtn  = new QPushButton(this);
+  QLabel *hostName = new QLabel(this);
 
  private:  // just for Qt meta object
 

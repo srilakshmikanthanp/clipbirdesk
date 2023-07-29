@@ -137,12 +137,15 @@ QDataStream& operator<<(QDataStream& stream, const InvalidRequest packet) {
  * @return QDataStream&
  */
 QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
+  // using malformed packet exception
+  using types::except::MalformedPacket;
+
   // read the packet length
   stream >> packet.packetLength;
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Length");
+    throw MalformedPacket(types::enums::CodingError, "Invalid Packet Length");
   }
 
   // read the packet type
@@ -150,7 +153,7 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet Type");
+    throw MalformedPacket(types::enums::CodingError, "Invalid Packet Type");
   }
 
   // check the packet type
@@ -163,7 +166,7 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Error Code");
+    throw MalformedPacket(types::enums::CodingError, "Invalid Error Code");
   }
 
   // using some types
@@ -171,7 +174,7 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
 
   // check the error code
   if (packet.errorCode != ErrorCode::CodingError && packet.errorCode != ErrorCode::SSLError) {
-    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Error Code");
+    throw MalformedPacket(types::enums::CodingError, "Invalid Error Code");
   }
 
   // Extract the error message length
@@ -189,7 +192,7 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
 
   // is the stream status is bad
   if (stream.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Error Message");
+    throw MalformedPacket(types::enums::CodingError, "Invalid Error Message");
   }
 
   // return the stream

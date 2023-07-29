@@ -12,37 +12,35 @@
 #include <QByteArray>
 
 // Local header files
-#include "network/packets/invalidrequest/invalidrequest.hpp"
+#include "network/packets/authentication/authentication.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"
 
 /**
- * @brief testing the MalformedPacket
+ * @brief testing the AuthenticationPacket
  */
-TEST(InvalidPacketTest, TestingInvalidPacket) {
-  // using the MalformedPacket
-  using srilakshmikanthanp::clipbirdesk::network::packets::InvalidRequest;
+TEST(AuthenticationTest, TestingAuthentication) {
+  // using the AuthenticationPacket
+  using srilakshmikanthanp::clipbirdesk::network::packets::Authentication;
 
   // using the ErrorCode
-  using srilakshmikanthanp::clipbirdesk::types::enums::ErrorCode;
+  using srilakshmikanthanp::clipbirdesk::types::enums::AuthStatus;
 
   // using functions namespace
   using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
 
   // creating the packet
-  InvalidRequest packet_send, packet_recv;
+  Authentication packet_send, packet_recv;
 
   // constant values
-  const auto packetType   = InvalidRequest::PacketType::RequestFailed;
-  const auto errorCode    = ErrorCode::CodingError;
-  const auto errorMessage = QByteArray("Hello", 5);
+  const auto packetType = Authentication::PacketType::AuthStatus;
 
   // setting the packet type
-  packet_send = createPacket({ packetType, errorCode, errorMessage});
+  packet_send = createPacket({ packetType, AuthStatus::AuthSuccess });
 
   // load the packet from network byte order
-  packet_recv = fromQByteArray<InvalidRequest>(toQByteArray(packet_send));
+  packet_recv = fromQByteArray<Authentication>(toQByteArray(packet_send));
 
   // check the packet type
   EXPECT_EQ(packet_recv.getPacketType(), packetType);
@@ -50,9 +48,6 @@ TEST(InvalidPacketTest, TestingInvalidPacket) {
   // check the packet length
   EXPECT_EQ(packet_recv.getPacketLength(), packet_send.size());
 
-  // check the error code
-  EXPECT_EQ(packet_recv.getErrorCode(), errorCode);
-
-  // check the message
-  EXPECT_EQ(packet_recv.getErrorMessage(), errorMessage);
+  // check the status code
+  EXPECT_EQ(packet_recv.getAuthStatus(), AuthStatus::AuthSuccess);
 }

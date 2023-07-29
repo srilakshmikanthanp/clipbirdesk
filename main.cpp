@@ -134,34 +134,34 @@ class ClipbirdApplication : public SingleApplication {
     using ui::gui::Window;
 
     // set the signal for menus About click
-    const auto signal_ab = &ui::gui::TrayMenu::OnAboutClicked;
-    const auto slot_ab   = &ClipbirdApplication::onAboutClicked;
-    QObject::connect(trayMenu, signal_ab, this, slot_ab);
+    const auto signal_ac = &ui::gui::TrayMenu::OnAboutClicked;
+    const auto slot_ac   = &ClipbirdApplication::onAboutClicked;
+    QObject::connect(trayMenu, signal_ac, this, slot_ac);
 
     // set the signal for menus Issue click
-    const auto signal_i = &ui::gui::TrayMenu::OnIssueClicked;
-    const auto slot_i   = &ClipbirdApplication::onIssueClicked;
-    QObject::connect(trayMenu, signal_i, this, slot_i);
+    const auto signal_ic = &ui::gui::TrayMenu::OnIssueClicked;
+    const auto slot_ic   = &ClipbirdApplication::onIssueClicked;
+    QObject::connect(trayMenu, signal_ic, this, slot_ic);
 
     // set the signal for menus Quit click
-    const auto signal_q = &ui::gui::TrayMenu::OnExitClicked;
-    const auto slot_q   = [] { qApp->quit(); };
-    QObject::connect(trayMenu, signal_q, this, slot_q);
+    const auto signal_qc = &ui::gui::TrayMenu::OnExitClicked;
+    const auto slot_qc   = [] { qApp->quit(); };
+    QObject::connect(trayMenu, signal_qc, this, slot_qc);
 
     // set activated action to show the window
-    const auto signal_a = &QSystemTrayIcon::activated;
-    const auto slot_a   = &Window::show;
-    QObject::connect(trayIcon, signal_a, guiMain, slot_a);
+    const auto signal_at = &QSystemTrayIcon::activated;
+    const auto slot_at   = &Window::show;
+    QObject::connect(trayIcon, signal_at, guiMain, slot_at);
 
     // set the signal for instance Started
-    const auto signal_s = &SingleApplication::instanceStarted;
-    const auto slot_s   = &Window::show;
-    QObject::connect(this, signal_s, guiMain, slot_s);
+    const auto signal_is = &SingleApplication::instanceStarted;
+    const auto slot_is   = &Window::show;
+    QObject::connect(this, signal_is, guiMain, slot_is);
 
     // set the signal for error occurred
-    const auto signal_e = &controller::ClipBird::OnErrorOccurred;
-    const auto slot_e   = &ClipbirdApplication::logError;
-    QObject::connect(controller, signal_e, this, slot_e);
+    const auto signal_eo = &controller::ClipBird::OnErrorOccurred;
+    const auto slot_eo   = &ClipbirdApplication::logError;
+    QObject::connect(controller, signal_eo, this, slot_eo);
 
     // show the tray icon
     trayIcon->show();

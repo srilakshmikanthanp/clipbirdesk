@@ -47,9 +47,6 @@ QVector<QPair<QString, QByteArray>> Clipboard::get() {
   // if mime data is not supported
   if (mimeData == nullptr) return items;
 
-  // get the formats
-  const auto formats = mimeData->formats();
-
   // has Color
   if (mimeData->hasColor()) {
     auto colors = qvariant_cast<QColor>(mimeData->colorData());

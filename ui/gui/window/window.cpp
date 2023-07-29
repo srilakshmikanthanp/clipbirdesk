@@ -299,10 +299,10 @@ Window::Window(Window::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   clientArea->setWidget(this->clientList);
 
   // add server list to tab
-  tab->addTab(clientArea, "Server");
+  tab->addTab(clientArea, s_tabTitle);
 
   // add client list to tab
-  tab->addTab(serverArea, "Client");
+  tab->addTab(serverArea, c_tabTitle);
 
   // add tab to  layout
   root->addWidget(tab);
@@ -342,14 +342,14 @@ Window::Window(Window::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   connect(controller, signal_sl, this, slot_sl);
 
   // Connect the signal and slot for server status change
-  const auto signal_ss = &ClipBird::OnServerStateChanged;
-  const auto slot_ss   = &Window::handleServerStateChange;
-  connect(controller, signal_ss, this, slot_ss);
+  const auto signal_st = &ClipBird::OnServerStateChanged;
+  const auto slot_st   = &Window::handleServerStateChange;
+  connect(controller, signal_st, this, slot_st);
 
   // Connect the signal and slot for server status change
-  const auto signal_sc = &ClipBird::OnServerStatusChanged;
-  const auto slot_sc   = &Window::handleServerStatusChanged;
-  connect(controller, signal_sc, this, slot_sc);
+  const auto signal_ss = &ClipBird::OnServerStatusChanged;
+  const auto slot_ss   = &Window::handleServerStatusChanged;
+  connect(controller, signal_ss, this, slot_ss);
 
   const auto signal_sa = &ClipBird::OnServerAuthentication;
   const auto slot_sa   = &Window::handleServerAuthentication;
@@ -371,9 +371,9 @@ Window::Window(Window::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   connect(this, signal_ts, this, slot_ts);
 
   // set the signal for on new Host
-  const auto signal_h = &controller::ClipBird::OnNewHostConnected;
-  const auto slot_h   = &Window::handleNewHostConnected;
-  QObject::connect(controller, signal_h, this, slot_h);
+  const auto signal_nh = &controller::ClipBird::OnNewHostConnected;
+  const auto slot_nh   = &Window::handleNewHostConnected;
+  QObject::connect(controller, signal_nh, this, slot_nh);
 
   // set the signal for on clipboard sent
   const auto signal_cs = &controller::ClipBird::OnClipboardSent;
@@ -389,7 +389,7 @@ Window::Window(Window::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   tab->setCurrentIndex(1);
 
   // set the object name
-  this->setObjectName("window");
+  this->setObjectName("Window");
 }
 
 /**

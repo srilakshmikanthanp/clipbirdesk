@@ -1,5 +1,7 @@
 # CMakeLists.txt for clipbird
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
+
+# set project name and version
 project(clipbird VERSION 1.0.0 LANGUAGES CXX)
 
 # set c++ standard 17

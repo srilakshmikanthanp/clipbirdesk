@@ -9,8 +9,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QScreen>
-#include <QWidget>
 #include <QTimer>
+#include <QWidget>
+
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 /**
@@ -27,8 +28,8 @@ class Toast : public QWidget {
 
  private:  // Member variable
 
-  QTimer *timer = new QTimer(this);
-  QLabel *label = new QLabel();
+  QTimer* timer   = new QTimer(this);
+  QLabel* label   = new QLabel();
   quint32 timeout = 0;
 
  public:
@@ -81,15 +82,15 @@ class Toast : public QWidget {
    * @brief Override the EnterEvent
    * @param event event
    */
-  void enterEvent(QEnterEvent *event) override;
+  void enterEvent(QEnterEvent* event) override;
 
- public: // static functions
+ public:  // static functions
 
   /**
    * @brief show the Toast
    * @param val Toast
    * @param timeout timeout
    */
-  static void toast(const QString& val, quint32 timeout = 2000, QWidget * parent = nullptr);
+  static void toast(const QString& val, quint32 timeout = 2000, QWidget* parent = nullptr);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

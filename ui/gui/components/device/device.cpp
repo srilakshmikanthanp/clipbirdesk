@@ -61,7 +61,7 @@ void Device::setHost(Device::Value host) {
   this->action    = std::get<2>(host);
 
   // set the host name
-  this->hostName->setText("...");
+  this->hostName->setText("Resolving...");
 
   // action text to set
   const auto a = action == Action::Disconnect ? disconnect : connect;

@@ -115,11 +115,14 @@ class Client : public service::Discover {
         wrote += bytes; continue;
       }
 
+      // get the error string
+      auto error = m_ssl_socket->errorString();
+
       // abort the transaction
       stream.abortTransaction();
 
       //  Notifies the error occurred
-      emit OnErrorOccurred(m_ssl_socket->errorString());
+      emit OnErrorOccurred(error);
     }
 
     // commit the transaction

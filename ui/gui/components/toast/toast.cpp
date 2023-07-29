@@ -56,11 +56,18 @@ quint32 Toast::getTimeout() const {
  * @param val Toast
  */
 void Toast::setToast(const QString& val) {
+  // set the text to label
   label->setText(val);
 
   // set the size hint
   auto size = label->sizeHint();
-  this->setFixedSize(size.width() + 20, size.height() + 20);
+
+  // set the height and width
+  size.setHeight(size.height() + 20);
+  size.setWidth(size.width() + 20);
+
+  // set the fixed size
+  this->setFixedSize(size);
 }
 
 /**

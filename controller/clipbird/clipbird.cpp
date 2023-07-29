@@ -78,43 +78,43 @@ void ClipBird::setCurrentHostAsServer() {
   server->setSSLConfiguration(m_sslConfig);
 
   // Connect the onClientStateChanged signal to the signal
-  const auto signal_s = &Server::OnCLientStateChanged;
-  const auto slot_s   = &ClipBird::OnCLientStateChanged;
-  connect(server, signal_s, this, slot_s);
+  const auto signal_cs = &Server::OnCLientStateChanged;
+  const auto slot_cs   = &ClipBird::OnCLientStateChanged;
+  connect(server, signal_cs, this, slot_cs);
 
   // Connect the onNewHostConnected signal to the signal
-  const auto signal_n = &Server::OnNewHostConnected;
-  const auto slot_n   = &ClipBird::OnNewHostConnected;
-  connect(server, signal_n, this, slot_n);
+  const auto signal_nh = &Server::OnNewHostConnected;
+  const auto slot_nh   = &ClipBird::OnNewHostConnected;
+  connect(server, signal_nh, this, slot_nh);
 
   // Connect the onSyncRequest signal to the clipboard
-  const auto signal_c = &Server::OnSyncRequest;
-  const auto slot_c   = &clipboard::Clipboard::set;
-  const auto slot_g   = &ClipBird::OnClipboardRecv;
-  connect(server, signal_c, &m_clipboard, slot_c);
-  connect(server, signal_c, this, slot_g);
+  const auto signal_sr = &Server::OnSyncRequest;
+  const auto slot_bs   = &clipboard::Clipboard::set;
+  const auto slot_br   = &ClipBird::OnClipboardRecv;
+  connect(server, signal_sr, &m_clipboard, slot_bs);
+  connect(server, signal_sr, this, slot_br);
 
   // connect the OnClipboardChange signal to the server
-  const auto signal_b = &clipboard::Clipboard::OnClipboardChange;
-  const auto slot_b   = &Server::syncItems;
-  const auto slot_x   = &ClipBird::OnClipboardSent;
-  connect(&m_clipboard, signal_b, server, slot_b);
-  connect(&m_clipboard, signal_b, this, slot_x);
+  const auto signal_cc = &clipboard::Clipboard::OnClipboardChange;
+  const auto slot_si   = &Server::syncItems;
+  const auto slot_cc   = &ClipBird::OnClipboardSent;
+  connect(&m_clipboard, signal_cc, server, slot_si);
+  connect(&m_clipboard, signal_cc, this, slot_cc);
 
   // Connect the onErrorOccurred signal to the signal
-  const auto signal_e = &Server::OnErrorOccurred;
-  const auto slot_e   = &ClipBird::OnErrorOccurred;
-  connect(server, signal_e, this, slot_e);
+  const auto signal_eo = &Server::OnErrorOccurred;
+  const auto slot_eo   = &ClipBird::OnErrorOccurred;
+  connect(server, signal_eo, this, slot_eo);
 
   // Connect the onClientListChanged signal to the signal
-  const auto signal_l = &Server::OnClientListChanged;
-  const auto slot_l   = &ClipBird::OnClientListChanged;
-  connect(server, signal_l, this, slot_l);
+  const auto signal_lc = &Server::OnClientListChanged;
+  const auto slot_lc   = &ClipBird::OnClientListChanged;
+  connect(server, signal_lc, this, slot_lc);
 
   // Connect the onServerStateChanged signal to the signal
-  const auto signal_t = &Server::OnServerStateChanged;
-  const auto slot_t   = &ClipBird::OnServerStateChanged;
-  connect(server, signal_t, this, slot_t);
+  const auto signal_ss = &Server::OnServerStateChanged;
+  const auto slot_ss   = &ClipBird::OnServerStateChanged;
+  connect(server, signal_ss, this, slot_ss);
 
   // Start the server to listen and accept the client
   server->startServer();
@@ -157,11 +157,11 @@ void ClipBird::setCurrentHostAsClient() {
   connect(client, signal_er, this, slot_er);
 
   // Connect the onSyncRequest signal to the clipboard
+  const auto slot_cr    = &ClipBird::OnClipboardRecv;
   const auto signal_rq = &Client::OnSyncRequest;
   const auto slot_rq   = &clipboard::Clipboard::set;
-  const auto slot_g    = &ClipBird::OnClipboardRecv;
   connect(client, signal_rq, &m_clipboard, slot_rq);
-  connect(client, signal_rq, this, slot_g);
+  connect(client, signal_rq, this, slot_cr);
 
   // Start the Discovery
   client->startDiscovery();

@@ -19,14 +19,10 @@ Discover::Discover(QObject* parent) : QObject(parent) {
 
 /// @brief On Service Found
 void Discover::OnServiceFound(KDNSSD::RemoteService::Ptr service) {
+  // get the name of the device & lambda callback
   const auto myDevice = QString::fromStdString(constants::getMDnsServiceName());
   const auto callback = [&, service](const QHostInfo& info) {
-    if (info.error() != QHostInfo::NoError) {
-      emit this->OnErrorOccurred("Unable to resolve service");
-      return;
-    }
-
-    if (info.addresses().isEmpty()) {
+    if (info.error() != QHostInfo::NoError || info.addresses().isEmpty()) {
       emit this->OnErrorOccurred("Unable to resolve service");
       return;
     }
@@ -36,28 +32,27 @@ void Discover::OnServiceFound(KDNSSD::RemoteService::Ptr service) {
     this->onServerAdded({host, port});
   };
 
+  // resolve the service
   if (!service->resolve()) {
     emit this->OnErrorOccurred("Unable to resolve service");
     return;
   }
 
+  // check if the service is mine
   if (service->serviceName() == myDevice) {
     return;
   }
 
+  // lookup the host
   QHostInfo::lookupHost(service->hostName(), callback);
 }
 
 /// @brief On Service Removed
 void Discover::OnServiceRemoved(KDNSSD::RemoteService::Ptr service) {
+  // get the name of the device & lambda callback
   const auto myDevice = QString::fromStdString(constants::getMDnsServiceName());
   const auto callback = [&, service](const QHostInfo& info) {
-    if (info.error() != QHostInfo::NoError) {
-      emit this->OnErrorOccurred("Unable to resolve service");
-      return;
-    }
-
-    if (info.addresses().isEmpty()) {
+    if (info.error() != QHostInfo::NoError || info.addresses().isEmpty()) {
       emit this->OnErrorOccurred("Unable to resolve service");
       return;
     }
@@ -67,15 +62,18 @@ void Discover::OnServiceRemoved(KDNSSD::RemoteService::Ptr service) {
     this->onServerRemoved({host, port});
   };
 
+  // resolve the service
   if (!service->resolve()) {
     emit this->OnErrorOccurred("Unable to resolve service");
     return;
   }
 
+  // check if the service is mine
   if (service->serviceName() == myDevice) {
     return;
   }
 
+  // lookup the host
   QHostInfo::lookupHost(service->hostName(), callback);
 }
 

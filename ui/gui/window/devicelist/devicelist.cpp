@@ -17,10 +17,10 @@ DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
   label->setAlignment(Qt::AlignCenter);
 
   // set object name
-  label->setObjectName("no-host-label");
+  label->setObjectName("NoHostLabel");
 
   // set the object name
-  this->setObjectName("devicelist");
+  this->setObjectName("DeviceList");
 
   // add the layout to the stack layout
   this->stackLayout->addWidget(label);

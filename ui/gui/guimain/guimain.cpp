@@ -20,7 +20,7 @@ GuiMain::GuiMain(QWidget* parent) : QMainWindow(parent) {
   this->setContentsMargins(20, 20, 20, 20);
 
   // set the object name
-  this->setObjectName("guimain");
+  this->setObjectName("GuiMain");
 }
 
 /**

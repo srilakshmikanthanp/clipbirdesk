@@ -126,7 +126,7 @@ QMenu::item:disabled {
 
 /*********************** Object Specified ************************/
 
-QLabel#no-host-label {
+QLabel#NoHostLabel {
   color: gray;
 }
 
@@ -135,6 +135,6 @@ QWidget#Toast {
   color: #ffffff;
   border: none;
   border-radius: 5px;
-  padding: 6px;
   margin: 2px;
+  padding: 6px;
 }

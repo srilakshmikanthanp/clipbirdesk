@@ -116,12 +116,15 @@ QDataStream& operator>>(QDataStream& stream, Authentication& packet) {
     throw types::except::NotThisPacket("Not Authentication Packet");
   }
 
+  // using malformed packet exception
+  using types::except::MalformedPacket;
+
   // auth status
   const auto authStatus = packet.authStatus;
 
   // Check the auth status
   if (authStatus != AuthStatus::AuthFailed && authStatus != AuthStatus::AuthSuccess) {
-    throw types::except::MalformedPacket(ErrorCode::CodingError, "Invalid Auth Status");
+    throw MalformedPacket(ErrorCode::CodingError, "Invalid Auth Status");
   }
 
   // return the stream

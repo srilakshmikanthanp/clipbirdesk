@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 // Local header files
+#include "tests/network/packets/Authentication.hpp"
 #include "tests/network/packets/InvalidRequest.hpp"
 #include "tests/network/packets/SyncingPacket.hpp"
 

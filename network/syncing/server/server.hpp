@@ -109,11 +109,14 @@ class Server : public service::Register {
         wrote += bytes; continue;
       }
 
+      // get the error string
+      auto error = client->errorString();
+
       // abort the transaction
       stream.abortTransaction();
 
       //  Notifies the error occurred
-      emit OnErrorOccurred(client->errorString());
+      emit OnErrorOccurred(error);
     }
 
     // commit the transaction

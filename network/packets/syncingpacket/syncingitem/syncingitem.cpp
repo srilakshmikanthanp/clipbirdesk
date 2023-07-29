@@ -138,14 +138,15 @@ QDataStream& operator<<(QDataStream& out, const SyncingItem& payload) {
  * @param payload
  */
 QDataStream& operator>>(QDataStream& in, SyncingItem& payload) {
+  // using malformed packet exception
+  using types::except::MalformedPacket;
+
   // read the mime length
   in >> payload.mimeLength;
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(
-        types::enums::ErrorCode::CodingError, "Invalid Mime Length"
-    );
+    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Mime Type Length");
   }
 
   // resize the mime type
@@ -156,7 +157,7 @@ QDataStream& operator>>(QDataStream& in, SyncingItem& payload) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Mime Type");
+    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Mime Type");
   }
 
   // read the payload length
@@ -164,9 +165,7 @@ QDataStream& operator>>(QDataStream& in, SyncingItem& payload) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(
-        types::enums::ErrorCode::CodingError, "Invalid Payload Length"
-    );
+    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Payload Len");
   }
 
   // resize the payload
@@ -177,9 +176,7 @@ QDataStream& operator>>(QDataStream& in, SyncingItem& payload) {
 
   // check if stream is valid
   if (in.status() != QDataStream::Ok) {
-    throw types::except::MalformedPacket(
-        types::enums::ErrorCode::CodingError, "Invalid Payload Attempt"
-    );
+    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Payload Attempt");
   }
 
   // return the stream

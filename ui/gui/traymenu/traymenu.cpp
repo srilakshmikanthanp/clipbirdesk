@@ -19,6 +19,6 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   this->addAction("Exit", this, &TrayMenu::OnExitClicked);
 
   // set the object name for styling
-  this->setObjectName("traymenu");
+  this->setObjectName("TrayMenu");
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

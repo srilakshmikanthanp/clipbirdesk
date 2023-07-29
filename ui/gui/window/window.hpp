@@ -46,14 +46,14 @@ class Window : public QFrame {
   window::DeviceList* clientList = new window::DeviceList();  // Server Tab
   window::DeviceList* serverList = new window::DeviceList();  // Client Tab
 
- private:  // typedefs used in this class
-
-  using ClipBird = controller::ClipBird;
-
  public:  // typedefs used in this class
 
   using Status = components::Status::Value;
   using Action = components::Device::Action;
+
+ private:  // typedefs used in this class
+
+  using ClipBird = controller::ClipBird;
 
  private:  // Disable copy and move
 
@@ -84,16 +84,18 @@ class Window : public QFrame {
  private:  // constant for keys (Server)
 
   static constexpr const char* const s_statusKey   = "Server Status";
-  static constexpr const char* const s_hostNameKey = "Server Hostname";
-  static constexpr const char* const s_ipPortKey   = "Server IP:Port";
-  static constexpr const char* const s_clientsKey  = "Clients";
+  static constexpr const char* const s_hostNameKey = "Server Name";
+  static constexpr const char* const s_ipPortKey   = "Server Info";
+  static constexpr const char* const s_clientsKey  = "No of Clients";
+  static constexpr const char* const s_tabTitle    = "As Server";
 
  private:  // constant for keys (Client)
 
   static constexpr const char* const c_statusKey   = "Connection Status";
-  static constexpr const char* const c_hostNameKey = "Server Hostname";
-  static constexpr const char* const c_ipPortKey   = "Server IP:Port";
-  static constexpr const char* const c_serversKey  = "Servers";
+  static constexpr const char* const c_hostNameKey = "Server Name";
+  static constexpr const char* const c_ipPortKey   = "Server Info";
+  static constexpr const char* const c_serversKey  = "No of Servers";
+  static constexpr const char* const c_tabTitle    = "As Client";
 
  private:  // private slots
 
