@@ -116,7 +116,7 @@ class Server : public service::Register {
       stream.abortTransaction();
 
       //  Notifies the error occurred
-      emit OnErrorOccurred(error);
+      emit OnErrorOccurred(LOG(error.toStdString()));
     }
 
     // commit the transaction

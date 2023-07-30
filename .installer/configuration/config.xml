@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ Copyright (c) 2023 Sri Lakshmi Kanthan P
+
+ This software is released under the MIT License.
+ https://opensource.org/licenses/MIT
+-->
+
+<Installer>
+  <TargetDir>@HomeDir@/.clipbird</TargetDir>
+  <Title>Clipbird Installer</Title>
+  <Name>Clipbird</Name>
+  <Version>1.0.0</Version>
+  <Publisher>Sri Lakshmi Kanthan P</Publisher>
+  <StartMenuDir>Clipbird</StartMenuDir>
+</Installer>

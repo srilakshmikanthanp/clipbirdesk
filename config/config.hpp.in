@@ -24,3 +24,6 @@
 
 // Application Issue page
 #define CLIPBIRDESK_ISSUEPAGE     "@APPLICATION_ISSUEPAGE@"
+
+// Log statement for debug
+#define LOG(msg)                  (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " " + msg).c_str()

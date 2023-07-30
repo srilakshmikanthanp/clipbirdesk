@@ -1,3 +1,8 @@
 # CMake Build Files
 # -----------------
+CMakeFiles
 build
+
+# kdetools install
+# ----------------
+.kdetools

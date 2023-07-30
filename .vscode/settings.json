@@ -19,6 +19,7 @@
   ],
   "files.associations": {
     ".env*": "dotenv",
+    ".qs": "javascript",
     "stdexcept": "cpp",
     "atomic": "cpp",
     "cinttypes": "cpp",

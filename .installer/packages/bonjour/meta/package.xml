@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ Copyright (c) 2023 Sri Lakshmi Kanthan P
+
+ This software is released under the MIT License.
+ https://opensource.org/licenses/MIT
+-->
+
+<Package>
+  <DisplayName>Bonjour</DisplayName>
+  <Description>
+    This is Needed component to discover the
+    Devices on your network, you may
+    deselect if you already have one
+  </Description>
+  <Version>3.0.0</Version>
+  <ReleaseDate>2023-07-19</ReleaseDate>
+  <RequiresAdminRights>true</RequiresAdminRights>
+  <Operations>
+    <Operation name="Execute">
+      <Argument>msiexec</Argument>
+      <Argument>/fo</Argument>
+      <Argument>@TargetDir@/bonjour.msi</Argument>
+    </Operation>
+  </Operations>
+</Package>

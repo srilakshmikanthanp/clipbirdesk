@@ -13,9 +13,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # include cmake modules
 include(FetchContent)
 
-# For MSVX
-set(protobuf_MSVC_STATIC_RUNTIME OFF)
-
 # set the APPLICATION_ISSUEPAGE
 set(APPLICATION_ISSUEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk/issues")
 
@@ -75,7 +72,7 @@ find_package(Qt6 REQUIRED COMPONENTS
 find_package(OpenSSL REQUIRED)
 
 # Find KDE DNS-SD Framework
-find_package(KF5DNSSD REQUIRED)
+find_package(KF6DNSSD NO_MODULE)
 
 # Configure config.hpp
 configure_file(
@@ -100,7 +97,7 @@ qt_add_executable(clipbird
 target_link_libraries(clipbird
   PRIVATE SingleApplication::SingleApplication
   PRIVATE Qt6::Widgets
-  PRIVATE KF5::DNSSD
+  PRIVATE KF6::DNSSD
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto)

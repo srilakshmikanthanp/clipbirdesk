@@ -106,9 +106,12 @@ Clipbird is in the development stage if the project succeeds in the future, we w
 
 ### Env Variables
 
-* `QT_CMAKE_DIR` - Qt6 installation directory
-* `ECM_DIR` - ECM installation directory
-* `KDNSSD_DIR` - KDNSSD installation directory
+* `KDE_ROOT` - KDE installation directory
+* `OPENSSL_DIR` - OpenSSL installation directory
+* `ECM_DIR` - ECM cmake directory
+* `QT_CMAKE_DIR` - Qt6 cmake directory
+* `BONJOUR_DIR` - Bonjour SDK directory
+* `VC_REDIST_DIR` - Visual C++ Redistributable directory
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

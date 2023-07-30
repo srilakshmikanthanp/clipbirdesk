@@ -131,12 +131,12 @@ void Server::processReadyRead() {
     this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
     return;
   } catch (const types::except::NotThisPacket &e) {
-    qInfo() << e.what();
+    emit OnErrorOccurred(LOG(e.what()));
   } catch (const std::exception &e) {
-    emit OnErrorOccurred(e.what());
+    emit OnErrorOccurred(LOG(e.what()));
     return;
   } catch (...) {
-    emit OnErrorOccurred("Unknown Error");
+    emit OnErrorOccurred(LOG("Unknown Error"));
     return;
   }
 

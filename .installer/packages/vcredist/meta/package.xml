@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ Copyright (c) 2023 Sri Lakshmi Kanthan P
+
+ This software is released under the MIT License.
+ https://opensource.org/licenses/MIT
+-->
+
+<Package>
+  <DisplayName>vc redist</DisplayName>
+  <Description>
+    This is Runtime for clipbird Application,
+    you may deselect if you already have one
+  </Description>
+  <Version>v143</Version>
+  <ReleaseDate>2023-07-19</ReleaseDate>
+  <RequiresAdminRights>true</RequiresAdminRights>
+  <Operations>
+    <Operation name="Execute">
+      <Argument>@TargetDir@/vc_redist.exe</Argument>
+      <Argument>/quite</Argument>
+    </Operation>
+  </Operations>
+</Package>

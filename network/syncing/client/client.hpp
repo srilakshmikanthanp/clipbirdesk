@@ -122,7 +122,7 @@ class Client : public service::Discover {
       stream.abortTransaction();
 
       //  Notifies the error occurred
-      emit OnErrorOccurred(error);
+      emit OnErrorOccurred(LOG(error.toStdString()));
     }
 
     // commit the transaction

@@ -213,7 +213,7 @@ auto main(int argc, char **argv) -> int {
   Logger::setLogFile(&logfile);
 
   // Set the custom message handler
-  qInstallMessageHandler(Logger::handler);
+  //qInstallMessageHandler(Logger::handler);
 
   // create the application
   ClipbirdApplication app(argc, argv);

@@ -23,7 +23,7 @@ void Discover::OnServiceFound(KDNSSD::RemoteService::Ptr service) {
   const auto myDevice = QString::fromStdString(constants::getMDnsServiceName());
   const auto callback = [&, service](const QHostInfo& info) {
     if (info.error() != QHostInfo::NoError || info.addresses().isEmpty()) {
-      emit this->OnErrorOccurred("Unable to resolve service");
+      emit this->OnErrorOccurred(LOG("Unable to resolve service"));
       return;
     }
 
@@ -34,7 +34,7 @@ void Discover::OnServiceFound(KDNSSD::RemoteService::Ptr service) {
 
   // resolve the service
   if (!service->resolve()) {
-    emit this->OnErrorOccurred("Unable to resolve service");
+    emit this->OnErrorOccurred(LOG("Unable to resolve service"));
     return;
   }
 
@@ -53,7 +53,7 @@ void Discover::OnServiceRemoved(KDNSSD::RemoteService::Ptr service) {
   const auto myDevice = QString::fromStdString(constants::getMDnsServiceName());
   const auto callback = [&, service](const QHostInfo& info) {
     if (info.error() != QHostInfo::NoError || info.addresses().isEmpty()) {
-      emit this->OnErrorOccurred("Unable to resolve service");
+      emit this->OnErrorOccurred(LOG("Unable to resolve service"));
       return;
     }
 
@@ -64,7 +64,7 @@ void Discover::OnServiceRemoved(KDNSSD::RemoteService::Ptr service) {
 
   // resolve the service
   if (!service->resolve()) {
-    emit this->OnErrorOccurred("Unable to resolve service");
+    emit this->OnErrorOccurred(LOG("Unable to resolve service"));
     return;
   }
 
