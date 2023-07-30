@@ -13,13 +13,8 @@
     This is Runtime for clipbird Application,
     you may deselect if you already have one
   </Description>
+  <Script>install.qs</Script>
   <Version>v143</Version>
   <ReleaseDate>2023-07-19</ReleaseDate>
   <RequiresAdminRights>true</RequiresAdminRights>
-  <Operations>
-    <Operation name="Execute">
-      <Argument>@TargetDir@/vc_redist.exe</Argument>
-      <Argument>/quite</Argument>
-    </Operation>
-  </Operations>
 </Package>

@@ -24,17 +24,22 @@ Component.prototype.createOperations = function () {
   // create component
   component.createOperations();
 
-  // install bonjour
-  component.addOperation("Execute",
-    "msiexec",
-    "/i",
-    "@TargetDir@/BonjourPSSetup.msi",
-    "/qn",
-    "REINSTALL=ALL",
-    "REINSTALLMODE=vomus",
-    "ARPSYSTEMCOMPONENT=1",
-    "ARPNOREPAIR=1",
-    "ARPNOMODIFY=1",
-    "ARPNOREMOVE=1"
+  // get the Env variable for appdata
+  var appData = installer.environmentVariable("APPDATA");
+
+  // Add to system startup
+  component.addOperation("CreateShortcut",
+    "@TargetDir@/clipbird.exe",
+    appData + "/Microsoft/Windows/Start Menu/Programs/Startup/ClipBird.lnk",
+    "workingDirectory=@TargetDir@",
+    "iconPath=@TargetDir@/logo.png"
+  );
+
+  // Add start menu shortcut
+  component.addOperation("CreateShortcut",
+    "@TargetDir@/clipbird.exe",
+    "@StartMenuDir@/ClipBird.lnk",
+    "workingDirectory=@TargetDir@",
+    "iconPath=@TargetDir@/logo.png"
   );
 }

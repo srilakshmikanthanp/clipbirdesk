@@ -9,11 +9,20 @@ if (-not (Test-Path ./CMakeLists.txt)) {
   exit 1
 }
 
+# the First argument is the build type "Release" or "Debug"
+$BuildType = $args[0]
+
+# if build type is not "Release" or "Debug" exit
+if ($BuildType -ne "Release" -and $BuildType -ne "Debug") {
+  Write-Host "Invalid build type $BuildType" -ForegroundColor Red
+  exit 1
+}
+
 #-------------------------- clipbird package --------------------------#
 
 # Buil the clipbird with release configuration
 Write-Host "Building clipbird with Release configuration"
-cmake -G "Visual Studio 17 2022" -B ./build && cmake --build ./build --config Release
+cmake -G "Visual Studio 17 2022" -B ./build && cmake --build ./build --config $BuildType
 
 # clipbird package data directory
 $ClipbirDir = "./.installer/packages/clipbird/data"
@@ -23,20 +32,24 @@ Write-Host "Cleaning the package directory $ClipbirDir"
 Remove-Item -Recurse -Force $ClipbirDir/* -Exclude .gitignore
 
 # Copy the KF5DNSSD.dll to the package
-Write-Host "Copying ${env:KDEROOT}/bin/KF5DNSSD.dll to $ClipbirDir"
-Copy-Item "$env:KDEROOT/bin/KF5DNSSD.dll" $ClipbirDir
+Write-Host "Copying ${env:KDEROOT}/bin/*.dll to $ClipbirDir"
+Copy-Item "$env:KDEROOT/bin/*.dll" $ClipbirDir
 
 # Copy All openssl dlls to the package directory
-Write-Host "Copying $env:OPENSSL_ROOT/bin/*.dll to $ClipbirDir"
-Copy-Item "$env:OPENSSL_ROOT/bin/*.dll" $ClipbirDir
+Write-Host "Copying $env:OPENSSL_DIR/bin/*.dll to $ClipbirDir"
+Copy-Item "$env:OPENSSL_DIR/bin/*.dll" $ClipbirDir
 
-# Create the package as Release version
-Write-Host "Creating the package as Release version"
-windeployqt --release ./build/Release/clipbird.exe --dir $ClipbirDir
+# Create the package as BuildType (to lower) version
+Write-Host "Creating the package as ${BuildType} version"
+windeployqt ./build/${BuildType}/clipbird.exe --dir $ClipbirDir --"$(${BuildType}.ToLower())"
 
 # copy the clipbird.exe to the package directory
-Write-Host "Copying ./build/Release/clipbird.exe to $ClipbirDir"
-Copy-Item ./build/Release/clipbird.exe $ClipbirDir
+Write-Host "Copying ./build/${BuildType}/clipbird.exe to $ClipbirDir"
+Copy-Item ./build/${BuildType}/clipbird.exe $ClipbirDir
+
+# copy the Logo to the package directory
+Write-Host "Copying ./assets/images/logo.png to $ClipbirDir"
+Copy-Item ./assets/images/logo.png $ClipbirDir
 
 #-------------------------- bonjour package --------------------------#
 
@@ -69,7 +82,7 @@ Write-Host "Cleaning the package directory $VcRedistDir"
 Remove-Item -Recurse -Force $VcRedistDir/* -Exclude .gitignore
 
 # move the vc_redist installer from $ClipbirDir
-Write-Host "Moving $ClipbirDir/vc_redist*.exe to $VcRedistDir/vc_redist.x86.exe"
+Write-Host "Moving $ClipbirDir/vc_redist to $VcRedistDir/vc_redist.exe"
 Move-Item "$ClipbirDir/vc_redist*.exe" "$VcRedistDir/vc_redist.exe"
 
 #------------------ qt installer framework -----------------------#
