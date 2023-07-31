@@ -1,3 +1,5 @@
+#pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -12,7 +14,7 @@ namespace srilakshmikanthanp::clipbirdesk::interfaces {
 /**
  * @brief Abstract Discovery Interface for mDNS Register
  */
-class ImDNSRegister : QObject {
+class ImDNSRegister : public QObject {
  signals:  // signals for this class
   /// @brief On Error Occurred
   void OnErrorOccurred(QString error);

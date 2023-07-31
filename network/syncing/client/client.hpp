@@ -21,17 +21,17 @@
 #include <utility>
 
 // Local headers
-#include "network/service/avahiclient/browser/browser.hpp"
-#include "network/service/bonjour/browser/browser.hpp"
+#include "network/service/avahi/browser/browser.hpp"
+#include "network/service/dnsd/browser/browser.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"
 
 #if defined  Q_OS_LINUX || Q_OS_UNIX
-  #define mDNSBrowser srilakshmikanthanp::clipbirdesk::network::service::avahiclient::Browser
+  #define mDNSBrowser srilakshmikanthanp::clipbirdesk::network::service::avahi::Browser
 #elif defined Q_OS_WIN || Q_OS_MAC
-  #define mDNSBrowser srilakshmikanthanp::clipbirdesk::network::service::bonjour::Browser
+  #define mDNSBrowser srilakshmikanthanp::clipbirdesk::network::service::dnsd::Browser
 #endif
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {

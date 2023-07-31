@@ -5,7 +5,7 @@
 
 #include "browser.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::bonjour {
+namespace srilakshmikanthanp::clipbirdesk::network::service::avahi {
 /**
  * @brief Construct a new Discovery Browser object
  *

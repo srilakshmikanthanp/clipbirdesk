@@ -83,11 +83,9 @@ Clipbird Software Helps you to sync your clipboard data between devices connecte
 
 ### Built With
 
-* ECM from KDE
 * C++
 * Qt6
 * OpenSSL
-* KDNSSD
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -106,9 +104,7 @@ Clipbird is in the development stage if the project succeeds in the future, we w
 
 ### Env Variables
 
-* `KDE_ROOT` - KDE installation directory
 * `OPENSSL_DIR` - OpenSSL installation directory
-* `ECM_DIR` - ECM cmake directory
 * `QT_CMAKE_DIR` - Qt6 cmake directory
 * `BONJOUR_DIR` - Bonjour SDK directory
 * `VC_REDIST_DIR` - Visual C++ Redistributable directory
@@ -157,11 +153,9 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [ECM from KDE](https://api.kde.org/ecm/)
 * [OpenSSL](https://www.openssl.org/)
 * [Qt](https://www.qt.io/)
 * [C++](https://www.cplusplus.com/)
-* [KDNSSD](https://api.kde.org/frameworks/kdnssd/html/index.html)
 
 <!-- Contributors -->
 ## Contributors

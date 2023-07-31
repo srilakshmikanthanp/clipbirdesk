@@ -14,17 +14,21 @@
 #include <QHostAddress>
 #include <QHostInfo>
 #include <QObject>
+#include <QSocketNotifier>
 #include <QTimer>
 #include <QUdpSocket>
 #include <QtLogging>
 
+// mDNS headers
+#include <dns_sd.h>
+
 // Local headers
 #include "constants/constants.hpp"
-#include "interfaces/imdnsregistar/imdnsregister.hpp"
+#include "interfaces/imdnsregister/imdnsregister.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::bonjour {
+namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd {
 /**
  * @brief Abstract Discovery server that Listens for the client that send
  * the broadcast message The user of this class should implement the
@@ -48,6 +52,31 @@ class Register : public interfaces::ImDNSRegister {
 
   Q_DISABLE_COPY_MOVE(Register)
 
+ private: // private variables
+
+  QSocketNotifier* m_notifier = nullptr; ///< Socket notifier
+  DNSServiceRef m_serviceRef = nullptr;  ///< Service ref
+
+ private: // private functions
+
+  /**
+   * @brief Callback function for DNSServiceRegister
+   */
+  static void publishCallback(
+    DNSServiceRef serviceRef,       // DNSServiceRef
+    DNSServiceFlags flags,          // DNSServiceFlags
+    DNSServiceErrorType errorCode,  // DNSServiceErrorType
+    const char* name,               // name of service
+    const char* regtype,            // regtype
+    const char* domain,             // domain
+    void* context                   // context
+  );
+
+  /**
+   * @brief Process Activated
+   */
+  void processActivated();
+
  public:  // public functions
 
   /**
@@ -62,7 +91,7 @@ class Register : public interfaces::ImDNSRegister {
   /**
    * @brief Destroy the Discovery Register object
    */
-  virtual ~Register()                            = default;
+  virtual ~Register();
 
  public:
 

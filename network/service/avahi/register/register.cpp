@@ -5,11 +5,7 @@
 
 #include "register.hpp"
 
-#ifdef Q_OS_WIN || Q_OS_MAC
-#include <dns_sd.h>
-#endif
-
-namespace srilakshmikanthanp::clipbirdesk::network::service {
+namespace srilakshmikanthanp::clipbirdesk::network::service::avahi {
 //---------------------  OS & Mac Windows Start  ----------------------//
 #ifdef Q_OS_WIN
 /**

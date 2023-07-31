@@ -192,7 +192,7 @@ void Client::handleDisconnected() {
 Client::Client(QObject* parent) : mDNSBrowser(parent) {
   // connect the signal to emit the signal for
   // OnErrorOccurred from the base class
-  const auto signal_e = &service::Browser::OnErrorOccurred;
+  const auto signal_e = &mDNSBrowser::OnErrorOccurred;
   const auto slot_e   = &Client::OnErrorOccurred;
   connect(this, signal_e, this, slot_e);
 

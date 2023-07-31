@@ -18,13 +18,16 @@
 #include <QUdpSocket>
 #include <QtLogging>
 
+// Third party headers
+#include <dns_sd.h>
+
 // Local headers
 #include "constants/constants.hpp"
-#include "interfaces/imdnsregistar/imdnsregister.hpp"
+#include "interfaces/imdnsregister/imdnsregister.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::avahiclient {
+namespace srilakshmikanthanp::clipbirdesk::network::service::avahi {
 /**
  * @brief Abstract Discovery server that Listens for the client that send
  * the broadcast message The user of this class should implement the

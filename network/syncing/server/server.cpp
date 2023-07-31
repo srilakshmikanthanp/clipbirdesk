@@ -191,12 +191,12 @@ Server::Server(QObject *p) : mDNSRegister(p) {
   QObject::connect(m_ssl_server, signal_c, this, slot_c);
 
   // connect OnErrorOccurred to from base class
-  const auto signal_e = &service::Register::OnErrorOccurred;
+  const auto signal_e = &mDNSRegister::OnErrorOccurred;
   const auto slot_e   = &Server::OnErrorOccurred;
   QObject::connect(this, signal_e, this, slot_e);
 
   // Notify the listeners that the server is started
-  const auto signal = &service::Register::OnServiceRegistered;
+  const auto signal = &mDNSRegister::OnServiceRegistered;
   const auto slot   = &Server::OnServiceRegistered;
   QObject::connect(this, signal, this, slot);
 }
@@ -404,7 +404,7 @@ void Server::startServer() {
   }
 
   // start the discovery server
-  service::Register::registerServiceAsync();
+  this->registerServiceAsync();
 }
 
 /**
@@ -412,7 +412,7 @@ void Server::startServer() {
  */
 void Server::stopServer() {
   // stop the discovery server
-  service::Register::unregisterService();
+  this->unregisterService();
 
   // disconnect all the clients
   this->disconnectAllClients();

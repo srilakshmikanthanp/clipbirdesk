@@ -25,7 +25,7 @@
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::avahiclient {
+namespace srilakshmikanthanp::clipbirdesk::network::service::avahi {
 /**
  * @brief Discovery client that sends the broadcast message
  * to the server and listen for the response if any server

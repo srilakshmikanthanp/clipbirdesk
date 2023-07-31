@@ -14,10 +14,15 @@
 #include <QHostAddress>
 #include <QHostInfo>
 #include <QObject>
+#include <QSocketNotifier>
 #include <QTimer>
-#include <QtTypes>
 #include <QUdpSocket>
 #include <QtLogging>
+#include <QtTypes>
+
+
+// mDNS headers
+#include <dns_sd.h>
 
 // Local headers
 #include "constants/constants.hpp"
@@ -25,7 +30,7 @@
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::bonjour {
+namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd {
 /**
  * @brief Discovery client that sends the broadcast message
  * to the server and listen for the response if any server
@@ -43,6 +48,32 @@ class Browser : public interfaces::ImDNSBrowser {
  private:  // disable copy and move
 
   Q_DISABLE_COPY_MOVE(Browser)
+
+ private:  // private variables
+
+  QSocketNotifier* m_notifier = nullptr;  ///< Socket notifier
+  DNSServiceRef m_serviceRef  = nullptr;  ///< Service ref
+
+ private:  // private functions
+
+  /**
+   * @brief Callback function for DNSServiceBrowse function
+   */
+  static void browseCallback(
+      DNSServiceRef serviceRef,       // DNSServiceRef
+      DNSServiceFlags flags,          // DNSServiceFlags
+      uint32_t interfaceIndex,        // InterfaceIndex
+      DNSServiceErrorType errorCode,  // DNSServiceErrorType
+      const char* serviceName,        // serviceName
+      const char* regtype,            // regtype
+      const char* domain,             // domain
+      void* context                   // context
+  );
+
+  /**
+   * @brief Process Activated
+   */
+  void processActivated();
 
  public:
 
@@ -81,7 +112,7 @@ class Browser : public interfaces::ImDNSBrowser {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServerAdded(QPair<QHostAddress, quint16>) = 0;
+  virtual void onServerAdded(QPair<QHostAddress, quint16>)   = 0;
 
   /**
    * @brief On Server Removed abstract function that
@@ -92,4 +123,4 @@ class Browser : public interfaces::ImDNSBrowser {
    */
   virtual void onServerRemoved(QPair<QHostAddress, quint16>) = 0;
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::network::discovery
+}  // namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd

@@ -10,6 +10,9 @@ set(CMAKE_CXX_STANDARD 17)
 # set c++ standard required
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# include FindBonjour
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
 # include cmake modules
 include(FetchContent)
 
@@ -27,6 +30,9 @@ set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
 
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
+
+# Set the BBONJOUR_DIR from env
+set(BONJOUR_DIR $ENV{BONJOUR_DIR})
 
 # Set Qt version
 set(QT_MAJOR_VERSION 6)
@@ -62,6 +68,11 @@ find_package(Qt6 REQUIRED COMPONENTS
   Network
 )
 
+# Find Bonjour on windows and mac
+if(WIN32 OR APPLE)
+  find_package(Bonjour REQUIRED)
+endif()
+
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
 
@@ -90,12 +101,15 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
-  PRIVATE OpenSSL::Crypto)
+  PRIVATE OpenSSL::Crypto
+  PRIVATE ${BONJOUR_LIBRARIES}
+)
 
 # Include directories
 target_include_directories(clipbird
   PUBLIC ${PROJECT_SOURCE_DIR}
-  PUBLIC ${PROJECT_BINARY_DIR})
+  PUBLIC ${PROJECT_BINARY_DIR}
+  PUBLIC ${BONJOUR_INCLUDE_DIR})
 
 # set target properties
 set_target_properties(clipbird PROPERTIES

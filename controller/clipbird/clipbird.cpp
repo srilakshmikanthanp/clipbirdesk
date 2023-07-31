@@ -164,7 +164,7 @@ void ClipBird::setCurrentHostAsClient() {
   connect(client, signal_rq, this, slot_cr);
 
   // Start the Discovery
-  client->startDiscovery();
+  client->startBrowsing();
 }
 
 //---------------------- Server functions -----------------------//

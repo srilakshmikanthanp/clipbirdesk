@@ -28,7 +28,7 @@ Component.prototype.createOperations = function () {
   component.addOperation("Execute",
     "msiexec",
     "/i",
-    "@TargetDir@/BonjourPSSetup.msi",
+    "@TargetDir@/Bonjour.msi",
     "/qn",
     "REINSTALL=ALL",
     "REINSTALLMODE=vomus",
