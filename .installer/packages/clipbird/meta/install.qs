@@ -8,7 +8,7 @@
  */
 function Component() {
   // Constructor for component class Leave
-  // This as Empty USed by Qt Installer
+  // This as Empty Ued by Qt Installer
   // and we add functions in prototype
 }
 

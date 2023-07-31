@@ -28,12 +28,6 @@ set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
 
-# Append ECM cmake dir to CMAKE_PREFIX_PATH
-list(APPEND CMAKE_PREFIX_PATH $ENV{ECM_DIR})
-
-# Append KDNSSD_DIR cmake dir to CMAKE_PREFIX_PATH
-list(APPEND CMAKE_PREFIX_PATH $ENV{KDNSSD_DIR})
-
 # Set Qt version
 set(QT_MAJOR_VERSION 6)
 
@@ -71,9 +65,6 @@ find_package(Qt6 REQUIRED COMPONENTS
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
 
-# Find KDE DNS-SD Framework
-find_package(KF6DNSSD NO_MODULE)
-
 # Configure config.hpp
 configure_file(
   ${PROJECT_SOURCE_DIR}/config/config.hpp.in
@@ -97,7 +88,6 @@ qt_add_executable(clipbird
 target_link_libraries(clipbird
   PRIVATE SingleApplication::SingleApplication
   PRIVATE Qt6::Widgets
-  PRIVATE KF6::DNSSD
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto)
