@@ -32,8 +32,8 @@ void Browser::browseCallback(
   }
 
   // service name
-  auto serviceName = QString::fromUtf8(serviceName);
-  auto regtype     = QString::fromUtf8(regtype);
+  auto name = QString::fromUtf8(serviceName);
+  auto type = QString::fromUtf8(regtype);
 
   // check for flags for add or remove
   if (flags & kDNSServiceFlagsAdd) {
