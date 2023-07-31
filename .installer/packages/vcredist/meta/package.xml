@@ -15,6 +15,8 @@
   </Description>
   <Script>install.qs</Script>
   <Version>v143</Version>
+  <Virtual>true</Virtual>
+  <RequiresAdminRights>true</RequiresAdminRights>
   <ReleaseDate>2023-07-19</ReleaseDate>
   <RequiresAdminRights>true</RequiresAdminRights>
 </Package>
