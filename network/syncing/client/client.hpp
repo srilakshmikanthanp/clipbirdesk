@@ -21,18 +21,25 @@
 #include <utility>
 
 // Local headers
-#include "network/service/discover/discover.hpp"
+#include "network/service/avahiclient/browser/browser.hpp"
+#include "network/service/bonjour/browser/browser.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"
+
+#if defined  Q_OS_LINUX || Q_OS_UNIX
+  #define mDNSBrowser srilakshmikanthanp::clipbirdesk::network::service::avahiclient::Browser
+#elif defined Q_OS_WIN || Q_OS_MAC
+  #define mDNSBrowser srilakshmikanthanp::clipbirdesk::network::service::bonjour::Browser
+#endif
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 /**
  * @brief Syncing client that syncs the clipboard data between
  * client and server
  */
-class Client : public service::Discover {
+class Client : public mDNSBrowser {
  signals:  // signals for this class
   /// @brief On Server List Changed
   void OnServerListChanged(QList<QPair<QHostAddress, quint16>> servers);

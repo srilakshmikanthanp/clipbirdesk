@@ -182,7 +182,7 @@ void Server::OnServiceRegistered() {
  * @param config SSL configuration
  * @param parent Parent object
  */
-Server::Server(QObject *p) : service::Register(p) {
+Server::Server(QObject *p) : mDNSRegister(p) {
   // Connect the socket to the callback function that
   // process the connections when the socket is ready
   // to read so the listener can be notified

@@ -12,7 +12,8 @@
         "${workspaceFolder}/build/_deps/singleapplication-src",
         "C:/Qt/6.5.1/mingw_64/include/QtCore",
         "${workspaceFolder}/build",
-        "C:/kderoot/include/KF6/KDNSSD"
+        "C:/kderoot/include/KF6/KDNSSD",
+        "C:\\Program Files\\Bonjour SDK\\Include"
       ],
       "defines": [ "_UNICODE", "_DEBUG", "UNICODE" ],
       "cStandard": "c17",

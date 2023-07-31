@@ -14,18 +14,25 @@
 #include <QVector>
 
 #include "network/packets/authentication/authentication.hpp"
-#include "network/service/register/register.hpp"
+#include "network/service/avahiclient/register/register.hpp"
+#include "network/service/bonjour/register/register.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"
+
+#if defined Q_OS_LINUX || Q_OS_UNIX
+  #define mDNSRegister srilakshmikanthanp::clipbirdesk::network::service::avahiclient::Register
+#elif defined Q_OS_WIN || Q_OS_MAC
+  #define mDNSRegister srilakshmikanthanp::clipbirdesk::network::service::bonjour::Register
+#endif
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 /**
  * @brief Syncing server that syncs the clipboard data between
  * the clients
  */
-class Server : public service::Register {
+class Server : public mDNSRegister {
  signals:  // signals
   /// @brief On client state changed
   void OnCLientStateChanged(QPair<QHostAddress, quint16>, bool connected);

@@ -19,21 +19,19 @@
 #include <QUdpSocket>
 #include <QtLogging>
 
-// KDE headers
-#include <KDNSSD/ServiceBrowser>
-
 // Local headers
 #include "constants/constants.hpp"
+#include "interfaces/imdnsbrowser/imdnsbrowser.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service {
+namespace srilakshmikanthanp::clipbirdesk::network::service::avahiclient {
 /**
  * @brief Discovery client that sends the broadcast message
  * to the server and listen for the response if any server
  * is found then the callback function is called
  */
-class Discover : public QObject {
+class Browser : public interfaces::ImDNSBrowser {
  signals:  // signals for this class
   /// @brief On Error Occurred
   void OnErrorOccurred(QString error);
@@ -44,42 +42,35 @@ class Discover : public QObject {
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(Discover)
-
- private:  // private Variables
-
-  /// @brief Service Browser
-  KDNSSD::ServiceBrowser* m_browser;
-
- private:  // private functions
-
-  /// @brief On Service Found
-  void OnServiceFound(KDNSSD::RemoteService::Ptr service);
-
-  /// @brief On Service Removed
-  void OnServiceRemoved(KDNSSD::RemoteService::Ptr service);
+  Q_DISABLE_COPY_MOVE(Browser)
 
  public:
 
   /**
-   * @brief Construct a new Discovery Discover object
+   * @brief Construct a new Discovery Browser object
    *
    * @param parent Parent object
    */
-  explicit Discover(QObject* parent = nullptr);
+  explicit Browser(QObject* parent = nullptr);
 
   /**
-   * @brief Destroy the Discovery Discover object
+   * @brief Destroy the Discovery Browser object
    */
-  ~Discover() = default;
+  ~Browser() = default;
 
   /**
-   * @brief Starts the discovery client by sending the
-   * broadcast message
+   * @brief Starts the mDNS Browsing
    *
    * @param interval Interval between each broadcast
    */
-  void startDiscovery();
+  void startBrowsing();
+
+  /**
+   * @brief Stop the mDNS Browsing
+   *
+   * @param interval Interval between each broadcast
+   */
+  void stopBrowsing();
 
  protected:  // abstract functions
 
