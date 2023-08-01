@@ -67,7 +67,7 @@ void Register::registerServiceAsync() {
       &this->m_serviceRef,                      // DNSServiceRef
       kDNSServiceInterfaceIndexAny,             // interfaceIndex
       0,                                        // flags
-      NULL,                                     // server's name
+      constants::getMDnsServiceName().c_str(),  // server's name
       constants::getMDnsServiceType().c_str(),  // service type
       NULL,                                     // domain
       NULL,                                     // host

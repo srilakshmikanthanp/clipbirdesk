@@ -81,7 +81,7 @@ class Browser : public interfaces::ImDNSBrowser {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServerAdded(QPair<QHostAddress, quint16>) = 0;
+  virtual void onServiceAdded(QPair<QHostAddress, quint16>) = 0;
 
   /**
    * @brief On Server Removed abstract function that
@@ -90,6 +90,6 @@ class Browser : public interfaces::ImDNSBrowser {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServerRemoved(QPair<QHostAddress, quint16>) = 0;
+  virtual void onServiceRemoved(QPair<QHostAddress, quint16>) = 0;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::discovery

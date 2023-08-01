@@ -259,7 +259,7 @@ class Client : public mDNSBrowser {
    * @param host Host address
    * @param port Port number
    */
-  void onServerAdded(QPair<QHostAddress, quint16> server) override;
+  void onServiceAdded(QPair<QHostAddress, quint16> server) override;
 
   /**
    * @brief On server removed function that That Called by the
@@ -267,6 +267,6 @@ class Client : public mDNSBrowser {
    *
    * @param server
    */
-  void onServerRemoved(QPair<QHostAddress, quint16> server) override;
+  void onServiceRemoved(QPair<QHostAddress, quint16> server) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

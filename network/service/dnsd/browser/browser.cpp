@@ -7,18 +7,43 @@
 
 namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd {
 /**
+ * @brief Callback for QHostInfo Address Resolve Function
+ *
+ * @param isAdded
+ * @param const QHostInfo& info
+ */
+void Browser::onHostResolved(bool isAdded, quint16 port, const QHostInfo& info) {
+  // check for error
+  if (info.error() != QHostInfo::NoError || info.addresses().isEmpty()) {
+    emit this->OnErrorOccurred(LOG("Unable to resolve service"));
+    return;
+  }
+
+  // get the ip address
+  auto ip = info.addresses().first();
+
+  // emit the signal
+  isAdded ? emit onServiceAdded({ip, port}) : emit onServiceRemoved({ip, port});
+}
+
+/**
  * @brief Callback function for DNSServiceBrowse function
  */
 void Browser::browseCallback(
-    DNSServiceRef serviceRef,       // DNSServiceRef
-    DNSServiceFlags flags,          // DNSServiceFlags
-    uint32_t interfaceIndex,        // InterfaceIndex
-    DNSServiceErrorType errorCode,  // DNSServiceErrorType
-    const char* serviceName,        // serviceName
-    const char* regtype,            // regtype
-    const char* domain,             // domain
-    void* context                   // context
+    DNSServiceRef serviceRef,                        // DNSServiceRef
+    DNSServiceFlags flags,                           // DNSServiceFlags
+    uint32_t interfaceIndex,                         // InterfaceIndex
+    DNSServiceErrorType errorCode,                   // DNSServiceErrorType
+    const char* serviceName,                         // serviceName
+    const char* regtype,                             // regtype
+    const char* domain,                              // domain
+    void* context                                    // context
 ) {
+  // if the service name is same as our service name
+  if (constants::getMDnsServiceName() == std::string(serviceName)) {
+    return;
+  }
+
   // convert context to Register object
   auto browserObj = static_cast<Browser*>(context);
 
@@ -28,28 +53,145 @@ void Browser::browseCallback(
 
   // check for Error
   if (errorCode != kDNSServiceErr_NoError) {
-    throw std::runtime_error("DNSServiceBrowse failed");
+    emit browserObj->OnErrorOccurred(LOG("DNSServiceBrowse failed"));
+    return;
   }
 
-  // service name
-  auto name = QString::fromUtf8(serviceName);
-  auto type = QString::fromUtf8(regtype);
+  // infer callback type from flag
+  auto callback = flags & kDNSServiceFlagsAdd ? (
+    addedCallback                                    // Service Added
+  ) : (
+    removeCallback                                   // Service Removed
+  );
 
-  // check for flags for add or remove
-  if (flags & kDNSServiceFlagsAdd) {
+  // resolve the service
+  auto errorType = DNSServiceResolve(
+      &browserObj->m_res_ref,                        // DNSServiceRef
+      0,                                             // DNSServiceFlags
+      interfaceIndex,                                // InterfaceIndex
+      serviceName,                                   // serviceName
+      regtype,                                       // regtype
+      domain,                                        // domain
+      callback,                                      // callback
+      browserObj                                     // context
+  );
 
-  } else {
-
+  // check for error
+  if (errorType != kDNSServiceErr_NoError) {
+    emit browserObj->OnErrorOccurred(LOG("DNSServiceResolve failed"));
+    return;
   }
+
+  // create socket notifier
+  browserObj->m_res_notify = new QSocketNotifier(
+      DNSServiceRefSockFD(browserObj->m_res_ref),    // socket
+      QSocketNotifier::Read,                         // type
+      browserObj                                     // parent
+  );
+
+  // process resolve socket
+  const auto processResSock = [=] {
+    if (DNSServiceProcessResult(browserObj->m_res_ref) != kDNSServiceErr_NoError) {
+      emit browserObj->OnErrorOccurred(LOG("DNSServiceProcessResult failed"));
+    }
+  };
+
+  // connect the socket notifier to slot
+  const auto signal = &QSocketNotifier::activated;
+  const auto slot   = processResSock;
+  connect(browserObj->m_res_notify, signal, slot);
 }
 
 /**
- * @brief Process Activated
+ * @brief Callback function for DNSServiceResolve function
  */
-void Browser::processActivated() {
-  if (DNSServiceProcessResult(this->m_serviceRef) != kDNSServiceErr_NoError) {
-    throw std::runtime_error("DNSServiceProcessResult failed");
+void Browser::addedCallback(
+    DNSServiceRef serviceRef,                        // DNSServiceRef
+    DNSServiceFlags flags,                           // DNSServiceFlags
+    uint32_t interfaceIndex,                         // InterfaceIndex
+    DNSServiceErrorType errorCode,                   // DNSServiceErrorType
+    const char* fullname,                            // fullname
+    const char* hosttarget,                          // hosttarget
+    uint16_t port,                                   // port
+    uint16_t txtLen,                                 // txtLen
+    const unsigned char* txtRecord,                  // txtRecord
+    void* context                                    // context
+) {
+  // convert context to Register object
+  auto browserObj = static_cast<Browser*>(context);
+
+  // Avoid warning of unused variables
+  Q_UNUSED(interfaceIndex);
+  Q_UNUSED(fullname);
+  Q_UNUSED(txtLen);
+  Q_UNUSED(txtRecord);
+
+  // check for Error
+  if (errorCode != kDNSServiceErr_NoError) {
+    emit browserObj->OnErrorOccurred(LOG("DNSServiceResolve failed"));
+    return;
   }
+
+  // service name
+  auto hostname   = QString::fromUtf8(hosttarget);
+
+  // bind the iAdded and port
+  auto callback = std::bind(
+    &onHostResolved,                                 // Function
+    browserObj,                                      // this
+    true,                                            // Removed
+    ntohs(port),                                     // port
+    std::placeholders::_1                            // QHostInfo
+  );
+
+  // Resolve the ip address from hostname
+  QHostInfo::lookupHost(hostname, callback);
+}
+
+/**
+ * @brief Callback function for DNSServiceResolve function
+ */
+void Browser::removeCallback(
+    DNSServiceRef serviceRef,                        // DNSServiceRef
+    DNSServiceFlags flags,                           // DNSServiceFlags
+    uint32_t interfaceIndex,                         // InterfaceIndex
+    DNSServiceErrorType errorCode,                   // DNSServiceErrorType
+    const char* fullname,                            // fullname
+    const char* hosttarget,                          // hosttarget
+    uint16_t port,                                   // port
+    uint16_t txtLen,                                 // txtLen
+    const unsigned char* txtRecord,                  // txtRecord
+    void* context                                    // context
+) {
+  // convert context to Register object
+  auto browserObj = static_cast<Browser*>(context);
+
+  // Avoid warning of unused variables
+  Q_UNUSED(interfaceIndex);
+  Q_UNUSED(fullname);
+  Q_UNUSED(txtLen);
+  Q_UNUSED(txtRecord);
+
+  // check for Error
+  if (errorCode != kDNSServiceErr_NoError) {
+    emit browserObj->OnErrorOccurred(LOG("DNSServiceResolve failed"));
+    return;
+  }
+
+  // service name
+  auto hostname   = QString::fromUtf8(hosttarget);
+
+  // bind the iAdded and port
+  auto callback = std::bind(
+    &onHostResolved,                                 // Function
+    browserObj,                                      // this
+    false,                                           // Removed
+    ntohs(port),                                     // port
+    std::placeholders::_1                            // QHostInfo
+  );
+
+  // Resolve the ip address from hostname
+  QHostInfo::lookupHost(hostname, callback);
 }
 
 /**
@@ -57,7 +199,9 @@ void Browser::processActivated() {
  *
  * @param parent Parent object
  */
-Browser::Browser(QObject* parent) : interfaces::ImDNSBrowser(parent) {}
+Browser::Browser(QObject* parent) : interfaces::ImDNSBrowser(parent) {
+  // Empty Constructor just calls the parent constructor
+}
 
 /**
  * @brief Starts the discovery client by sending the
@@ -68,7 +212,7 @@ Browser::Browser(QObject* parent) : interfaces::ImDNSBrowser(parent) {}
 void Browser::startBrowsing() {
   // Start to browse for the service
   auto errorType = DNSServiceBrowse(
-      &this->m_serviceRef,                      // DNSServiceRef
+      &this->m_browse_ref,                      // DNSServiceRef
       0,                                        // DNSServiceFlags
       kDNSServiceInterfaceIndexAny,             // InterfaceIndex
       constants::getMDnsServiceType().c_str(),  // regtype
@@ -79,47 +223,68 @@ void Browser::startBrowsing() {
 
   // check for error
   if (errorType != kDNSServiceErr_NoError) {
-    throw std::runtime_error("DNSServiceBrowse failed");
+    emit this->OnErrorOccurred(LOG("DNSServiceBrowse failed"));
+    return;
   }
 
   // create socket notifier
-  this->m_notifier = new QSocketNotifier(
-      DNSServiceRefSockFD(this->m_serviceRef),  // socket
+  this->m_browse_notify = new QSocketNotifier(
+      DNSServiceRefSockFD(this->m_browse_ref),  // socket
       QSocketNotifier::Read,                    // type
       this                                      // parent
   );
 
+  // process register socket
+  const auto processBrowseSock = [=] {
+    if (DNSServiceProcessResult(this->m_browse_ref) != kDNSServiceErr_NoError) {
+      emit this->OnErrorOccurred(LOG("DNSServiceProcessResult failed"));
+    }
+  };
+
   // connect the socket notifier to slot
   const auto signal = &QSocketNotifier::activated;
-  const auto slot   = &Browser::processActivated;
-  connect(this->m_notifier, signal, this, slot);
+  const auto slot   = processBrowseSock;
+  connect(this->m_browse_notify, signal, slot);
 }
 
 /**
- * @brief Stops the discovery client by sending the
- * broadcast message
- *
- * @param interval Interval between each broadcast
+ * @brief Stops the mDNS Browser by stopping the
+ * socket notifier and service
  */
 void Browser::stopBrowsing() {
-  // check for service ref & notifier
-  if (this->m_serviceRef == nullptr || this->m_notifier == nullptr) {
-    return;
-  }
+  const auto deleter = [=](auto& serviceRef, auto*& notifier) {
+    // check for service ref & notifier
+    if (serviceRef == nullptr || notifier == nullptr) {
+      return;
+    }
 
-  // stop the socket notifier
-  this->m_notifier->setEnabled(false);
+    // stop the socket notifier
+    notifier->setEnabled(false);
 
-  // stop the service
-  DNSServiceRefDeallocate(this->m_serviceRef);
+    // stop the service
+    DNSServiceRefDeallocate(serviceRef);
 
-  // delete the notifier
-  delete this->m_notifier;
+    // delete the notifier
+    delete notifier;
 
-  // set the notifier to nullptr
-  this->m_notifier = nullptr;
+    // set the service ref to nullptr
+    serviceRef = nullptr;
 
-  // set the service ref to nullptr
-  this->m_serviceRef = nullptr;
+    // set the notifier to nullptr
+    notifier = nullptr;
+  };
+
+  // delete the service ref & socket notifier for resolve
+  deleter(this->m_res_ref, this->m_res_notify);
+
+  // delete the service ref & socket notifier for browse
+  deleter(this->m_browse_ref, this->m_browse_notify);
+}
+
+/**
+ * @brief Destroy the Discovery Browser object
+ */
+Browser::~Browser() {
+  this->stopBrowsing();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd

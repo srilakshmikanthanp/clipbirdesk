@@ -20,7 +20,6 @@
 #include <QtLogging>
 #include <QtTypes>
 
-
 // mDNS headers
 #include <dns_sd.h>
 
@@ -51,10 +50,20 @@ class Browser : public interfaces::ImDNSBrowser {
 
  private:  // private variables
 
-  QSocketNotifier* m_notifier = nullptr;  ///< Socket notifier
-  DNSServiceRef m_serviceRef  = nullptr;  ///< Service ref
+  QSocketNotifier* m_browse_notify = nullptr;  ///< Socket notifier
+  DNSServiceRef m_browse_ref       = nullptr;  ///< Service ref
+  QSocketNotifier* m_res_notify    = nullptr;  ///< Socket notifier
+  DNSServiceRef m_res_ref          = nullptr;  ///< Service ref
 
  private:  // private functions
+
+  /**
+   * @brief Callback for QHostInfo Address Resolve Function
+   *
+   * @param isAdded
+   * @param const QHostInfo& info
+   */
+  void onHostResolved(bool isAdded, quint16 port, const QHostInfo& info);
 
   /**
    * @brief Callback function for DNSServiceBrowse function
@@ -71,9 +80,38 @@ class Browser : public interfaces::ImDNSBrowser {
   );
 
   /**
-   * @brief Process Activated
+   * @brief Callback function for DNSServiceResolve function
+   * that service Added
    */
-  void processActivated();
+  static void addedCallback(
+      DNSServiceRef serviceRef,        // DNSServiceRef
+      DNSServiceFlags flags,           // DNSServiceFlags
+      uint32_t interfaceIndex,         // InterfaceIndex
+      DNSServiceErrorType errorCode,   // DNSServiceErrorType
+      const char* fullname,            // fullname
+      const char* hosttarget,          // hosttarget
+      uint16_t port,                   // port
+      uint16_t txtLen,                 // txtLen
+      const unsigned char* txtRecord,  // txtRecord
+      void* context                    // context
+  );
+
+  /**
+   * @brief Callback function for DNSServiceResolve function
+   * that service Removed
+   */
+  static void removeCallback(
+      DNSServiceRef serviceRef,        // DNSServiceRef
+      DNSServiceFlags flags,           // DNSServiceFlags
+      uint32_t interfaceIndex,         // InterfaceIndex
+      DNSServiceErrorType errorCode,   // DNSServiceErrorType
+      const char* fullname,            // fullname
+      const char* hosttarget,          // hosttarget
+      uint16_t port,                   // port
+      uint16_t txtLen,                 // txtLen
+      const unsigned char* txtRecord,  // txtRecord
+      void* context                    // context
+  );
 
  public:
 
@@ -87,19 +125,15 @@ class Browser : public interfaces::ImDNSBrowser {
   /**
    * @brief Destroy the Discovery Browser object
    */
-  ~Browser() = default;
+  virtual ~Browser();
 
   /**
    * @brief Starts the mDNS Browsing
-   *
-   * @param interval Interval between each broadcast
    */
   void startBrowsing();
 
   /**
    * @brief Stop the mDNS Browsing
-   *
-   * @param interval Interval between each broadcast
    */
   void stopBrowsing();
 
@@ -112,7 +146,7 @@ class Browser : public interfaces::ImDNSBrowser {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServerAdded(QPair<QHostAddress, quint16>)   = 0;
+  virtual void onServiceAdded(QPair<QHostAddress, quint16>)   = 0;
 
   /**
    * @brief On Server Removed abstract function that
@@ -121,6 +155,6 @@ class Browser : public interfaces::ImDNSBrowser {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServerRemoved(QPair<QHostAddress, quint16>) = 0;
+  virtual void onServiceRemoved(QPair<QHostAddress, quint16>) = 0;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd

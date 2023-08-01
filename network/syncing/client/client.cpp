@@ -358,7 +358,7 @@ QPair<QHostAddress, quint16> Client::getAuthedServerOrEmpty() const {
  * @param host Host address
  * @param port Port number
  */
-void Client::onServerAdded(QPair<QHostAddress, quint16> server) {
+void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
   // emit the signal for server found event
   emit OnServerFound(server);
 
@@ -373,7 +373,7 @@ void Client::onServerAdded(QPair<QHostAddress, quint16> server) {
  * @brief
  *
  */
-void Client::onServerRemoved(QPair<QHostAddress, quint16> server) {
+void Client::onServiceRemoved(QPair<QHostAddress, quint16> server) {
   // emit the signal for server gone event
   emit OnServerGone(server);
 
