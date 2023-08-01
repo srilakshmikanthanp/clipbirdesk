@@ -19,7 +19,7 @@
 #include <QtLogging>
 
 // Third party headers
-#include <dns_sd.h>
+#include <KDNSSD/PublicService>
 
 // Local headers
 #include "constants/constants.hpp"
@@ -46,6 +46,10 @@ class Register : public interfaces::ImDNSRegister {
  private:  // Just for Qt
 
   Q_OBJECT
+
+ private:  // variables
+
+  KDNSSD::PublicService* service;
 
  private:  // disable copy and move
 

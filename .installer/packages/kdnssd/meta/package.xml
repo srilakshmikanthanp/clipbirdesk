@@ -1,0 +1,20 @@
+<!--
+ Copyright (c) 2023 Sri Lakshmi Kanthan P
+
+ This software is released under the MIT License.
+ https://opensource.org/licenses/MIT
+-->
+
+<Package>
+  <DisplayName>KDNSSD</DisplayName>
+  <Description>
+    This is Needed component to discover the
+    Devices on your network, you may
+    deselect if you already have one
+  </Description>
+  <Version>5.108.0</Version>
+  <Script>install.qs</Script>
+  <Virtual>true</Virtual>
+  <ReleaseDate>2023-07-1</ReleaseDate>
+  <RequiresAdminRights>true</RequiresAdminRights>
+</Package>

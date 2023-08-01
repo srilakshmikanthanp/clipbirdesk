@@ -83,6 +83,9 @@ Clipbird Software Helps you to sync your clipboard data between devices connecte
 
 ### Built With
 
+* Extra Cmake Modules
+* KDNSSD
+* Bonjour
 * C++
 * Qt6
 * OpenSSL
@@ -96,18 +99,21 @@ Clipbird is in the development stage if the project succeeds in the future, we w
 
 ### Prerequisites
 
-* ECM from KDE
+* Extra Cmake Modules
+* KDNSSD
+* Bonjour
 * C++
 * Qt6
 * OpenSSL
-* KDNSSD
 
 ### Env Variables
 
 * `OPENSSL_DIR` - OpenSSL installation directory
+* `ECM_DIR` - Extra Cmake Modules directory
+* `KDNSSD_DIR` - KDNSSD cmake directory
 * `QT_CMAKE_DIR` - Qt6 cmake directory
-* `BONJOUR_DIR` - Bonjour SDK directory
-* `VC_REDIST_DIR` - Visual C++ Redistributable directory
+* `BONJOUR_HOME` - Bonjour SDK directory
+* `VCREDIST_DIR` - Visual C++ Redistributable directory
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -156,6 +162,9 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 * [OpenSSL](https://www.openssl.org/)
 * [Qt](https://www.qt.io/)
 * [C++](https://www.cplusplus.com/)
+* [KDNSSD](https://api.kde.org/frameworks/kdnssd/html/index.html)
+* [Bonjour](https://developer.apple.com/bonjour/)
+* [ECM](https://api.kde.org/ecm/)
 
 <!-- Contributors -->
 ## Contributors

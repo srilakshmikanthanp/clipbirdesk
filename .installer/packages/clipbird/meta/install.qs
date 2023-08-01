@@ -16,30 +16,28 @@ function Component() {
  * Creates operations for component
  */
 Component.prototype.createOperations = function () {
-  // if the system is not windows then return
-  if (systemInfo.productType !== "windows") {
-    return;
-  }
-
-  // create component
+  // create operations
   component.createOperations();
 
-  // get the Env variable for appdata
-  var appData = installer.environmentVariable("APPDATA");
+  // if the system is not windows then return
+  if (systemInfo.productType === "windows") {
+    // get the Env variable for appdata
+    var appData = installer.environmentVariable("APPDATA");
 
-  // Add to system startup
-  component.addOperation("CreateShortcut",
-    "@TargetDir@/clipbird.exe",
-    appData + "/Microsoft/Windows/Start Menu/Programs/Startup/ClipBird.lnk",
-    "workingDirectory=@TargetDir@",
-    "iconPath=@TargetDir@/logo.png"
-  );
+    // Add to system startup
+    component.addOperation("CreateShortcut",
+      "@TargetDir@/clipbird.exe",
+      appData + "/Microsoft/Windows/Start Menu/Programs/Startup/ClipBird.lnk",
+      "workingDirectory=@TargetDir@",
+      "iconPath=@TargetDir@/logo.png"
+    );
 
-  // Add start menu shortcut
-  component.addOperation("CreateShortcut",
-    "@TargetDir@/clipbird.exe",
-    "@StartMenuDir@/ClipBird.lnk",
-    "workingDirectory=@TargetDir@",
-    "iconPath=@TargetDir@/logo.png"
-  );
+    // Add start menu shortcut
+    component.addOperation("CreateShortcut",
+      "@TargetDir@/clipbird.exe",
+      "@StartMenuDir@/ClipBird.lnk",
+      "workingDirectory=@TargetDir@",
+      "iconPath=@TargetDir@/logo.png"
+    );
+  }
 }

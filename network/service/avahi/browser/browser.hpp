@@ -19,6 +19,9 @@
 #include <QUdpSocket>
 #include <QtLogging>
 
+// KDE headers
+#include <KDNSSD/ServiceBrowser>
+
 // Local headers
 #include "constants/constants.hpp"
 #include "interfaces/imdnsbrowser/imdnsbrowser.hpp"
@@ -43,6 +46,19 @@ class Browser : public interfaces::ImDNSBrowser {
  private:  // disable copy and move
 
   Q_DISABLE_COPY_MOVE(Browser)
+
+ private:  // private Variables
+
+  /// @brief Service Browser
+  KDNSSD::ServiceBrowser* m_browser;
+
+ private:  // private functions
+
+  /// @brief On Service Removed
+  void OnServiceRemoved(KDNSSD::RemoteService::Ptr service);
+
+  /// @brief On Service Found
+  void OnServiceFound(KDNSSD::RemoteService::Ptr service);
 
  public:
 
