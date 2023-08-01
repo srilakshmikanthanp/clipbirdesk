@@ -14,18 +14,11 @@
 #include <QVector>
 
 #include "network/packets/authentication/authentication.hpp"
-#include "network/service/avahi/register/register.hpp"
-#include "network/service/dnsd/register/register.hpp"
+#include "network/service/index.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"
-
-#if defined Q_OS_LINUX || Q_OS_UNIX
-  #define mDNSRegister srilakshmikanthanp::clipbirdesk::network::service::avahi::Register
-#elif defined Q_OS_WIN || Q_OS_MAC
-  #define mDNSRegister srilakshmikanthanp::clipbirdesk::network::service::dnsd::Register
-#endif
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 /**

@@ -21,8 +21,7 @@
 #include <utility>
 
 // Local headers
-#include "network/service/avahi/browser/browser.hpp"
-#include "network/service/dnsd/browser/browser.hpp"
+#include "network/service/index.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
