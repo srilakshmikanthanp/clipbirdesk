@@ -21,11 +21,7 @@ void Server::processSyncingPacket(const packets::SyncingPacket &packet) {
   }
 
   // Notify the listeners to sync the data
-  emit OnSyncRequest(items);
-
-  // send the packet to all the clients
-  this->sendPacket(packet);
-}
+  emit OnSyncRequest(items);}
 
 /**
  * @brief Process the connections that are pending
@@ -45,8 +41,7 @@ void Server::processConnections() {
       const auto message  = "Client is not SSL client";
 
       using utility::functions::createPacket;
-
-      this->sendPacket(client_tcp, createPacket({packType, code, message}));
+      this->sendPacket(client_tls, createPacket({packType, code, message}));
       client_tcp->disconnectFromHost();
     } else {
       // add the client to unauthenticated list
@@ -125,6 +120,7 @@ void Server::processReadyRead() {
   // Deserialize the data to SyncingPacket
   try {
     this->processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
+    this->sendPacket(fromQByteArray<packets::SyncingPacket>(data), client);
     return;
   } catch (const types::except::MalformedPacket &e) {
     const auto type = packets::InvalidRequest::PacketType::RequestFailed;
@@ -364,9 +360,6 @@ void Server::authFailed(const QPair<QHostAddress, quint16> &client) {
   // If the client is not found then return from the function
   if (client_itr == m_un_authed_clients.end()) return;
 
-  // Get the client from the iterator
-  auto client_tls = *client_itr;
-
   // Remove the client from the unauthenticated list
   m_un_authed_clients.erase(client_itr);
 
@@ -380,13 +373,13 @@ void Server::authFailed(const QPair<QHostAddress, quint16> &client) {
   });
 
   // send the packet to the client
-  this->sendPacket(client_tls, packet);
+  this->sendPacket((*client_itr), packet);
 
   // disconnect and delete the client
-  client_tls->disconnectFromHost();
+  (*client_itr)->disconnectFromHost();
 
   // delete the client after the client is disconnected
-  client_tls->deleteLater();
+  (*client_itr)->deleteLater();
 }
 
 /**

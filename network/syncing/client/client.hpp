@@ -113,9 +113,10 @@ class Client : public mDNSBrowser {
     // write the packet length
     while (wrote < data.size()) {
       // try to write the data
-      auto start = data.data() + wrote;
-      auto size  = data.size() - wrote;
-      auto bytes = stream.writeRawData(start, size);
+      auto bytes = stream.writeRawData(
+        data.data() + wrote, // start of data
+        data.size() - wrote  // size of data
+      );
 
       // if no error occurred
       if (bytes != -1) {

@@ -86,7 +86,7 @@ class Window : public QFrame {
   static constexpr const char* const s_statusKey   = "Server Status";
   static constexpr const char* const s_hostNameKey = "Server Name";
   static constexpr const char* const s_ipPortKey   = "Server Info";
-  static constexpr const char* const s_clientsKey  = "No of Clients";
+  static constexpr const char* const s_clientsKey  = "Connected Clients";
   static constexpr const char* const s_tabTitle    = "As Server";
 
  private:  // constant for keys (Client)
@@ -94,7 +94,7 @@ class Window : public QFrame {
   static constexpr const char* const c_statusKey   = "Connection Status";
   static constexpr const char* const c_hostNameKey = "Server Name";
   static constexpr const char* const c_ipPortKey   = "Server Info";
-  static constexpr const char* const c_serversKey  = "No of Servers";
+  static constexpr const char* const c_serversKey  = "Available Servers";
   static constexpr const char* const c_tabTitle    = "As Client";
 
  private:  // private slots

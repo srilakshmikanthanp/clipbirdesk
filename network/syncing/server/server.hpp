@@ -90,8 +90,8 @@ class Server : public mDNSRegister {
    * @param client Client to send
    * @param packet Packet to send
    */
-  template <typename Client, typename Packet>
-  void sendPacket(Client* client, const Packet& pack) {
+  template <typename Packet>
+  void sendPacket(QSslSocket* client, const Packet& pack) {
     // Convert the packet to QByteArray
     const auto data = utility::functions::toQByteArray(pack);
 
@@ -107,9 +107,10 @@ class Server : public mDNSRegister {
     // write the packet length
     while (wrote < data.size()) {
       // try to write the data
-      auto start = data.data() + wrote;
-      auto size  = data.size() - wrote;
-      auto bytes = stream.writeRawData(start, size);
+      auto bytes = stream.writeRawData(
+        data.data() + wrote, // start of the data
+        data.size() - wrote  // size of the data
+      );
 
       // if no error occurred
       if (bytes != -1) {
@@ -137,9 +138,9 @@ class Server : public mDNSRegister {
    * @param packet Packet to send
    */
   template <typename Packet>
-  void sendPacket(const Packet& pack) {
+  void sendPacket(const Packet& pack, QSslSocket* except = nullptr) {
     for (auto client : m_authed_clients) {
-      this->sendPacket(client, pack);
+      if (client != except) sendPacket(client, pack);
     }
   }
 
