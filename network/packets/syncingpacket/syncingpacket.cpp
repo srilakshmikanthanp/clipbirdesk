@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
  *
  * @param length
  */
-void SyncingPacket::setPacketLength(qint32 length) {
+void SyncingPacket::setPacketLength(quint32 length) {
   this->packetLength = length;
 }
 
@@ -20,7 +20,7 @@ void SyncingPacket::setPacketLength(qint32 length) {
  *
  * @return qint32
  */
-qint32 SyncingPacket::getPacketLength() const noexcept {
+quint32 SyncingPacket::getPacketLength() const noexcept {
   return this->packetLength;
 }
 
@@ -49,7 +49,7 @@ quint8 SyncingPacket::getPacketType() const noexcept {
  *
  * @param count
  */
-void SyncingPacket::setItemCount(qint32 count) {
+void SyncingPacket::setItemCount(quint32 count) {
   this->itemCount = count;
 }
 
@@ -58,7 +58,7 @@ void SyncingPacket::setItemCount(qint32 count) {
  *
  * @return qint32
  */
-qint32 SyncingPacket::getItemCount() const noexcept {
+quint32 SyncingPacket::getItemCount() const noexcept {
   return this->itemCount;
 }
 
@@ -89,7 +89,7 @@ QVector<SyncingItem> SyncingPacket::getItems() const noexcept {
  *
  * @return size_t
  */
-qint32 SyncingPacket::size() const noexcept {
+quint32 SyncingPacket::size() const noexcept {
   size_t size = (
     sizeof(this->packetType) + sizeof(this->packetLength) + sizeof(this->itemCount)
   );
@@ -98,7 +98,7 @@ qint32 SyncingPacket::size() const noexcept {
     size += payload.size();
   }
 
-  return size;
+  return qint32(size);
 }
 
 /**

@@ -1,3 +1,4 @@
+#ifdef __linux__  // Only for Linux Operating System that supports avahi & kdnssd
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
@@ -84,3 +85,4 @@ class Register : public interfaces::ImDNSRegister {
   virtual void unregisterService() override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service
+#endif  // Q_OS_LINUX

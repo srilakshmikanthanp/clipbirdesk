@@ -9,7 +9,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
  * @brief Set the Mime Length object
  */
-void SyncingItem::setMimeLength(qint32 length) {
+void SyncingItem::setMimeLength(quint32 length) {
   this->mimeLength = length;
 }
 
@@ -18,7 +18,7 @@ void SyncingItem::setMimeLength(qint32 length) {
  *
  * @return qint32
  */
-qint32 SyncingItem::getMimeLength() const noexcept {
+quint32 SyncingItem::getMimeLength() const noexcept {
   return this->mimeLength;
 }
 
@@ -49,7 +49,7 @@ QByteArray SyncingItem::getMimeType() const noexcept {
  *
  * @param length
  */
-void SyncingItem::setPayloadLength(qint32 length) {
+void SyncingItem::setPayloadLength(quint32 length) {
   this->payloadLength = length;
 }
 
@@ -58,7 +58,7 @@ void SyncingItem::setPayloadLength(qint32 length) {
  *
  * @return qint32
  */
-qint32 SyncingItem::getPayloadLength() const noexcept {
+quint32 SyncingItem::getPayloadLength() const noexcept {
   return this->payloadLength;
 }
 
@@ -89,8 +89,8 @@ QByteArray SyncingItem::getPayload() const noexcept {
  *
  * @return size_t
  */
-qint32 SyncingItem::size() const noexcept {
-  return (
+quint32 SyncingItem::size() const noexcept {
+  return quint32(
     sizeof(this->mimeLength) +
     this->mimeType.size() +
     sizeof(this->payloadLength) +

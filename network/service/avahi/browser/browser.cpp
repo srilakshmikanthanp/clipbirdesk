@@ -1,3 +1,5 @@
+#ifdef __linux__  // Only for Linux Operating System that supports avahi & kdnssd
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -110,3 +112,4 @@ void Browser::stopBrowsing() {
   delete this->m_browser;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service
+#endif  // Q_OS_LINUX

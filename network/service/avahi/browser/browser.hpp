@@ -1,3 +1,4 @@
+#ifdef __linux__  // Only for Linux Operating System that supports avahi & kdnssd
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
@@ -109,3 +110,4 @@ class Browser : public interfaces::ImDNSBrowser {
   virtual void onServiceRemoved(QPair<QHostAddress, quint16>) = 0;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::discovery
+#endif  // Q_OS_LINUX

@@ -28,8 +28,8 @@ class SyncingPacket {
  private:  // private members
 
   quint8 packetType = 0x02;
-  qint32 packetLength;
-  qint32 itemCount;
+  quint32 packetLength;
+  quint32 itemCount;
   QVector<SyncingItem> items;
 
  public:
@@ -44,14 +44,14 @@ class SyncingPacket {
    *
    * @param length
    */
-  void setPacketLength(qint32 length);
+  void setPacketLength(quint32 length);
 
   /**
    * @brief Get the Packet Length object
    *
    * @return qint32
    */
-  qint32 getPacketLength() const noexcept;
+  quint32 getPacketLength() const noexcept;
 
   /**
    * @brief Set the Packet Type object
@@ -72,14 +72,14 @@ class SyncingPacket {
    *
    * @param count
    */
-  void setItemCount(qint32 count);
+  void setItemCount(quint32 count);
 
   /**
    * @brief Get the Item Count object
    *
    * @return qint32
    */
-  qint32 getItemCount() const noexcept;
+  quint32 getItemCount() const noexcept;
 
   /**
    * @brief Set the Payloads object
@@ -100,7 +100,7 @@ class SyncingPacket {
    *
    * @return size_t
    */
-  qint32 size() const noexcept;
+  quint32 size() const noexcept;
 
   /**
    * @brief Overloaded operator<< for QDataStream

@@ -26,9 +26,9 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
 class SyncingItem {
  private:
 
-  qint32 mimeLength;
+  quint32 mimeLength;
   QByteArray mimeType;
-  qint32 payloadLength;
+  quint32 payloadLength;
   QByteArray payload;
 
  public:
@@ -36,14 +36,14 @@ class SyncingItem {
   /**
    * @brief Set the Mime Length object
    */
-  void setMimeLength(qint32 length);
+  void setMimeLength(quint32 length);
 
   /**
    * @brief Get the Mime Length object
    *
    * @return qint32
    */
-  qint32 getMimeLength() const noexcept;
+  quint32 getMimeLength() const noexcept;
 
   /**
    * @brief Set the Mime Type object
@@ -64,14 +64,14 @@ class SyncingItem {
    *
    * @param length
    */
-  void setPayloadLength(qint32 length);
+  void setPayloadLength(quint32 length);
 
   /**
    * @brief Get the Payload Length object
    *
    * @return qint32
    */
-  qint32 getPayloadLength() const noexcept;
+  quint32 getPayloadLength() const noexcept;
 
   /**
    * @brief Set the Payload object
@@ -92,7 +92,7 @@ class SyncingItem {
    *
    * @return size_t
    */
-  qint32 size() const noexcept;
+  quint32 size() const noexcept;
 
   /**
    * @brief Overloaded operator<< for QDataStream

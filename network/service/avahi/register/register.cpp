@@ -1,3 +1,5 @@
+#ifdef __linux__  // Only for Linux Operating System that supports avahi & kdnssd
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -44,5 +46,5 @@ void Register::registerServiceAsync() {
 void Register::unregisterService() {
   this->service->stop();
 }
-//------------------------ Os Windows & Mac End ----------------------//
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service
+#endif // Q_OS_LINUX

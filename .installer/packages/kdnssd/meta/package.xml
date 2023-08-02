@@ -15,6 +15,6 @@
   <Version>5.108.0</Version>
   <Script>install.qs</Script>
   <Virtual>true</Virtual>
-  <ReleaseDate>2023-07-1</ReleaseDate>
+  <ReleaseDate>2023-07-01</ReleaseDate>
   <RequiresAdminRights>true</RequiresAdminRights>
 </Package>

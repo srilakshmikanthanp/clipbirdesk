@@ -27,12 +27,6 @@
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"
 
-#if defined  Q_OS_LINUX || Q_OS_UNIX
-  #define mDNSBrowser srilakshmikanthanp::clipbirdesk::network::service::avahi::Browser
-#elif defined Q_OS_WIN || Q_OS_MAC
-  #define mDNSBrowser srilakshmikanthanp::clipbirdesk::network::service::dnsd::Browser
-#endif
-
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 /**
  * @brief Syncing client that syncs the clipboard data between

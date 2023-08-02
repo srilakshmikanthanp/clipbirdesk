@@ -21,6 +21,14 @@ Component.prototype.createOperations = function () {
     return;
   }
 
+  // bonjour file name
+  var bonjour = "bonjour.msi";
+
+  // if platfrom is x64
+  if (systemInfo.currentCpuArchitecture === "x86_64") {
+    bonjour = "bonjour64.msi";
+  }
+
   // create component
   component.createOperations();
 
@@ -28,7 +36,7 @@ Component.prototype.createOperations = function () {
   component.addOperation("Execute",
     "msiexec",
     "/i",
-    "@TargetDir@/Bonjour.msi",
+    `@TargetDir@/${bonjour}`,
     "/qn",
     "REINSTALL=ALL",
     "REINSTALLMODE=vomus",

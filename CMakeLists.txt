@@ -31,6 +31,12 @@ set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
 # Set the BBONJOUR_DIR from env
 set(BONJOUR_SDK_HOME $ENV{BONJOUR_SDK_HOME})
 
+# set KF major version
+set(KF_MAJOR_VERSION 5)
+
+# Set Qt version
+set(QT_MAJOR_VERSION 6)
+
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
 
@@ -39,12 +45,6 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{ECM_DIR})
 
 # Append KDNSSD_DIR cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{KDNSSD_DIR})
-
-# set KF major version
-set(KF_MAJOR_VERSION 5)
-
-# Set Qt version
-set(QT_MAJOR_VERSION 6)
 
 # --------------------------------- Main Project ---------------------------------#
 # Fetch SingleApplication from github
@@ -65,6 +65,16 @@ FetchContent_MakeAvailable(SingleApplication)
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
 
+# Add network/service/dnsd if windows or mac
+if(WIN32 OR APPLE)
+  list(FILTER main_cpp EXCLUDE REGEX "network/service/avahi")
+endif()
+
+# Add network/service/avahi if linux
+if(LINUX)
+  list(FILTER main_cpp EXCLUDE REGEX "network/service/dnsd")
+endif()
+
 # remove tests folder from list
 list(FILTER main_cpp EXCLUDE REGEX "tests/")
 
@@ -76,11 +86,14 @@ find_package(Qt6 REQUIRED COMPONENTS
   Widgets
   Network)
 
+# Find KF5DNSSD with avahi on linux
+if(LINUX)
+  find_package(KF${KF_MAJOR_VERSION}DNSSD REQUIRED)
+endif()
+
 # Find Bonjour on windows and mac
 if(WIN32 OR APPLE)
   find_package(Bonjour REQUIRED)
-elseif(LINUX)
-  find_package(KF${KF_MAJOR_VERSION}DNSSD REQUIRED)
 endif()
 
 # Find OpenSSL
@@ -108,16 +121,18 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
-  PRIVATE OpenSSL::Crypto
-  PRIVATE ${BONJOUR_LIBRARIES})
+  PRIVATE OpenSSL::Crypto)
 
-# link if windows or Mac
+# link kdnssd & avahi if linux based system
+if(LINUX)
+  target_link_libraries(clipbird
+    PRIVATE KF${KF_MAJOR_VERSION}::DNSSD)
+endif()
+
+# link bonjour if windows or Mac
 if(WIN32 OR APPLE)
   target_link_libraries(clipbird
     PRIVATE ${BONJOUR_LIBRARIES})
-elseif(LINUX)
-  target_link_libraries(clipbird
-    PRIVATE KF${KF_MAJOR_VERSION}::DNSSD)
 endif()
 
 # Include directories
@@ -145,6 +160,21 @@ endif()
 # add target compiler options MSVC /std:c++17
 if(MSVC)
   target_compile_options(clipbird PRIVATE /std:c++17)
+endif()
+
+# Add Platform specific definitions for apple
+if(APPLE)
+  add_definitions(-D__APPLE__)
+endif()
+
+# Add Platform specific definitions for win
+if(WIN32)
+  add_definitions(-D_WIN32)
+endif()
+
+# Add Platform specific definitions for linux
+if(LINUX)
+  add_definitions(-D__linux__)
 endif()
 
 # --------------------------------- Unit Tests ---------------------------------#

@@ -32,6 +32,24 @@ Component.prototype.createOperations = function () {
       "iconPath=@TargetDir@/logo.png"
     );
 
+    // if system is x64 install vc_redist.x64
+    if (systemInfo.currentCpuArchitecture === "x86_64") {
+      component.addOperation("Execute",
+        "@TargetDir@/vcredist_x64.exe",
+        "/q",
+        "wait"
+      );
+    }
+
+    // if system is x86 install vc_redist.x86
+    if (systemInfo.currentCpuArchitecture === "x86") {
+      component.addOperation("Execute",
+        "@TargetDir@/vcredist_x86.exe",
+        "/q",
+        "wait"
+      );
+    }
+
     // Add start menu shortcut
     component.addOperation("CreateShortcut",
       "@TargetDir@/clipbird.exe",

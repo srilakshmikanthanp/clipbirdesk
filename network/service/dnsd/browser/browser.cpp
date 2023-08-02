@@ -1,3 +1,5 @@
+#if defined(_WIN32) || defined(__APPLE__)   // Only for Linux Operating System that supports bonjour
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -288,3 +290,4 @@ Browser::~Browser() {
   this->stopBrowsing();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd
+#endif

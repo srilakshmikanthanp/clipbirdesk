@@ -1,3 +1,4 @@
+#if defined(_WIN32) || defined(__APPLE__)   // Only for Linux Operating System that supports bonjour
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
@@ -106,3 +107,4 @@ class Register : public interfaces::ImDNSRegister {
   virtual void unregisterService() override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service
+#endif

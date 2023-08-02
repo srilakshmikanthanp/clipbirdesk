@@ -1,3 +1,5 @@
+#if defined(_WIN32) || defined(__APPLE__)   // Only for Linux Operating System that supports bonjour
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -13,13 +15,13 @@ namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd {
  * Register object as context
  */
 void Register::publishCallback(
-    DNSServiceRef serviceRef,       // DNSServiceRef
-    DNSServiceFlags flags,          // DNSServiceFlags
-    DNSServiceErrorType errorCode,  // DNSServiceErrorType
-    const char* name,               // name of service
-    const char* regtype,            // regtype
-    const char* domain,             // domain
-    void* context                   // context
+    DNSServiceRef serviceRef,                   // DNSServiceRef
+    DNSServiceFlags flags,                      // DNSServiceFlags
+    DNSServiceErrorType errorCode,              // DNSServiceErrorType
+    const char* name,                           // name of service
+    const char* regtype,                        // regtype
+    const char* domain,                         // domain
+    void* context                               // context
 ) {
   // convert context to Register object
   auto registerObj = static_cast<Register*>(context);
@@ -53,7 +55,9 @@ void Register::processActivated() {
  *
  * @param parent Parent object
  */
-Register::Register(QObject* parent) : interfaces::ImDNSRegister(parent) { }
+Register::Register(QObject* parent) : interfaces::ImDNSRegister(parent) {
+  // Empty Constructor just calls the parent constructor
+}
 
 /**
  * @brief Register the service
@@ -128,3 +132,4 @@ Register::~Register() {
   this->unregisterService();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd
+#endif
