@@ -37,7 +37,6 @@
   </a>
 
 <h3 align="center">Clipbird</h3>
-
   <p align="center">
     A Bird that syncs Your clipboard data between devices connected in a local network.
     <br />
@@ -108,12 +107,17 @@ Clipbird is in the development stage if the project succeeds in the future, we w
 
 ### Env Variables
 
-* `OPENSSL_DIR` - OpenSSL installation directory
-* `ECM_DIR` - Extra Cmake Modules directory
-* `KDNSSD_DIR` - KDNSSD cmake directory
-* `QT_CMAKE_DIR` - Qt6 cmake directory
-* `BONJOUR_HOME` - Bonjour SDK directory
-* `VCREDIST_DIR` - Visual C++ Redistributable directory
+In the following table, you can find the environment variables that you need to set to build the project, On Different platforms.
+
+#### For Windows
+
+| Variable            | Value                           |
+|---------------------|---------------------------------|
+| `OPENSSL_DIR`       | OpenSSL installation directory  |
+| `ECM_DIR`           | Extra Cmake Modules directory   |
+| `KDNSSD_DIR`        | KDNSSD cmake directory          |
+| `QT_CMAKE_DIR`      | Qt6 cmake directory             |
+| `BONJOUR_SDK_HOME`  | Bonjour SDK directory           |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
