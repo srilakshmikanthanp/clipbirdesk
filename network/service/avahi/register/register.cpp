@@ -1,3 +1,5 @@
+#ifdef __linux__  // Only for Linux Operating System that supports avahi & kdnssd
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -5,14 +7,14 @@
 
 #include "register.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service {
-
+namespace srilakshmikanthanp::clipbirdesk::network::service::avahi {
 /**
  * @brief Construct a new Discovery Register object
  *
  * @param parent Parent object
  */
-Register::Register(QObject* parent) : QObject(parent) {
+Register::Register(QObject* parent) : interfaces::ImDNSRegister(parent) {
+  // create the service
   this->service = new KDNSSD::PublicService();
   this->service->setParent(this);
 
@@ -44,4 +46,5 @@ void Register::registerServiceAsync() {
 void Register::unregisterService() {
   this->service->stop();
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::network::discovery
+}  // namespace srilakshmikanthanp::clipbirdesk::network::service
+#endif // Q_OS_LINUX

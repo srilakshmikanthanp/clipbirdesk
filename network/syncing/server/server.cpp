@@ -21,11 +21,7 @@ void Server::processSyncingPacket(const packets::SyncingPacket &packet) {
   }
 
   // Notify the listeners to sync the data
-  emit OnSyncRequest(items);
-
-  // send the packet to all the clients
-  this->sendPacket(packet);
-}
+  emit OnSyncRequest(items);}
 
 /**
  * @brief Process the connections that are pending
@@ -45,8 +41,7 @@ void Server::processConnections() {
       const auto message  = "Client is not SSL client";
 
       using utility::functions::createPacket;
-
-      this->sendPacket(client_tcp, createPacket({packType, code, message}));
+      this->sendPacket(client_tls, createPacket({packType, code, message}));
       client_tcp->disconnectFromHost();
     } else {
       // add the client to unauthenticated list
@@ -125,6 +120,7 @@ void Server::processReadyRead() {
   // Deserialize the data to SyncingPacket
   try {
     this->processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
+    this->sendPacket(fromQByteArray<packets::SyncingPacket>(data), client);
     return;
   } catch (const types::except::MalformedPacket &e) {
     const auto type = packets::InvalidRequest::PacketType::RequestFailed;
@@ -182,7 +178,7 @@ void Server::OnServiceRegistered() {
  * @param config SSL configuration
  * @param parent Parent object
  */
-Server::Server(QObject *p) : service::Register(p) {
+Server::Server(QObject *p) : mDNSRegister(p) {
   // Connect the socket to the callback function that
   // process the connections when the socket is ready
   // to read so the listener can be notified
@@ -191,12 +187,12 @@ Server::Server(QObject *p) : service::Register(p) {
   QObject::connect(m_ssl_server, signal_c, this, slot_c);
 
   // connect OnErrorOccurred to from base class
-  const auto signal_e = &service::Register::OnErrorOccurred;
+  const auto signal_e = &mDNSRegister::OnErrorOccurred;
   const auto slot_e   = &Server::OnErrorOccurred;
   QObject::connect(this, signal_e, this, slot_e);
 
   // Notify the listeners that the server is started
-  const auto signal = &service::Register::OnServiceRegistered;
+  const auto signal = &mDNSRegister::OnServiceRegistered;
   const auto slot   = &Server::OnServiceRegistered;
   QObject::connect(this, signal, this, slot);
 }
@@ -364,9 +360,6 @@ void Server::authFailed(const QPair<QHostAddress, quint16> &client) {
   // If the client is not found then return from the function
   if (client_itr == m_un_authed_clients.end()) return;
 
-  // Get the client from the iterator
-  auto client_tls = *client_itr;
-
   // Remove the client from the unauthenticated list
   m_un_authed_clients.erase(client_itr);
 
@@ -380,13 +373,13 @@ void Server::authFailed(const QPair<QHostAddress, quint16> &client) {
   });
 
   // send the packet to the client
-  this->sendPacket(client_tls, packet);
+  this->sendPacket((*client_itr), packet);
 
   // disconnect and delete the client
-  client_tls->disconnectFromHost();
+  (*client_itr)->disconnectFromHost();
 
   // delete the client after the client is disconnected
-  client_tls->deleteLater();
+  (*client_itr)->deleteLater();
 }
 
 /**
@@ -404,7 +397,7 @@ void Server::startServer() {
   }
 
   // start the discovery server
-  service::Register::registerServiceAsync();
+  this->registerServiceAsync();
 }
 
 /**
@@ -412,7 +405,7 @@ void Server::startServer() {
  */
 void Server::stopServer() {
   // stop the discovery server
-  service::Register::unregisterService();
+  this->unregisterService();
 
   // disconnect all the clients
   this->disconnectAllClients();

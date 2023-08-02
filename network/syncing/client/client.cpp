@@ -189,10 +189,10 @@ void Client::handleDisconnected() {
  * @param th threshold
  * @param parent Parent
  */
-Client::Client(QObject* parent) : service::Discover(parent) {
+Client::Client(QObject* parent) : mDNSBrowser(parent) {
   // connect the signal to emit the signal for
   // OnErrorOccurred from the base class
-  const auto signal_e = &service::Discover::OnErrorOccurred;
+  const auto signal_e = &mDNSBrowser::OnErrorOccurred;
   const auto slot_e   = &Client::OnErrorOccurred;
   connect(this, signal_e, this, slot_e);
 
@@ -358,7 +358,7 @@ QPair<QHostAddress, quint16> Client::getAuthedServerOrEmpty() const {
  * @param host Host address
  * @param port Port number
  */
-void Client::onServerAdded(QPair<QHostAddress, quint16> server) {
+void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
   // emit the signal for server found event
   emit OnServerFound(server);
 
@@ -373,7 +373,7 @@ void Client::onServerAdded(QPair<QHostAddress, quint16> server) {
  * @brief
  *
  */
-void Client::onServerRemoved(QPair<QHostAddress, quint16> server) {
+void Client::onServiceRemoved(QPair<QHostAddress, quint16> server) {
   // emit the signal for server gone event
   emit OnServerGone(server);
 

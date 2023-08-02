@@ -26,7 +26,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
 class Authentication {
  private:
 
-  qint32 packetLength;
+  quint32 packetLength;
   quint8 packetType = 0x00;
   quint8 authStatus;
 
@@ -42,14 +42,14 @@ class Authentication {
    *
    * @param length
    */
-  void setPacketLength(qint32 length);
+  void setPacketLength(quint32 length);
 
   /**
    * @brief Get the Packet Length object
    *
    * @return qint32
    */
-  qint32 getPacketLength() const noexcept;
+  quint32 getPacketLength() const noexcept;
 
   /**
    * @brief Set the Packet Type object
@@ -84,7 +84,7 @@ class Authentication {
    *
    * @return qint32
    */
-  qint32 size() const noexcept;
+  quint32 size() const noexcept;
 
   /**
    * @brief Input stream operator for QDataStream

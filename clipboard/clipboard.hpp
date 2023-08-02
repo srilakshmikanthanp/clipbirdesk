@@ -63,6 +63,10 @@ class Clipboard : public QObject {
   const QString MIME_TYPE_COLOR = "application/x-color";
   const QString MIME_TYPE_HTML  = "text/html";
 
+ private: // image type
+
+  const char* IMAGE_TYPE_PNG = "PNG";
+
  public:  // constructor
 
   /**

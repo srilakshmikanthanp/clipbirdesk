@@ -21,7 +21,7 @@
 #include <utility>
 
 // Local headers
-#include "network/service/discover/discover.hpp"
+#include "network/service/index.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
@@ -32,7 +32,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing client that syncs the clipboard data between
  * client and server
  */
-class Client : public service::Discover {
+class Client : public mDNSBrowser {
  signals:  // signals for this class
   /// @brief On Server List Changed
   void OnServerListChanged(QList<QPair<QHostAddress, quint16>> servers);
@@ -106,9 +106,10 @@ class Client : public service::Discover {
     // write the packet length
     while (wrote < data.size()) {
       // try to write the data
-      auto start = data.data() + wrote;
-      auto size  = data.size() - wrote;
-      auto bytes = stream.writeRawData(start, size);
+      auto bytes = stream.writeRawData(
+        data.data() + wrote, // start of data
+        data.size() - wrote  // size of data
+      );
 
       // if no error occurred
       if (bytes != -1) {
@@ -252,7 +253,7 @@ class Client : public service::Discover {
    * @param host Host address
    * @param port Port number
    */
-  void onServerAdded(QPair<QHostAddress, quint16> server) override;
+  void onServiceAdded(QPair<QHostAddress, quint16> server) override;
 
   /**
    * @brief On server removed function that That Called by the
@@ -260,6 +261,6 @@ class Client : public service::Discover {
    *
    * @param server
    */
-  void onServerRemoved(QPair<QHostAddress, quint16> server) override;
+  void onServiceRemoved(QPair<QHostAddress, quint16> server) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

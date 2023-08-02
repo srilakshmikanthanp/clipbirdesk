@@ -37,7 +37,6 @@
   </a>
 
 <h3 align="center">Clipbird</h3>
-
   <p align="center">
     A Bird that syncs Your clipboard data between devices connected in a local network.
     <br />
@@ -83,11 +82,12 @@ Clipbird Software Helps you to sync your clipboard data between devices connecte
 
 ### Built With
 
-* ECM from KDE
+* Extra Cmake Modules
+* KDNSSD
+* Bonjour
 * C++
 * Qt6
 * OpenSSL
-* KDNSSD
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -98,20 +98,26 @@ Clipbird is in the development stage if the project succeeds in the future, we w
 
 ### Prerequisites
 
-* ECM from KDE
+* Extra Cmake Modules
+* KDNSSD
+* Bonjour
 * C++
 * Qt6
 * OpenSSL
-* KDNSSD
 
 ### Env Variables
 
-* `KDE_ROOT` - KDE installation directory
-* `OPENSSL_DIR` - OpenSSL installation directory
-* `ECM_DIR` - ECM cmake directory
-* `QT_CMAKE_DIR` - Qt6 cmake directory
-* `BONJOUR_DIR` - Bonjour SDK directory
-* `VC_REDIST_DIR` - Visual C++ Redistributable directory
+In the following table, you can find the environment variables that you need to set to build the project, On Different platforms.
+
+#### For Windows
+
+| Variable            | Value                           |
+|---------------------|---------------------------------|
+| `OPENSSL_DIR`       | OpenSSL installation directory  |
+| `ECM_DIR`           | Extra Cmake Modules directory   |
+| `KDNSSD_DIR`        | KDNSSD cmake directory          |
+| `QT_CMAKE_DIR`      | Qt6 cmake directory             |
+| `BONJOUR_SDK_HOME`  | Bonjour SDK directory           |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -157,11 +163,12 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [ECM from KDE](https://api.kde.org/ecm/)
 * [OpenSSL](https://www.openssl.org/)
 * [Qt](https://www.qt.io/)
 * [C++](https://www.cplusplus.com/)
 * [KDNSSD](https://api.kde.org/frameworks/kdnssd/html/index.html)
+* [Bonjour](https://developer.apple.com/bonjour/)
+* [ECM](https://api.kde.org/ecm/)
 
 <!-- Contributors -->
 ## Contributors

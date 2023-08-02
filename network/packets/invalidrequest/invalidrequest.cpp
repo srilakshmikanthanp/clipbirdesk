@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
  *
  * @param length
  */
-void InvalidRequest::setPacketLength(qint32 length) {
+void InvalidRequest::setPacketLength(quint32 length) {
   this->packetLength = length;
 }
 
@@ -20,7 +20,7 @@ void InvalidRequest::setPacketLength(qint32 length) {
  *
  * @return qint32
  */
-qint32 InvalidRequest::getPacketLength() const noexcept {
+quint32 InvalidRequest::getPacketLength() const noexcept {
   return this->packetLength;
 }
 
@@ -89,8 +89,8 @@ QByteArray InvalidRequest::getErrorMessage() const noexcept {
  *
  * @return std::size_t
  */
-qint32 InvalidRequest::size() const noexcept {
-  return (sizeof(packetType) + sizeof(packetLength) + sizeof(errorCode) + errorMessage.size());
+quint32 InvalidRequest::size() const noexcept {
+  return quint32(sizeof(packetType) + sizeof(packetLength) + sizeof(errorCode) + errorMessage.size());
 }
 
 /**

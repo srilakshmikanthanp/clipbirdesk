@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
  *
  * @param length
  */
-void Authentication::setPacketLength(qint32 length) {
+void Authentication::setPacketLength(quint32 length) {
   this->packetLength = length;
 }
 
@@ -20,7 +20,7 @@ void Authentication::setPacketLength(qint32 length) {
  *
  * @return qint32
  */
-qint32 Authentication::getPacketLength() const noexcept {
+quint32 Authentication::getPacketLength() const noexcept {
   return this->packetLength;
 }
 
@@ -79,9 +79,12 @@ quint8 Authentication::getAuthStatus() const noexcept {
  *
  * @return qint32
  */
-qint32 Authentication::size() const noexcept {
-  return sizeof(this->packetLength) + sizeof(this->packetType) +
-         sizeof(this->authStatus);
+quint32 Authentication::size() const noexcept {
+  return qint32(
+    sizeof(this->packetLength) +
+    sizeof(this->packetType) +
+    sizeof(this->authStatus)
+  );
 }
 
 /**

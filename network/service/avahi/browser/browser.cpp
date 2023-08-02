@@ -1,24 +1,15 @@
+#ifdef __linux__  // Only for Linux Operating System that supports avahi & kdnssd
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "discover.hpp"
-#include <iostream>
+#include "browser.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service {
-/**
- * @brief Construct a new Discovery Discover object
- *
- * @param parent Parent object
- */
-Discover::Discover(QObject* parent) : QObject(parent) {
-  this->m_browser = new KDNSSD::ServiceBrowser(constants::getMDnsServiceType().c_str());
-  this->m_browser->setParent(this);
-}
-
+namespace srilakshmikanthanp::clipbirdesk::network::service::avahi {
 /// @brief On Service Found
-void Discover::OnServiceFound(KDNSSD::RemoteService::Ptr service) {
+void Browser::OnServiceFound(KDNSSD::RemoteService::Ptr service) {
   // get the name of the device & lambda callback
   const auto myDevice = QString::fromStdString(constants::getMDnsServiceName());
   const auto callback = [&, service](const QHostInfo& info) {
@@ -29,7 +20,7 @@ void Discover::OnServiceFound(KDNSSD::RemoteService::Ptr service) {
 
     auto host = info.addresses().first();
     auto port = quint16(service->port());
-    this->onServerAdded({host, port});
+    this->onServiceAdded({host, port});
   };
 
   // resolve the service
@@ -48,7 +39,7 @@ void Discover::OnServiceFound(KDNSSD::RemoteService::Ptr service) {
 }
 
 /// @brief On Service Removed
-void Discover::OnServiceRemoved(KDNSSD::RemoteService::Ptr service) {
+void Browser::OnServiceRemoved(KDNSSD::RemoteService::Ptr service) {
   // get the name of the device & lambda callback
   const auto myDevice = QString::fromStdString(constants::getMDnsServiceName());
   const auto callback = [&, service](const QHostInfo& info) {
@@ -59,7 +50,7 @@ void Discover::OnServiceRemoved(KDNSSD::RemoteService::Ptr service) {
 
     auto host = info.addresses().first();
     auto port = quint16(service->port());
-    this->onServerRemoved({host, port});
+    this->onServiceRemoved({host, port});
   };
 
   // resolve the service
@@ -78,23 +69,47 @@ void Discover::OnServiceRemoved(KDNSSD::RemoteService::Ptr service) {
 }
 
 /**
+ * @brief Construct a new Discovery Browser object
+ *
+ * @param parent Parent object
+ */
+Browser::Browser(QObject* parent) : interfaces::ImDNSBrowser(parent) {
+  // Empty Constructor just calls the parent constructor
+}
+
+/**
  * @brief Starts the discovery client by sending the
  * broadcast message
  *
  * @param interval Interval between each broadcast
  */
-void Discover::startDiscovery() {
+void Browser::startBrowsing() {
+  // create the browser object and set the parent
+  this->m_browser = new KDNSSD::ServiceBrowser(constants::getMDnsServiceType().c_str());
+  this->m_browser->setParent(this);
+
   // connect the browser signal to the slot of this class
   const auto signal_r = &KDNSSD::ServiceBrowser::serviceRemoved;
-  const auto slot_r   = &Discover::OnServiceRemoved;
+  const auto slot_r   = &Browser::OnServiceRemoved;
   connect(this->m_browser, signal_r, this, slot_r);
 
   // connect the browser signal to the slot of this class
   const auto signal_a = &KDNSSD::ServiceBrowser::serviceAdded;
-  const auto slot_a   = &Discover::OnServiceFound;
+  const auto slot_a   = &Browser::OnServiceFound;
   connect(this->m_browser, signal_a, this, slot_a);
 
   // start the browser
   this->m_browser->startBrowse();
 }
+
+/**
+ * @brief Stops the discovery client by sending the
+ * broadcast message
+ *
+ * @param interval Interval between each broadcast
+ */
+void Browser::stopBrowsing() {
+  delete this->m_browser;
+}
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service
+#endif  // Q_OS_LINUX

@@ -8,7 +8,7 @@
  */
 function Component() {
   // Constructor for component class Leave
-  // This as Empty USed by Qt Installer
+  // This as Empty Used by Qt Installer
   // and we add functions in prototype
 }
 
@@ -21,6 +21,14 @@ Component.prototype.createOperations = function () {
     return;
   }
 
+  // bonjour file name
+  var bonjour = "bonjour.msi";
+
+  // if platfrom is x64
+  if (systemInfo.currentCpuArchitecture === "x86_64") {
+    bonjour = "bonjour64.msi";
+  }
+
   // create component
   component.createOperations();
 
@@ -28,7 +36,7 @@ Component.prototype.createOperations = function () {
   component.addOperation("Execute",
     "msiexec",
     "/i",
-    "@TargetDir@/BonjourPSSetup.msi",
+    `@TargetDir@/${bonjour}`,
     "/qn",
     "REINSTALL=ALL",
     "REINSTALLMODE=vomus",

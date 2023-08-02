@@ -8,7 +8,7 @@
  */
 function Component() {
   // Constructor for component class Leave
-  // This as Empty USed by Qt Installer
+  // This as Empty Ued by Qt Installer
   // and we add functions in prototype
 }
 
@@ -16,17 +16,18 @@ function Component() {
  * Creates operations for component
  */
 Component.prototype.createOperations = function () {
-  // if the system is not windows then return
-  if (systemInfo.productType !== "windows") {
-    return;
-  }
-
-  // create component
+  // create operations
   component.createOperations();
 
-  // install vc_redist
-  component.addOperation("Execute",
-    "@TargetDir@/vc_redist.exe",
-    "/quite"
-  );
+  // if the system is linux
+  if (systemInfo.productType === "linux") {
+    // install kdnssd-kf5 package for runtime
+    component.addOperation(
+      "Execute",
+      "pkexec",
+      "apt-get",
+      ["install", "-y", "libkf5dnssd5"],
+      "installer.execute"
+    );
+  }
 }

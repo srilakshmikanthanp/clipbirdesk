@@ -14,12 +14,12 @@
     to Sync your Clipboard across your devices
     on your network.
   </Description>
+  <ReleaseDate>2023-07-29</ReleaseDate>
   <Version>1.0.0</Version>
   <Script>install.qs</Script>
-  <ReleaseDate>2023-07-29</ReleaseDate>
-  <ForcedInstallation>true</ForcedInstallation>
-  <RequiresAdminRights>true</RequiresAdminRights>
   <Licenses>
     <License name="MIT LICENSE" file="LICENSE" />
   </Licenses>
+  <ForcedInstallation>true</ForcedInstallation>
+  <RequiresAdminRights>true</RequiresAdminRights>
 </Package>

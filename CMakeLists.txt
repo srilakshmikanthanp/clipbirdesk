@@ -10,6 +10,9 @@ set(CMAKE_CXX_STANDARD 17)
 # set c++ standard required
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# include FindBonjour
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
 # include cmake modules
 include(FetchContent)
 
@@ -25,6 +28,15 @@ set(APPLICATION_LOGO_PATH ":/images/logo.png")
 # Set the APPLICATION_HOMEPAGE
 set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
 
+# Set the BBONJOUR_DIR from env
+set(BONJOUR_SDK_HOME $ENV{BONJOUR_SDK_HOME})
+
+# set KF major version
+set(KF_MAJOR_VERSION 5)
+
+# Set Qt version
+set(QT_MAJOR_VERSION 6)
+
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
 
@@ -33,9 +45,6 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{ECM_DIR})
 
 # Append KDNSSD_DIR cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{KDNSSD_DIR})
-
-# Set Qt version
-set(QT_MAJOR_VERSION 6)
 
 # --------------------------------- Main Project ---------------------------------#
 # Fetch SingleApplication from github
@@ -56,6 +65,16 @@ FetchContent_MakeAvailable(SingleApplication)
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
 
+# Add network/service/dnsd if windows or mac
+if(WIN32 OR APPLE)
+  list(FILTER main_cpp EXCLUDE REGEX "network/service/avahi")
+endif()
+
+# Add network/service/avahi if linux
+if(LINUX)
+  list(FILTER main_cpp EXCLUDE REGEX "network/service/dnsd")
+endif()
+
 # remove tests folder from list
 list(FILTER main_cpp EXCLUDE REGEX "tests/")
 
@@ -65,53 +84,98 @@ list(FILTER main_cpp EXCLUDE REGEX "build/")
 # Find Qt packages
 find_package(Qt6 REQUIRED COMPONENTS
   Widgets
-  Network
-)
+  Network)
+
+# Find KF5DNSSD with avahi on linux
+if(LINUX)
+  find_package(KF${KF_MAJOR_VERSION}DNSSD REQUIRED)
+endif()
+
+# Find Bonjour on windows and mac
+if(WIN32 OR APPLE)
+  find_package(Bonjour REQUIRED)
+endif()
 
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
 
-# Find KDE DNS-SD Framework
-find_package(KF6DNSSD NO_MODULE)
-
 # Configure config.hpp
 configure_file(
   ${PROJECT_SOURCE_DIR}/config/config.hpp.in
-  ${PROJECT_BINARY_DIR}/config/config.hpp
-)
+  ${PROJECT_BINARY_DIR}/config/config.hpp)
 
 # set up project using Qt
 qt_standard_project_setup()
 
 # add resources to project
 qt_add_resources(RESOURCES
-  ${PROJECT_SOURCE_DIR}/assets/resources.qrc
-)
+  ${PROJECT_SOURCE_DIR}/assets/resources.qrc)
 
 # Add executable
 qt_add_executable(clipbird
-  ${main_cpp} ${RESOURCES}
-)
+  ${main_cpp} ${RESOURCES})
 
 # Link libraries
 target_link_libraries(clipbird
   PRIVATE SingleApplication::SingleApplication
   PRIVATE Qt6::Widgets
-  PRIVATE KF6::DNSSD
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto)
+
+# link kdnssd & avahi if linux based system
+if(LINUX)
+  target_link_libraries(clipbird
+    PRIVATE KF${KF_MAJOR_VERSION}::DNSSD)
+endif()
+
+# link bonjour if windows or Mac
+if(WIN32 OR APPLE)
+  target_link_libraries(clipbird
+    PRIVATE ${BONJOUR_LIBRARIES})
+endif()
 
 # Include directories
 target_include_directories(clipbird
   PUBLIC ${PROJECT_SOURCE_DIR}
   PUBLIC ${PROJECT_BINARY_DIR})
 
+# include in win or mac
+if (WIN32 OR APPLE)
+  target_include_directories(clipbird
+    PUBLIC ${BONJOUR_INCLUDE_DIR})
+endif()
+
 # set target properties
 set_target_properties(clipbird PROPERTIES
   WIN32_EXECUTABLE TRUE
   MACOSX_BUNDLE TRUE
 )
+
+# add target compiler options GCC -std=c++17
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  target_compile_options(clipbird PRIVATE -std=c++17)
+endif()
+
+# add target compiler options MSVC /std:c++17
+if(MSVC)
+  target_compile_options(clipbird PRIVATE /std:c++17)
+endif()
+
+# Add Platform specific definitions for apple
+if(APPLE)
+  add_definitions(-D__APPLE__)
+endif()
+
+# Add Platform specific definitions for win
+if(WIN32)
+  add_definitions(-D_WIN32)
+endif()
+
+# Add Platform specific definitions for linux
+if(LINUX)
+  add_definitions(-D__linux__)
+endif()
 
 # --------------------------------- Unit Tests ---------------------------------#
 # Download and unpack googletest for unit testing
@@ -130,13 +194,11 @@ file(GLOB_RECURSE test_cpp
   utility/functions/packet/*.cpp
   tests/*.cpp
   types/*.cpp
-  network/packets/*.cpp
-)
+  network/packets/*.cpp)
 
 # Add Executable to test
 qt_add_executable(check
-  ${test_cpp}
-)
+  ${test_cpp})
 
 # Enable testing
 enable_testing()
