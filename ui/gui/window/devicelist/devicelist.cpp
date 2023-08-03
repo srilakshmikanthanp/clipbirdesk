@@ -7,7 +7,7 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
 DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
-  // set alignment from start
+  // set alignment from start and center
   verticalLayout->setAlignment(Qt::AlignTop);
 
   // create a label

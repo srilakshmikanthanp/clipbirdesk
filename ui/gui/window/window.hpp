@@ -91,9 +91,9 @@ class Window : public QFrame {
 
  private:  // constant for keys (Client)
 
-  static constexpr const char* const c_statusKey   = "Connection Status";
-  static constexpr const char* const c_hostNameKey = "Server Hostname";
-  static constexpr const char* const c_ipPortKey   = "Server Ipv4";
+  static constexpr const char* const c_statusKey   = "Client Status";
+  static constexpr const char* const c_hostNameKey = "HostName";
+  static constexpr const char* const c_ipPortKey   = "Ipv4";
   static constexpr const char* const c_serversKey  = "Servers";
   static constexpr const char* const c_tabTitle    = "Client";
 

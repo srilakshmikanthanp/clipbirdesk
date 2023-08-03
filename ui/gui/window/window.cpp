@@ -127,50 +127,64 @@ void Window::handleServerStateChange(bool isStarted) {
  * @param client
  */
 void Window::handleNewHostConnected(const QPair<QHostAddress, quint16> &client) {
-  // get the message to show
-  // clang-format off
-  auto message = QString(
-    "A New client is trying to connect to the server\n"
-    "Host: %1:%2\n"
-    "Accept the connection?"
-  ).arg(
-    client.first.toString(), QString::number(client.second)
-  );
-  // clang-format on
+  // callback for host info looked up
+  const auto callback = [=](const QHostInfo& info) {
+    // get the host name
+    auto hostName = info.hostName();
 
-  // get the user input
-  auto dialog = new QMessageBox();
+    // if the host name is empty
+    if (hostName.isEmpty()) {
+      hostName = client.first.toString();
+    }
 
-  // set the icon
-  dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+    // get the message to show
+    // clang-format off
+    auto message = QString(
+      "A New client Attempting to connect 😯\n"
+      "Host: %1:%2\n"
+      "Accept the connection? 🤔"
+    ).arg(
+      hostName, QString::number(client.second)
+    );
+    // clang-format on
 
-  // set the title
-  dialog->setWindowTitle("Clipbird");
+    // get the user input
+    auto dialog = new QMessageBox();
 
-  // set the message
-  dialog->setText(message);
+    // set the icon
+    dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
 
-  // set the buttons
-  dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    // set the title
+    dialog->setWindowTitle("Clipbird");
 
-  // set the default button
-  dialog->setDefaultButton(QMessageBox::No);
+    // set the message
+    dialog->setText(message);
 
-  // set delete on close
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
+    // set the buttons
+    dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
-  // show the dialog
-  dialog->show();
+    // set the default button
+    dialog->setDefaultButton(QMessageBox::No);
 
-  // connect the dialog to window AuthSuccess signal
-  const auto signal_s = &QMessageBox::accepted;
-  const auto slot_s   = [=] { controller->authSuccess(client); };
-  connect(dialog, signal_s, slot_s);
+    // set delete on close
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
 
-  // connect the dialog to window AuthFail signal
-  const auto signal_f = &QMessageBox::rejected;
-  const auto slot_f   = [=] { controller->authFailed(client); };
-  connect(dialog, signal_f, slot_f);
+    // show the dialog
+    dialog->show();
+
+    // connect the dialog to window AuthSuccess signal
+    const auto signal_s = &QMessageBox::accepted;
+    const auto slot_s   = [=] { controller->authSuccess(client); };
+    connect(dialog, signal_s, slot_s);
+
+    // connect the dialog to window AuthFail signal
+    const auto signal_f = &QMessageBox::rejected;
+    const auto slot_f   = [=] { controller->authFailed(client); };
+    connect(dialog, signal_f, slot_f);
+  };
+
+  // lookup the host info
+  QHostInfo::lookupHost(client.first.toString(), callback);
 }
 
 //----------------------------- slots for Client --------------------------//

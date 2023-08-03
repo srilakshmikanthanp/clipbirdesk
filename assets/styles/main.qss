@@ -131,10 +131,14 @@ QLabel#NoHostLabel {
 }
 
 QWidget#Toast {
-  background-color: #2a2a3b;
+  background-color: rgba(42, 42, 59, 0.8);
   color: #ffffff;
   border: none;
   border-radius: 5px;
   margin: 2px;
   padding: 6px;
+}
+
+QWidget#DeviceList :hover {
+  background-color: #0277fa;
 }

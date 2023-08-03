@@ -41,6 +41,8 @@ class ClipbirdApplication : public SingleApplication {
 
   Q_DISABLE_COPY_MOVE(ClipbirdApplication);
 
+ private: // private slots
+
   /**
    * @brief On About Clicked
    */
@@ -87,7 +89,6 @@ class ClipbirdApplication : public SingleApplication {
 
     // clang-format off
     #ifdef Q_OS_LINUX
-    // set the signal handler for linux
     signal(SIGKILL, [](int sig) { qApp->quit(); });
     #endif
     // clang-format on
@@ -108,8 +109,8 @@ class ClipbirdApplication : public SingleApplication {
     auto shadow = new QGraphicsDropShadowEffect();
 
     // set the shadow Properties
-    shadow->setBlurRadius(5);
-    shadow->setOffset(5, 5);
+    shadow->setBlurRadius(10);
+    shadow->setOffset(3, );
     shadow->setColor(QColor(0, 0, 0, 100));
 
     // set the shadow to window
@@ -165,7 +166,6 @@ class ClipbirdApplication : public SingleApplication {
 
     // show the tray icon
     trayIcon->show();
-    window->show();
   }
 
   /**
