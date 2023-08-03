@@ -110,7 +110,7 @@ class ClipbirdApplication : public SingleApplication {
 
     // set the shadow Properties
     shadow->setBlurRadius(10);
-    shadow->setOffset(3, );
+    shadow->setOffset(3, 3);
     shadow->setColor(QColor(0, 0, 0, 100));
 
     // set the shadow to window

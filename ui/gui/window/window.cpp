@@ -32,7 +32,10 @@ void Window::handleTabChangeForClient(Tabs tab) {
   if (tab != Tabs::Client) return;  // if not client tab return
 
   // initialize the client Window
-  this->resetClientInfo();
+  this->setStatus(c_statusKey, Status::Disconnected);
+  this->setServerHostName(c_hostNameKey, "-");
+  this->setServerIpPort(c_ipPortKey, "-");
+  this->setHostCount(c_serversKey, 0);
 
   // reset the device list
   this->removeAllClient();
@@ -48,7 +51,10 @@ void Window::handleTabChangeForServer(Tabs tab) {
   if (tab != Tabs::Server) return;  // if not server tab return
 
   // initialize the server Window
-  this->resetServerInfo();
+  this->setStatus(s_statusKey, Status::Inactive);
+  this->setServerHostName(s_hostNameKey, "-");
+  this->setServerIpPort(s_ipPortKey, "-");
+  this->setHostCount(s_clientsKey, 0);
 
   // reset the device list
   this->removeAllServers();
@@ -117,8 +123,16 @@ void Window::handleServerStateChange(bool isStarted) {
   this->setServerIpPort(s_ipPortKey, ipPort);
   this->setHostCount(s_clientsKey, clients.size());
 
-  // update the client list
-  this->handleClientListChange(clients);
+  // Create a list of tuple with Action
+  QList<components::Device::Value> clients_m;
+
+  // Add the clients to the list
+  for (auto c : clients) {
+    clients_m.append({c.first, c.second, Action::Disconnect});
+  }
+
+  // set the client list to the window
+  this->setClientList(clients_m);
 }
 
 /**
@@ -126,17 +140,9 @@ void Window::handleServerStateChange(bool isStarted) {
  *
  * @param client
  */
-void Window::handleNewHostConnected(const QPair<QHostAddress, quint16> &client) {
+void Window::handleNewHostConnected(const QPair<QHostAddress, quint16>& client) {
   // callback for host info looked up
-  const auto callback = [=](const QHostInfo& info) {
-    // get the host name
-    auto hostName = info.hostName();
-
-    // if the host name is empty
-    if (hostName.isEmpty()) {
-      hostName = client.first.toString();
-    }
-
+  const auto onHostInfoFound = [=](const QHostInfo& info) -> void {
     // get the message to show
     // clang-format off
     auto message = QString(
@@ -144,15 +150,18 @@ void Window::handleNewHostConnected(const QPair<QHostAddress, quint16> &client) 
       "Host: %1:%2\n"
       "Accept the connection? 🤔"
     ).arg(
-      hostName, QString::number(client.second)
+      info.hostName(), QString::number(client.second)
     );
     // clang-format on
 
     // get the user input
     auto dialog = new QMessageBox();
 
+    // icon for the dialog
+    auto icon = QIcon(constants::getAppLogo().c_str());
+
     // set the icon
-    dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+    dialog->setWindowIcon(icon);
 
     // set the title
     dialog->setWindowTitle("Clipbird");
@@ -160,14 +169,14 @@ void Window::handleNewHostConnected(const QPair<QHostAddress, quint16> &client) 
     // set the message
     dialog->setText(message);
 
+    // set delete on close
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+
     // set the buttons
     dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
     // set the default button
     dialog->setDefaultButton(QMessageBox::No);
-
-    // set delete on close
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
 
     // show the dialog
     dialog->show();
@@ -184,7 +193,7 @@ void Window::handleNewHostConnected(const QPair<QHostAddress, quint16> &client) 
   };
 
   // lookup the host info
-  QHostInfo::lookupHost(client.first.toString(), callback);
+  QHostInfo::lookupHost(client.first.toString(), onHostInfoFound);
 }
 
 //----------------------------- slots for Client --------------------------//
@@ -197,7 +206,7 @@ void Window::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers)
   QList<components::Device::Value> servers_m;
 
   // get the connected server
-  const auto server = controller->getAuthedServerOrEmpty();
+  const auto server    = controller->getAuthedServerOrEmpty();
 
   // get the action for the server
   const auto getAction = [&server](const auto& s) {
@@ -217,16 +226,7 @@ void Window::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers)
 }
 
 /**
- * @brief Handle the server status change
- */
-void Window::handleServerStatusChanged(bool status) {
-  const auto servers = controller->getServerList();
-  this->resetClientInfo();
-  this->handleServerListChange(servers);
-}
-
-/**
- * @brief Handle the server status change
+ * @brief Handle the server authentication
  */
 void Window::handleServerAuthentication(bool isAuthed) {
   // infer the status from the server state
@@ -250,30 +250,55 @@ void Window::handleServerAuthentication(bool isAuthed) {
   this->setServerIpPort(c_ipPortKey, ipPort);
   this->setHostCount(c_serversKey, servers.size());
 
-  // update the server list
-  this->handleServerListChange(servers);
+  // Create a list of tuple with Action
+  QList<components::Device::Value> servers_m;
+
+  // get the connected server
+  const auto server    = controller->getAuthedServerOrEmpty();
+
+  // get the action for the server
+  const auto getAction = [&server](const auto& s) {
+    return s == server ? Action::Disconnect : Action::Connect;
+  };
+
+  // add the server to the list
+  for (auto s : servers) {
+    servers_m.append({s.first, s.second, getAction(s)});
+  }
+
+  // set the server list to the window
+  this->setServerList(servers_m);
 }
 
 /**
- * @brief Reset the Server Info
+ * @brief Handle the server status change
  */
-void Window::resetServerInfo() {
-  // initialize the server Window
-  this->setStatus(s_statusKey, Status::Inactive);
-  this->setServerHostName(s_hostNameKey, "-");
-  this->setServerIpPort(s_ipPortKey, "-");
-  this->setHostCount(s_clientsKey, 0);
-}
+void Window::handleServerStatusChanged(bool status) {
+  if (status) return; // ignore the TSL connection and leave it to authentication
 
-/**
- * @brief Reset the Client Info
- */
-void Window::resetClientInfo() {
-  // initialize the client Window
+  // if the server is disconnected
   this->setStatus(c_statusKey, Status::Disconnected);
   this->setServerHostName(c_hostNameKey, "-");
   this->setServerIpPort(c_ipPortKey, "-");
-  this->setHostCount(c_serversKey, 0);
+
+  // Create a list of tuple with Action
+  QList<components::Device::Value> servers_m;
+
+  // get the connected server
+  const auto server    = controller->getAuthedServerOrEmpty();
+
+  // get the action for the server
+  const auto getAction = [&server](const auto& s) {
+    return s == server ? Action::Disconnect : Action::Connect;
+  };
+
+  // add the server to the list
+  for (auto s : controller->getServerList()) {
+    servers_m.append({s.first, s.second, getAction(s)});
+  }
+
+  // set the server list to the window
+  this->setServerList(servers_m);
 }
 
 /**
@@ -308,6 +333,10 @@ Window::Window(Window::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   serverArea->setWidgetResizable(true);
   clientArea->setWidgetResizable(true);
 
+  // set policy for scroll area
+  serverArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  clientArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
   // set the widget to scroll area
   serverArea->setWidget(this->serverList);
   clientArea->setWidget(this->clientList);
@@ -329,60 +358,17 @@ Window::Window(Window::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
     emit onTabChanged((currentTab = static_cast<Tabs>(index)));
   });
 
+  // clang-format off
   // server list slot
-  auto serverListSlot = [=](const auto& host) {
+  auto serverListSlot  = [=](const auto& host) {
     emit onHostAction(Tabs::Client, host);
   };
 
   // client list slot
-  auto clientListSlot = [=](const auto& host) {
+  auto clientListSlot  = [=](const auto& host) {
     emit onHostAction(Tabs::Server, host);
   };
-
-  // connect server list signal
-  connect(serverList, &window::DeviceList::onAction, serverListSlot);
-
-  // connect client list signal
-  connect(clientList, &window::DeviceList::onAction, clientListSlot);
-
-  // Connect the signal and slot for client list change
-  const auto signal_cl = &ClipBird::OnClientListChanged;
-  const auto slot_cl   = &Window::handleClientListChange;
-  connect(controller, signal_cl, this, slot_cl);
-
-  // Connect the signal and slot for server list change
-  const auto signal_sl = &ClipBird::OnServerListChanged;
-  const auto slot_sl   = &Window::handleServerListChange;
-  connect(controller, signal_sl, this, slot_sl);
-
-  // Connect the signal and slot for server status change
-  const auto signal_st = &ClipBird::OnServerStateChanged;
-  const auto slot_st   = &Window::handleServerStateChange;
-  connect(controller, signal_st, this, slot_st);
-
-  // Connect the signal and slot for server status change
-  const auto signal_ss = &ClipBird::OnServerStatusChanged;
-  const auto slot_ss   = &Window::handleServerStatusChanged;
-  connect(controller, signal_ss, this, slot_ss);
-
-  const auto signal_sa = &ClipBird::OnServerAuthentication;
-  const auto slot_sa   = &Window::handleServerAuthentication;
-  connect(controller, signal_sa, this, slot_sa);
-
-  // Connect the signal and slot for host action
-  const auto signal_ha = &Window::onHostAction;
-  const auto slot_ha   = &Window::handleHostAction;
-  connect(this, signal_ha, this, slot_ha);
-
-  // Connect the signal and slot for tab change(client)
-  const auto signal_tc = &Window::onTabChanged;
-  const auto slot_tc   = &Window::handleTabChangeForClient;
-  connect(this, signal_tc, this, slot_tc);
-
-  // Connect the signal and slot for tab change(server)
-  const auto signal_ts = &Window::onTabChanged;
-  const auto slot_ts   = &Window::handleTabChangeForServer;
-  connect(this, signal_ts, this, slot_ts);
+  // clang-format on
 
   // set the signal for on new Host
   const auto signal_nh = &controller::ClipBird::OnNewHostConnected;
@@ -399,11 +385,58 @@ Window::Window(Window::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto slot_cr   = &Window::handleClipboardRecv;
   QObject::connect(controller, signal_cr, this, slot_cr);
 
+  // connect server list signal
+  const auto signal_so = &window::DeviceList::onAction;
+  const auto slot_so   = serverListSlot;
+  connect(serverList, signal_so, slot_so);
+
+  // connect client list signal
+  const auto signal_co = &window::DeviceList::onAction;
+  const auto slot_co   = clientListSlot;
+  connect(clientList, signal_co, slot_co);
+
+  // Connect the signal and slot for client list change
+  const auto signal_cl = &ClipBird::OnClientListChanged;
+  const auto slot_cl   = &Window::handleClientListChange;
+  connect(controller, signal_cl, this, slot_cl);
+
+  // Connect the signal and slot for server authentication
+  const auto signal_sa = &ClipBird::OnServerAuthentication;
+  const auto slot_sa   = &Window::handleServerAuthentication;
+  connect(controller, signal_sa, this, slot_sa);
+
+  // Connect the signal and slot for server list change
+  const auto signal_sl = &ClipBird::OnServerListChanged;
+  const auto slot_sl   = &Window::handleServerListChange;
+  connect(controller, signal_sl, this, slot_sl);
+
+  // Connect the signal and slot for server status change
+  const auto signal_st = &ClipBird::OnServerStateChanged;
+  const auto slot_st   = &Window::handleServerStateChange;
+  connect(controller, signal_st, this, slot_st);
+
+  // Connect the signal and slot for server status change
+  const auto signal_ss = &ClipBird::OnServerStatusChanged;
+  const auto slot_ss   = &Window::handleServerStatusChanged;
+  connect(controller, signal_ss, this, slot_ss);
+
+  // Connect the signal and slot for host action
+  const auto signal_ha = &Window::onHostAction;
+  const auto slot_ha   = &Window::handleHostAction;
+  connect(this, signal_ha, this, slot_ha);
+
+  // Connect the signal and slot for tab change(client)
+  const auto signal_tc = &Window::onTabChanged;
+  const auto slot_tc   = &Window::handleTabChangeForClient;
+  connect(this, signal_tc, this, slot_tc);
+
+  // Connect the signal and slot for tab change(server)
+  const auto signal_ts = &Window::onTabChanged;
+  const auto slot_ts   = &Window::handleTabChangeForServer;
+  connect(this, signal_ts, this, slot_ts);
+
   // Initialize the Tab as Client
   tab->setCurrentIndex(1);
-
-  // set the object name
-  this->setObjectName("Window");
 }
 
 /**

@@ -153,28 +153,14 @@ class Window : public QFrame {
   void handleServerListChange(QList<QPair<QHostAddress, quint16>> servers);
 
   /**
-   * @brief Handle the server status change
-   */
-  void handleServerStatusChanged(bool status);
-
-  /**
    * @brief Handle the Server Authentication
-   *
-   * @param status
    */
   void handleServerAuthentication(bool isAuthed);
 
- private: // private functions
-
   /**
-   * @brief Reset the Server Info
+   * @brief Handle the server status change
    */
-  void resetServerInfo();
-
-  /**
-   * @brief Reset the Client Info
-   */
-  void resetClientInfo();
+  void handleServerStatusChanged(bool status);
 
  public:
 

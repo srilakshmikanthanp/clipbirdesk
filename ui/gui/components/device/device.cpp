@@ -56,9 +56,9 @@ Device::Device(QWidget *parent) : QWidget(parent) {
  */
 void Device::setHost(Device::Value host) {
   // set the address and port
-  this->address   = std::get<0>(host);
-  this->port      = std::get<1>(host);
-  this->action    = std::get<2>(host);
+  this->address = std::get<0>(host);
+  this->port    = std::get<1>(host);
+  this->action  = std::get<2>(host);
 
   // set the host name
   this->hostName->setText("Resolving...");

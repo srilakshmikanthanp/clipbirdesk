@@ -27,9 +27,6 @@ Toast::Toast(QWidget* parent) : QWidget(parent) {
   // set padding
   label->setContentsMargins(10, 10, 10, 10);
 
-  // set the object name
-  setObjectName("Toast");
-
   // set the timer
   connect(timer, &QTimer::timeout, this, &Toast::close);
 }

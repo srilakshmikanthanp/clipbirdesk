@@ -16,11 +16,8 @@ DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
   // set alignment as center
   label->setAlignment(Qt::AlignCenter);
 
-  // set object name
-  label->setObjectName("NoHostLabel");
-
-  // set the object name
-  this->setObjectName("DeviceList");
+  // set the style sheet
+  label->setStyleSheet("QLabel { color : gray; }");
 
   // add the layout to the stack layout
   this->stackLayout->addWidget(label);

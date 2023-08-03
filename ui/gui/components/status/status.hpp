@@ -7,6 +7,9 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPainter>
+#include <QStyle>
+#include <QStyleOption>
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class Status : public QLabel {

@@ -10,7 +10,10 @@
 #include <QHostAddress>
 #include <QHostInfo>
 #include <QLabel>
+#include <QPainter>
 #include <QPushButton>
+#include <QStyle>
+#include <QStyleOption>
 #include <QVBoxLayout>
 #include <QWidget>
 

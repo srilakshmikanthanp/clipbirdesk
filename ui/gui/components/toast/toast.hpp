@@ -11,6 +11,9 @@
 #include <QScreen>
 #include <QTimer>
 #include <QWidget>
+#include <QPainter>
+#include <QStyle>
+#include <QStyleOption>
 
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {

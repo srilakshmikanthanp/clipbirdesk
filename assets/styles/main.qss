@@ -65,8 +65,7 @@ QTabBar::tab:hover {
 }
 
 QScrollArea {
-  padding-bottom: 6px;
-  padding-top: 6px;
+  padding: 0px;
   border: none;
 }
 
@@ -121,24 +120,4 @@ QMenu::item:selected {
 QMenu::item:disabled {
   background-color: #2a2a3b;
   color: #ffffff;
-}
-
-
-/*********************** Object Specified ************************/
-
-QLabel#NoHostLabel {
-  color: gray;
-}
-
-QWidget#Toast {
-  background-color: rgba(42, 42, 59, 0.8);
-  color: #ffffff;
-  border: none;
-  border-radius: 5px;
-  margin: 2px;
-  padding: 6px;
-}
-
-QWidget#DeviceList :hover {
-  background-color: #0277fa;
 }
