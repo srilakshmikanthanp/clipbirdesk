@@ -171,7 +171,7 @@ QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
   }
 
   // read the payloads
-  for (int i = 0; i < packet.itemCount; i++) {
+  for (auto i = 0U; i < packet.itemCount; i++) {
     SyncingItem payload;
 
     in >> payload;
