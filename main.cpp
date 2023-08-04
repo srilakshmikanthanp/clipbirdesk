@@ -17,11 +17,12 @@
 // Project Headers
 #include "constants/constants.hpp"
 #include "controller/clipbird/clipbird.hpp"
-#include "ui/gui/guimain/guimain.hpp"
+#include "ui/gui/content/content.hpp"
 #include "ui/gui/traymenu/traymenu.hpp"
 #include "ui/gui/window/window.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
+
 
 namespace srilakshmikanthanp::clipbirdesk {
 /**
@@ -32,16 +33,16 @@ class ClipbirdApplication : public SingleApplication {
  private:  //  Member Variables and Objects
 
   controller::ClipBird *controller;
-  ui::gui::Window *window;
+  ui::gui::Content *content;
   QSystemTrayIcon *trayIcon;
   ui::gui::TrayMenu *trayMenu;
-  ui::gui::GuiMain *guiMain;
+  ui::gui::Window *window;
 
  private:  // Disable Copy, Move and Assignment
 
   Q_DISABLE_COPY_MOVE(ClipbirdApplication);
 
- private: // private slots
+ private:  // private slots
 
   /**
    * @brief On About Clicked
@@ -77,17 +78,17 @@ class ClipbirdApplication : public SingleApplication {
     controller = new controller::ClipBird(
         QApplication::clipboard(), utility::functions::getQSslConfiguration()
     );
-    window   = new ui::gui::Window(controller);
+    content   = new ui::gui::Content(controller);
     trayIcon = new QSystemTrayIcon();
     trayMenu = new ui::gui::TrayMenu();
-    guiMain  = new ui::gui::GuiMain();
+    window  = new ui::gui::Window();
 
     // set the signal handler for all os
     signal(SIGTERM, [](int sig) { qApp->quit(); });
     signal(SIGINT, [](int sig) { qApp->quit(); });
     signal(SIGABRT, [](int sig) { qApp->quit(); });
 
-    // clang-format off
+// clang-format off
     #ifdef Q_OS_LINUX
     signal(SIGKILL, [](int sig) { qApp->quit(); });
     #endif
@@ -102,7 +103,7 @@ class ClipbirdApplication : public SingleApplication {
     // set the style sheet
     qApp->setStyleSheet(qssFile.readAll());
 
-    // set not to quit on last window closed
+    // set not to quit on last content closed
     qApp->setQuitOnLastWindowClosed(false);
 
     // BackDrop Shadow
@@ -113,17 +114,17 @@ class ClipbirdApplication : public SingleApplication {
     shadow->setOffset(3, 3);
     shadow->setColor(QColor(0, 0, 0, 100));
 
-    // set the shadow to window
-    window->setGraphicsEffect(shadow);
+    // set the shadow to content
+    content->setGraphicsEffect(shadow);
 
-    // set the window Ratio
-    guiMain->setSizeRatio(constants::getAppWindowRatio());
+    // set the content Ratio
+    window->setSizeRatio(constants::getAppWindowRatio());
 
-    // set the window
-    guiMain->setCentralWidget(window);
+    // set the content
+    window->setCentralWidget(content);
 
-    // set the icon to window
-    guiMain->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+    // set the icon to content
+    window->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
 
     // set the icon to tray
     trayIcon->setIcon(QIcon(constants::getAppLogo().c_str()));
@@ -132,7 +133,7 @@ class ClipbirdApplication : public SingleApplication {
     trayIcon->setContextMenu(trayMenu);
 
     // using some classes
-    using ui::gui::Window;
+    using ui::gui::Content;
 
     // set the signal for menus About click
     const auto signal_ac = &ui::gui::TrayMenu::OnAboutClicked;
@@ -149,15 +150,15 @@ class ClipbirdApplication : public SingleApplication {
     const auto slot_qc   = [] { qApp->quit(); };
     QObject::connect(trayMenu, signal_qc, this, slot_qc);
 
-    // set activated action to show the window
+    // set activated action to show the content
     const auto signal_at = &QSystemTrayIcon::activated;
-    const auto slot_at   = &Window::show;
-    QObject::connect(trayIcon, signal_at, guiMain, slot_at);
+    const auto slot_at   = &Content::show;
+    QObject::connect(trayIcon, signal_at, window, slot_at);
 
     // set the signal for instance Started
     const auto signal_is = &SingleApplication::instanceStarted;
-    const auto slot_is   = &Window::show;
-    QObject::connect(this, signal_is, guiMain, slot_is);
+    const auto slot_is   = &Content::show;
+    QObject::connect(this, signal_is, window, slot_is);
 
     // set the signal for error occurred
     const auto signal_eo = &controller::ClipBird::OnErrorOccurred;
@@ -174,10 +175,10 @@ class ClipbirdApplication : public SingleApplication {
    */
   virtual ~ClipbirdApplication() {
     delete controller;
-    delete window;
+    delete content;
     delete trayIcon;
     delete trayMenu;
-    delete guiMain;
+    delete window;
   }
 };
 }  // namespace srilakshmikanthanp::clipbirdesk

@@ -157,8 +157,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   target_compile_options(clipbird PRIVATE -std=c++17)
 endif()
 
+# add target linker options MSVC /NODEFAULTLIB:library
 # add target compiler options MSVC /std:c++17
 if(MSVC)
+  target_link_options(clipbird PRIVATE /NODEFAULTLIB:library)
   target_compile_options(clipbird PRIVATE /std:c++17)
 endif()
 
