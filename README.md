@@ -33,7 +33,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/srilakshmikanthanp/clipbirdesk">
-    <img src="assets/logo.png" alt="Logo" width="80" height="80">
+    <img src="assets/images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Clipbird</h3>
@@ -56,14 +56,7 @@
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
+    <li><a href="#getting-started">Getting Started</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -96,25 +89,63 @@ Clipbird Software Helps you to sync your clipboard data between devices connecte
 
 Clipbird is in the development stage if the project succeeds in the future, we will release the binaries to use. However, you can build the project from the source.
 
-### Prerequisites
+### Building Clipbird on a Windows Platform
 
-* Extra Cmake Modules
-* KDNSSD
+In the following steps, we will see how to build the project in the Windows platform, We use choco to install the dependencies in the Windows platform. If you don't have choco installed in your system, you can install it from [here](https://chocolatey.org/install).
+
+#### Prerequisites
+
 * Bonjour
 * C++
 * Qt6
 * OpenSSL
 
-### Installing Bonjour in Windows
+#### Installing Qt6
 
-Just goto [bonjour](https://developer.apple.com/bonjour/) and downlod the bonjour SDK for windows, then install it in your system
+Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for windows, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
 
-### Installing KDNSSD in Linux
+#### Installing Bonjour
 
-Installing Extra cmake modules,
+Just go to [bonjour](https://developer.apple.com/bonjour/) and downlod the bonjour SDK for windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
+
+#### Installing OpenSSL
+
+Install OpenSSL using the following command and set the environment variable `OPENSSL_DIR` to the OpenSSL installation directory.
 
 ~~~sh
-# Build & install the ECM repository
+choco install openssl
+~~~
+
+#### Environment Variables
+
+| Variable            | Value                           |
+|---------------------|---------------------------------|
+| `OPENSSL_DIR`       | OpenSSL installation directory  |
+| `QT_CMAKE_DIR`      | Qt6 cmake directory             |
+| `BONJOUR_SDK_HOME`  | Bonjour SDK directory           |
+
+### Building Clipbird on a Linux Platform
+
+In the following steps, we will see how to build the project in the Linux platform, We use apt to install the dependencies in the Linux platform.
+
+#### Prerequisites
+
+* Extra Cmake Modules
+* Avahi
+* KDNSSD
+* C++
+* Qt6
+* OpenSSL
+
+#### Installing Qt6
+
+Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for windows, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
+
+#### Installing ECM
+
+Run the following commands to install ECM, and set the environment variable `ECM_DIR` to the ECM cmake directory.
+
+~~~sh
 git clone https://invent.kde.org/frameworks/extra-cmake-modules.git
 cd extra-cmake-modules
 git checkout 380397587ebc6206034ab3f9fb9bd94c028dfadb
@@ -123,13 +154,15 @@ cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.kderoot -DCMAKE_BUILD_TYPE=Release -DQT_M
 make && make install
 ~~~
 
-Installing avahi,
+#### Installing Avahi
 
 ~~~sh
 sudo apt install libavahi-core-dev 
 ~~~
 
-Installing KDNSSD,
+#### Installing KDNSSD
+
+Run the following commands to install KDNSSD, set the environment variable `KDNSSD_DIR` to the KDNSSD cmake directory and add the KDNSSD library to the `LD_LIBRARY_PATH` environment variable.
 
 ~~~sh
 git clone https://invent.kde.org/frameworks/kdnssd.git
@@ -140,19 +173,15 @@ cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.kderoot -DCMAKE_BUILD_TYPE=Release -DQT_M
 make && make install
 ~~~
 
-### Env Variables
+#### Installing OpenSSL
 
-In the following table, you can find the environment variables that you need to set to build the project, On Different platforms.
+Install OpenSSL using the following command and set the environment variable `OPENSSL_DIR` to the OpenSSL installation directory.
 
-#### For Windows
+~~~sh
+sudo apt install libssl-dev
+~~~
 
-| Variable            | Value                           |
-|---------------------|---------------------------------|
-| `OPENSSL_DIR`       | OpenSSL installation directory  |
-| `QT_CMAKE_DIR`      | Qt6 cmake directory             |
-| `BONJOUR_SDK_HOME`  | Bonjour SDK directory           |
-
-#### For Linux
+#### Environment Variables
 
 | Variable            | Value                           |
 |---------------------|---------------------------------|
