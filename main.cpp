@@ -88,7 +88,7 @@ class ClipbirdApplication : public SingleApplication {
     signal(SIGINT, [](int sig) { qApp->quit(); });
     signal(SIGABRT, [](int sig) { qApp->quit(); });
 
-// clang-format off
+    // clang-format off
     #ifdef Q_OS_LINUX
     signal(SIGKILL, [](int sig) { qApp->quit(); });
     #endif
