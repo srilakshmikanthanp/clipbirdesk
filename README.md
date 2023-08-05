@@ -105,6 +105,41 @@ Clipbird is in the development stage if the project succeeds in the future, we w
 * Qt6
 * OpenSSL
 
+### Installing Bonjour in Windows
+
+Just goto [bonjour](https://developer.apple.com/bonjour/) and downlod the bonjour SDK for windows, then install it in your system
+
+### Installing KDNSSD in Linux
+
+Installing Extra cmake modules,
+
+~~~sh
+# Build & install the ECM repository
+git clone https://invent.kde.org/frameworks/extra-cmake-modules.git
+cd extra-cmake-modules
+git checkout 380397587ebc6206034ab3f9fb9bd94c028dfadb
+mkdir build && cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.kderoot -DCMAKE_BUILD_TYPE=Release -DQT_MAJOR_VERSION=6 -DCMAKE_PREFIX_PATH=$QT_CMAKE_DIR -S .. -B .
+make && make install
+~~~
+
+Installing avahi,
+
+~~~sh
+sudo apt install libavahi-core-dev 
+~~~
+
+Installing KDNSSD,
+
+~~~sh
+git clone https://invent.kde.org/frameworks/kdnssd.git
+cd kdnssd
+git checkout 39c7501c997cf14e84bc3693969fe6787a2ce5f4
+mkdir build && cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.kderoot -DCMAKE_BUILD_TYPE=Release -DQT_MAJOR_VERSION=6 -DCMAKE_PREFIX_PATH=$QT_CMAKE_DIR -S .. -B .
+make && make install
+~~~
+
 ### Env Variables
 
 In the following table, you can find the environment variables that you need to set to build the project, On Different platforms.
@@ -114,10 +149,17 @@ In the following table, you can find the environment variables that you need to 
 | Variable            | Value                           |
 |---------------------|---------------------------------|
 | `OPENSSL_DIR`       | OpenSSL installation directory  |
+| `QT_CMAKE_DIR`      | Qt6 cmake directory             |
+| `BONJOUR_SDK_HOME`  | Bonjour SDK directory           |
+
+#### For Linux
+
+| Variable            | Value                           |
+|---------------------|---------------------------------|
+| `OPENSSL_DIR`       | OpenSSL installation directory  |
 | `ECM_DIR`           | Extra Cmake Modules directory   |
 | `KDNSSD_DIR`        | KDNSSD cmake directory          |
 | `QT_CMAKE_DIR`      | Qt6 cmake directory             |
-| `BONJOUR_SDK_HOME`  | Bonjour SDK directory           |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

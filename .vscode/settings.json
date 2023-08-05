@@ -1,6 +1,6 @@
 {
   "C_Cpp.clang_format_fallbackStyle": "Google",
-  "cmake.generator": "Visual Studio 17 2022",
+  "cmake.generator": "Unix Makefiles",
   "grammarly.files.exclude": [
     "**/CMakeLists.txt"
   ],

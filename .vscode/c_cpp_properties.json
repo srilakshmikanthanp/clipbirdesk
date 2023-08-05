@@ -1,6 +1,28 @@
 {
   "configurations": [
     {
+      "compilerPath": "/usr/bin/gcc",
+      "name": "linux",
+      "includePath": [
+        "${workspaceFolder}/build/_deps/singleapplication-src",
+        "${workspaceFolder}/build",
+        "${workspaceFolder}/",
+        "${workspaceFolder}/build/_deps/**",
+        "/opt/Qt/6.5.2/gcc_64/include/QtGui",
+        "/opt/Qt/6.5.2/gcc_64/include/QtCore",
+        "/opt/Qt/6.5.2/gcc_64/include/**"
+      ],
+      "defines": [
+        "_UNICODE",
+        "_DEBUG",
+        "UNICODE"
+      ],
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "linux-gcc-x64",
+      "configurationProvider": "ms-vscode.cpptools"
+    },
+    {
       "compilerPath": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.33.31629/bin/Hostx64/x64/cl.exe",
       "name": "Win32",
       "includePath": [
@@ -14,7 +36,11 @@
         "${workspaceFolder}/build",
         "C:\\Program Files\\Bonjour SDK\\Include"
       ],
-      "defines": [ "_UNICODE", "_DEBUG", "UNICODE" ],
+      "defines": [
+        "_UNICODE",
+        "_DEBUG",
+        "UNICODE"
+      ],
       "cStandard": "c17",
       "cppStandard": "c++17",
       "intelliSenseMode": "msvc-x64",

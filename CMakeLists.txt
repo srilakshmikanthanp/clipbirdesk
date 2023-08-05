@@ -19,20 +19,20 @@ include(FetchContent)
 # set the APPLICATION_ISSUEPAGE
 set(APPLICATION_ISSUEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk/issues")
 
+# Set the APPLICATION_HOMEPAGE
+set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
+
 # set the main.qss path variable
 set(APPLICATION_MAIN_QSS_PATH ":/styles/main.qss")
 
 # Set the logo.png path variable
 set(APPLICATION_LOGO_PATH ":/images/logo.png")
 
-# Set the APPLICATION_HOMEPAGE
-set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
-
 # Set the BBONJOUR_DIR from env
 set(BONJOUR_SDK_HOME $ENV{BONJOUR_SDK_HOME})
 
 # set KF major version
-set(KF_MAJOR_VERSION 5)
+set(KF_MAJOR_VERSION 6)
 
 # Set Qt version
 set(QT_MAJOR_VERSION 6)
@@ -65,14 +65,14 @@ FetchContent_MakeAvailable(SingleApplication)
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
 
+# Add network/service/avahi if the os is linux
+if(UNIX AND NOT APPLE)
+  list(FILTER main_cpp EXCLUDE REGEX "network/service/dnsd")
+endif()
+
 # Add network/service/dnsd if windows or mac
 if(WIN32 OR APPLE)
   list(FILTER main_cpp EXCLUDE REGEX "network/service/avahi")
-endif()
-
-# Add network/service/avahi if linux
-if(LINUX)
-  list(FILTER main_cpp EXCLUDE REGEX "network/service/dnsd")
 endif()
 
 # remove tests folder from list
@@ -86,8 +86,8 @@ find_package(Qt6 REQUIRED COMPONENTS
   Widgets
   Network)
 
-# Find KF5DNSSD with avahi on linux
-if(LINUX)
+# Find KF5DNSSD with avahi if os is linux
+if(UNIX AND NOT APPLE)
   find_package(KF${KF_MAJOR_VERSION}DNSSD REQUIRED)
 endif()
 
@@ -123,8 +123,8 @@ target_link_libraries(clipbird
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto)
 
-# link kdnssd & avahi if linux based system
-if(LINUX)
+# link kdnssd & avahi in linux based system
+if(UNIX AND NOT APPLE)
   target_link_libraries(clipbird
     PRIVATE KF${KF_MAJOR_VERSION}::DNSSD)
 endif()
@@ -175,7 +175,7 @@ if(WIN32)
 endif()
 
 # Add Platform specific definitions for linux
-if(LINUX)
+if(UNIX AND NOT APPLE)
   add_definitions(-D__linux__)
 endif()
 
