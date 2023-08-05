@@ -95,14 +95,41 @@ In the following steps, we will see how to build the project in the Windows plat
 
 #### Prerequisites
 
+* Extra Cmake Modules
+* KGuiAddons
 * Bonjour
 * C++
 * Qt6
 * OpenSSL
 
+
 #### Installing Qt6
 
 Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for windows, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
+
+#### Installing ECM
+
+Run the following commands to install ECM, and set the environment variable `ECM_DIR` to the ECM cmake directory.
+
+~~~sh
+git clone https://invent.kde.org/frameworks/extra-cmake-modules.git
+cd extra-cmake-modules
+git checkout 380397587ebc6206034ab3f9fb9bd94c028dfadb
+mkdir build && cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=C:/kderoot -DCMAKE_BUILD_TYPE=Release -DQT_MAJOR_VERSION=6 -DCMAKE_PREFIX_PATH=%QT_CMAKE_DIR% -S .. -B .
+msbuild ECM.sln && msbuild INSTALL.vcxproj
+~~~
+
+#### Installing KGUiAddons
+
+~~~sh
+git clone https://invent.kde.org/frameworks/kguiaddons.git
+cd kguiaddons
+git checkout af1733445dae3cbe8d9abdeb64ce975ac5b96ffb
+mkdir build && cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=C:/kderoot -DCMAKE_BUILD_TYPE=Release -DQT_MAJOR_VERSION=6 -DCMAKE_PREFIX_PATH=%QT_CMAKE_DIR% -S .. -B .
+msbuild KGuiAddons.sln && msbuild INSTALL.vcxproj
+~~~
 
 #### Installing Bonjour
 
@@ -121,6 +148,8 @@ choco install openssl
 | Variable            | Value                           |
 |---------------------|---------------------------------|
 | `OPENSSL_DIR`       | OpenSSL installation directory  |
+| `ECM_DIR`           | Extra Cmake Modules directory   |
+| `KGUIADDONS_DIR`    | KGuiAddons cmake directory      |
 | `QT_CMAKE_DIR`      | Qt6 cmake directory             |
 | `BONJOUR_SDK_HOME`  | Bonjour SDK directory           |
 
@@ -132,6 +161,7 @@ In the following steps, we will see how to build the project in the Linux platfo
 
 * Extra Cmake Modules
 * Avahi
+* KGuiAddons
 * KDNSSD
 * C++
 * Qt6

@@ -75,9 +75,7 @@ class ClipbirdApplication : public SingleApplication {
    */
   ClipbirdApplication(int &argc, char **argv) : SingleApplication(argc, argv) {
     // create the objects of the class
-    controller = new controller::ClipBird(
-        QApplication::clipboard(), utility::functions::getQSslConfiguration()
-    );
+    controller = new controller::ClipBird(utility::functions::getQSslConfiguration());
     content   = new ui::gui::Content(controller);
     trayIcon = new QSystemTrayIcon();
     trayMenu = new ui::gui::TrayMenu();

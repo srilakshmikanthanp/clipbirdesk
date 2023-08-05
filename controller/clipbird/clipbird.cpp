@@ -61,8 +61,8 @@ void ClipBird::handleServerStatusChanged(bool status) {
  * @param board  clipboard that is managed
  * @param parent parent object
  */
-ClipBird::ClipBird(QClipboard *board, QSslConfiguration config, QObject *parent)
-    : QObject(parent), m_clipboard(board, this), m_sslConfig(config) {}
+ClipBird::ClipBird(QSslConfiguration config, QObject *parent)
+    : QObject(parent), m_clipboard(this), m_sslConfig(config) {}
 
 //---------------------- public slots -----------------------//
 

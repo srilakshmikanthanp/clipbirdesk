@@ -6,6 +6,7 @@
 // https://opensource.org/licenses/MIT
 
 // Qt header
+#include <QApplication>
 #include <QBuffer>
 #include <QByteArray>
 #include <QClipboard>
@@ -19,6 +20,9 @@
 #include <QString>
 #include <QUrl>
 #include <QVector>
+
+// KDE Header
+#include <KSystemClipboard>
 
 // project header
 #include "types/except/except.hpp"
@@ -39,7 +43,7 @@ class Clipboard : public QObject {
 
  private:  // members
 
-  QClipboard* m_clipboard = nullptr;
+  KSystemClipboard* m_clipboard = KSystemClipboard::instance();
 
  private:  // just for Qt
 
@@ -76,7 +80,7 @@ class Clipboard : public QObject {
    * @param clipboard Clipboard that is managed
    * @param parent parent object
    */
-  explicit Clipboard(QClipboard* clipboard, QObject* parent = nullptr);
+  explicit Clipboard(QObject* parent = nullptr);
 
   /**
    * @brief Get the clipboard data from the clipboard

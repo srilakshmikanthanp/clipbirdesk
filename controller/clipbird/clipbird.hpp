@@ -104,7 +104,7 @@ signals:  // signals for this class
    * @param board  clipboard that is managed
    * @param parent parent object
    */
-  ClipBird(QClipboard *board, QSslConfiguration config, QObject *parent = nullptr);
+  ClipBird(QSslConfiguration config, QObject *parent = nullptr);
 
   /**
    * @brief Destroy the ClipBird object

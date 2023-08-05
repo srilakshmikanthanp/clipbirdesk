@@ -43,6 +43,9 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
 # Append ECM cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{ECM_DIR})
 
+# Append QGUIADDONS_DIR cmake dir to CMAKE_PREFIX_PATH
+list(APPEND CMAKE_PREFIX_PATH $ENV{QGUIADDONS_DIR})
+
 # Append KDNSSD_DIR cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{KDNSSD_DIR})
 
@@ -86,6 +89,12 @@ find_package(Qt6 REQUIRED COMPONENTS
   Widgets
   Network)
 
+# find QGuiAddons
+find_package(KF${KF_MAJOR_VERSION}GuiAddons)
+
+# Find OpenSSL
+find_package(OpenSSL REQUIRED)
+
 # Find KF5DNSSD with avahi if os is linux
 if(UNIX AND NOT APPLE)
   find_package(KF${KF_MAJOR_VERSION}DNSSD REQUIRED)
@@ -95,9 +104,6 @@ endif()
 if(WIN32 OR APPLE)
   find_package(Bonjour REQUIRED)
 endif()
-
-# Find OpenSSL
-find_package(OpenSSL REQUIRED)
 
 # Configure config.hpp
 configure_file(
@@ -121,7 +127,8 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
-  PRIVATE OpenSSL::Crypto)
+  PRIVATE OpenSSL::Crypto
+  PRIVATE KF${KF_MAJOR_VERSION}::GuiAddons)
 
 # link kdnssd & avahi in linux based system
 if(UNIX AND NOT APPLE)
