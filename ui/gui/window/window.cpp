@@ -21,46 +21,17 @@ Window::Window(QWidget* parent) : QMainWindow(parent) {
 }
 
 /**
- * @brief Set the Size Ratio object
- */
-void Window::setSizeRatio(QSize r) {
-  this->ratio = r;
-}
-
-/**
- * @brief Get the Size Ratio object
- */
-QSize Window::getSizeRatio() {
-  return this->ratio;
-}
-
-/**
  * @brief Override the setVisiblity
  */
 void Window::setVisible(bool visible) {
-  // if visible
+  // if visible is false return
   if (!visible) return QWidget::setVisible(visible);
 
-  // Get the Primary Screen
-  auto screen  = QGuiApplication::primaryScreen();
+  // screen center
+  auto center = QGuiApplication::primaryScreen()->geometry().center();
 
-  // get the screen size
-  auto sc_siz  = screen->availableGeometry();
-
-  // Calculate the Window size from ratio
-  auto win_siz = QSize();
-
-  // calc the Height
-  win_siz.setHeight(sc_siz.height() / ratio.height());
-
-  // calc the Width
-  win_siz.setWidth(sc_siz.width() / ratio.width());
-
-  // set the Window size
-  setFixedSize(win_siz);
-
-  // move the Window to center
-  move(screen->geometry().center() - rect().center());
+  // set the window to center
+  QWidget::move(center - QWidget::rect().center());
 
   // show the Window
   QWidget::setVisible(visible);

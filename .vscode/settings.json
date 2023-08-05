@@ -18,7 +18,6 @@
   ],
   "files.associations": {
     ".env*": "dotenv",
-    ".qs": "javascript",
     "stdexcept": "cpp",
     "atomic": "cpp",
     "cinttypes": "cpp",
@@ -145,6 +144,9 @@
     "format": "cpp",
     "qlabel": "cpp",
     "qtabwidget": "cpp",
-    "qdatastream": "cpp"
+    "qdatastream": "cpp",
+    "*.qs": "javascript",
+    ".qs": "javascript",
+    "qsystemtrayicon": "cpp"
   },
 }

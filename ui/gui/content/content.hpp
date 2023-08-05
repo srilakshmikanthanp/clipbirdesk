@@ -16,6 +16,7 @@
 #include <QMessageBox>
 #include <QScrollArea>
 #include <QScreen>
+#include <QSystemTrayIcon>
 #include <QTabBar>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -31,7 +32,6 @@
 #include "controller/clipbird/clipbird.hpp"
 #include "ui/gui/components/device/device.hpp"
 #include "ui/gui/components/status/status.hpp"
-#include "ui/gui/components/toast/toast.hpp"
 #include "ui/gui/content/deviceinfo/deviceinfo.hpp"
 #include "ui/gui/content/devicelist/devicelist.hpp"
 
@@ -115,16 +115,6 @@ class Content : public QFrame {
    * @brief On Tab Changed for Server
    */
   void handleTabChangeForServer(Tabs tab);
-
-  /**
-   * @brief Handle the clipboard sent
-   */
-  void handleClipboardSent();
-
-  /**
-   * @brief Handle the clipboard recv
-   */
-  void handleClipboardRecv();
 
   //----------------------------- slots for Server --------------------------//
 

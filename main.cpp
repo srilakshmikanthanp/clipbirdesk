@@ -23,7 +23,6 @@
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
 
-
 namespace srilakshmikanthanp::clipbirdesk {
 /**
  * @brief Single Application class specialization
@@ -34,15 +33,31 @@ class ClipbirdApplication : public SingleApplication {
 
   controller::ClipBird *controller;
   ui::gui::Content *content;
-  QSystemTrayIcon *trayIcon;
-  ui::gui::TrayMenu *trayMenu;
   ui::gui::Window *window;
+  ui::gui::TrayMenu *trayMenu;
+  QSystemTrayIcon *trayIcon;
 
  private:  // Disable Copy, Move and Assignment
 
   Q_DISABLE_COPY_MOVE(ClipbirdApplication);
 
  private:  // private slots
+
+  /**
+   * @brief Handle the clipboard sent
+   */
+  void handleClipboardSent() {
+    QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon::Information;
+    trayIcon->showMessage("Clipbird", "Sending", icon, 100);
+  }
+
+  /**
+   * @brief Handle the clipboard recv
+   */
+  void handleClipboardRecv() {
+    QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon::Information;
+    trayIcon->showMessage("Clipbird", "Received", icon, 100);
+  }
 
   /**
    * @brief On About Clicked
@@ -65,6 +80,15 @@ class ClipbirdApplication : public SingleApplication {
     qErrnoWarning(s.toStdString().c_str());
   }
 
+  /**
+   * @brief On Tray Icon Clicked
+   */
+  void onTrayIconClicked(QSystemTrayIcon::ActivationReason reason) {
+    if (reason == QSystemTrayIcon::ActivationReason::Trigger) {
+      window->isVisible() ? window->hide() : window->show();
+    }
+  }
+
  public:  // Constructors and Destructors
 
   /**
@@ -76,10 +100,10 @@ class ClipbirdApplication : public SingleApplication {
   ClipbirdApplication(int &argc, char **argv) : SingleApplication(argc, argv) {
     // create the objects of the class
     controller = new controller::ClipBird(utility::functions::getQSslConfiguration());
-    content   = new ui::gui::Content(controller);
-    trayIcon = new QSystemTrayIcon();
-    trayMenu = new ui::gui::TrayMenu();
-    window  = new ui::gui::Window();
+    content    = new ui::gui::Content(controller);
+    trayIcon   = new QSystemTrayIcon();
+    trayMenu   = new ui::gui::TrayMenu();
+    window     = new ui::gui::Window();
 
     // set the signal handler for all os
     signal(SIGTERM, [](int sig) { qApp->quit(); });
@@ -116,7 +140,7 @@ class ClipbirdApplication : public SingleApplication {
     content->setGraphicsEffect(shadow);
 
     // set the content Ratio
-    window->setSizeRatio(constants::getAppWindowRatio());
+    window->setFixedSize(constants::getAppWindowSize());
 
     // set the content
     window->setCentralWidget(content);
@@ -148,10 +172,20 @@ class ClipbirdApplication : public SingleApplication {
     const auto slot_qc   = [] { qApp->quit(); };
     QObject::connect(trayMenu, signal_qc, this, slot_qc);
 
+    // set the signal for on clipboard sent
+    const auto signal_cs = &controller::ClipBird::OnClipboardSent;
+    const auto slot_cs   = &ClipbirdApplication::handleClipboardSent;
+    QObject::connect(controller, signal_cs, this, slot_cs);
+
+    // set the signal for on clipboard recv
+    const auto signal_cr = &controller::ClipBird::OnClipboardRecv;
+    const auto slot_cr   = &ClipbirdApplication::handleClipboardRecv;
+    QObject::connect(controller, signal_cr, this, slot_cr);
+
     // set activated action to show the content
     const auto signal_at = &QSystemTrayIcon::activated;
-    const auto slot_at   = &Content::show;
-    QObject::connect(trayIcon, signal_at, window, slot_at);
+    const auto slot_at   = &ClipbirdApplication::onTrayIconClicked;
+    QObject::connect(trayIcon, signal_at, this, slot_at);
 
     // set the signal for instance Started
     const auto signal_is = &SingleApplication::instanceStarted;

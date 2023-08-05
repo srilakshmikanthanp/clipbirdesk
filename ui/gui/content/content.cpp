@@ -63,20 +63,6 @@ void Content::handleTabChangeForServer(Tabs tab) {
   controller->setCurrentHostAsServer();
 }
 
-/**
- * @brief Handle the clipboard sent
- */
-void Content::handleClipboardSent() {
-  components::Toast::toast("Clipboard Sent", 3000);
-}
-
-/**
- * @brief Handle the clipboard recv
- */
-void Content::handleClipboardRecv() {
-  components::Toast::toast("Clipboard Recv", 3000);
-}
-
 //----------------------------- slots for Server --------------------------//
 
 /**
@@ -374,16 +360,6 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto signal_nh = &controller::ClipBird::OnNewHostConnected;
   const auto slot_nh   = &Content::handleNewHostConnected;
   QObject::connect(controller, signal_nh, this, slot_nh);
-
-  // set the signal for on clipboard sent
-  const auto signal_cs = &controller::ClipBird::OnClipboardSent;
-  const auto slot_cs   = &Content::handleClipboardSent;
-  QObject::connect(controller, signal_cs, this, slot_cs);
-
-  // set the signal for on clipboard recv
-  const auto signal_cr = &controller::ClipBird::OnClipboardRecv;
-  const auto slot_cr   = &Content::handleClipboardRecv;
-  QObject::connect(controller, signal_cr, this, slot_cr);
 
   // connect server list signal
   const auto signal_so = &window::DeviceList::onAction;

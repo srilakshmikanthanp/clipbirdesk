@@ -83,7 +83,7 @@ std::string getAppIssuePage();
  * @brief Get the App Window Ratio
  * @return QSize
  */
-QSize getAppWindowRatio();
+QSize getAppWindowSize();
 
 /**
  * @brief Get the MDns Service Name

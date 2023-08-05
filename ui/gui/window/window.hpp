@@ -28,16 +28,6 @@ class Window : public QMainWindow {
   explicit Window(QWidget* parent = nullptr);
 
   /**
-   * @brief Set the Size Ratio object
-   */
-  void setSizeRatio(QSize r);
-
-  /**
-   * @brief Get the Size Ratio object
-   */
-  QSize getSizeRatio();
-
-  /**
    * @brief Destroy the Gui Main object
    *
    */

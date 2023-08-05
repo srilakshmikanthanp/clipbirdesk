@@ -171,6 +171,12 @@ In the following steps, we will see how to build the project in the Linux platfo
 
 Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for windows, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
 
+#### Installing Avahi
+
+~~~sh
+sudo apt install libavahi-core-dev 
+~~~
+
 #### Installing ECM
 
 Run the following commands to install ECM, and set the environment variable `ECM_DIR` to the ECM cmake directory.
@@ -184,12 +190,6 @@ cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.kderoot -DCMAKE_BUILD_TYPE=Release -DQT_M
 make && make install
 ~~~
 
-#### Installing Avahi
-
-~~~sh
-sudo apt install libavahi-core-dev 
-~~~
-
 #### Installing KDNSSD
 
 Run the following commands to install KDNSSD, set the environment variable `KDNSSD_DIR` to the KDNSSD cmake directory and add the KDNSSD library to the `LD_LIBRARY_PATH` environment variable.
@@ -200,6 +200,17 @@ cd kdnssd
 git checkout 39c7501c997cf14e84bc3693969fe6787a2ce5f4
 mkdir build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.kderoot -DCMAKE_BUILD_TYPE=Release -DQT_MAJOR_VERSION=6 -DCMAKE_PREFIX_PATH=$QT_CMAKE_DIR -S .. -B .
+make && make install
+~~~
+
+#### Installing KGUiAddons
+
+~~~sh
+git clone https://invent.kde.org/frameworks/kguiaddons.git
+cd kguiaddons
+git checkout af1733445dae3cbe8d9abdeb64ce975ac5b96ffb
+mkdir build && cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=C:/kderoot -DCMAKE_BUILD_TYPE=Release -DQT_MAJOR_VERSION=6 -DCMAKE_PREFIX_PATH=%QT_CMAKE_DIR% -S .. -B .
 make && make install
 ~~~
 
@@ -218,6 +229,7 @@ sudo apt install libssl-dev
 | `OPENSSL_DIR`       | OpenSSL installation directory  |
 | `ECM_DIR`           | Extra Cmake Modules directory   |
 | `KDNSSD_DIR`        | KDNSSD cmake directory          |
+| `KGUIADDONS_DIR`    | KGuiAddons cmake directory      |
 | `QT_CMAKE_DIR`      | Qt6 cmake directory             |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

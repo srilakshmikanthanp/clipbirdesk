@@ -72,11 +72,11 @@ std::string getAppLogFile() {
 }
 
 /**
- * @brief Get the App Window Ratio
+ * @brief Get the App Window Size
  * @return QSize
  */
-QSize getAppWindowRatio() {
-  return QSize(4, 2);
+QSize getAppWindowSize() {
+  return QSize(400, 450);
 }
 
 /**
