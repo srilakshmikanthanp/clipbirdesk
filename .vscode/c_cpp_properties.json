@@ -10,7 +10,8 @@
         "${workspaceFolder}/build/_deps/**",
         "/opt/Qt/6.5.2/gcc_64/include/QtGui",
         "/opt/Qt/6.5.2/gcc_64/include/QtCore",
-        "/opt/Qt/6.5.2/gcc_64/include/**"
+        "/opt/Qt/6.5.2/gcc_64/include/**",
+        "${HOME}/.kderoot/include/KF6/KDNSSD"
       ],
       "defines": [
         "_UNICODE",
