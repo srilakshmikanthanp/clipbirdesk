@@ -21,9 +21,6 @@
 #include <QUrl>
 #include <QVector>
 
-// KDE Header
-#include <KSystemClipboard>
-
 // project header
 #include "types/except/except.hpp"
 
@@ -43,7 +40,7 @@ class Clipboard : public QObject {
 
  private:  // members
 
-  KSystemClipboard* m_clipboard = KSystemClipboard::instance();
+  QClipboard *m_clipboard = QApplication::clipboard();
 
  private:  // just for Qt
 

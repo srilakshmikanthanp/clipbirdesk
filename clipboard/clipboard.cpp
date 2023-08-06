@@ -13,7 +13,7 @@ namespace srilakshmikanthanp::clipbirdesk::clipboard {
  * @brief Slot to notify the clipboard change
  */
 void Clipboard::onClipboardChangeImpl() {
-  if (!QApplication::clipboard()->ownsClipboard()) {
+  if (!this->m_clipboard->ownsClipboard()) {
     emit OnClipboardChange(this->get());
   }
 }
@@ -28,7 +28,7 @@ void Clipboard::onClipboardChangeImpl() {
 Clipboard::Clipboard(QObject* parent) : QObject(parent) {
   // connect the clipboard change signal to the slot
   // that is used to notify the listeners
-  const auto signal = &KSystemClipboard::changed;
+  const auto signal = &QClipboard::changed;
   const auto slot   = &Clipboard::onClipboardChangeImpl;
   QObject::connect(m_clipboard, signal, this, slot);
 }
@@ -41,6 +41,8 @@ Clipboard::Clipboard(QObject* parent) : QObject(parent) {
 QVector<QPair<QString, QByteArray>> Clipboard::get() {
   // Default clipboard data & mime data
   QVector<QPair<QString, QByteArray>> items;
+
+  // get the mime data
   const auto mimeData = m_clipboard->mimeData(QClipboard::Mode::Clipboard);
 
   // if mime data is not supported

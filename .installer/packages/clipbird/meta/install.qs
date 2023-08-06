@@ -29,14 +29,18 @@ Component.prototype.createOperations = function () {
       "@TargetDir@/clipbird.exe",
       appData + "/Microsoft/Windows/Start Menu/Programs/Startup/ClipBird.lnk",
       "workingDirectory=@TargetDir@",
-      "iconPath=@TargetDir@/logo.png"
+      "iconPath=@TargetDir@/logo.png",
+      "IconId=0",
+      "description=ClipBird"
     );
 
     // if system is x64 install vc_redist.x64
     if (systemInfo.currentCpuArchitecture === "x86_64") {
       component.addOperation("Execute",
-        "@TargetDir@/vcredist_x64.exe",
-        "/q",
+        "@TargetDir@/vc_redist.x64.exe",
+        "/install",
+        "/quiet",
+        "/norestart",
         "wait"
       );
     }
@@ -44,8 +48,10 @@ Component.prototype.createOperations = function () {
     // if system is x86 install vc_redist.x86
     if (systemInfo.currentCpuArchitecture === "x86") {
       component.addOperation("Execute",
-        "@TargetDir@/vcredist_x86.exe",
-        "/q",
+        "@TargetDir@/vc_redist.x86.exe",
+        "/install",
+        "/quiet",
+        "/norestart",
         "wait"
       );
     }
@@ -55,7 +61,9 @@ Component.prototype.createOperations = function () {
       "@TargetDir@/clipbird.exe",
       "@StartMenuDir@/ClipBird.lnk",
       "workingDirectory=@TargetDir@",
-      "iconPath=@TargetDir@/logo.png"
+      "iconPath=@TargetDir@/logo.png",
+      "IconId=0",
+      "description=ClipBird"
     );
   }
 }

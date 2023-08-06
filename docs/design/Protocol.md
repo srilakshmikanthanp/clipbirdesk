@@ -29,9 +29,11 @@ Clipbird uses TLS over TCP to ensure secure communication between devices. TLS p
 
 ## Packet Types
 
-Clipbird utilizes a variety of packet types for different purposes. These packet types include the broadcast packet, clipbird packet, and others, each serving a specific function within the application. Below, we provide a detailed description of each packet type and its intended usage in Clipbird.
+Clipbird utilizes a variety of packet types for different purposes. These packet types include the clipbird packet, and others, each serving a specific function within the application. Below, we provide a detailed description of each packet type and its intended usage in Clipbird.
 
 ### What are the packets Required for Clipbird
+
+First we need to Send the authenticate Response to connecting client it can be either success or failure to accomplish this we are going to use **Authentication** Packet.
 
 Once the server has been identified, clipboard data is transmitted between the client and the server using a single type of packet known as the **SyncingPacket**. This packet is responsible for transferring clipboard data from the client to the server and vice versa, ensuring seamless sharing of clipboard content between the two devices.
 

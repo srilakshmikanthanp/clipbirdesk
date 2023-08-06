@@ -38,26 +38,6 @@ windeployqt ./build/Release/clipbird.exe --dir $ClipbirDir --release
 Write-Host "Copying ./build/Release/clipbird.exe to $ClipbirDir" -ForegroundColor Green
 Copy-Item ./build/Release/clipbird.exe $ClipbirDir
 
-#-------------------------- bonjour package --------------------------#
-
-# Bonjour Package data directory
-$BonjourDir = "./.installer/packages/bonjour/data"
-
-# clean the package directory items except .gitignore
-Write-Host "Cleaning the package directory $BonjourDir" -ForegroundColor Green
-Remove-Item -Recurse -Force $BonjourDir/* -Exclude .gitignore
-
-# copy the bonjour installer to the package if x64
-if ($env:PROCESSOR_ARCHITECTURE -eq "AMD64") {
-  $bonjour_installer = "bonjour64.msi"
-} else {
-  $bonjour_installer = "bonjour.msi"
-}
-
-# copy the bonjour installer to the package x86
-Write-Host "Copying $bonjour_installer to $BonjourDir" -ForegroundColor Green
-Copy-Item "$env:BONJOUR_SDK_HOME/Installer/$bonjour_installer" $BonjourDir
-
 #------------------ qt installer framework -----------------------#
 
 # Config file for qt installer framework

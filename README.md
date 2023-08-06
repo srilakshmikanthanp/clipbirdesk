@@ -69,14 +69,14 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Clipbird Software Helps you to sync your clipboard data between devices connected to a local network. It is a cross-platform software that works on various platforms. It is free and open-source software that is licensed under the MIT License.
+Clipbird Software Helps you to sync your clipboard data between devices connected to a local network. It is a cross-platform software that works on various platforms. It is free and open-source software that is licensed under the MIT License. It currently supports
+
+* Windows
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
-* Extra Cmake Modules
-* KDNSSD
 * Bonjour
 * C++
 * Qt6
@@ -89,47 +89,32 @@ Clipbird Software Helps you to sync your clipboard data between devices connecte
 
 Clipbird is in the development stage if the project succeeds in the future, we will release the binaries to use. However, you can build the project from the source.
 
+### Installing Clipbird on a Windows Platform
+
+In the following steps, we will see how to install clipbird in the Windows platform.
+
+#### Installing Bonjour
+
+Just go to [bonjour](https://developer.apple.com/bonjour/) and downlod the bonjour SDK for windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
+
+#### Installing Clipbird
+
+Just go to Github Release and choose the suitable version for your system and download it. Then install it in your system.
+
 ### Building Clipbird on a Windows Platform
 
 In the following steps, we will see how to build the project in the Windows platform, We use choco to install the dependencies in the Windows platform. If you don't have choco installed in your system, you can install it from [here](https://chocolatey.org/install).
 
 #### Prerequisites
 
-* Extra Cmake Modules
-* KGuiAddons
 * Bonjour
 * C++
 * Qt6
 * OpenSSL
 
-
 #### Installing Qt6
 
 Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for windows, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
-
-#### Installing ECM
-
-Run the following commands to install ECM, and set the environment variable `ECM_DIR` to the ECM cmake directory.
-
-~~~sh
-git clone https://invent.kde.org/frameworks/extra-cmake-modules.git
-cd extra-cmake-modules
-git checkout 380397587ebc6206034ab3f9fb9bd94c028dfadb
-mkdir build && cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=C:/kderoot -DCMAKE_BUILD_TYPE=Release -DQT_MAJOR_VERSION=6 -DCMAKE_PREFIX_PATH=%QT_CMAKE_DIR% -S .. -B .
-msbuild ECM.sln && msbuild INSTALL.vcxproj
-~~~
-
-#### Installing KGUiAddons
-
-~~~sh
-git clone https://invent.kde.org/frameworks/kguiaddons.git
-cd kguiaddons
-git checkout af1733445dae3cbe8d9abdeb64ce975ac5b96ffb
-mkdir build && cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=C:/kderoot -DCMAKE_BUILD_TYPE=Release -DQT_MAJOR_VERSION=6 -DCMAKE_PREFIX_PATH=%QT_CMAKE_DIR% -S .. -B .
-msbuild KGuiAddons.sln && msbuild INSTALL.vcxproj
-~~~
 
 #### Installing Bonjour
 
@@ -148,89 +133,8 @@ choco install openssl
 | Variable            | Value                           |
 |---------------------|---------------------------------|
 | `OPENSSL_DIR`       | OpenSSL installation directory  |
-| `ECM_DIR`           | Extra Cmake Modules directory   |
-| `KGUIADDONS_DIR`    | KGuiAddons cmake directory      |
 | `QT_CMAKE_DIR`      | Qt6 cmake directory             |
 | `BONJOUR_SDK_HOME`  | Bonjour SDK directory           |
-
-### Building Clipbird on a Linux Platform
-
-In the following steps, we will see how to build the project in the Linux platform, We use apt to install the dependencies in the Linux platform.
-
-#### Prerequisites
-
-* Extra Cmake Modules
-* Avahi
-* KGuiAddons
-* KDNSSD
-* C++
-* Qt6
-* OpenSSL
-
-#### Installing Qt6
-
-Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for windows, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
-
-#### Installing Avahi
-
-~~~sh
-sudo apt install libavahi-core-dev 
-~~~
-
-#### Installing ECM
-
-Run the following commands to install ECM, and set the environment variable `ECM_DIR` to the ECM cmake directory.
-
-~~~sh
-git clone https://invent.kde.org/frameworks/extra-cmake-modules.git
-cd extra-cmake-modules
-git checkout 380397587ebc6206034ab3f9fb9bd94c028dfadb
-mkdir build && cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.kderoot -DCMAKE_BUILD_TYPE=Release -DQT_MAJOR_VERSION=6 -DCMAKE_PREFIX_PATH=$QT_CMAKE_DIR -S .. -B .
-make && make install
-~~~
-
-#### Installing KDNSSD
-
-Run the following commands to install KDNSSD, set the environment variable `KDNSSD_DIR` to the KDNSSD cmake directory and add the KDNSSD library to the `LD_LIBRARY_PATH` environment variable.
-
-~~~sh
-git clone https://invent.kde.org/frameworks/kdnssd.git
-cd kdnssd
-git checkout 39c7501c997cf14e84bc3693969fe6787a2ce5f4
-mkdir build && cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.kderoot -DCMAKE_BUILD_TYPE=Release -DQT_MAJOR_VERSION=6 -DCMAKE_PREFIX_PATH=$QT_CMAKE_DIR -S .. -B .
-make && make install
-~~~
-
-#### Installing KGUiAddons
-
-~~~sh
-git clone https://invent.kde.org/frameworks/kguiaddons.git
-cd kguiaddons
-git checkout af1733445dae3cbe8d9abdeb64ce975ac5b96ffb
-mkdir build && cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=C:/kderoot -DCMAKE_BUILD_TYPE=Release -DQT_MAJOR_VERSION=6 -DCMAKE_PREFIX_PATH=%QT_CMAKE_DIR% -S .. -B .
-make && make install
-~~~
-
-#### Installing OpenSSL
-
-Install OpenSSL using the following command and set the environment variable `OPENSSL_DIR` to the OpenSSL installation directory.
-
-~~~sh
-sudo apt install libssl-dev
-~~~
-
-#### Environment Variables
-
-| Variable            | Value                           |
-|---------------------|---------------------------------|
-| `OPENSSL_DIR`       | OpenSSL installation directory  |
-| `ECM_DIR`           | Extra Cmake Modules directory   |
-| `KDNSSD_DIR`        | KDNSSD cmake directory          |
-| `KGUIADDONS_DIR`    | KGuiAddons cmake directory      |
-| `QT_CMAKE_DIR`      | Qt6 cmake directory             |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -279,9 +183,7 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 * [OpenSSL](https://www.openssl.org/)
 * [Qt](https://www.qt.io/)
 * [C++](https://www.cplusplus.com/)
-* [KDNSSD](https://api.kde.org/frameworks/kdnssd/html/index.html)
 * [Bonjour](https://developer.apple.com/bonjour/)
-* [ECM](https://api.kde.org/ecm/)
 
 <!-- Contributors -->
 ## Contributors

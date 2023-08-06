@@ -13,14 +13,8 @@
 #define mDNSRegister srilakshmikanthanp::clipbirdesk::network::service::dnsd::Register
 #define mDNSBrowser  srilakshmikanthanp::clipbirdesk::network::service::dnsd::Browser
 
-#endif
+#else // any other platforms
 
-#ifdef __linux__ // for linux using avahi
-
-#include "network/service/avahi/browser/browser.hpp"
-#include "network/service/avahi/register/register.hpp"
-
-#define mDNSRegister srilakshmikanthanp::clipbirdesk::network::service::avahi::Register
-#define mDNSBrowser  srilakshmikanthanp::clipbirdesk::network::service::avahi::Browser
+#Error "Currently We don't Support Any platform other than Apple and windows"
 
 #endif
