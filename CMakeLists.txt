@@ -31,23 +31,11 @@ set(APPLICATION_LOGO_PATH ":/images/logo.png")
 # Set the BBONJOUR_DIR from env
 set(BONJOUR_SDK_HOME $ENV{BONJOUR_SDK_HOME})
 
-# set KF major version
-set(KF_MAJOR_VERSION 6)
-
 # Set Qt version
 set(QT_MAJOR_VERSION 6)
 
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
-
-# Append ECM cmake dir to CMAKE_PREFIX_PATH
-list(APPEND CMAKE_PREFIX_PATH $ENV{ECM_DIR})
-
-# Append QGUIADDONS_DIR cmake dir to CMAKE_PREFIX_PATH
-list(APPEND CMAKE_PREFIX_PATH $ENV{QGUIADDONS_DIR})
-
-# Append KDNSSD_DIR cmake dir to CMAKE_PREFIX_PATH
-list(APPEND CMAKE_PREFIX_PATH $ENV{KDNSSD_DIR})
 
 # --------------------------------- Main Project ---------------------------------#
 # Fetch SingleApplication from github
@@ -69,13 +57,8 @@ FetchContent_MakeAvailable(SingleApplication)
 file(GLOB_RECURSE main_cpp *.cpp)
 
 # Add network/service/avahi if the os is linux
-if(UNIX AND NOT APPLE)
+if(NOT WIN32 AND NOT APPLE)
   list(FILTER main_cpp EXCLUDE REGEX "network/service/dnsd")
-endif()
-
-# Add network/service/dnsd if windows or mac
-if(WIN32 OR APPLE)
-  list(FILTER main_cpp EXCLUDE REGEX "network/service/avahi")
 endif()
 
 # remove tests folder from list
@@ -89,16 +72,8 @@ find_package(Qt6 REQUIRED COMPONENTS
   Widgets
   Network)
 
-# find QGuiAddons
-find_package(KF${KF_MAJOR_VERSION}GuiAddons)
-
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
-
-# Find KF5DNSSD with avahi if os is linux
-if(UNIX AND NOT APPLE)
-  find_package(KF${KF_MAJOR_VERSION}DNSSD REQUIRED)
-endif()
 
 # Find Bonjour on windows and mac
 if(WIN32 OR APPLE)
@@ -127,14 +102,7 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
-  PRIVATE OpenSSL::Crypto
-  PRIVATE KF${KF_MAJOR_VERSION}::GuiAddons)
-
-# link kdnssd & avahi in linux based system
-if(UNIX AND NOT APPLE)
-  target_link_libraries(clipbird
-    PRIVATE KF${KF_MAJOR_VERSION}::DNSSD)
-endif()
+  PRIVATE OpenSSL::Crypto)
 
 # link bonjour if windows or Mac
 if(WIN32 OR APPLE)
