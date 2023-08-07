@@ -214,13 +214,13 @@ Browser::Browser(QObject* parent) : interfaces::ImDNSBrowser(parent) {
 void Browser::startBrowsing() {
   // Start to browse for the service
   auto errorType = DNSServiceBrowse(
-      &this->m_browse_ref,                      // DNSServiceRef
-      0,                                        // DNSServiceFlags
-      kDNSServiceInterfaceIndexAny,             // InterfaceIndex
-      constants::getMDnsServiceType().c_str(),  // regtype
-      NULL,                                     // domain
-      browseCallback,                           // callback
-      this                                      // context
+      &this->m_browse_ref,                           // DNSServiceRef
+      0,                                             // DNSServiceFlags
+      kDNSServiceInterfaceIndexAny,                  // InterfaceIndex
+      constants::getMDnsServiceType().c_str(),       // regtype
+      NULL,                                          // domain
+      browseCallback,                                // callback
+      this                                           // context
   );
 
   // check for error
@@ -231,9 +231,9 @@ void Browser::startBrowsing() {
 
   // create socket notifier
   this->m_browse_notify = new QSocketNotifier(
-      DNSServiceRefSockFD(this->m_browse_ref),  // socket
-      QSocketNotifier::Read,                    // type
-      this                                      // parent
+      DNSServiceRefSockFD(this->m_browse_ref),       // socket
+      QSocketNotifier::Read,                         // type
+      this                                           // parent
   );
 
   // process register socket
