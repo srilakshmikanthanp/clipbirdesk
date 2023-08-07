@@ -52,7 +52,13 @@ std::string getAppLogo();
  * @brief Get the Application QSS File
  * @return std::string
  */
-std::string getAppQSS();
+std::string getAppQSSLight();
+
+/**
+ * @brief Get the Application QSS File
+ * @return std::string
+ */
+std::string getAppQSSDark();
 
 /**
  * @brief Get App Home Directory

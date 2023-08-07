@@ -8,25 +8,25 @@
 /*********************** Common to All ************************/
 
 QFrame, QWidget {
-  background: #1e1e2c;
-  color: #ffffff;
+  background: #FFFFFF;
+  color: #0000;
   font-family: sans-serif;
-  font-weight: 800;
   margin: 2px 0px 2px 0px;
+  font-weight: 500;
 }
 
 QFrame {
-  background: #1e1e2c;
+  background: #FFFFFF;
   border-radius: 8px;
 }
 
 QLabel {
-  color: #ffffff;
+  color: #0000;
 }
 
 QPushButton {
-  background-color: #2a2a3b;
-  color: #ffffff;
+  background-color: #f8f8f8;
+  color: #0000;
   border: none;
   border-radius: 5px;
   padding: 6px;
@@ -34,10 +34,11 @@ QPushButton {
 
 QPushButton:hover {
   background-color: #0277fa;
+  color: #FFFFFF;
 }
 
 QTabWidget::pane {
-  background-color: #1e1e2c;
+  background-color: #FFFFFF;
   border: none;
   margin: 0px;
   padding: 0px;
@@ -48,20 +49,20 @@ QTabWidget::tab-bar {
 }
 
 QTabBar::tab {
-  background-color: #2a2a3b;
-  color: #ffffff;
+  border-bottom: 3px solid #FFFFFF;
+  color: #0000;
   border: none;
-  border-radius: 5px;
   padding: 6px;
   margin: 2px;
+  background-color: #FFFFFF;
 }
 
 QTabBar::tab:selected {
-  background-color: #0277fa;
+  border-bottom: 3px solid #0277fa;
 }
 
 QTabBar::tab:hover {
-  background-color: #0277fa;
+  border-bottom: 3px solid #0277fa;
 }
 
 QScrollArea {
@@ -70,14 +71,14 @@ QScrollArea {
 }
 
 QScrollBar:vertical {
-  background: #1e1e2c;
+  background: #FFFFFF;
   border: none;
   width: 10px;
   margin: 0px;
 }
 
 QScrollBar::handle:vertical {
-  background: #2a2a3b;
+  background: #858585;
   border-radius: 5px;
 }
 
@@ -97,27 +98,30 @@ QScrollBar::sub-page:vertical {
 }
 
 QMenu {
-  background-color: #1e1e2c;
+  background-color: #FFFFFF;
   border: none;
   border-radius: 5px;
   padding: 6px;
   margin: 2px;
+  border-radius: 10px;
 }
 
 QMenu::item {
-  background-color: #1e1e2c;
-  color: #ffffff;
+  background-color: #FFFFFF;
+  color: #0000;
   border: none;
   border-radius: 5px;
   padding: 6px;
   margin: 2px;
+  width: 80px;
 }
 
 QMenu::item:selected {
   background-color: #0277fa;
+  color: #FFFFFF;
 }
 
 QMenu::item:disabled {
-  background-color: #2a2a3b;
-  color: #ffffff;
+  background-color: #FFFFFF;
+  color: gray;
 }

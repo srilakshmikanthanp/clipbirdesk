@@ -1,0 +1,127 @@
+/**
+ * Copyright (c) 2023 Sri Lakshmi Kanthan P
+ *
+ * This software is released under the MIT License.
+ * https://opensource.org/licenses/MIT
+ */
+
+/*********************** Common to All ************************/
+
+QFrame, QWidget {
+  background: #191919;
+  color: #FFFFFF;
+  font-family: sans-serif;
+  margin: 2px 0px 2px 0px;
+  font-weight: 500;
+}
+
+QFrame {
+  background: #191919;
+  border-radius: 8px;
+}
+
+QLabel {
+  color: #0000;
+}
+
+QPushButton {
+  background-color: #2c2c2c;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 5px;
+  padding: 6px;
+}
+
+QPushButton:hover {
+  background-color: #0277fa;
+  color: #FFFFFF;
+}
+
+QTabWidget::pane {
+  background-color: #191919;
+  border: none;
+  margin: 0px;
+  padding: 0px;
+}
+
+QTabWidget::tab-bar {
+  alignment: center;
+}
+
+QTabBar::tab {
+  border-bottom: 3px solid #191919;
+  color: #0000;
+  border: none;
+  padding: 6px;
+  margin: 2px;
+  background-color: #191919;
+}
+
+QTabBar::tab:selected {
+  border-bottom: 3px solid #0277fa;
+}
+
+QTabBar::tab:hover {
+  border-bottom: 3px solid #0277fa;
+}
+
+QScrollArea {
+  padding: 0px;
+  border: none;
+}
+
+QScrollBar:vertical {
+  background: #191919;
+  border: none;
+  width: 10px;
+  margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+  background: #959595;
+  border-radius: 5px;
+}
+
+QScrollBar::add-line:vertical {
+  height: 0px;
+}
+
+QScrollBar::sub-line:vertical {
+  height: 0px;
+}
+
+QScrollBar::up-arrow:vertical,
+QScrollBar::down-arrow:vertical,
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+  background: none;
+}
+
+QMenu {
+  background-color: #191919;
+  border: none;
+  border-radius: 5px;
+  padding: 6px;
+  margin: 2px;
+  border-radius: 10px;
+}
+
+QMenu::item {
+  background-color: #191919;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 5px;
+  padding: 6px;
+  margin: 2px;
+  width: 80px;
+}
+
+QMenu::item:selected {
+  background-color: #0277fa;
+  color: #FFFFFF;
+}
+
+QMenu::item:disabled {
+  background-color: #191919;
+  color: gray;
+}

@@ -6,8 +6,10 @@
 // https://opensource.org/licenses/MIT
 
 #include <QFormLayout>
+#include <QStyleOption>
 #include <QPair>
 #include <QWidget>
+#include <QPaintEvent>
 #include <QLabel>
 
 #include "ui/gui/components/status/status.hpp"

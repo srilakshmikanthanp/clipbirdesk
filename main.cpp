@@ -6,6 +6,7 @@
 // Qt Headers
 #include <QDesktopServices>
 #include <QFile>
+#include <QStyleHints>
 #include <QGraphicsDropShadowEffect>
 #include <QMessageBox>
 #include <QSystemTrayIcon>
@@ -89,6 +90,26 @@ class ClipbirdApplication : public SingleApplication {
     }
   }
 
+  /**
+   * @brief Set the Qss File
+   */
+  void setQssFile(Qt::ColorScheme scheme) {
+    // detect system theme is dark or light
+    bool isDark = scheme == Qt::ColorScheme::Dark;
+
+    // qss
+    std::string qss = isDark ? constants::getAppQSSDark() : constants::getAppQSSLight();
+
+    // QFile to read the qss file
+    QFile qssFile(QString::fromStdString(qss));
+
+    // open the qss file
+    qssFile.open(QFile::ReadOnly);
+
+    // set the style sheet
+    qApp->setStyleSheet(qssFile.readAll());
+  }
+
  public:  // Constructors and Destructors
 
   /**
@@ -110,20 +131,13 @@ class ClipbirdApplication : public SingleApplication {
     signal(SIGINT, [](int sig) { qApp->quit(); });
     signal(SIGABRT, [](int sig) { qApp->quit(); });
 
-    // clang-format off
-    #ifdef Q_OS_LINUX
-    signal(SIGKILL, [](int sig) { qApp->quit(); });
-    #endif
-    // clang-format on
+    // set initial theme
+    setQssFile(QGuiApplication::styleHints()->colorScheme());
 
-    // QFile to read the qss file
-    QFile qssFile(QString::fromStdString(constants::getAppQSS()));
-
-    // open the qss file
-    qssFile.open(QFile::ReadOnly);
-
-    // set the style sheet
-    qApp->setStyleSheet(qssFile.readAll());
+    // detect the system theme
+    const auto signal = &QStyleHints::colorSchemeChanged;
+    const auto slot   = &ClipbirdApplication::setQssFile;
+    QObject::connect(QGuiApplication::styleHints(), signal, this, slot);
 
     // set not to quit on last content closed
     qApp->setQuitOnLastWindowClosed(false);
@@ -133,7 +147,7 @@ class ClipbirdApplication : public SingleApplication {
 
     // set the shadow Properties
     shadow->setBlurRadius(10);
-    shadow->setOffset(3, 3);
+    shadow->setOffset(5, 5);
     shadow->setColor(QColor(0, 0, 0, 100));
 
     // set the shadow to content

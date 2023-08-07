@@ -6,24 +6,27 @@
 // https://opensource.org/licenses/MIT
 
 // Application Version
-#define CLIPBIRDESK_VERSION_MAJOR "@clipbirdesk_VERSION_MAJOR@"
-#define CLIPBIRDESK_VERSION_MINOR "@clipbirdesk_VERSION_MINOR@"
-#define CLIPBIRDESK_VERSION_PATCH "@clipbirdesk_VERSION_PATCH@"
+#define CLIPBIRDESK_VERSION_MAJOR  "@clipbirdesk_VERSION_MAJOR@"
+#define CLIPBIRDESK_VERSION_MINOR  "@clipbirdesk_VERSION_MINOR@"
+#define CLIPBIRDESK_VERSION_PATCH  "@clipbirdesk_VERSION_PATCH@"
 
 // Application Name
-#define CLIPBIRDESK_NAME          "@CMAKE_PROJECT_NAME@"
+#define CLIPBIRDESK_NAME           "@CMAKE_PROJECT_NAME@"
 
 // Application main.qss file
-#define CLIPBIRDESK_QSS           "@APPLICATION_MAIN_QSS_PATH@"
+#define APPLICATION_LIGHT_QSS_PATH "@APPLICATION_LIGHT_QSS_PATH@"
+
+// Application main.qss file
+#define APPLICATION_DARK_QSS_PATH  "@APPLICATION_DARK_QSS_PATH@"
 
 // Application Logo
-#define CLIPBIRDESK_LOGO          "@APPLICATION_LOGO_PATH@"
+#define CLIPBIRDESK_LOGO           "@APPLICATION_LOGO_PATH@"
 
 // Application Home page
-#define CLIPBIRDESK_HOMEPAGE      "@APPLICATION_HOMEPAGE@"
+#define CLIPBIRDESK_HOMEPAGE       "@APPLICATION_HOMEPAGE@"
 
 // Application Issue page
-#define CLIPBIRDESK_ISSUEPAGE     "@APPLICATION_ISSUEPAGE@"
+#define CLIPBIRDESK_ISSUEPAGE      "@APPLICATION_ISSUEPAGE@"
 
 // Log statement for debug
-#define LOG(msg)                  (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " " + msg).c_str()
+#define LOG(msg)                   (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " " + msg).c_str()

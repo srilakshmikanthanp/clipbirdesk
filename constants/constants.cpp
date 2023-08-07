@@ -52,8 +52,16 @@ std::string getAppLogo() {
  * @brief Get the Application QSS File
  * @return std::string
  */
-std::string getAppQSS() {
-  return std::string(CLIPBIRDESK_QSS);
+std::string getAppQSSLight() {
+  return std::string(APPLICATION_LIGHT_QSS_PATH);
+}
+
+/**
+ * @brief Get the Application QSS File
+ * @return std::string
+ */
+std::string getAppQSSDark() {
+  return std::string(APPLICATION_DARK_QSS_PATH);
 }
 
 /**
@@ -76,7 +84,7 @@ std::string getAppLogFile() {
  * @return QSize
  */
 QSize getAppWindowSize() {
-  return QSize(400, 450);
+  return QSize(380, 400);
 }
 
 /**

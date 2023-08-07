@@ -39,7 +39,7 @@ Component.prototype.createOperations = function () {
       component.addOperation("Execute",
         "@TargetDir@/vc_redist.x64.exe",
         "/install",
-        "/quiet",
+        "/passive",
         "/norestart",
         "wait"
       );
@@ -50,7 +50,7 @@ Component.prototype.createOperations = function () {
       component.addOperation("Execute",
         "@TargetDir@/vc_redist.x86.exe",
         "/install",
-        "/quiet",
+        "/passive",
         "/norestart",
         "wait"
       );

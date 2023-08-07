@@ -87,7 +87,7 @@ class Content : public QFrame {
   static constexpr const char* const s_hostNameKey = "Hostname";
   static constexpr const char* const s_ipPortKey   = "Ipv4";
   static constexpr const char* const s_clientsKey  = "Clients";
-  static constexpr const char* const s_tabTitle    = "Server";
+  static constexpr const char* const s_tabTitle    = "Create Group";
 
  private:  // constant for keys (Client)
 
@@ -95,7 +95,7 @@ class Content : public QFrame {
   static constexpr const char* const c_hostNameKey = "HostName";
   static constexpr const char* const c_ipPortKey   = "Ipv4";
   static constexpr const char* const c_serversKey  = "Servers";
-  static constexpr const char* const c_tabTitle    = "Client";
+  static constexpr const char* const c_tabTitle    = "Join Group";
 
  private:  // private slots
 

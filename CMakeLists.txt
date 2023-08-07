@@ -22,8 +22,11 @@ set(APPLICATION_ISSUEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk/iss
 # Set the APPLICATION_HOMEPAGE
 set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
 
-# set the main.qss path variable
-set(APPLICATION_MAIN_QSS_PATH ":/styles/main.qss")
+# set the main.qss path variable (Light)
+set(APPLICATION_LIGHT_QSS_PATH ":/styles/light.qss")
+
+# set the main.qss path variable (Dark)
+set(APPLICATION_DARK_QSS_PATH ":/styles/dark.qss")
 
 # Set the logo.png path variable
 set(APPLICATION_LOGO_PATH ":/images/logo.png")

@@ -11,6 +11,9 @@
     <file>images/logo.png</file>
   </qresource>
   <qresource>
-    <file>styles/main.qss</file>
+    <file>styles/light.qss</file>
+  </qresource>
+  <qresource>
+    <file>styles/dark.qss</file>
   </qresource>
 </RCC>
