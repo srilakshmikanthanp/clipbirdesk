@@ -4,7 +4,7 @@
 #   BONJOUR_INCLUDE_DIR   - the bonjour include directory
 #   BONJOUR_LIBRARIES     - the libraries needed to use bonjour
 # You need to pass the following variables to cmake:
-#   BONJOUR_SDK_HOME           - the root directory of bonjour
+#   BONJOUR_SDK_HOME      - the root directory of bonjour
 
 # try to find dns_sd.h with path hind as BONJOUR_SDK_HOME/include
 find_path(BONJOUR_INCLUDE_DIR dns_sd.h

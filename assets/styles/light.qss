@@ -113,7 +113,7 @@ QMenu::item {
   border-radius: 5px;
   padding: 6px;
   margin: 2px;
-  width: 80px;
+  width: 60px;
 }
 
 QMenu::item:selected {
