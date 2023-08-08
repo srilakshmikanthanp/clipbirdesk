@@ -5,3 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
+# clipbird docs
+
+This is documentations folder for clipbird, to learn more about the clipbird designs see [design](design] Directory
+

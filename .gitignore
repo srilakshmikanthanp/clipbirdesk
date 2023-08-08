@@ -3,10 +3,7 @@
 CMakeFiles
 build
 
-# kdetools install
-# ----------------
-.kdetools
-
-# .vs
+# visual studio
 #-----------------
 .vs
+out

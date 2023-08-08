@@ -6,7 +6,6 @@
  */
 
 #include "clipboard.hpp"
-#include <iostream>
 
 namespace srilakshmikanthanp::clipbirdesk::clipboard {
 /**
