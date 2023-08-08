@@ -6,3 +6,7 @@ build
 # kdetools install
 # ----------------
 .kdetools
+
+# .vs
+#-----------------
+.vs
