@@ -134,11 +134,6 @@ class ClipbirdApplication : public SingleApplication {
     // set initial theme
     setQssFile(QGuiApplication::styleHints()->colorScheme());
 
-    // detect the system theme
-    const auto signal = &QStyleHints::colorSchemeChanged;
-    const auto slot   = &ClipbirdApplication::setQssFile;
-    QObject::connect(QGuiApplication::styleHints(), signal, this, slot);
-
     // set not to quit on last content closed
     qApp->setQuitOnLastWindowClosed(false);
 
@@ -205,6 +200,11 @@ class ClipbirdApplication : public SingleApplication {
     const auto signal_is = &SingleApplication::instanceStarted;
     const auto slot_is   = &Content::show;
     QObject::connect(this, signal_is, window, slot_is);
+
+    // detect the system theme
+    const auto signal = &QStyleHints::colorSchemeChanged;
+    const auto slot   = &ClipbirdApplication::setQssFile;
+    QObject::connect(QGuiApplication::styleHints(), signal, this, slot);
 
     // set the signal for error occurred
     const auto signal_eo = &controller::ClipBird::OnErrorOccurred;
