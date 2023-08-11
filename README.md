@@ -85,7 +85,7 @@ Clipbird Software helps you to sync your clipboard data between devices connecte
 <!-- GETTING STARTED -->
 ## Getting Started
 
-To Install Clipbird on your system, you can either download the installer from the [release](github.com/srilakshmikanthanp/clipbirdesk/releases) or build it from the source. The following steps will guide you through the installation process.
+To Install Clipbird on your system, you can either download the installer from the release or build it from the source. The following steps will guide you through the installation process.
 
 ### Installing Clipbird on a Windows Platform
 
