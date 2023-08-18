@@ -370,8 +370,8 @@ void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
 }
 
 /**
- * @brief
- *
+ * @brief On server removed function that That Called by the
+ * discovery client when the server is removed
  */
 void Client::onServiceRemoved(QPair<QHostAddress, quint16> server) {
   // emit the signal for server gone event

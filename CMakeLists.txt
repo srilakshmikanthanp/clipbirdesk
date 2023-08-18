@@ -56,6 +56,15 @@ set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleAp
 # Make Available SingleApplication
 FetchContent_MakeAvailable(SingleApplication)
 
+# Fetch jwt-cpp from github
+FetchContent_Declare(jwt-cpp
+  GIT_REPOSITORY https://github.com/Thalhammer/jwt-cpp.git
+  GIT_TAG        v0.6.0
+)
+
+# Make Available jwt-cpp
+FetchContent_MakeAvailable(jwt-cpp)
+
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
 
@@ -105,7 +114,8 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
-  PRIVATE OpenSSL::Crypto)
+  PRIVATE OpenSSL::Crypto
+  PRIVATE jwt-cpp)
 
 # link bonjour if windows or Mac
 if(WIN32 OR APPLE)

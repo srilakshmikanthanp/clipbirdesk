@@ -31,13 +31,13 @@ Clipbird uses TLS over TCP to ensure secure communication between devices. TLS p
 
 Clipbird supports automatic reconnection between already connected devices. Clipbird Achieve this by utilizing JWT token for authentication. When a client connects to the server, the client need to pass JWT token to the server. The following cases are possible.
 
-### Case 1: FirstConnect
+### Case 1: OnConnect
 
-Upon FirstConnect the client has to sent an JWT token to the server. So server can store it for future use. Then Server will Send the Authentication packet with JWT token to authenticate the client later on Reconnect.
+Upon First Connect the client has to sent an JWT token to the server. So server can store it for future use. Then Server will Send the Authentication packet with JWT token to authenticate the client later on Reconnect.
 
 ### Case 2: Reconnect
 
-Upon Reconnect the client has to sent an valid JWT token sent by server on FirstConnect so Server will accept Request without user intervention. Then Server will send the Authentication packet with JWT token sent by client on FirstConnect to authenticate the server itself.
+Upon Reconnect the client has to sent an valid JWT token sent by server on First Connect so Server will accept Request without user intervention. Then Server will send the Authentication packet with JWT token sent by client on FirstConnect to authenticate the server itself.
 
 Note, the server need to send the Authentication packet with JWT token after FirstConnect or Reconnect. If the server does not send the Authentication packet with JWT token to the client in specified time then client can disconnect the connection.
 
@@ -99,9 +99,9 @@ The **Authentication** is used to indicate the authentication process to the cli
 #### Body
 
 - **AuthType**: This field specifies the status of the authentication process. it can be one of the following values.
-  - 0x00: FirstConnect
+  - 0x00: OnConnect
   - 0x01: Reconnect
-  - 0x02: FirstConnectResp
+  - 0x02: OnConnectResp
   - 0x03: ReconnectResp
 - **Token Length**: This field specifies the length of the JWT token.
 - **Token**: This field contains the auth token.
