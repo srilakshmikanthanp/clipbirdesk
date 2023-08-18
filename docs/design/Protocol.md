@@ -27,7 +27,7 @@ Clipbird utilizes the TCP/IP protocol for reliable communication between devices
 
 Clipbird uses TLS over TCP to ensure secure communication between devices. TLS provides end-to-end encryption, preventing unauthorized access to the data being transmitted. This security mechanism ensures that the clipboard content is protected from malicious attacks and other security threats, allowing for safe and secure clipboard synchronization across devices. By utilizing TLS over TCP, Clipbird guarantees that the clipboard data is transmitted securely and reliably, enhancing the overall user experience.
 
-## Auto Reconnect
+## Connection
 
 Clipbird supports automatic reconnection between already connected devices. Clipbird Achieve this by utilizing JWT token for authentication. When a client connects to the server, the client need to pass JWT token to the server. The following cases are possible.
 
