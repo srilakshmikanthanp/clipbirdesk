@@ -46,14 +46,6 @@ class ClipBird : public QObject {
   /// @brief On Error Occurred (General)
   void OnErrorOccurred(QString error);
 
- signals:  // signals for this class
-  /// @brief On Clipboard Sent (General)
-  void OnClipboardSent();
-
-signals:  // signals for this class
-  /// @brief On Clipboard Recv (General)
-  void OnClipboardRecv();
-
   //----------------------- server Signals ------------------------//
 
  signals:  // signals

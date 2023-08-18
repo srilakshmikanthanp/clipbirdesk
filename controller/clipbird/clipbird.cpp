@@ -21,12 +21,10 @@ void ClipBird::handleServerAuthentication(bool isSuccess) {
   const auto signal = &clipboard::Clipboard::OnClipboardChange;
   auto *client      = &std::get<Client>(m_host);
   const auto slot_n = &Client::syncItems;
-  const auto slot_l = &ClipBird::OnClipboardSent;
 
   // if the client is connected then connect the signals
   if (isSuccess) {
     connect(&m_clipboard, signal, client, slot_n);
-    connect(&m_clipboard, signal, this, slot_l);
   }
 }
 
@@ -45,12 +43,10 @@ void ClipBird::handleServerStatusChanged(bool status) {
   const auto signal = &clipboard::Clipboard::OnClipboardChange;
   auto *client      = &std::get<Client>(m_host);
   const auto slot_n = &Client::syncItems;
-  const auto slot_l = &ClipBird::OnClipboardSent;
 
   // if the client is connected then connect the signals
   if (!status) {
     disconnect(&m_clipboard, signal, client, slot_n);
-    disconnect(&m_clipboard, signal, this, slot_l);
   }
 }
 
@@ -90,16 +86,12 @@ void ClipBird::setCurrentHostAsServer() {
   // Connect the onSyncRequest signal to the clipboard
   const auto signal_sr = &Server::OnSyncRequest;
   const auto slot_bs   = &clipboard::Clipboard::set;
-  const auto slot_br   = &ClipBird::OnClipboardRecv;
   connect(server, signal_sr, &m_clipboard, slot_bs);
-  connect(server, signal_sr, this, slot_br);
 
   // connect the OnClipboardChange signal to the server
   const auto signal_cc = &clipboard::Clipboard::OnClipboardChange;
   const auto slot_si   = &Server::syncItems;
-  const auto slot_cc   = &ClipBird::OnClipboardSent;
   connect(&m_clipboard, signal_cc, server, slot_si);
-  connect(&m_clipboard, signal_cc, this, slot_cc);
 
   // Connect the onErrorOccurred signal to the signal
   const auto signal_eo = &Server::OnErrorOccurred;
@@ -157,11 +149,9 @@ void ClipBird::setCurrentHostAsClient() {
   connect(client, signal_er, this, slot_er);
 
   // Connect the onSyncRequest signal to the clipboard
-  const auto slot_cr    = &ClipBird::OnClipboardRecv;
   const auto signal_rq = &Client::OnSyncRequest;
   const auto slot_rq   = &clipboard::Clipboard::set;
   connect(client, signal_rq, &m_clipboard, slot_rq);
-  connect(client, signal_rq, this, slot_cr);
 
   // Start the Discovery
   client->startBrowsing();

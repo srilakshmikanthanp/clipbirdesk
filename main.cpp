@@ -45,22 +45,6 @@ class ClipbirdApplication : public SingleApplication {
  private:  // private slots
 
   /**
-   * @brief Handle the clipboard sent
-   */
-  void handleClipboardSent() {
-    QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon::Information;
-    trayIcon->showMessage("Clipbird", "Sending", icon, 100);
-  }
-
-  /**
-   * @brief Handle the clipboard recv
-   */
-  void handleClipboardRecv() {
-    QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon::Information;
-    trayIcon->showMessage("Clipbird", "Received", icon, 100);
-  }
-
-  /**
    * @brief On About Clicked
    */
   void onAboutClicked() {
@@ -180,16 +164,6 @@ class ClipbirdApplication : public SingleApplication {
     const auto signal_qc = &ui::gui::TrayMenu::OnExitClicked;
     const auto slot_qc   = [] { qApp->quit(); };
     QObject::connect(trayMenu, signal_qc, this, slot_qc);
-
-    // set the signal for on clipboard sent
-    const auto signal_cs = &controller::ClipBird::OnClipboardSent;
-    const auto slot_cs   = &ClipbirdApplication::handleClipboardSent;
-    QObject::connect(controller, signal_cs, this, slot_cs);
-
-    // set the signal for on clipboard recv
-    const auto signal_cr = &controller::ClipBird::OnClipboardRecv;
-    const auto slot_cr   = &ClipbirdApplication::handleClipboardRecv;
-    QObject::connect(controller, signal_cr, this, slot_cr);
 
     // set activated action to show the content
     const auto signal_at = &QSystemTrayIcon::activated;
