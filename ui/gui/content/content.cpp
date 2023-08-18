@@ -32,10 +32,9 @@ void Content::handleTabChangeForClient(Tabs tab) {
   if (tab != Tabs::Client) return;  // if not client tab return
 
   // initialize the client Content
+  this->setGroupName(c_groupNameKey, "-");
   this->setStatus(c_statusKey, Status::Disconnected);
-  this->setServerHostName(c_hostNameKey, "-");
-  this->setServerIpPort(c_ipPortKey, "-");
-  this->setHostCount(c_serversKey, 0);
+  this->setHostCount(c_hostsKey, 0);
 
   // reset the device list
   this->removeAllClient();
@@ -51,10 +50,9 @@ void Content::handleTabChangeForServer(Tabs tab) {
   if (tab != Tabs::Server) return;  // if not server tab return
 
   // initialize the server Content
+  this->setGroupName(s_groupNameKey, "-");
   this->setStatus(s_statusKey, Status::Inactive);
-  this->setServerHostName(s_hostNameKey, "-");
-  this->setServerIpPort(s_ipPortKey, "-");
-  this->setHostCount(s_clientsKey, 0);
+  this->setHostCount(s_hostsKey, 0);
 
   // reset the device list
   this->removeAllServers();
@@ -81,7 +79,7 @@ void Content::handleClientListChange(QList<QPair<QHostAddress, quint16>> clients
   this->setClientList(clients_m);
 
   // set the host count
-  this->setHostCount(s_clientsKey, clients_m.size());
+  this->setHostCount(s_hostsKey, clients_m.size());
 }
 
 /**
@@ -89,9 +87,8 @@ void Content::handleClientListChange(QList<QPair<QHostAddress, quint16>> clients
  */
 void Content::handleServerStateChange(bool isStarted) {
   // infer the status from the server state
+  auto groupName  = QString("-");
   auto status_m   = isStarted ? Status::Active : Status::Inactive;
-  auto serverName = QString("-");
-  auto ipPort     = QString("-");
   auto clients    = controller->getConnectedClientsList();
 
   // if the server is started
@@ -99,15 +96,13 @@ void Content::handleServerStateChange(bool isStarted) {
     auto info  = controller->getServerInfo();
     auto ip    = info.first.toString();
     auto port  = info.second;
-    serverName = QHostInfo::fromName(ip).hostName();
-    ipPort     = QString("%1:%2").arg(ip).arg(port);
+    groupName  = QHostInfo::fromName(ip).hostName();
   }
 
   // set the server status
-  this->setServerHostName(s_hostNameKey, serverName);
+  this->setGroupName(s_groupNameKey, groupName);
   this->setStatus(s_statusKey, status_m);
-  this->setServerIpPort(s_ipPortKey, ipPort);
-  this->setHostCount(s_clientsKey, clients.size());
+  this->setHostCount(s_hostsKey, clients.size());
 
   // Create a list of tuple with Action
   QList<components::Device::Value> clients_m;
@@ -209,7 +204,7 @@ void Content::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers
   this->setServerList(servers_m);
 
   // set the host count
-  this->setHostCount(c_serversKey, servers_m.size());
+  this->setHostCount(c_hostsKey, servers_m.size());
 }
 
 /**
@@ -217,9 +212,8 @@ void Content::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers
  */
 void Content::handleServerAuthentication(bool isAuthed) {
   // infer the status from the server state
+  auto groupName  = QString("-");
   auto status_m   = isAuthed ? Status::Connected : Status::Disconnected;
-  auto ipPort     = QString("-");
-  auto serverName = QString("-");
   auto servers    = controller->getServerList();
 
   // if the client is Authed
@@ -227,15 +221,13 @@ void Content::handleServerAuthentication(bool isAuthed) {
     auto server = controller->getAuthedServer();
     auto ip     = server.first.toString();
     auto port   = server.second;
-    serverName  = QHostInfo::fromName(ip).hostName();
-    ipPort      = QString("%1:%2").arg(ip).arg(port);
+    groupName   = QHostInfo::fromName(ip).hostName();
   }
 
   // set the server status
-  this->setServerHostName(c_hostNameKey, serverName);
+  this->setGroupName(c_groupNameKey, groupName);
   this->setStatus(c_statusKey, status_m);
-  this->setServerIpPort(c_ipPortKey, ipPort);
-  this->setHostCount(c_serversKey, servers.size());
+  this->setHostCount(c_hostsKey, servers.size());
 
   // Create a list of tuple with Action
   QList<components::Device::Value> servers_m;
@@ -265,8 +257,7 @@ void Content::handleServerStatusChanged(bool status) {
 
   // if the server is disconnected
   this->setStatus(c_statusKey, Status::Disconnected);
-  this->setServerHostName(c_hostNameKey, "-");
-  this->setServerIpPort(c_ipPortKey, "-");
+  this->setGroupName(c_groupNameKey, "-");
 
   // Create a list of tuple with Action
   QList<components::Device::Value> servers_m;
@@ -433,29 +424,15 @@ QPair<QString, components::Status::Value> Content::getStatus() {
 /**
  * @brief Set the Server Name object
  */
-void Content::setServerHostName(const QString& key, const QString& val) {
-  this->deviceInfo->setServerName({key, val});
+void Content::setGroupName(const QString& key, const QString& val) {
+  this->deviceInfo->setGroupName({key, val});
 }
 
 /**
  * @brief Get the Server Name object
  */
 QPair<QString, QString> Content::getServerHostName() {
-  return this->deviceInfo->getServerName();
-}
-
-/**
- * @brief Set the Server Ip object
- */
-void Content::setServerIpPort(const QString& key, const QString& val) {
-  this->deviceInfo->setServerIpPort({key, val});
-}
-
-/**
- * @brief Get the Server Ip object
- */
-QPair<QString, QString> Content::getServerIpPort() {
-  return this->deviceInfo->getServerIpPort();
+  return this->deviceInfo->getGroupName();
 }
 
 /**

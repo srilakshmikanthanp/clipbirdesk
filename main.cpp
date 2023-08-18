@@ -126,7 +126,7 @@ class ClipbirdApplication : public SingleApplication {
 
     // set the shadow Properties
     shadow->setBlurRadius(10);
-    shadow->setOffset(5, 5);
+    shadow->setOffset(2, 2);
     shadow->setColor(QColor(0, 0, 0, 100));
 
     // set the shadow to content

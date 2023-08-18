@@ -51,7 +51,6 @@ QTabWidget::tab-bar {
 QTabBar::tab {
   border-bottom: 3px solid #FFFFFF;
   color: #0000;
-  border: none;
   padding: 6px;
   margin: 2px;
   background-color: #FFFFFF;

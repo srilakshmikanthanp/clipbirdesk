@@ -18,9 +18,8 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
 class DeviceInfo : public QWidget {
  private:  // Member Variables
 
+  QPair<QLabel*, QLabel*> groupName;
   QPair<QLabel*, components::Status*> hostStatus;
-  QPair<QLabel*, QLabel*> serverName;
-  QPair<QLabel*, QLabel*> serverIp;
   QPair<QLabel*, QLabel*> hostCount;
 
  private:  // just for Qt
@@ -51,14 +50,7 @@ class DeviceInfo : public QWidget {
    *
    * @param QPair
    */
-  void setServerName(const QPair<QString, QString>&);
-
-  /**
-   * @brief Set the Server Ip
-   *
-   * @param QPair
-   */
-  void setServerIpPort(const QPair<QString, QString>&);
+  void setGroupName(const QPair<QString, QString>&);
 
   /**
    * @brief Set the Host Count
@@ -79,14 +71,7 @@ class DeviceInfo : public QWidget {
    *
    * @return QPair
    */
-  QPair<QString, QString> getServerName() const;
-
-  /**
-   * @brief Get the Server Ip
-   *
-   * @return QPair
-   */
-  QPair<QString, QString> getServerIpPort() const;
+  QPair<QString, QString> getGroupName() const;
 
   /**
    * @brief Get the Host Count

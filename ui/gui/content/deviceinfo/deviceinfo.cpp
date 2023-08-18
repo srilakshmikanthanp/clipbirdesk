@@ -16,11 +16,8 @@ DeviceInfo::DeviceInfo(QWidget* parent) : QWidget(parent) {
   this->hostStatus.first  = new QLabel();
   this->hostStatus.second = new components::Status();
 
-  this->serverName.first  = new QLabel();
-  this->serverName.second = new QLabel();
-
-  this->serverIp.first    = new QLabel();
-  this->serverIp.second   = new QLabel();
+  this->groupName.first  = new QLabel();
+  this->groupName.second = new QLabel();
 
   this->hostCount.first   = new QLabel();
   this->hostCount.second  = new QLabel();
@@ -29,11 +26,8 @@ DeviceInfo::DeviceInfo(QWidget* parent) : QWidget(parent) {
   this->hostStatus.first->setAlignment(Qt::AlignLeft);
   this->hostStatus.second->setAlignment(Qt::AlignRight);
 
-  this->serverName.first->setAlignment(Qt::AlignLeft);
-  this->serverName.second->setAlignment(Qt::AlignRight);
-
-  this->serverIp.first->setAlignment(Qt::AlignLeft);
-  this->serverIp.second->setAlignment(Qt::AlignRight);
+  this->groupName.first->setAlignment(Qt::AlignLeft);
+  this->groupName.second->setAlignment(Qt::AlignRight);
 
   this->hostCount.first->setAlignment(Qt::AlignLeft);
   this->hostCount.second->setAlignment(Qt::AlignRight);
@@ -42,9 +36,8 @@ DeviceInfo::DeviceInfo(QWidget* parent) : QWidget(parent) {
   auto top = new QFormLayout();
 
   // add top layout components
+  top->addRow(this->groupName.first, this->groupName.second);
   top->addRow(this->hostStatus.first, this->hostStatus.second);
-  top->addRow(this->serverName.first, this->serverName.second);
-  top->addRow(this->serverIp.first, this->serverIp.second);
   top->addRow(this->hostCount.first, this->hostCount.second);
 
   // set top layout alignment
@@ -70,19 +63,9 @@ void DeviceInfo::setHostStatus(const QPair<QString, components::Status::Value>& 
  *
  * @param QPair
  */
-void DeviceInfo::setServerName(const QPair<QString, QString>& name) {
-  this->serverName.first->setText(name.first);
-  this->serverName.second->setText(name.second);
-}
-
-/**
- * @brief Set the Server Ip
- *
- * @param QPair
- */
-void DeviceInfo::setServerIpPort(const QPair<QString, QString>& ip) {
-  this->serverIp.first->setText(ip.first);
-  this->serverIp.second->setText(ip.second);
+void DeviceInfo::setGroupName(const QPair<QString, QString>& name) {
+  this->groupName.first->setText(name.first);
+  this->groupName.second->setText(name.second);
 }
 
 /**
@@ -109,17 +92,8 @@ QPair<QString, components::Status::Value> DeviceInfo::getHostStatus() const {
  *
  * @return QPair
  */
-QPair<QString, QString> DeviceInfo::getServerName() const {
-  return {this->serverName.first->text(), this->serverName.second->text()};
-}
-
-/**
- * @brief Get the Server Ip
- *
- * @return QPair
- */
-QPair<QString, QString> DeviceInfo::getServerIpPort() const {
-  return {this->serverIp.first->text(), this->serverIp.second->text()};
+QPair<QString, QString> DeviceInfo::getGroupName() const {
+  return {this->groupName.first->text(), this->groupName.second->text()};
 }
 
 /**

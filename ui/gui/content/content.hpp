@@ -83,19 +83,17 @@ class Content : public QFrame {
 
  private:  // constant for keys (Server)
 
-  static constexpr const char* const s_statusKey   = "Server Status";
-  static constexpr const char* const s_hostNameKey = "Hostname";
-  static constexpr const char* const s_ipPortKey   = "Ipv4";
-  static constexpr const char* const s_clientsKey  = "Clients";
-  static constexpr const char* const s_tabTitle    = "Create Group";
+  static constexpr const char* const s_groupNameKey = "Group Name";
+  static constexpr const char* const s_statusKey    = "Status";
+  static constexpr const char* const s_hostsKey     = "Devices";
+  static constexpr const char* const s_tabTitle     = "Create Group";
 
  private:  // constant for keys (Client)
 
-  static constexpr const char* const c_statusKey   = "Client Status";
-  static constexpr const char* const c_hostNameKey = "HostName";
-  static constexpr const char* const c_ipPortKey   = "Ipv4";
-  static constexpr const char* const c_serversKey  = "Servers";
-  static constexpr const char* const c_tabTitle    = "Join Group";
+  static constexpr const char* const c_groupNameKey = "Group Name";
+  static constexpr const char* const c_statusKey    = "Status";
+  static constexpr const char* const c_hostsKey     = "Groups";
+  static constexpr const char* const c_tabTitle     = "Join Group";
 
  private:  // private slots
 
@@ -173,22 +171,12 @@ class Content : public QFrame {
   /**
    * @brief Set the Server Name object
    */
-  void setServerHostName(const QString& key, const QString& val);
+  void setGroupName(const QString& key, const QString& val);
 
   /**
    * @brief Get the Server Name object
    */
   QPair<QString, QString> getServerHostName();
-
-  /**
-   * @brief Set the Server Ip object
-   */
-  void setServerIpPort(const QString& key, const QString& val);
-
-  /**
-   * @brief Get the Server Ip object
-   */
-  QPair<QString, QString> getServerIpPort();
 
   /**
    * @brief Set the Hosts object

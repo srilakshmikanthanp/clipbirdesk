@@ -27,13 +27,27 @@ Clipbird utilizes the TCP/IP protocol for reliable communication between devices
 
 Clipbird uses TLS over TCP to ensure secure communication between devices. TLS provides end-to-end encryption, preventing unauthorized access to the data being transmitted. This security mechanism ensures that the clipboard content is protected from malicious attacks and other security threats, allowing for safe and secure clipboard synchronization across devices. By utilizing TLS over TCP, Clipbird guarantees that the clipboard data is transmitted securely and reliably, enhancing the overall user experience.
 
+## Auto Reconnect
+
+Clipbird supports automatic reconnection between already connected devices. Clipbird Achieve this by utilizing JWT token for authentication. When a client connects to the server, the client need to pass JWT token to the server. The following cases are possible.
+
+### Case 1: FirstConnect
+
+Upon FirstConnect the client has to sent an JWT token to the server. So server can store it for future use. Then Server will Send the Authentication packet with JWT token to authenticate the client later on Reconnect.
+
+### Case 2: Reconnect
+
+Upon Reconnect the client has to sent an valid JWT token sent by server on FirstConnect so Server will accept Request without user intervention. Then Server will send the Authentication packet with JWT token sent by client on FirstConnect to authenticate the server itself.
+
+Note, the server need to send the Authentication packet with JWT token after FirstConnect or Reconnect. If the server does not send the Authentication packet with JWT token to the client in specified time then client can disconnect the connection.
+
 ## Packet Types
 
 Clipbird utilizes a variety of packet types for different purposes. These packet types include the clipbird packet, and others, each serving a specific function within the application. Below, we provide a detailed description of each packet type and its intended usage in Clipbird.
 
 ### What are the packets Required for Clipbird
 
-First we need to Send the authenticate Response to connecting client it can be either success or failure to accomplish this we are going to use **Authentication** Packet.
+First we need to Send the authenticate Request to the server, for that we need to send the **Authentication** packet to the server. This packet may contains the JWT token if it has a valid JWT token the server will accept the connection without user intervention. If the token is invalid the server will send the **Authentication** packet with **AuthStatus** set to 0x00. If the token is valid the server will send the **Authentication** packet with **AuthStatus** set to 0x01. If the server is not configured to use JWT token it will send the **Authentication** packet with **AuthStatus** set to 0x01. If the server is configured to use JWT token but the client does not send the **Authentication** packet with JWT token the server will send the **Authentication** packet with **AuthStatus** set to 0x00.
 
 Once the server has been identified, clipboard data is transmitted between the client and the server using a single type of packet known as the **SyncingPacket**. This packet is responsible for transferring clipboard data from the client to the server and vice versa, ensuring seamless sharing of clipboard content between the two devices.
 
@@ -84,9 +98,13 @@ The **Authentication** is used to indicate the authentication process to the cli
 
 #### Body
 
-- **AuthStatus**: This field specifies the status of the authentication process. it can be one of the following values.
-  - 0x00: Auth Failed
-  - 0x01: Auth Success
+- **AuthType**: This field specifies the status of the authentication process. it can be one of the following values.
+  - 0x00: FirstConnect
+  - 0x01: Reconnect
+  - 0x02: FirstConnectResp
+  - 0x03: ReconnectResp
+- **Token Length**: This field specifies the length of the JWT token.
+- **Token**: This field contains the auth token.
 
 #### Structure
 
@@ -94,7 +112,9 @@ The **Authentication** is used to indicate the authentication process to the cli
 |-----------------|-------| ----- |
 | Packet Length   | 4     |       |
 | Packet Type     | 1     | 0x01  |
-| AuthStatus      | 1     |       |
+| AuthType        | 1     |       |
+| TokenLength     | 4     |       |
+| Token           | varies|       |
 
 ### SyncingPacket
 
