@@ -123,4 +123,13 @@ std::string getMDnsServiceName() {
 std::string getMDnsServiceType() {
   return std::string("_clipbird._tcp");
 }
+
+/**
+ * @brief Get the Organization Name
+ *
+ * @return std::string
+ */
+std::string getAppOrgName() {
+  return std::string(CLIPBIRDESK_ORG_NAME);
+}
 }  // namespace srilakshmikanthanp::clipbirdesk::config

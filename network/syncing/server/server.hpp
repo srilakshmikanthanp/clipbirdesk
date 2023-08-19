@@ -13,6 +13,9 @@
 #include <QSslSocket>
 #include <QVector>
 
+// jwt-cpp
+#include <jwt-cpp/jwt.h>
+
 #include "network/packets/authentication/authentication.hpp"
 #include "network/service/index.hpp"
 #include "types/enums/enums.hpp"

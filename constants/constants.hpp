@@ -104,4 +104,11 @@ std::string getMDnsServiceName();
  * @return std::string
  */
 std::string getMDnsServiceType();
+
+/**
+ * @brief Get the App Org Name object
+ *
+ * @return std::string
+ */
+std::string getAppOrgName();
 }  // namespace srilakshmikanthanp::clipbirdesk::config

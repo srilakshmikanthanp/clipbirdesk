@@ -147,6 +147,7 @@
     "qdatastream": "cpp",
     "*.qs": "javascript",
     ".qs": "javascript",
-    "qsystemtrayicon": "cpp"
+    "qsystemtrayicon": "cpp",
+    "qsettings": "cpp"
   },
 }

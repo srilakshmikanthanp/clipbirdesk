@@ -22,14 +22,17 @@ set(APPLICATION_ISSUEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk/iss
 # Set the APPLICATION_HOMEPAGE
 set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
 
+# Set the logo.png path variable
+set(APPLICATION_LOGO_PATH ":/images/logo.png")
+
 # set the main.qss path variable (Light)
 set(APPLICATION_LIGHT_QSS_PATH ":/styles/light.qss")
 
 # set the main.qss path variable (Dark)
 set(APPLICATION_DARK_QSS_PATH ":/styles/dark.qss")
 
-# Set the logo.png path variable
-set(APPLICATION_LOGO_PATH ":/images/logo.png")
+# set organization name
+set(APPLICATION_ORGANIZATION_NAME "srilakshmikanthanp")
 
 # Set the BBONJOUR_DIR from env
 set(BONJOUR_SDK_HOME $ENV{BONJOUR_SDK_HOME})
@@ -82,7 +85,8 @@ list(FILTER main_cpp EXCLUDE REGEX "build/")
 # Find Qt packages
 find_package(Qt6 REQUIRED COMPONENTS
   Widgets
-  Network)
+  Network
+  Sql)
 
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
@@ -113,6 +117,7 @@ target_link_libraries(clipbird
   PRIVATE SingleApplication::SingleApplication
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
+  PRIVATE Qt6::Sql
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto
   PRIVATE jwt-cpp)

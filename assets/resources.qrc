@@ -11,6 +11,9 @@
     <file>images/logo.png</file>
   </qresource>
   <qresource>
+    <file>images/logo.svg</file>
+  </qresource>
+  <qresource>
     <file>styles/light.qss</file>
   </qresource>
   <qresource>

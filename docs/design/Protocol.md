@@ -19,14 +19,6 @@ This architecture ensures efficient and organized communication between devices,
 
 Clipbird utilizes a discovery mechanism to identify compatible devices within the local network by utilizing the mdns protocol. This mechanism allows the client to discover the server without requiring the user to manually enter the IP address and port number.
 
-## Protocol
-
-Clipbird utilizes the TCP/IP protocol for reliable communication between devices. The packets transmitted within the application are in binary format, consisting of a header and a body. The header contains essential information about the packet, such as its type and additional metadata. The body of the packet contains the actual data being transmitted, which typically includes clipboard content. By employing TCP/IP, Clipbird ensures that the packets are sent and received accurately, enabling seamless clipboard synchronization between devices. The use of a structured packet format with a header and body allows for efficient and organized data transmission within the application.
-
-## Security
-
-Clipbird uses TLS over TCP to ensure secure communication between devices. TLS provides end-to-end encryption, preventing unauthorized access to the data being transmitted. This security mechanism ensures that the clipboard content is protected from malicious attacks and other security threats, allowing for safe and secure clipboard synchronization across devices. By utilizing TLS over TCP, Clipbird guarantees that the clipboard data is transmitted securely and reliably, enhancing the overall user experience.
-
 ## Connection
 
 Clipbird supports automatic reconnection between already connected devices. Clipbird Achieve this by utilizing JWT token for authentication. When a client connects to the server, the client need to pass JWT token to the server. The following cases are possible.
@@ -40,6 +32,14 @@ Upon First Connect the client has to sent an JWT token to the server. So server 
 Upon Reconnect the client has to sent an valid JWT token sent by server on First Connect so Server will accept Request without user intervention. Then Server will send the Authentication packet with JWT token sent by client on FirstConnect to authenticate the server itself.
 
 Note, the server need to send the Authentication packet with JWT token after FirstConnect or Reconnect. If the server does not send the Authentication packet with JWT token to the client in specified time then client can disconnect the connection.
+
+## Protocol
+
+Clipbird utilizes the TCP/IP protocol for reliable communication between devices. The packets transmitted within the application are in binary format, consisting of a header and a body. The header contains essential information about the packet, such as its type and additional metadata. The body of the packet contains the actual data being transmitted, which typically includes clipboard content. By employing TCP/IP, Clipbird ensures that the packets are sent and received accurately, enabling seamless clipboard synchronization between devices. The use of a structured packet format with a header and body allows for efficient and organized data transmission within the application.
+
+## Security
+
+Clipbird uses TLS over TCP to ensure secure communication between devices. TLS provides end-to-end encryption, preventing unauthorized access to the data being transmitted. This security mechanism ensures that the clipboard content is protected from malicious attacks and other security threats, allowing for safe and secure clipboard synchronization across devices. By utilizing TLS over TCP, Clipbird guarantees that the clipboard data is transmitted securely and reliably, enhancing the overall user experience.
 
 ## Packet Types
 
@@ -101,8 +101,8 @@ The **Authentication** is used to indicate the authentication process to the cli
 - **AuthType**: This field specifies the status of the authentication process. it can be one of the following values.
   - 0x00: OnConnect
   - 0x01: Reconnect
-  - 0x02: OnConnectResp
-  - 0x03: ReconnectResp
+  - 0x02: RespOnCon
+  - 0x03: RespRecon
 - **Token Length**: This field specifies the length of the JWT token.
 - **Token**: This field contains the auth token.
 
