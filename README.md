@@ -75,6 +75,7 @@ Clipbird Software helps you to sync your clipboard data between devices connecte
 
 ### Built With
 
+* POCO C++ Libraries
 * Bonjour
 * C++
 * Qt6
