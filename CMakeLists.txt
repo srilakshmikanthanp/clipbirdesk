@@ -46,8 +46,8 @@ set(QT_MAJOR_VERSION 6)
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
 
-# Append Vcpkg file to CMAKE_TOOLCHAIN_FILE
-list(APPEND CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_CMAKE})
+# Append POCO
+list(APPEND CMAKE_PREFIX_PATH $ENV{POCO_CMAKE_DIR})
 
 # --------------------------------- Main Project ---------------------------------#
 # Fetch SingleApplication from github
@@ -88,6 +88,9 @@ find_package(Qt6 REQUIRED COMPONENTS
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
 
+# Find JWT from pocO
+find_package(POCO REQUIRED JWT)
+
 # Find Bonjour on windows and mac
 if(WIN32 OR APPLE)
   find_package(Bonjour REQUIRED)
@@ -115,6 +118,7 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE Qt6::Sql
+  PRIVATE JWT
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto)
 

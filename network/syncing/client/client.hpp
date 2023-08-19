@@ -102,10 +102,7 @@ class Client : public service::mdnsBrowser {
     // write the packet length
     while (wrote < data.size()) {
       // try to write the data
-      auto bytes = stream.writeRawData(
-        data.data() + wrote, // start of data
-        data.size() - wrote  // size of data
-      );
+      auto bytes = stream.writeRawData(data.data() + wrote, data.size() - wrote);
 
       // if no error occurred
       if (bytes != -1) {
@@ -115,11 +112,8 @@ class Client : public service::mdnsBrowser {
       // abort the transaction
       stream.abortTransaction();
 
-      // get the error string
-      auto error = m_ssl_socket->errorString();
-
       // log
-      qWarning() << LOG(error.toStdString());
+      qWarning() << LOG(m_ssl_socket->errorString().toStdString());
     }
 
     // commit the transaction
@@ -239,6 +233,23 @@ class Client : public service::mdnsBrowser {
    * @return QPair<QHostAddress, quint16>
    */
   QPair<QHostAddress, quint16> getAuthedServerOrEmpty() const;
+
+  /**
+   * @brief Send To Connected Server
+   *
+   * @tparam Packet
+   * @param pack
+   */
+  template <typename Packet>
+  void sendToConnectedServer(const Packet& pack) {
+    // if not connected
+    if (!m_ssl_socket->isConnected()) {
+      throw std::runtime_error("Not connected to the server");
+    }
+
+    // send the packet
+    sendPacket(pack);
+  }
 
  protected:  // abstract functions from the base class
 

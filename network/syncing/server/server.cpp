@@ -21,7 +21,8 @@ void Server::processSyncingPacket(const packets::SyncingPacket &packet) {
   }
 
   // Notify the listeners to sync the data
-  emit OnSyncRequest(items);}
+  emit OnSyncRequest(items);
+}
 
 /**
  * @brief Process the connections that are pending

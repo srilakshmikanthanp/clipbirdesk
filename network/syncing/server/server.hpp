@@ -96,24 +96,18 @@ class Server : public service::mdnsRegister {
     // write the packet length
     while (wrote < data.size()) {
       // try to write the data
-      auto bytes = stream.writeRawData(
-        data.data() + wrote, // start of the data
-        data.size() - wrote  // size of the data
-      );
+      auto bytes = stream.writeRawData(data.data() + wrote, data.size() - wrote);
 
       // if no error occurred
       if (bytes != -1) {
         wrote += bytes; continue;
       }
 
-      // get the error string
-      auto error = client->errorString();
-
       // abort the transaction
       stream.abortTransaction();
 
       //  Notifies the error occurred
-      qWarning() << (LOG(error.toStdString()));
+      qWarning() << (LOG(client->errorString().toStdString()));
     }
 
     // commit the transaction
@@ -249,6 +243,35 @@ class Server : public service::mdnsRegister {
    * @brief Stop the server
    */
   void stopServer();
+
+  /**
+   * @brief Send the packet to the client
+   *
+   * @param packet Packet to send
+   * @param QPair {QHostAddress, port}
+   */
+  template <typename Packet>
+  void sendToClient(const Packet &packet, const QPair<QHostAddress, quint16> &client) {
+    // Matcher Lambda Function to find the client
+    const auto matcher = [&client](QSslSocket *c) {
+      return (c->peerAddress() == client.first) && (c->peerPort() == client.second);
+    };
+
+    // Get the iterator to the start and end of the list
+    auto start      = m_authed_clients.begin();
+    auto end        = m_authed_clients.end();
+
+    // Get the client from the unauthenticated list and remove it
+    auto client_itr = std::find_if(start, end, matcher);
+
+    // If the client is not found then return from the function
+    if (client_itr == m_authed_clients.end()) {
+      throw std::runtime_error("Client not found");
+    }
+
+    // send the packet to the client
+    this->sendPacket(packet, (*client_itr));
+  }
 
  protected:  // override functions from the base class
 

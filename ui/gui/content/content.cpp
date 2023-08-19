@@ -129,10 +129,9 @@ void Content::handleNewHostConnected(const QPair<QHostAddress, quint16>& client)
     auto message = QString(
       "A New client Attempting to connect\n"
       "Host: %1\n"
-      "Port: %2\n"
       "Accept the connection?"
     ).arg(
-      info.hostName(), QString::number(client.second)
+      info.hostName()
     );
     // clang-format on
 

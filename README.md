@@ -131,17 +131,17 @@ choco install openssl
 Install POCO C++ Libraries using the following command.
 
 ~~~sh
-vcpkg install poco
+vcpkg install poco --triplet x64-windows
 ~~~
 
 #### Environment Variables
 
-| Variable            | Value                           |
-|---------------------|---------------------------------|
-| `OPENSSL_ROOT_DIR`  | OpenSSL installation directory  |
-| `QT_CMAKE_DIR`      | Qt6 cmake directory             |
-| `BONJOUR_SDK_HOME`  | Bonjour SDK directory           |
-| `VCPKG_CMAKE`       | vcpkg cmake File                |
+| Variable            | Value                              |
+|---------------------|------------------------------------|
+| `OPENSSL_ROOT_DIR`  | OpenSSL installation directory     |
+| `QT_CMAKE_DIR`      | Qt6 cmake directory                |
+| `BONJOUR_SDK_HOME`  | Bonjour SDK directory              |
+| `POCO_CMAKE_DIR`    | POCO C++ Libraries cmake directory |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
