@@ -5,7 +5,7 @@
 
 #include "deviceinfo.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
 /**
  * @brief Construct a new Device Info:: Device Info object
  *

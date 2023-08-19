@@ -13,7 +13,7 @@
 // Project headers
 #include "ui/gui/components/device/device.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
 class DeviceList : public QWidget {
  signals:  // Signals
   void onAction(components::Device::Value host);

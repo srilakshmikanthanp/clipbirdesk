@@ -7,7 +7,7 @@
 
 #include "register.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd {
+namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
 /**
  * @brief Callback function for DNSServiceRegister function
  * This is called when the service is registered, Note
@@ -55,7 +55,7 @@ void Register::processActivated() {
  *
  * @param parent Parent object
  */
-Register::Register(QObject* parent) : interfaces::ImDNSRegister(parent) {
+Register::Register(QObject* parent) : QObject(parent) {
   // Empty Constructor just calls the parent constructor
 }
 

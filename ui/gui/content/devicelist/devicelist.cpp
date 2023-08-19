@@ -5,7 +5,7 @@
 
 #include "devicelist.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
 DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
   // set alignment from start and center
   verticalLayout->setAlignment(Qt::AlignTop);

@@ -37,11 +37,17 @@ set(APPLICATION_ORGANIZATION_NAME "srilakshmikanthanp")
 # Set the BBONJOUR_DIR from env
 set(BONJOUR_SDK_HOME $ENV{BONJOUR_SDK_HOME})
 
+# set OPENSSL_ROOT_DIR
+set(OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT_DIR})
+
 # Set Qt version
 set(QT_MAJOR_VERSION 6)
 
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
+
+# Append Vcpkg file to CMAKE_TOOLCHAIN_FILE
+list(APPEND CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_CMAKE})
 
 # --------------------------------- Main Project ---------------------------------#
 # Fetch SingleApplication from github
@@ -58,15 +64,6 @@ set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleAp
 
 # Make Available SingleApplication
 FetchContent_MakeAvailable(SingleApplication)
-
-# Fetch jwt-cpp from github
-FetchContent_Declare(jwt-cpp
-  GIT_REPOSITORY https://github.com/Thalhammer/jwt-cpp.git
-  GIT_TAG        v0.6.0
-)
-
-# Make Available jwt-cpp
-FetchContent_MakeAvailable(jwt-cpp)
 
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
@@ -119,8 +116,7 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Network
   PRIVATE Qt6::Sql
   PRIVATE OpenSSL::SSL
-  PRIVATE OpenSSL::Crypto
-  PRIVATE jwt-cpp)
+  PRIVATE OpenSSL::Crypto)
 
 # link bonjour if windows or Mac
 if(WIN32 OR APPLE)

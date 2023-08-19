@@ -93,11 +93,6 @@ void ClipBird::setCurrentHostAsServer() {
   const auto slot_si   = &Server::syncItems;
   connect(&m_clipboard, signal_cc, server, slot_si);
 
-  // Connect the onErrorOccurred signal to the signal
-  const auto signal_eo = &Server::OnErrorOccurred;
-  const auto slot_eo   = &ClipBird::OnErrorOccurred;
-  connect(server, signal_eo, this, slot_eo);
-
   // Connect the onClientListChanged signal to the signal
   const auto signal_lc = &Server::OnClientListChanged;
   const auto slot_lc   = &ClipBird::OnClientListChanged;
@@ -142,11 +137,6 @@ void ClipBird::setCurrentHostAsClient() {
   const auto slot_au   = &ClipBird::OnServerAuthentication;
   connect(client, signal_au, this, slot_au);
   connect(client, signal_au, this, slot_ha);
-
-  // Connect the onErrorOccurred signal to the signal
-  const auto signal_er = &Client::OnErrorOccurred;
-  const auto slot_er   = &ClipBird::OnErrorOccurred;
-  connect(client, signal_er, this, slot_er);
 
   // Connect the onSyncRequest signal to the clipboard
   const auto signal_rq = &Client::OnSyncRequest;

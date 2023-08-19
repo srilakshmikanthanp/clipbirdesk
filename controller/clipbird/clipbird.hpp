@@ -40,12 +40,6 @@ class ClipBird : public QObject {
   /// @brief On Server Auth Succeed (From Client)
   void OnServerAuthentication(bool isSuccessful);
 
-  //----------------------- general Signals -----------------------//
-
- signals:  // signals for this class
-  /// @brief On Error Occurred (General)
-  void OnErrorOccurred(QString error);
-
   //----------------------- server Signals ------------------------//
 
  signals:  // signals

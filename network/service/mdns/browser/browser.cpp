@@ -7,7 +7,7 @@
 
 #include "browser.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd {
+namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
 /**
  * @brief Callback for QHostInfo Address Resolve Function
  *
@@ -17,7 +17,8 @@ namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd {
 void Browser::onHostResolved(bool isAdded, quint16 port, const QHostInfo& info) {
   // check for error
   if (info.error() != QHostInfo::NoError || info.addresses().isEmpty()) {
-    emit this->OnErrorOccurred(LOG("Unable to resolve service"));
+    // log the error with qt
+    qWarning() << LOG("Unable to resolve service");
     return;
   }
 
@@ -55,7 +56,7 @@ void Browser::browseCallback(
 
   // check for Error
   if (errorCode != kDNSServiceErr_NoError) {
-    emit browserObj->OnErrorOccurred(LOG("DNSServiceBrowse failed"));
+    qWarning() << LOG("DNSServiceBrowse failed");
     return;
   }
 
@@ -80,7 +81,7 @@ void Browser::browseCallback(
 
   // check for error
   if (errorType != kDNSServiceErr_NoError) {
-    emit browserObj->OnErrorOccurred(LOG("DNSServiceResolve failed"));
+    qWarning() << LOG("DNSServiceResolve failed");
     return;
   }
 
@@ -94,7 +95,7 @@ void Browser::browseCallback(
   // process resolve socket
   const auto processResSock = [=] {
     if (DNSServiceProcessResult(browserObj->m_res_ref) != kDNSServiceErr_NoError) {
-      emit browserObj->OnErrorOccurred(LOG("DNSServiceProcessResult failed"));
+      qWarning() << LOG("DNSServiceProcessResult failed");
     }
   };
 
@@ -130,7 +131,7 @@ void Browser::addedCallback(
 
   // check for Error
   if (errorCode != kDNSServiceErr_NoError) {
-    emit browserObj->OnErrorOccurred(LOG("DNSServiceResolve failed"));
+    qWarning() << LOG("DNSServiceResolve failed");
     return;
   }
 
@@ -176,7 +177,7 @@ void Browser::removeCallback(
 
   // check for Error
   if (errorCode != kDNSServiceErr_NoError) {
-    emit browserObj->OnErrorOccurred(LOG("DNSServiceResolve failed"));
+    qWarning() << LOG("DNSServiceResolve failed");
     return;
   }
 
@@ -201,7 +202,7 @@ void Browser::removeCallback(
  *
  * @param parent Parent object
  */
-Browser::Browser(QObject* parent) : interfaces::ImDNSBrowser(parent) {
+Browser::Browser(QObject* parent) : QObject(parent) {
   // Empty Constructor just calls the parent constructor
 }
 
@@ -225,7 +226,7 @@ void Browser::startBrowsing() {
 
   // check for error
   if (errorType != kDNSServiceErr_NoError) {
-    emit this->OnErrorOccurred(LOG("DNSServiceBrowse failed"));
+    qWarning() << LOG("DNSServiceBrowse failed");
     return;
   }
 
@@ -239,7 +240,7 @@ void Browser::startBrowsing() {
   // process register socket
   const auto processBrowseSock = [=] {
     if (DNSServiceProcessResult(this->m_browse_ref) != kDNSServiceErr_NoError) {
-      emit this->OnErrorOccurred(LOG("DNSServiceProcessResult failed"));
+      qWarning() << LOG("DNSServiceProcessResult failed");
     }
   };
 

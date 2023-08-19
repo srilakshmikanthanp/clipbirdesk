@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::storage {
  *
  * @param parent
  */
-Storage::Storage(QObject *parent = nullptr) : QObject(parent) {
+Storage::Storage(QObject *parent) : QObject(parent) {
   this->settings->setParent(this);
 }
 
@@ -37,14 +37,14 @@ void Storage::setClientToken(const QString &hostname, const QString &token) {
  */
 QString Storage::getClientToken(const QString &hostname) {
   settings->beginGroup(clientGroup);
-  auto token = settings->value(hostname).toString();
+  auto token = settings->value(hostname);
   settings->endGroup();
 
-  if (token.isEmpty()) {
+  if (token.isNull()) {
     throw std::invalid_argument("hostname not found");
   }
 
-  return token;
+  return token.toString();
 }
 
 /**
@@ -69,13 +69,13 @@ void Storage::setServerToken(const QString &hostname, const QString &token) {
  */
 QString Storage::getServerToken(const QString &hostname) {
   settings->beginGroup(serverGroup);
-  auto token = settings->value(hostname).toString();
+  auto token = settings->value(hostname);
   settings->endGroup();
 
-  if (token.isEmpty()) {
+  if (token.isNull()) {
     throw std::invalid_argument("hostname not found");
   }
 
-  return token;
+  return token.toString();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::storage

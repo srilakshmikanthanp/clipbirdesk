@@ -14,7 +14,7 @@
 
 #include "ui/gui/components/status/status.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::window {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
 class DeviceInfo : public QWidget {
  private:  // Member Variables
 

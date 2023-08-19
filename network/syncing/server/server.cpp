@@ -127,12 +127,12 @@ void Server::processReadyRead() {
     this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
     return;
   } catch (const types::except::NotThisPacket &e) {
-    emit OnErrorOccurred(LOG(e.what()));
+    qWarning() << (LOG(e.what()));
   } catch (const std::exception &e) {
-    emit OnErrorOccurred(LOG(e.what()));
+    qWarning() << (LOG(e.what()));
     return;
   } catch (...) {
-    emit OnErrorOccurred(LOG("Unknown Error"));
+    qWarning() << (LOG("Unknown Error"));
     return;
   }
 
@@ -178,7 +178,7 @@ void Server::OnServiceRegistered() {
  * @param config SSL configuration
  * @param parent Parent object
  */
-Server::Server(QObject *p) : mDNSRegister(p) {
+Server::Server(QObject *parent) : service::mdnsRegister(parent) {
   // Connect the socket to the callback function that
   // process the connections when the socket is ready
   // to read so the listener can be notified
@@ -186,13 +186,8 @@ Server::Server(QObject *p) : mDNSRegister(p) {
   const auto slot_c   = &Server::processConnections;
   QObject::connect(m_ssl_server, signal_c, this, slot_c);
 
-  // connect OnErrorOccurred to from base class
-  const auto signal_e = &mDNSRegister::OnErrorOccurred;
-  const auto slot_e   = &Server::OnErrorOccurred;
-  QObject::connect(this, signal_e, this, slot_e);
-
   // Notify the listeners that the server is started
-  const auto signal = &mDNSRegister::OnServiceRegistered;
+  const auto signal = &service::mdnsRegister::OnServiceRegistered;
   const auto slot   = &Server::OnServiceRegistered;
   QObject::connect(this, signal, this, slot);
 }
@@ -418,21 +413,6 @@ void Server::stopServer() {
 }
 
 /**
- * @brief Get the IP Type of the Server it can be IPv4 or
- * IPv6 the IP type is used to determine the length of the IP address
- * if the IP type is IPv4 then the IP address is 4 bytes long if
- * the IP type is IPv6 then the IP address is 16 bytes long
- *
- * @note The IP Type used in Server is IPv4
- *
- * @return types::IPType IP type
- * @throw Any Exception If any error occurs
- */
-types::enums::IPType Server::getIPType() const {
-  return types::enums::IPType::IPv4;
-}
-
-/**
  * @brief Get the Port number of the Server it can be any port
  * number from 0 to 65535 but the port number should be greater than 1024
  * because the port number less than 1024 are reserved for the system
@@ -443,17 +423,5 @@ types::enums::IPType Server::getIPType() const {
  */
 quint16 Server::getPort() const {
   return m_ssl_server->serverPort();
-}
-
-/**
- * @brief Get the IP Address of the Server it can be IPv4 or
- * IPv6 if the IP type is IPv4 then the IP address is 4 bytes long if
- * the IP type is IPv6 then the IP address is 16 bytes long
- *
- * @return types::IPAddress IP address
- * @throw Any Exception If any error occurs
- */
-QHostAddress Server::getIPAddress() const {
-  return m_ssl_server->serverAddress();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

@@ -23,8 +23,8 @@ Write-Host "Cleaning the package directory $ClipbirDir" -ForegroundColor Green
 Remove-Item -Recurse -Force $ClipbirDir/* -Exclude .gitignore
 
 # Copy All openssl dlls to the package directory
-Write-Host "Copying $env:OPENSSL_DIR/bin/*.dll to $ClipbirDir" -ForegroundColor Green
-Copy-Item "$env:OPENSSL_DIR/bin/*.dll" $ClipbirDir
+Write-Host "Copying $env:OPENSSL_ROOT_DIR /bin/*.dll to $ClipbirDir" -ForegroundColor Green
+Copy-Item "$env:OPENSSL_ROOT_DIR /bin/*.dll" $ClipbirDir
 
 # copy the Logo to the package directory
 Write-Host "Copying ./assets/images/logo.png to $ClipbirDir" -ForegroundColor Green

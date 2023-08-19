@@ -101,7 +101,7 @@ Just go to Github Release and choose the suitable version for your system and do
 
 ### Building Clipbird on a Windows Platform
 
-In the following steps, we will see how to build the project in the Windows platform, We use choco to install the dependencies in the Windows platform. If you don't have choco installed in your system, you can install it from [here](https://chocolatey.org/install).
+In the following steps, we will see how to build the project in the Windows platform, We use choco and vcpkg to install the dependencies in the Windows platform. If you don't have choco or vcpkg installed in your system, you can install it from [here](https://chocolatey.org/install) and [here](https://vcpkg.io/en/getting-started)
 
 #### Prerequisites
 
@@ -120,19 +120,28 @@ Just go to [bonjour](https://developer.apple.com/bonjour/) and downlod the bonjo
 
 #### Installing OpenSSL
 
-Install OpenSSL using the following command and set the environment variable `OPENSSL_DIR` to the OpenSSL installation directory.
+Install OpenSSL using the following command and set the environment variable `OPENSSL_ROOT_DIR` to the OpenSSL installation directory.
 
 ~~~sh
 choco install openssl
+~~~
+
+#### Installing POCO C++ Libraries
+
+Install POCO C++ Libraries using the following command.
+
+~~~sh
+vcpkg install poco
 ~~~
 
 #### Environment Variables
 
 | Variable            | Value                           |
 |---------------------|---------------------------------|
-| `OPENSSL_DIR`       | OpenSSL installation directory  |
+| `OPENSSL_ROOT_DIR`  | OpenSSL installation directory  |
 | `QT_CMAKE_DIR`      | Qt6 cmake directory             |
 | `BONJOUR_SDK_HOME`  | Bonjour SDK directory           |
+| `VCPKG_CMAKE`       | vcpkg cmake File                |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

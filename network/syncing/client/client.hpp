@@ -32,7 +32,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing client that syncs the clipboard data between
  * client and server
  */
-class Client : public mDNSBrowser {
+class Client : public service::mdnsBrowser {
  signals:  // signals for this class
   /// @brief On Server List Changed
   void OnServerListChanged(QList<QPair<QHostAddress, quint16>> servers);
@@ -44,10 +44,6 @@ class Client : public mDNSBrowser {
  signals:  // signals for this class
   /// @brief On Server Gone
   void OnServerGone(QPair<QHostAddress, quint16>);
-
- signals:  // signals for this class
-  /// @brief On Error Occurred
-  void OnErrorOccurred(QString error);
 
  signals:  // signals for this class
   /// @brief On Server state changed
@@ -116,14 +112,14 @@ class Client : public mDNSBrowser {
         wrote += bytes; continue;
       }
 
-      // get the error string
-      auto error = m_ssl_socket->errorString();
-
       // abort the transaction
       stream.abortTransaction();
 
-      //  Notifies the error occurred
-      emit OnErrorOccurred(LOG(error.toStdString()));
+      // get the error string
+      auto error = m_ssl_socket->errorString();
+
+      // log
+      qWarning() << LOG(error.toStdString());
     }
 
     // commit the transaction

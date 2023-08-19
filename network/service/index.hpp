@@ -5,15 +5,17 @@
 
 #include <QObject>
 
-#if defined _WIN32 || defined __APPLE__ // for windows and macos using bonjour
+#if defined _WIN32 || defined __APPLE__  // for windows and macos using bonjour
 
-#include "network/service/dnsd/browser/browser.hpp"
-#include "network/service/dnsd/register/register.hpp"
+#include "network/service/mdns/browser/browser.hpp"
+#include "network/service/mdns/register/register.hpp"
 
-#define mDNSRegister srilakshmikanthanp::clipbirdesk::network::service::dnsd::Register
-#define mDNSBrowser  srilakshmikanthanp::clipbirdesk::network::service::dnsd::Browser
+namespace srilakshmikanthanp::clipbirdesk::network::service {
+using mdnsRegister = mdns::Register;
+using mdnsBrowser  = mdns::Browser;
+}  // namespace srilakshmikanthanp::clipbirdesk::network::service
 
-#else // any other platforms
+#else  // any other platforms
 
 #Error "Currently We don't Support Any platform other than Apple and windows"
 

@@ -280,6 +280,20 @@ void Content::handleServerStatusChanged(bool status) {
 }
 
 /**
+ * @brief On About Clicked
+ */
+void Content::onAboutClicked() {
+  QDesktopServices::openUrl(QUrl(constants::getAppHomePage().c_str()));
+}
+
+/**
+ * @brief On Issue Clicked
+ */
+void Content::onIssueClicked() {
+  QDesktopServices::openUrl(QUrl(constants::getAppIssuePage().c_str()));
+}
+
+/**
  * @brief Construct a new Content object
  * with parent as QWidget
  *
@@ -295,9 +309,6 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
 
   // add top layout to  layout
   root->addWidget(this->deviceInfo);
-
-  // create tab widget
-  QTabWidget* tab = new QTabWidget();
 
   // Set the Expanding & Document Mode
   tab->tabBar()->setExpanding(true);
@@ -348,18 +359,27 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   };
   // clang-format on
 
+  // set the icon to tray
+  trayIcon->setIcon(QIcon(constants::getAppLogo().c_str()));
+
+  // set the tray menu
+  trayIcon->setContextMenu(trayMenu);
+
+  // set tooltip
+  trayIcon->setToolTip(constants::getAppName().c_str());
+
   // set the signal for on new Host
   const auto signal_nh = &controller::ClipBird::OnNewHostConnected;
   const auto slot_nh   = &Content::handleNewHostConnected;
   QObject::connect(controller, signal_nh, this, slot_nh);
 
   // connect server list signal
-  const auto signal_so = &window::DeviceList::onAction;
+  const auto signal_so = &content::DeviceList::onAction;
   const auto slot_so   = serverListSlot;
   connect(serverList, signal_so, slot_so);
 
   // connect client list signal
-  const auto signal_co = &window::DeviceList::onAction;
+  const auto signal_co = &content::DeviceList::onAction;
   const auto slot_co   = clientListSlot;
   connect(clientList, signal_co, slot_co);
 
@@ -403,8 +423,26 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto slot_ts   = &Content::handleTabChangeForServer;
   connect(this, signal_ts, this, slot_ts);
 
-  // Initialize the Tab as Client
-  tab->setCurrentIndex(1);
+  // set the signal for menus About click
+  const auto signal_ac = &ui::gui::content::TrayMenu::OnAboutClicked;
+  const auto slot_ac   = &Content::onAboutClicked;
+  QObject::connect(trayMenu, signal_ac, this, slot_ac);
+
+  // set the signal for menus Issue click
+  const auto signal_ic = &ui::gui::content::TrayMenu::OnIssueClicked;
+  const auto slot_ic   = &Content::onIssueClicked;
+  QObject::connect(trayMenu, signal_ic, this, slot_ic);
+
+  // set the signal for menus Quit click
+  const auto signal_qc = &ui::gui::content::TrayMenu::OnExitClicked;
+  const auto slot_qc   = [] { qApp->quit(); };
+  QObject::connect(trayMenu, signal_qc, this, slot_qc);
+
+  // Set As Client
+  this->setTabAsClient();
+
+  // show tray icon
+  trayIcon->show();
 }
 
 /**
@@ -448,6 +486,27 @@ void Content::setHostCount(const QString& key, int val) {
 QPair<QString, int> Content::getHostCount() {
   const auto hostCount = this->deviceInfo->getHostCount();
   return {hostCount.first, hostCount.second.toInt()};
+}
+
+/**
+ * @brief Set tab as client
+ */
+void Content::setTabAsClient() {
+  this->tab->setCurrentIndex(1);
+}
+
+/**
+ * @brief Set tab as server
+ */
+void Content::setTabAsServer() {
+  this->tab->setCurrentIndex(0);
+}
+
+/**
+ * @brief Get System Tray Icon
+ */
+QSystemTrayIcon* Content::getTrayIcon() {
+  return this->trayIcon;
 }
 
 //---------------------- Server Tab ----------------------//

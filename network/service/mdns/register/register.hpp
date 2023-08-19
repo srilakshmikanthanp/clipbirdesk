@@ -25,21 +25,25 @@
 
 // Local headers
 #include "constants/constants.hpp"
-#include "interfaces/imdnsregister/imdnsregister.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd {
+namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
 /**
  * @brief Abstract Discovery server that Listens for the client that send
  * the broadcast message The user of this class should implement the
  * getIpType(), getIPAddress() and getPort() functions to return the
  * IP type, IP address and port number respectively
  */
-class Register : public interfaces::ImDNSRegister {
- signals:  // signals for this class
-  /// @brief On Error Occurred
-  void OnErrorOccurred(QString error);
+class Register : public QObject {
+ private:   // private variables
+
+  QSocketNotifier* m_notifier = nullptr; ///< Socket notifier
+  DNSServiceRef m_serviceRef = nullptr;  ///< Service ref
+
+ signals:
+  // Signal for service registered
+  void OnServiceRegistered();
 
  private:  // typedefs for this class
 
@@ -52,11 +56,6 @@ class Register : public interfaces::ImDNSRegister {
  private:  // disable copy and move
 
   Q_DISABLE_COPY_MOVE(Register)
-
- private: // private variables
-
-  QSocketNotifier* m_notifier = nullptr; ///< Socket notifier
-  DNSServiceRef m_serviceRef = nullptr;  ///< Service ref
 
  private: // private functions
 
@@ -99,12 +98,21 @@ class Register : public interfaces::ImDNSRegister {
   /**
    * @brief Register the service
    */
-  virtual void registerServiceAsync() override;
+  void registerServiceAsync();
 
   /**
    * @brief Stop the server
    */
-  virtual void unregisterService() override;
+  void unregisterService();
+
+ protected:  // protected functions
+
+  /**
+   * @brief Get the Port
+   *
+   * @return quint16
+   */
+  virtual quint16 getPort() const = 0;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service
 #endif

@@ -45,7 +45,7 @@ void Client::processSyncingPacket(const packets::SyncingPacket& packet) {
  * @param packet Invalid packet
  */
 void Client::processInvalidPacket(const packets::InvalidRequest& packet) {
-  emit OnErrorOccurred(LOG(packet.getErrorMessage().toStdString()));
+  qWarning() << (LOG(packet.getErrorMessage().toStdString()));
 }
 
 /**
@@ -106,15 +106,15 @@ void Client::processReadyRead() {
     processAuthentication(fromQByteArray<packets::Authentication>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    emit OnErrorOccurred(LOG(e.what()));
+    qWarning() << (LOG(e.what()));
     return;
   } catch (const types::except::NotThisPacket& e) {
-    emit OnErrorOccurred(LOG(e.what()));
+    qWarning() << (LOG(e.what()));
   } catch (const std::exception& e) {
-    emit OnErrorOccurred(LOG(e.what()));
+    qWarning() << (LOG(e.what()));
     return;
   } catch (...) {
-    emit OnErrorOccurred(LOG("Unknown Error"));
+    qWarning() << (LOG("Unknown Error"));
     return;
   }
 
@@ -123,15 +123,15 @@ void Client::processReadyRead() {
     processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    emit OnErrorOccurred(LOG(e.what()));
+    qWarning() << (LOG(e.what()));
     return;
   } catch (const types::except::NotThisPacket& e) {
-    emit OnErrorOccurred(LOG(e.what()));
+    qWarning() << (LOG(e.what()));
   } catch (const std::exception& e) {
-    emit OnErrorOccurred(LOG(e.what()));
+    qWarning() << (LOG(e.what()));
     return;
   } catch (...) {
-    emit OnErrorOccurred(LOG("Unknown Error"));
+    qWarning() << (LOG("Unknown Error"));
     return;
   }
 
@@ -140,20 +140,20 @@ void Client::processReadyRead() {
     processInvalidPacket(fromQByteArray<packets::InvalidRequest>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    emit OnErrorOccurred(LOG(e.what()));
+    qWarning() << (LOG(e.what()));
     return;
   } catch (const types::except::NotThisPacket& e) {
-    emit OnErrorOccurred(LOG(e.what()));
+    qWarning() << (LOG(e.what()));
   } catch (const std::exception& e) {
-    emit OnErrorOccurred(LOG(e.what()));
+    qWarning() << (LOG(e.what()));
     return;
   } catch (...) {
-    emit OnErrorOccurred(LOG("Unknown Error"));
+    qWarning() << (LOG("Unknown Error"));
     return;
   }
 
   // if no packet is found
-  OnErrorOccurred(LOG("Unknown Packet Found"));
+  qWarning() << (LOG("Unknown Packet Found"));
 }
 
 /**
@@ -163,7 +163,7 @@ void Client::processReadyRead() {
  */
 void Client::processSslError(const QList<QSslError>& errors) {
   for (auto& error : errors) {
-    emit OnErrorOccurred(LOG(error.errorString().toStdString()));
+    qWarning() << (LOG(error.errorString().toStdString()));
   }
 }
 
@@ -189,14 +189,8 @@ void Client::handleDisconnected() {
  * @param th threshold
  * @param parent Parent
  */
-Client::Client(QObject* parent) : mDNSBrowser(parent) {
+Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
   // connect the signal to emit the signal for
-  // OnErrorOccurred from the base class
-  const auto signal_e = &mDNSBrowser::OnErrorOccurred;
-  const auto slot_e   = &Client::OnErrorOccurred;
-  connect(this, signal_e, this, slot_e);
-
-  // connected signal to emit the signal for
   // server state changed
   const auto signal_c = &QSslSocket::connected;
   const auto slot_c   = &Client::handleConnected;

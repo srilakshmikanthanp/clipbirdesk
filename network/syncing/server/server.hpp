@@ -13,9 +13,6 @@
 #include <QSslSocket>
 #include <QVector>
 
-// jwt-cpp
-#include <jwt-cpp/jwt.h>
-
 #include "network/packets/authentication/authentication.hpp"
 #include "network/service/index.hpp"
 #include "types/enums/enums.hpp"
@@ -28,7 +25,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing server that syncs the clipboard data between
  * the clients
  */
-class Server : public mDNSRegister {
+class Server : public service::mdnsRegister {
  signals:  // signals
   /// @brief On client state changed
   void OnCLientStateChanged(QPair<QHostAddress, quint16>, bool connected);
@@ -36,10 +33,6 @@ class Server : public mDNSRegister {
  signals:  // signals for this class
   /// @brief On New Host Connected
   void OnNewHostConnected(QPair<QHostAddress, quint16>);
-
- signals:  // signals for this class
-  /// @brief On Error Occurred
-  void OnErrorOccurred(QString error);
 
  signals:  // signals for this class
   /// @brief On Server State Changed
@@ -120,7 +113,7 @@ class Server : public mDNSRegister {
       stream.abortTransaction();
 
       //  Notifies the error occurred
-      emit OnErrorOccurred(LOG(error.toStdString()));
+      qWarning() << (LOG(error.toStdString()));
     }
 
     // commit the transaction
@@ -260,19 +253,6 @@ class Server : public mDNSRegister {
  protected:  // override functions from the base class
 
   /**
-   * @brief Get the IP Type of the Server it can be IPv4 or
-   * IPv6 the IP type is used to determine the length of the IP address
-   * if the IP type is IPv4 then the IP address is 4 bytes long if
-   * the IP type is IPv6 then the IP address is 16 bytes long
-   *
-   * @note The IP Type used in Server is IPv4
-   *
-   * @return types::IPType IP type
-   * @throw Any Exception If any error occurs
-   */
-  virtual types::enums::IPType getIPType() const override;
-
-  /**
    * @brief Get the Port number of the Server it can be any port
    * number from 0 to 65535 but the port number should be greater than 1024
    * because the port number less than 1024 are reserved for the system
@@ -282,15 +262,5 @@ class Server : public mDNSRegister {
    * @throw Any Exception If any error occurs
    */
   virtual quint16 getPort() const override;
-
-  /**
-   * @brief Get the IP Address of the Server it can be IPv4 or
-   * IPv6 if the IP type is IPv4 then the IP address is 4 bytes long if
-   * the IP type is IPv6 then the IP address is 16 bytes long
-   *
-   * @return types::IPAddress IP address
-   * @throw Any Exception If any error occurs
-   */
-  virtual QHostAddress getIPAddress() const override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

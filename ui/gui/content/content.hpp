@@ -7,6 +7,7 @@
 
 // Qt headers
 #include <QApplication>
+#include <QDesktopServices>
 #include <QFocusEvent>
 #include <QFormLayout>
 #include <QGuiApplication>
@@ -34,17 +35,27 @@
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/content/deviceinfo/deviceinfo.hpp"
 #include "ui/gui/content/devicelist/devicelist.hpp"
+#include "ui/gui/content/traymenu/traymenu.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 class Content : public QFrame {
+ private:  // Member variable (Tray)
+
+  ui::gui::content::TrayMenu *trayMenu = new ui::gui::content::TrayMenu(this);  // Tray Menu
+  QSystemTrayIcon *trayIcon = new QSystemTrayIcon(this);      // Tray Icon
+
  private:  // Member variable
 
-  window::DeviceInfo* deviceInfo = new window::DeviceInfo();  // Device Info
+  content::DeviceInfo* deviceInfo = new content::DeviceInfo();  // Device Info
 
  private:  // Member variable (Tabs)
 
-  window::DeviceList* clientList = new window::DeviceList();  // Server Tab
-  window::DeviceList* serverList = new window::DeviceList();  // Client Tab
+  content::DeviceList* clientList = new content::DeviceList();  // Server Tab
+  content::DeviceList* serverList = new content::DeviceList();  // Client Tab
+
+ private:  // Member variable (Layout)
+
+  QTabWidget* tab = new QTabWidget();
 
  public:  // typedefs used in this class
 
@@ -150,6 +161,18 @@ class Content : public QFrame {
    */
   void handleServerStatusChanged(bool status);
 
+  //----------------------------- slots for Tray ----------------------------//
+
+  /**
+   * @brief On About Clicked
+   */
+  void onAboutClicked();
+
+  /**
+   * @brief On Issue Clicked
+   */
+  void onIssueClicked();
+
  public:
 
   /**
@@ -187,6 +210,21 @@ class Content : public QFrame {
    * @brief Get the Hosts object
    */
   QPair<QString, int> getHostCount();
+
+  /**
+   * @brief Set tab as client
+   */
+  void setTabAsClient();
+
+  /**
+   * @brief Set tab as server
+   */
+  void setTabAsServer();
+
+  /**
+   * @brief Get System Tray Icon
+   */
+  QSystemTrayIcon* getTrayIcon();
 
   //---------------------- Server Tab ----------------------//
 

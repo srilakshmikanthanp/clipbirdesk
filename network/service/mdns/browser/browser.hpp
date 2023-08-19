@@ -26,20 +26,22 @@
 
 // Local headers
 #include "constants/constants.hpp"
-#include "interfaces/imdnsbrowser/imdnsbrowser.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd {
+namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
 /**
  * @brief Discovery client that sends the broadcast message
  * to the server and listen for the response if any server
  * is found then the callback function is called
  */
-class Browser : public interfaces::ImDNSBrowser {
- signals:  // signals for this class
-  /// @brief On Error Occurred
-  void OnErrorOccurred(QString error);
+class Browser : public QObject {
+ private:  // private variables
+
+  QSocketNotifier* m_browse_notify = nullptr;  ///< Socket notifier
+  DNSServiceRef m_browse_ref       = nullptr;  ///< Service ref
+  QSocketNotifier* m_res_notify    = nullptr;  ///< Socket notifier
+  DNSServiceRef m_res_ref          = nullptr;  ///< Service ref
 
  private:  // Just for Qt
 
@@ -48,13 +50,6 @@ class Browser : public interfaces::ImDNSBrowser {
  private:  // disable copy and move
 
   Q_DISABLE_COPY_MOVE(Browser)
-
- private:  // private variables
-
-  QSocketNotifier* m_browse_notify = nullptr;  ///< Socket notifier
-  DNSServiceRef m_browse_ref       = nullptr;  ///< Service ref
-  QSocketNotifier* m_res_notify    = nullptr;  ///< Socket notifier
-  DNSServiceRef m_res_ref          = nullptr;  ///< Service ref
 
  private:  // private functions
 

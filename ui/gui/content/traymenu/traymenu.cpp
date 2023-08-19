@@ -5,7 +5,7 @@
 
 #include "traymenu.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
 /**
  * @brief Construct a new Sys Tray object
  *

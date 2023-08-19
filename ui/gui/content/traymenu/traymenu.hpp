@@ -9,7 +9,7 @@
 #include <QMenu>
 #include <QSystemTrayIcon>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
 class TrayMenu : public QMenu {
  private:  // Disable copy constructor and copy assignment operator
 
