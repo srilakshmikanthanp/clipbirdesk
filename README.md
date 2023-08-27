@@ -133,7 +133,6 @@ choco install openssl
 | `OPENSSL_ROOT_DIR`  | OpenSSL installation directory     |
 | `QT_CMAKE_DIR`      | Qt6 cmake directory                |
 | `BONJOUR_SDK_HOME`  | Bonjour SDK directory              |
-| `POCO_CMAKE_DIR`    | POCO C++ Libraries cmake directory |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
