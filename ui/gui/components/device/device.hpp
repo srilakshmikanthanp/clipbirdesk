@@ -17,9 +17,11 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-
 // C++ Headers
 #include <tuple>
+
+// local headers
+#include "types/device/device.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class Device : public QWidget {
@@ -33,19 +35,14 @@ class Device : public QWidget {
 
  public:  // typedefs
 
-  using Value = std::tuple<QHostAddress, quint16, Action>;
+  using Value = std::tuple<types::device::Device, Action>;
 
  signals:  // Signals
-  void onAction(std::tuple<QHostAddress, quint16, Action>);
-
- private:  // Private Functions
-
-  void onHostResolved(const QHostInfo &info);
+  void onAction(std::tuple<types::device::Device, Action>);
 
  private:  // Member variable
 
-  QHostAddress address;
-  quint16 port;
+  types::device::Device device;
   Action action;
 
  private:  // Member variable
@@ -68,15 +65,11 @@ class Device : public QWidget {
 
   /**
    * @brief Set the Host
-   *
-   * @param QPair<QHostAddress, quint16>
    */
   void setHost(Value host);
 
   /**
    * @brief Get the Host
-   *
-   * @return QPair<QHostAddress, quint16>
    */
   Value getHost() const;
 

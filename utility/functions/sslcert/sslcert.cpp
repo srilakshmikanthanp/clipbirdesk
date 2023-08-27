@@ -73,6 +73,39 @@ std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey) {
     throw std::runtime_error("Can't Create X509");
   }
 
+  // get local host name
+  auto cname   = constants::getMDnsServiceName();
+  auto org     = constants::getAppOrgName();
+  auto orgUnit = constants::getAppName();
+
+  // get the subject name
+  X509_NAME *name = X509_get_subject_name(x509.get());
+
+  // set the common name
+  if(!X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, (const unsigned char *)cname.data(), -1, -1, 0)) {
+    throw std::runtime_error("Can't Set Subject Name");
+  }
+
+  // set the organization name
+  if(!X509_NAME_add_entry_by_txt(name, "O", MBSTRING_ASC, (const unsigned char *)org.c_str(), -1, -1, 0)) {
+    throw std::runtime_error("Can't Set Subject Name");
+  }
+
+  // set the unit name
+  if(!X509_NAME_add_entry_by_txt(name, "OU", MBSTRING_ASC, (const unsigned char *)orgUnit.c_str(), -1, -1, 0)) {
+    throw std::runtime_error("Can't Set Subject Name");
+  }
+
+  // try to set the subject name
+  if (!X509_set_subject_name(x509.get(), name)) {
+    throw std::runtime_error("Can't Set Subject Name");
+  }
+
+  // Set the issuer name
+  if (!X509_set_issuer_name(x509.get(), name)) {
+    throw std::runtime_error("Can't Set Issuer Name");
+  }
+
   // set Expiry date to 1 year
   X509_gmtime_adj(X509_get_notBefore(x509.get()), 0);
   X509_gmtime_adj(X509_get_notAfter(x509.get()), expiry);

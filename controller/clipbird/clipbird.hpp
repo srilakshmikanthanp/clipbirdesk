@@ -26,11 +26,11 @@ class ClipBird : public QObject {
 
  signals:  // signals for this class
   /// @brief On Server List Changed (From Client)
-  void OnServerListChanged(QList<QPair<QHostAddress, quint16>> servers);
+  void OnServerListChanged(QList<types::device::Device> servers);
 
  signals:  // signals for this class
   /// @brief On Server Found  (From Client)
-  void OnServerFound(QPair<QHostAddress, quint16> server);
+  void OnServerFound(types::device::Device server);
 
  signals:  // signals for this class
   /// @brief On Server state changed (From Client)
@@ -44,11 +44,11 @@ class ClipBird : public QObject {
 
  signals:  // signals
   /// @brief On client state changed (From Server)
-  void OnCLientStateChanged(QPair<QHostAddress, quint16> client, bool connected);
+  void OnCLientStateChanged(types::device::Device client, bool connected);
 
  signals:  // signals for this class
   /// @brief On New Host Connected
-  void OnNewHostConnected(QPair<QHostAddress, quint16> client);
+  void OnAuthRequested(types::device::Device client);
 
  signals:  // signals for this class
   /// @brief On Server state changed (From Server)
@@ -56,7 +56,7 @@ class ClipBird : public QObject {
 
  signals:  // signals for this class
   /// @brief On Sync Request  (From Server)
-  void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
+  void OnClientListChanged(QList<types::device::Device> clients);
 
  private:  // typedefs for this class
 
@@ -117,7 +117,7 @@ class ClipBird : public QObject {
    *
    * @return QList<QSslSocket*> List of clients
    */
-  QList<QPair<QHostAddress, quint16>> getConnectedClientsList() const;
+  QList<types::device::Device> getConnectedClientsList() const;
 
   /**
    * @brief Disconnect the client from the server and delete
@@ -125,7 +125,7 @@ class ClipBird : public QObject {
    * @param host ip address of the client
    * @param ip port number of the client
    */
-  void disconnectClient(const QPair<QHostAddress, quint16> &client);
+  void disconnectClient(const types::device::Device &client);
 
   /**
    * @brief Disconnect the all the clients from the server
@@ -137,7 +137,7 @@ class ClipBird : public QObject {
    *
    * @param client the client that is currently processed
    */
-  void authSuccess(const QPair<QHostAddress, quint16> &client);
+  void authSuccess(const types::device::Device &client);
 
   /**
    * @brief The function that is called when the client it not
@@ -145,21 +145,21 @@ class ClipBird : public QObject {
    *
    * @param client the client that is currently processed
    */
-  void authFailed(const QPair<QHostAddress, quint16> &client);
+  void authFailed(const types::device::Device &client);
 
   /**
    * @brief Get the server QHostAddress and port
    */
-  QPair<QHostAddress, quint16> getServerInfo() const;
+  types::device::Device getServerInfo() const;
 
   //---------------------- Client functions -----------------------//
 
   /**
    * @brief Get the Server List object
    *
-   * @return QList<QPair<QHostAddress, quint16>> List of servers
+   * @return QList<types::device::Device> List of servers
    */
-  QList<QPair<QHostAddress, quint16>> getServerList() const;
+  QList<types::device::Device> getServerList() const;
 
   /**
    * @brief Connect to the server with the given host and port
@@ -168,37 +168,34 @@ class ClipBird : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  void connectToServer(const QPair<QHostAddress, quint16> &host);
+  void connectToServer(const types::device::Device &host);
+
+  /**
+   * @brief Is Client Connected
+   */
+  bool isConnectedToServer();
 
   /**
    * @brief get the connected server address and port
    *
-   * @return QPair<QHostAddress, quint16> address and port
+   * @return types::device::Device address and port
    */
-  QPair<QHostAddress, quint16> getConnectedServer() const;
-
-  /**
-   * @brief get the connected server address and port or empty
-   *
-   * @return QPair<QHostAddress, quint16> address and port
-   */
-  QPair<QHostAddress, quint16> getConnectedServerOrEmpty() const;
+  types::device::Device getConnectedServer() const;
 
   /**
    * @brief Disconnect from the server
    */
-  void disconnectFromServer(const QPair<QHostAddress, quint16> &host);
+  void disconnectFromServer(const types::device::Device &host);
+
+  /**
+   * @brief Is Client Authed
+   */
+  bool isClientAuthed();
 
   /**
    * @brief Get the Authed Server object
-   * @return QPair<QHostAddress, quint16>
+   * @return types::device::Device
    */
-  QPair<QHostAddress, quint16> getAuthedServer() const;
-
-  /**
-   * @brief Get the Authed Server object Or Empty
-   * @return QPair<QHostAddress, quint16>
-   */
-  QPair<QHostAddress, quint16> getAuthedServerOrEmpty() const;
+  types::device::Device getAuthedServer() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::controller

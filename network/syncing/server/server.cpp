@@ -7,6 +7,44 @@
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 /**
+ * Process the AuthenticationPacket from the client
+ */
+void Server::processAuthenticationPacket(const packets::Authentication &packet) {
+  // if the packet is not Authentication Req then throw
+  if (packet.getAuthType() != types::enums::AuthType::AuthReq) {
+    throw types::except::MalformedPacket(
+      types::enums::ErrorCode::InvalidPacket, "Not Authentication Request"
+    );
+  }
+
+  // get the sender of the packet
+  auto client = qobject_cast<QSslSocket *>(sender());
+
+  // if not in unauthenticated list then throw
+  if (!m_un_authed_clients.contains(client)) {
+    throw types::except::MalformedPacket(
+      types::enums::ErrorCode::InvalidPacket, "Client is not TLS client"
+    );
+  }
+
+  // get the details of the client
+  const auto peerAddress = client->peerAddress();
+  const auto peerPort    = client->peerPort();
+  const auto certificate = client->peerCertificate();
+
+  // create the device
+  auto device = types::device::Device {
+    peerAddress,
+    peerPort,
+    certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
+    certificate,
+  };
+
+  // emit the signal that new host is connected
+  emit OnAuthRequested(device);
+}
+
+/**
  * @brief Process the SyncingPacket from the client
  *
  * @param packet SyncingPacket
@@ -51,16 +89,12 @@ void Server::processConnections() {
       // add the client to unauthenticated list
       m_un_authed_clients.append(client_tls);
 
-      // create the device
-      auto device = types::device::Device {
-          peerAddress,
-          peerPort,
-          certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
-          certificate,
-      };
-
-      // emit the signal that new host is connected
-      emit OnNewHostConnected(device);
+      // Connect the socket to the callback function that
+      // process the ready read when the socket is ready
+      // to read so the listener can be notified
+      const auto signal_r = &QSslSocket::readyRead;
+      const auto slot_r   = &Server::processReadyRead;
+      QObject::connect(client_tls, signal_r, this, slot_r);
     }
   }
 }
@@ -124,6 +158,27 @@ void Server::processReadyRead() {
     return;
   }
 
+  // Deserialize the data to AuthenticationPacket
+  try {
+    this->processAuthenticationPacket(fromQByteArray<packets::Authentication>(data));
+    return;
+  } catch (const types::except::MalformedPacket &e) {
+    const auto type = packets::InvalidRequest::PacketType::RequestFailed;
+    this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
+    return;
+  } catch (const types::except::NotThisPacket &e) {
+    qWarning() << (LOG(e.what()));
+  } catch (const std::exception &e) {
+    qWarning() << (LOG(e.what()));
+    return;
+  } catch (...) {
+    qWarning() << (LOG("Unknown Error"));
+    return;
+  }
+
+  // if not authenticated then return
+  if (!m_authed_clients.contains(client)) return;
+
   // Deserialize the data to SyncingPacket
   try {
     this->processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
@@ -164,10 +219,10 @@ void Server::processDisconnection() {
 
   // create the device
   auto device = types::device::Device {
-      peerAddress,
-      peerPort,
-      certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
-      certificate,
+    peerAddress,
+    peerPort,
+    certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
+    certificate,
   };
 
   // Notify the listeners that the client is disconnected
@@ -228,21 +283,14 @@ QList<types::device::Device> Server::getConnectedClientsList() const {
   QList<types::device::Device> list;
 
   for (auto client : m_authed_clients) {
-    // Peer info of the client
-    const auto peerAddress = client->peerAddress();
-    const auto peerPort    = client->peerPort();
-    const auto certificate = client->peerCertificate();
-
-    // create the device
-    auto device = types::device::Device {
-        peerAddress,
-        peerPort,
-        certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
-        certificate,
-    };
+    // Peer info of the client that is connected
+    const auto address = client->peerAddress();
+    const auto port    = client->peerPort();
+    const auto cert    = client->peerCertificate();
+    const auto name    = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
     // add the device to the list
-    list.append(device);
+    list.append({address, port, name, cert});
   }
 
   return list;
@@ -254,10 +302,10 @@ QList<types::device::Device> Server::getConnectedClientsList() const {
  *
  * @param client Client to disconnect
  */
-void Server::disconnectClient(QPair<QHostAddress, quint16> client) {
+void Server::disconnectClient(types::device::Device client) {
   // matcher lambda function to find the client
   const auto matcher = [&client](QSslSocket *c) {
-    return (c->peerAddress() == client.first) && (c->peerPort() == client.second);
+    return (c->peerAddress() == client.ip) && (c->peerPort() == client.port);
   };
 
   // find the client from the list of clients
@@ -278,10 +326,17 @@ void Server::disconnectAllClients() {
 /**
  * @brief Get the Server QHostAddress & Port
  *
- * @return QPair<QHostAddress, quint16>
+ * @return types::device::Device
  */
-QPair<QHostAddress, quint16> Server::getServerInfo() const {
-  return {m_ssl_server->serverAddress(), m_ssl_server->serverPort()};
+types::device::Device Server::getServerInfo() const {
+  // server information
+  auto address = m_ssl_server->serverAddress();
+  auto port = m_ssl_server->serverPort();
+  auto cert = m_ssl_server->sslConfiguration().localCertificate();
+  auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+
+  // Return info
+  return { address, port, name, cert };
 }
 
 /**
@@ -307,10 +362,10 @@ QSslConfiguration Server::getSSLConfiguration() const {
  *
  * @param client the client that is currently processed
  */
-void Server::authSuccess(const QPair<QHostAddress, quint16> &client) {
+void Server::authSuccess(const types::device::Device &client) {
   // Matcher Lambda Function to find the client
   const auto matcher = [&client](QSslSocket *c) {
-    return (c->peerAddress() == client.first) && (c->peerPort() == client.second);
+    return (c->peerAddress() == client.ip) && (c->peerPort() == client.port);
   };
 
   // Get the iterator to the start and end of the list
@@ -336,24 +391,18 @@ void Server::authSuccess(const QPair<QHostAddress, quint16> &client) {
   const auto slot_d   = &Server::processDisconnection;
   QObject::connect(client_tls, signal_d, this, slot_d);
 
-  // Connect the socket to the callback function that
-  // process the ready read when the socket is ready
-  // to read so the listener can be notified
-  const auto signal_r = &QSslSocket::readyRead;
-  const auto slot_r   = &Server::processReadyRead;
-  QObject::connect(client_tls, signal_r, this, slot_r);
-
   // Peer info
-  const auto peerAddress = client_tls->peerAddress();
-  const auto peerPort    = client_tls->peerPort();
-  const auto certificate = client_tls->peerCertificate();
+  const auto address = client_tls->peerAddress();
+  const auto port    = client_tls->peerPort();
+  const auto cert    = client_tls->peerCertificate();
+  const auto name    = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
   // create the device
   auto device = types::device::Device {
-      peerAddress,
-      peerPort,
-      certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
-      certificate,
+      address,
+      port,
+      name,
+      cert,
   };
 
   // Notify the listeners that the client is connected
@@ -370,8 +419,9 @@ void Server::authSuccess(const QPair<QHostAddress, quint16> &client) {
 
   // create the Authentication packet
   packets::Authentication packet = createPacket({
-      packets::Authentication::PacketType::AuthStatus,
-      types::enums::AuthStatus::AuthSuccess,
+      packets::Authentication::PacketType::AuthPacket,
+      types::enums::AuthType::AuthRes,
+      types::enums::AuthStatus::AuthOkay,
   });
 
   // send the packet to the client
@@ -383,10 +433,10 @@ void Server::authSuccess(const QPair<QHostAddress, quint16> &client) {
  *
  * @param client the client that is currently processed
  */
-void Server::authFailed(const QPair<QHostAddress, quint16> &client) {
+void Server::authFailed(const types::device::Device&client) {
   // Matcher Lambda Function to find the client
   const auto matcher = [&client](QSslSocket *c) {
-    return (c->peerAddress() == client.first) && (c->peerPort() == client.second);
+    return (c->peerAddress() == client.ip) && (c->peerPort() == client.port);
   };
 
   // Get the iterator to the start and end of the list
@@ -407,8 +457,9 @@ void Server::authFailed(const QPair<QHostAddress, quint16> &client) {
 
   // create the Authentication packet
   packets::Authentication packet = createPacket({
-      packets::Authentication::PacketType::AuthStatus,
-      types::enums::AuthStatus::AuthFailed,
+      packets::Authentication::PacketType::AuthPacket,
+      types::enums::AuthType::AuthRes,
+      types::enums::AuthStatus::AuthFail,
   });
 
   // send the packet to the client

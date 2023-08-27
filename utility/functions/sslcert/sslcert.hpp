@@ -12,6 +12,7 @@
 #include <QSslCertificate>
 #include <QSslConfiguration>
 #include <QSslKey>
+#include <QHostInfo>
 
 // C++ headers
 #include <memory>
@@ -22,6 +23,10 @@
 // openssl headers
 #include <openssl/pem.h>
 #include <openssl/x509.h>
+#include <openssl/err.h>
+
+// local headers
+#include "constants/constants.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions::internal {
 /**

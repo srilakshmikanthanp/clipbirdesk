@@ -27,6 +27,7 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions::internals {
  */
 struct AuthenticationParams {
   quint8 packetType;
+  quint8 authType;
   quint8 authStatus;
 };
 

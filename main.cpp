@@ -4,6 +4,8 @@
 // https://opensource.org/licenses/MIT
 
 // Qt Headers
+#include <QApplication>
+#include <QHostInfo>
 #include <QFile>
 #include <QStyleHints>
 #include <QGraphicsDropShadowEffect>

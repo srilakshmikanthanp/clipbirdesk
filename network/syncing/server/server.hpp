@@ -33,7 +33,7 @@ class Server : public service::mdnsRegister {
 
  signals:  // signals for this class
   /// @brief On New Host Connected
-  void OnNewHostConnected(types::device::Device);
+  void OnAuthRequested(types::device::Device);
 
  signals:  // signals for this class
   /// @brief On Server State Changed
@@ -128,6 +128,13 @@ class Server : public service::mdnsRegister {
   }
 
   /**
+   * @brief Process the AuthenticationPacket from the client
+   *
+   * @param packet
+   */
+  void processAuthenticationPacket(const packets::Authentication &packet);
+
+  /**
    * @brief Process the SyncingPacket from the client
    *
    * @param packet SyncingPacket
@@ -190,7 +197,7 @@ class Server : public service::mdnsRegister {
    *
    * @param client Client to disconnect
    */
-  void disconnectClient(QPair<QHostAddress, quint16> client);
+  void disconnectClient(types::device::Device client);
 
   /**
    * @brief Disconnect the all the clients from the server
@@ -200,9 +207,9 @@ class Server : public service::mdnsRegister {
   /**
    * @brief Get the Server QHostAddress & Port
    *
-   * @return QPair<QHostAddress, quint16>
+   * @return types::device::Device
    */
-  QPair<QHostAddress, quint16> getServerInfo() const;
+  types::device::Device getServerInfo() const;
 
   /**
    * @brief Set the SSL Configuration object
@@ -222,7 +229,7 @@ class Server : public service::mdnsRegister {
    *
    * @param client the client that is currently processed
    */
-  void authSuccess(const QPair<QHostAddress, quint16>&);
+  void authSuccess(const types::device::Device&);
 
   /**
    * @brief The function that is called when the client it not
@@ -230,7 +237,7 @@ class Server : public service::mdnsRegister {
    *
    * @param client the client that is currently processed
    */
-  void authFailed(const QPair<QHostAddress, quint16>&);
+  void authFailed(const types::device::Device&);
 
   /**
    * @brief Start the server
@@ -249,10 +256,10 @@ class Server : public service::mdnsRegister {
    * @param QPair {QHostAddress, port}
    */
   template <typename Packet>
-  void sendToClient(const Packet &packet, const QPair<QHostAddress, quint16> &client) {
+  void sendToClient(const Packet &packet, const types::device::Device &client) {
     // Matcher Lambda Function to find the client
     const auto matcher = [&client](QSslSocket *c) {
-      return (c->peerAddress() == client.first) && (c->peerPort() == client.second);
+      return (c->peerAddress() == client.ip) && (c->peerPort() == client.port);
     };
 
     // Get the iterator to the start and end of the list

@@ -27,6 +27,9 @@ TEST(AuthenticationTest, TestingAuthentication) {
   // using the ErrorCode
   using srilakshmikanthanp::clipbirdesk::types::enums::AuthStatus;
 
+  // using the AuthType
+  using srilakshmikanthanp::clipbirdesk::types::enums::AuthType;
+
   // using functions namespace
   using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
 
@@ -34,10 +37,10 @@ TEST(AuthenticationTest, TestingAuthentication) {
   Authentication packet_send, packet_recv;
 
   // constant values
-  const auto packetType = Authentication::PacketType::AuthStatus;
+  const auto packetType = Authentication::PacketType::AuthPacket;
 
   // setting the packet type
-  packet_send = createPacket({ packetType, AuthStatus::AuthSuccess });
+  packet_send = createPacket({ packetType, AuthType::AuthRes, AuthStatus::AuthOkay });
 
   // load the packet from network byte order
   packet_recv = fromQByteArray<Authentication>(toQByteArray(packet_send));
@@ -48,6 +51,9 @@ TEST(AuthenticationTest, TestingAuthentication) {
   // check the packet length
   EXPECT_EQ(packet_recv.getPacketLength(), packet_send.size());
 
+  // check the auth type
+  EXPECT_EQ(packet_recv.getAuthType(), AuthType::AuthRes);
+
   // check the status code
-  EXPECT_EQ(packet_recv.getAuthStatus(), AuthStatus::AuthSuccess);
+  EXPECT_EQ(packet_recv.getAuthStatus(), AuthStatus::AuthOkay);
 }

@@ -34,7 +34,7 @@ class Authentication {
  public:
 
   /// @brief Allowed Packet Types
-  enum PacketType : quint8 { AuthStatus = 0x01 };
+  enum PacketType : quint8 { AuthPacket = 0x01 };
 
  public:
 

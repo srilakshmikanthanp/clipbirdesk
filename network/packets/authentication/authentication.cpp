@@ -30,7 +30,7 @@ quint32 Authentication::getPacketLength() const noexcept {
  * @param type
  */
 void Authentication::setPacketType(quint8 type) {
-  if (type != PacketType::AuthStatus) {
+  if (type != PacketType::AuthPacket) {
     throw std::invalid_argument("Invalid Packet Type");
   }
 
@@ -80,12 +80,12 @@ quint8 Authentication::getAuthType() const noexcept {
  * @param status
  */
 void Authentication::setAuthStatus(quint8 status) {
-  if (status == types::enums::AuthStatus::AuthFailed) {
+  if (status == types::enums::AuthStatus::AuthFail) {
     this->authStatus = status;
     return;
   }
 
-  if (status == types::enums::AuthStatus::AuthSuccess) {
+  if (status == types::enums::AuthStatus::AuthOkay) {
     this->authStatus = status;
     return;
   }
@@ -143,7 +143,7 @@ QDataStream& operator>>(QDataStream& stream, Authentication& packet) {
   using types::enums::ErrorCode;
 
   // Check the packet type
-  if (packet.packetType != Authentication::PacketType::AuthStatus) {
+  if (packet.packetType != Authentication::PacketType::AuthPacket) {
     throw types::except::NotThisPacket("Not Authentication Packet");
   }
 
@@ -154,7 +154,7 @@ QDataStream& operator>>(QDataStream& stream, Authentication& packet) {
   const auto authStatus = packet.authStatus;
 
   // Check the auth status
-  if (authStatus != AuthStatus::AuthFailed && authStatus != AuthStatus::AuthSuccess) {
+  if (authStatus != AuthStatus::AuthFail && authStatus != AuthStatus::AuthOkay) {
     throw MalformedPacket(ErrorCode::CodingError, "Invalid Auth Status");
   }
 

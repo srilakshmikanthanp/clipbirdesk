@@ -12,16 +12,16 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui {
  * @brief handle the host action from the window
  */
 void Content::handleHostAction(Tabs t, components::Device::Value h) {
-  if (t == Tabs::Server && std::get<2>(h) == Action::Disconnect) {
-    controller->disconnectClient({std::get<0>(h), std::get<1>(h)});
+  if (t == Tabs::Server && std::get<1>(h) == Action::Disconnect) {
+    controller->disconnectClient(std::get<0>(h));
   }
 
-  if (t == Tabs::Client && std::get<2>(h) == Action::Connect) {
-    controller->connectToServer({std::get<0>(h), std::get<1>(h)});
+  if (t == Tabs::Client && std::get<1>(h) == Action::Connect) {
+    controller->connectToServer(std::get<0>(h));
   }
 
-  if (t == Tabs::Client && std::get<2>(h) == Action::Disconnect) {
-    controller->disconnectFromServer({std::get<0>(h), std::get<1>(h)});
+  if (t == Tabs::Client && std::get<1>(h) == Action::Disconnect) {
+    controller->disconnectFromServer(std::get<0>(h));
   }
 }
 
@@ -66,13 +66,13 @@ void Content::handleTabChangeForServer(Tabs tab) {
 /**
  * @brief Handle the Client List Item Clicked
  */
-void Content::handleClientListChange(QList<QPair<QHostAddress, quint16>> clients) {
+void Content::handleClientListChange(QList<types::device::Device> clients) {
   // Create a list of tuple with Action
   QList<components::Device::Value> clients_m;
 
   // Add the clients to the list
   for (auto c : clients) {
-    clients_m.append({c.first, c.second, Action::Disconnect});
+    clients_m.append({c, Action::Disconnect});
   }
 
   // set the client list to the window
@@ -94,8 +94,8 @@ void Content::handleServerStateChange(bool isStarted) {
   // if the server is started
   if (isStarted) {
     auto info  = controller->getServerInfo();
-    auto ip    = info.first.toString();
-    auto port  = info.second;
+    auto ip    = info.ip.toString();
+    auto port  = info.port;
     groupName  = QHostInfo::fromName(ip).hostName();
   }
 
@@ -109,7 +109,7 @@ void Content::handleServerStateChange(bool isStarted) {
 
   // Add the clients to the list
   for (auto c : clients) {
-    clients_m.append({c.first, c.second, Action::Disconnect});
+    clients_m.append({c, Action::Disconnect});
   }
 
   // set the client list to the window
@@ -121,7 +121,7 @@ void Content::handleServerStateChange(bool isStarted) {
  *
  * @param client
  */
-void Content::handleNewHostConnected(const QPair<QHostAddress, quint16>& client) {
+void Content::handleNewHostConnected(const types::device::Device& client) {
   // callback for host info looked up
   const auto onHostInfoFound = [=](const QHostInfo& info) -> void {
     // get the message to show
@@ -130,9 +130,7 @@ void Content::handleNewHostConnected(const QPair<QHostAddress, quint16>& client)
       "A New client Attempting to connect\n"
       "Host: %1\n"
       "Accept the connection?"
-    ).arg(
-      info.hostName()
-    );
+    ).arg(info.hostName());
     // clang-format on
 
     // get the user input
@@ -174,7 +172,7 @@ void Content::handleNewHostConnected(const QPair<QHostAddress, quint16>& client)
   };
 
   // lookup the host info
-  QHostInfo::lookupHost(client.first.toString(), onHostInfoFound);
+  QHostInfo::lookupHost(client.ip.toString(), onHostInfoFound);
 }
 
 //----------------------------- slots for Client --------------------------//
@@ -182,21 +180,31 @@ void Content::handleNewHostConnected(const QPair<QHostAddress, quint16>& client)
 /**
  * @brief Handle the Server List Item Clicked
  */
-void Content::handleServerListChange(QList<QPair<QHostAddress, quint16>> servers) {
+void Content::handleServerListChange(QList<types::device::Device> servers) {
   // Create a list of tuple with Action
   QList<components::Device::Value> servers_m;
 
-  // get the connected server
-  const auto server    = controller->getAuthedServerOrEmpty();
-
   // get the action for the server
-  const auto getAction = [&server](const auto& s) {
-    return s == server ? Action::Disconnect : Action::Connect;
+  const auto getAction = [=](const types::device::Device& s) {
+    // is not authed
+    if (!controller->isClientAuthed()) {
+      return Action::Connect;
+    }
+
+    // is authed
+    auto authed = controller->getAuthedServer();
+
+    // infer
+    if (s.ip == authed.ip && s.port == authed.port) {
+      return Action::Disconnect;
+    } else {
+      return Action::Connect;
+    }
   };
 
   // add the server to the list
   for (auto s : servers) {
-    servers_m.append({s.first, s.second, getAction(s)});
+    servers_m.append({s, getAction(s)});
   }
 
   // set the server list to the window
@@ -218,8 +226,8 @@ void Content::handleServerAuthentication(bool isAuthed) {
   // if the client is Authed
   if (isAuthed) {
     auto server = controller->getAuthedServer();
-    auto ip     = server.first.toString();
-    auto port   = server.second;
+    auto ip     = server.ip.toString();
+    auto port   = server.port;
     groupName   = QHostInfo::fromName(ip).hostName();
   }
 
@@ -231,17 +239,27 @@ void Content::handleServerAuthentication(bool isAuthed) {
   // Create a list of tuple with Action
   QList<components::Device::Value> servers_m;
 
-  // get the connected server
-  const auto server    = controller->getAuthedServerOrEmpty();
-
   // get the action for the server
-  const auto getAction = [&server](const auto& s) {
-    return s == server ? Action::Disconnect : Action::Connect;
+  const auto getAction = [=](const auto& s) {
+    // is not authed
+    if (!controller->isClientAuthed()) {
+      return Action::Connect;
+    }
+
+    // is authed
+    auto authed = controller->getAuthedServer();
+
+    // infer
+    if (s.ip == authed.ip && s.port == authed.port) {
+      return Action::Disconnect;
+    } else {
+      return Action::Connect;
+    }
   };
 
   // add the server to the list
   for (auto s : servers) {
-    servers_m.append({s.first, s.second, getAction(s)});
+    servers_m.append({s, getAction(s)});
   }
 
   // set the server list to the window
@@ -261,17 +279,27 @@ void Content::handleServerStatusChanged(bool status) {
   // Create a list of tuple with Action
   QList<components::Device::Value> servers_m;
 
-  // get the connected server
-  const auto server    = controller->getAuthedServerOrEmpty();
-
   // get the action for the server
-  const auto getAction = [&server](const auto& s) {
-    return s == server ? Action::Disconnect : Action::Connect;
+  const auto getAction = [=](const auto& s) {
+    // is not authed
+    if (!controller->isClientAuthed()) {
+      return Action::Connect;
+    }
+
+    // is authed
+    auto authed = controller->getAuthedServer();
+
+    // infer
+    if (s.ip == authed.ip && s.port == authed.port) {
+      return Action::Disconnect;
+    } else {
+      return Action::Connect;
+    }
   };
 
   // add the server to the list
   for (auto s : controller->getServerList()) {
-    servers_m.append({s.first, s.second, getAction(s)});
+    servers_m.append({s, getAction(s)});
   }
 
   // set the server list to the window
@@ -368,7 +396,7 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   trayIcon->setToolTip(constants::getAppName().c_str());
 
   // set the signal for on new Host
-  const auto signal_nh = &controller::ClipBird::OnNewHostConnected;
+  const auto signal_nh = &controller::ClipBird::OnAuthRequested;
   const auto slot_nh   = &Content::handleNewHostConnected;
   QObject::connect(controller, signal_nh, this, slot_nh);
 

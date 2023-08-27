@@ -79,8 +79,8 @@ void ClipBird::setCurrentHostAsServer() {
   connect(server, signal_cs, this, slot_cs);
 
   // Connect the onNewHostConnected signal to the signal
-  const auto signal_nh = &Server::OnNewHostConnected;
-  const auto slot_nh   = &ClipBird::OnNewHostConnected;
+  const auto signal_nh = &Server::OnAuthRequested;
+  const auto slot_nh   = &ClipBird::OnAuthRequested;
   connect(server, signal_nh, this, slot_nh);
 
   // Connect the onSyncRequest signal to the clipboard
@@ -154,7 +154,7 @@ void ClipBird::setCurrentHostAsClient() {
  *
  * @return QList<QSslSocket*> List of clients
  */
-QList<QPair<QHostAddress, quint16>> ClipBird::getConnectedClientsList() const {
+QList<types::device::Device> ClipBird::getConnectedClientsList() const {
   if (std::holds_alternative<Server>(m_host)) {
     return std::get<Server>(m_host).getConnectedClientsList();
   } else {
@@ -168,7 +168,7 @@ QList<QPair<QHostAddress, quint16>> ClipBird::getConnectedClientsList() const {
  * @param host ip address of the client
  * @param ip port number of the client
  */
-void ClipBird::disconnectClient(const QPair<QHostAddress, quint16> &client) {
+void ClipBird::disconnectClient(const types::device::Device &client) {
   // if the host is not server then throw
   if (!std::holds_alternative<Server>(m_host)) {
     throw std::runtime_error("Host is not server");
@@ -176,7 +176,7 @@ void ClipBird::disconnectClient(const QPair<QHostAddress, quint16> &client) {
 
   // find the client with the given host and ip
   const auto match = [&](auto i) -> auto{
-    return i.first == client.first && i.second == client.second;
+    return (i.ip == client.ip) && (i.port == client.port);
   };
 
   // get the list of clients
@@ -209,7 +209,7 @@ void ClipBird::disconnectAllClients() {
  *
  * @param client the client that is currently processed
  */
-void ClipBird::authSuccess(const QPair<QHostAddress, quint16> &client) {
+void ClipBird::authSuccess(const types::device::Device &client) {
   if (std::holds_alternative<Server>(m_host)) {
     std::get<Server>(m_host).authSuccess(client);
   } else {
@@ -223,7 +223,7 @@ void ClipBird::authSuccess(const QPair<QHostAddress, quint16> &client) {
  *
  * @param client the client that is currently processed
  */
-void ClipBird::authFailed(const QPair<QHostAddress, quint16> &client) {
+void ClipBird::authFailed(const types::device::Device &client) {
   if (std::holds_alternative<Server>(m_host)) {
     std::get<Server>(m_host).authFailed(client);
   } else {
@@ -234,7 +234,7 @@ void ClipBird::authFailed(const QPair<QHostAddress, quint16> &client) {
 /**
  * @brief Get the server QHostAddress and port
  */
-QPair<QHostAddress, quint16> ClipBird::getServerInfo() const {
+types::device::Device ClipBird::getServerInfo() const {
   if (std::holds_alternative<Server>(m_host)) {
     return std::get<Server>(m_host).getServerInfo();
   } else {
@@ -247,9 +247,9 @@ QPair<QHostAddress, quint16> ClipBird::getServerInfo() const {
 /**
  * @brief Get the Server List object
  *
- * @return QList<QPair<QHostAddress, quint16>> List of servers
+ * @return QList<types::device::Device> List of servers
  */
-QList<QPair<QHostAddress, quint16>> ClipBird::getServerList() const {
+QList<types::device::Device> ClipBird::getServerList() const {
   if (std::holds_alternative<Client>(m_host)) {
     return std::get<Client>(m_host).getServerList();
   } else {
@@ -264,7 +264,7 @@ QList<QPair<QHostAddress, quint16>> ClipBird::getServerList() const {
  * @param host Host address
  * @param port Port number
  */
-void ClipBird::connectToServer(const QPair<QHostAddress, quint16> &host) {
+void ClipBird::connectToServer(const types::device::Device &host) {
   if (std::holds_alternative<Client>(m_host)) {
     std::get<Client>(m_host).connectToServer(host);
   } else {
@@ -273,11 +273,22 @@ void ClipBird::connectToServer(const QPair<QHostAddress, quint16> &host) {
 }
 
 /**
+ * @brief Is Client Connected
+ */
+bool ClipBird::isConnectedToServer() {
+  if (std::holds_alternative<Client>(m_host)) {
+    return std::get<Client>(m_host).isConnected();
+  } else {
+    throw std::runtime_error("Host is not client");
+  }
+}
+
+/**
  * @brief get the connected server address and port
  *
- * @return QPair<QHostAddress, quint16> address and port
+ * @return types::device::Device address and port
  */
-QPair<QHostAddress, quint16> ClipBird::getConnectedServer() const {
+types::device::Device ClipBird::getConnectedServer() const {
   if (std::holds_alternative<Client>(m_host)) {
     return std::get<Client>(m_host).getConnectedServer();
   } else {
@@ -286,22 +297,9 @@ QPair<QHostAddress, quint16> ClipBird::getConnectedServer() const {
 }
 
 /**
- * @brief get the connected server address and port or empty
- *
- * @return QPair<QHostAddress, quint16> address and port
- */
-QPair<QHostAddress, quint16> ClipBird::getConnectedServerOrEmpty() const {
-  if (std::holds_alternative<Client>(m_host)) {
-    return std::get<Client>(m_host).getConnectedServerOrEmpty();
-  } else {
-    throw std::runtime_error("Host is not client");
-  }
-}
-
-/**
  * @brief Disconnect from the server
  */
-void ClipBird::disconnectFromServer(const QPair<QHostAddress, quint16> &host) {
+void ClipBird::disconnectFromServer(const types::device::Device &host) {
   // if the host is not client then throw error
   if (!std::holds_alternative<Client>(m_host)) {
     throw std::runtime_error("Host is not client");
@@ -309,7 +307,7 @@ void ClipBird::disconnectFromServer(const QPair<QHostAddress, quint16> &host) {
 
   // find the server with the given host and ip
   const auto match = [&](auto i) -> auto{
-    return i.first == host.first && i.second == host.second;
+    return (i.ip == host.ip) && (i.port == host.port);
   };
 
   // get the connected server
@@ -324,24 +322,23 @@ void ClipBird::disconnectFromServer(const QPair<QHostAddress, quint16> &host) {
 }
 
 /**
- * @brief Get the Authed Server object
- * @return QPair<QHostAddress, quint16>
+ * @brief Is Authed Server
  */
-QPair<QHostAddress, quint16> ClipBird::getAuthedServer() const {
+bool ClipBird::isClientAuthed() {
   if (std::holds_alternative<Client>(m_host)) {
-    return std::get<Client>(m_host).getAuthedServer();
+    return std::get<Client>(m_host).isAuthenticated();
   } else {
     throw std::runtime_error("Host is not client");
   }
 }
 
 /**
- * @brief Get the Authed Server object Or Empty
- * @return QPair<QHostAddress, quint16>
+ * @brief Get the Authed Server object
+ * @return types::device::Device
  */
-QPair<QHostAddress, quint16> ClipBird::getAuthedServerOrEmpty() const {
+types::device::Device ClipBird::getAuthedServer() const {
   if (std::holds_alternative<Client>(m_host)) {
-    return std::get<Client>(m_host).getAuthedServerOrEmpty();
+    return std::get<Client>(m_host).getAuthedServer();
   } else {
     throw std::runtime_error("Host is not client");
   }

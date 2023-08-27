@@ -29,7 +29,8 @@ enum AuthType : quint8 {
 
 /// @brief Allowed Authentication Status
 enum AuthStatus : quint8 {
-  AuthFailed  = 0x00,
-  AuthSuccess = 0x01,
+  AuthStart = 0x00,
+  AuthOkay  = 0x01,
+  AuthFail  = 0x02,
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::types::enums

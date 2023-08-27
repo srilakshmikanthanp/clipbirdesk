@@ -21,6 +21,9 @@ network::packets::Authentication createPacket(internals::AuthenticationParams pa
   // set the packet type
   packet.setPacketType(params.packetType);
 
+  // set the auth type
+  packet.setAuthType(params.authType);
+
   // set the auth status
   packet.setAuthStatus(params.authStatus);
 

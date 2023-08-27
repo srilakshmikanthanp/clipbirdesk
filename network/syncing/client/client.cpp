@@ -12,7 +12,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @param packet Authentication
  */
 void Client::processAuthentication(const packets::Authentication& packet) {
-  if (packet.getAuthStatus() == types::enums::AuthStatus::AuthSuccess) {
+  if (packet.getAuthStatus() == types::enums::AuthStatus::AuthOkay) {
     emit OnServerAuthentication((this->m_is_authed = true));
   } else {
     emit OnServerAuthentication((this->m_is_authed = false));
@@ -268,6 +268,19 @@ QList<types::device::Device> Client::getServerList() const {
  * @param port Port number
  */
 void Client::connectToServer(types::device::Device client) {
+  // on Encrypted lambda function to process
+  const auto onEncrypted = [this]() {
+    // create Authentication packet
+    auto packet = utility::functions::createPacket({
+        packets::Authentication::PacketType::AuthPacket,
+        types::enums::AuthType::AuthReq,
+        types::enums::AuthStatus::AuthStart,
+    });
+
+    // send the packet to the server
+    this->sendPacket(packet);
+  };
+
   // check if the SSL configuration is set
   if (m_ssl_socket->sslConfiguration().isNull()) {
     throw std::runtime_error("SSL Configuration is not set");
@@ -284,6 +297,9 @@ void Client::connectToServer(types::device::Device client) {
 
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
+
+  // connect the signal to the lambda function
+  connect(m_ssl_socket, &QSslSocket::encrypted, onEncrypted);
 }
 
 /**
@@ -361,7 +377,7 @@ void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
     emit OnServerFound({server.first, server.second, name, cert});
 
     // add the server to the list
-    m_servers.append({server.first, server.second});
+    m_servers.append({server.first, server.second, name, cert});
 
     // emit the signal
     emit OnServerListChanged(getServerList());

@@ -148,6 +148,9 @@
     "*.qs": "javascript",
     ".qs": "javascript",
     "qsystemtrayicon": "cpp",
-    "qsettings": "cpp"
+    "qsettings": "cpp",
+    "queue": "cpp",
+    "stack": "cpp",
+    "qsslcertificate": "cpp"
   },
 }
