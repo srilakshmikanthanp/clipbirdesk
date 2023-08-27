@@ -21,6 +21,12 @@ enum ErrorCode : quint8 {
   InvalidPacket = 0x03,
 };
 
+/// @brief Allowed Authentication Types
+enum AuthType : quint8 {
+  AuthReq = 0x00,
+  AuthRes = 0x01,
+};
+
 /// @brief Allowed Authentication Status
 enum AuthStatus : quint8 {
   AuthFailed  = 0x00,

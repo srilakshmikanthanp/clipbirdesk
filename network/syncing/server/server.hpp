@@ -15,6 +15,7 @@
 
 #include "network/packets/authentication/authentication.hpp"
 #include "network/service/index.hpp"
+#include "types/device/device.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
@@ -28,11 +29,11 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 class Server : public service::mdnsRegister {
  signals:  // signals
   /// @brief On client state changed
-  void OnCLientStateChanged(QPair<QHostAddress, quint16>, bool connected);
+  void OnCLientStateChanged(types::device::Device, bool connected);
 
  signals:  // signals for this class
   /// @brief On New Host Connected
-  void OnNewHostConnected(QPair<QHostAddress, quint16>);
+  void OnNewHostConnected(types::device::Device);
 
  signals:  // signals for this class
   /// @brief On Server State Changed
@@ -44,8 +45,7 @@ class Server : public service::mdnsRegister {
 
  signals:  // signals for this class
   /// @brief On Sync Request
-  void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
-
+  void OnClientListChanged(QList<types::device::Device> clients);
 
  private:  // just for Qt
 
@@ -181,10 +181,8 @@ class Server : public service::mdnsRegister {
 
   /**
    * @brief Get the Clients that are connected to the server
-   *
-   * @return QList<QSslSocket*> List of clients
    */
-  QList<QPair<QHostAddress, quint16>> getConnectedClientsList() const;
+  QList<types::device::Device> getConnectedClientsList() const;
 
   /**
    * @brief Disconnect the client from the server and delete

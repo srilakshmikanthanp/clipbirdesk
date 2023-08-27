@@ -28,6 +28,7 @@ class Authentication {
 
   quint32 packetLength;
   quint8 packetType = 0x00;
+  quint8 authType;
   quint8 authStatus;
 
  public:
@@ -64,6 +65,20 @@ class Authentication {
    * @return quint8
    */
   quint8 getPacketType() const noexcept;
+
+  /**
+   * @brief Set the Auth Type object
+   *
+   * @param type
+   */
+  void setAuthType(quint8 type);
+
+  /**
+   * @brief Get the Auth Type object
+   *
+   * @return quint8
+   */
+  quint8 getAuthType() const noexcept;
 
   /**
    * @brief Set the Auth Status object

@@ -15,6 +15,7 @@
 #include <QSslSocket>
 #include <QTimer>
 #include <QVector>
+#include <QNetworkReply>
 
 // standard headers
 #include <tuple>
@@ -23,6 +24,7 @@
 // Local headers
 #include "network/service/index.hpp"
 #include "types/enums/enums.hpp"
+#include "types/device/device.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"
@@ -35,15 +37,15 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 class Client : public service::mdnsBrowser {
  signals:  // signals for this class
   /// @brief On Server List Changed
-  void OnServerListChanged(QList<QPair<QHostAddress, quint16>> servers);
+  void OnServerListChanged(QList<types::device::Device> servers);
 
  signals:  // signals for this class
   /// @brief On Server Found
-  void OnServerFound(QPair<QHostAddress, quint16>);
+  void OnServerFound(types::device::Device);
 
  signals:  // signals for this class
   /// @brief On Server Gone
-  void OnServerGone(QPair<QHostAddress, quint16>);
+  void OnServerGone(types::device::Device);
 
  signals:  // signals for this class
   /// @brief On Server state changed
@@ -70,7 +72,7 @@ class Client : public service::mdnsBrowser {
  private:  // Member variables
 
   /// @brief List of Found servers and timestamp
-  QList<std::tuple<QHostAddress, quint16>> m_servers;
+  QList<types::device::Device> m_servers;
 
   /// @brief SSL socket
   QSslSocket* m_ssl_socket = new QSslSocket(this);
@@ -194,7 +196,7 @@ class Client : public service::mdnsBrowser {
    *
    * @return QList<QPair<QHostAddress, quint16>> List of servers
    */
-  QList<QPair<QHostAddress, quint16>> getServerList() const;
+  QList<types::device::Device> getServerList() const;
 
   /**
    * @brief Connect to the server with the given host and port
@@ -203,19 +205,17 @@ class Client : public service::mdnsBrowser {
    * @param host Host address
    * @param port Port number
    */
-  void connectToServer(QPair<QHostAddress, quint16> client);
+  void connectToServer(types::device::Device client);
+
+  /**
+   * @brief IS connected to the server
+   */
+  bool isConnected() const;
 
   /**
    * @brief Get the Connection Host and Port object
-   * @return QPair<QHostAddress, quint16>
    */
-  QPair<QHostAddress, quint16> getConnectedServer() const;
-
-  /**
-   * @brief Get the Connection Host and Port object Or Empty
-   * @return QPair<QHostAddress, quint16>
-   */
-  QPair<QHostAddress, quint16> getConnectedServerOrEmpty() const;
+  types::device::Device getConnectedServer() const;
 
   /**
    * @brief Disconnect from the server
@@ -223,16 +223,14 @@ class Client : public service::mdnsBrowser {
   void disconnectFromServer();
 
   /**
-   * @brief Get the Authed Server object
-   * @return QPair<QHostAddress, quint16>
+   * @brief Is client is authenticated
    */
-  QPair<QHostAddress, quint16> getAuthedServer() const;
+  bool isAuthenticated() const;
 
   /**
-   * @brief Get the Authed Server object Or Empty
-   * @return QPair<QHostAddress, quint16>
+   * @brief Get the Authed Server object
    */
-  QPair<QHostAddress, quint16> getAuthedServerOrEmpty() const;
+  types::device::Device getAuthedServer() const;
 
   /**
    * @brief Send To Connected Server

@@ -43,15 +43,24 @@ void Server::processConnections() {
       this->sendPacket(client_tls, createPacket({packType, code, message}));
       client_tcp->disconnectFromHost();
     } else {
+      // get the peer address ans port of the client
+      const auto peerAddress = client_tls->peerAddress();
+      const auto peerPort    = client_tls->peerPort();
+      const auto certificate = client_tls->peerCertificate();
+
       // add the client to unauthenticated list
       m_un_authed_clients.append(client_tls);
 
-      // get the peer address ans port
-      const auto peerAddress = client_tls->peerAddress();
-      const auto peerPort    = client_tls->peerPort();
+      // create the device
+      auto device = types::device::Device {
+          peerAddress,
+          peerPort,
+          certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
+          certificate,
+      };
 
       // emit the signal that new host is connected
-      emit OnNewHostConnected({peerAddress, peerPort});
+      emit OnNewHostConnected(device);
     }
   }
 }
@@ -148,11 +157,21 @@ void Server::processDisconnection() {
   // Get the client that was disconnected
   auto client = qobject_cast<QSslSocket *>(sender());
 
-  // convert to QPair<QHostAddress, quint16>
-  auto info   = QPair<QHostAddress, quint16>(client->peerAddress(), client->peerPort());
+  // peer info of the client
+  const auto peerAddress = client->peerAddress();
+  const auto peerPort    = client->peerPort();
+  const auto certificate = client->peerCertificate();
+
+  // create the device
+  auto device = types::device::Device {
+      peerAddress,
+      peerPort,
+      certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
+      certificate,
+  };
 
   // Notify the listeners that the client is disconnected
-  emit OnCLientStateChanged(info, false);
+  emit OnCLientStateChanged(device, false);
 
   // Remove the client from the list of clients
   m_authed_clients.removeOne(client);
@@ -205,11 +224,27 @@ void Server::syncItems(QVector<QPair<QString, QByteArray>> items) {
  *
  * @return QList<QSslSocket*> List of clients
  */
-QList<QPair<QHostAddress, quint16>> Server::getConnectedClientsList() const {
-  QList<QPair<QHostAddress, quint16>> list;
+QList<types::device::Device> Server::getConnectedClientsList() const {
+  QList<types::device::Device> list;
+
   for (auto client : m_authed_clients) {
-    list.append({client->peerAddress(), client->peerPort()});
+    // Peer info of the client
+    const auto peerAddress = client->peerAddress();
+    const auto peerPort    = client->peerPort();
+    const auto certificate = client->peerCertificate();
+
+    // create the device
+    auto device = types::device::Device {
+        peerAddress,
+        peerPort,
+        certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
+        certificate,
+    };
+
+    // add the device to the list
+    list.append(device);
   }
+
   return list;
 }
 
@@ -311,12 +346,18 @@ void Server::authSuccess(const QPair<QHostAddress, quint16> &client) {
   // Peer info
   const auto peerAddress = client_tls->peerAddress();
   const auto peerPort    = client_tls->peerPort();
+  const auto certificate = client_tls->peerCertificate();
 
-  // convert to QPair<QHostAddress, quint16>
-  auto client_info       = QPair<QHostAddress, quint16>(peerAddress, peerPort);
+  // create the device
+  auto device = types::device::Device {
+      peerAddress,
+      peerPort,
+      certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
+      certificate,
+  };
 
   // Notify the listeners that the client is connected
-  emit OnCLientStateChanged(client_info, true);
+  emit OnCLientStateChanged(device, true);
 
   // Add the client to the list of clients
   m_authed_clients.append(client_tls);

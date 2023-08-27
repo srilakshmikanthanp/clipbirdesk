@@ -47,6 +47,34 @@ quint8 Authentication::getPacketType() const noexcept {
 }
 
 /**
+ * @brief Set the Auth Type object
+ *
+ * @param type
+ */
+void Authentication::setAuthType(quint8 type) {
+  if (type == types::enums::AuthType::AuthReq) {
+    this->authType = type;
+    return;
+  }
+
+  if (type == types::enums::AuthType::AuthRes) {
+    this->authType = type;
+    return;
+  }
+
+  throw std::invalid_argument("Invalid Auth Type");
+}
+
+/**
+ * @brief Get the Auth Type object
+ *
+ * @return quint8
+ */
+quint8 Authentication::getAuthType() const noexcept {
+  return this->authType;
+}
+
+/**
  * @brief Set the Auth Status object
  *
  * @param status

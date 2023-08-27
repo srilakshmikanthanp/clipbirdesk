@@ -247,13 +247,13 @@ void Client::syncItems(QVector<QPair<QString, QByteArray>> items) {
  *
  * @return QList<QPair<QHostAddress, quint16>> List of servers
  */
-QList<QPair<QHostAddress, quint16>> Client::getServerList() const {
+QList<types::device::Device> Client::getServerList() const {
   // Host address and port number
-  QList<QPair<QHostAddress, quint16>> list;
+  QList<types::device::Device> list;
 
   // iterate and add the server
-  for (auto& [host, port] : m_servers) {
-    list.append({host, port});
+  for (auto& server : m_servers) {
+    list.append(server);
   }
 
   // return the list
@@ -267,7 +267,7 @@ QList<QPair<QHostAddress, quint16>> Client::getServerList() const {
  * @param host Host address
  * @param port Port number
  */
-void Client::connectToServer(QPair<QHostAddress, quint16> client) {
+void Client::connectToServer(types::device::Device client) {
   // check if the SSL configuration is set
   if (m_ssl_socket->sslConfiguration().isNull()) {
     throw std::runtime_error("SSL Configuration is not set");
@@ -279,36 +279,39 @@ void Client::connectToServer(QPair<QHostAddress, quint16> client) {
   }
 
   // create the host address
-  const auto host = client.first.toString();
-  const auto port = client.second;
+  const auto host = client.ip.toString();
+  const auto port = client.port;
 
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
 }
 
 /**
+ * @brief IS connected to the server
+ */
+bool Client::isConnected() const {
+  return m_ssl_socket->state() == QAbstractSocket::ConnectedState;
+}
+
+/**
  * @brief Get the Connection Host and Port object
  * @return QPair<QHostAddress, quint16>
  */
-QPair<QHostAddress, quint16> Client::getConnectedServer() const {
+types::device::Device Client::getConnectedServer() const {
   if (this->m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
     throw std::runtime_error("Socket is not connected");
   }
 
-  return {m_ssl_socket->peerAddress(), m_ssl_socket->peerPort()};
+  // peer server details
+  auto address = m_ssl_socket->peerAddress();
+  auto port    = m_ssl_socket->peerPort();
+  auto cert    = m_ssl_socket->peerCertificate();
+  auto name    = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+
+  // return the host address and port number
+  return { address, port, name, cert };
 }
 
-/**
- * @brief Get the Connection Host and Port object Or Empty
- * @return QPair<QHostAddress, quint16>
- */
-QPair<QHostAddress, quint16> Client::getConnectedServerOrEmpty() const {
-  try {
-    return this->getConnectedServer();
-  } catch (const std::exception&) {
-    return QPair<QHostAddress, quint16>();
-  }
-}
 
 /**
  * @brief Disconnect from the server
@@ -318,10 +321,17 @@ void Client::disconnectFromServer() {
 }
 
 /**
+ * @brief Is client is authenticated
+ */
+bool Client::isAuthenticated() const {
+  return m_is_authed;
+}
+
+/**
  * @brief Get the Authed Server object
  * @return QPair<QHostAddress, quint16>
  */
-QPair<QHostAddress, quint16> Client::getAuthedServer() const {
+types::device::Device Client::getAuthedServer() const {
   if (this->m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
     throw std::runtime_error("Socket is not connected");
   }
@@ -330,19 +340,7 @@ QPair<QHostAddress, quint16> Client::getAuthedServer() const {
     throw std::runtime_error("Socket is not authenticated");
   }
 
-  return {m_ssl_socket->peerAddress(), m_ssl_socket->peerPort()};
-}
-
-/**
- * @brief Get the Authed Server object Or Empty
- * @return QPair<QHostAddress, quint16>
- */
-QPair<QHostAddress, quint16> Client::getAuthedServerOrEmpty() const {
-  try {
-    return this->getAuthedServer();
-  } catch (const std::exception&) {
-    return QPair<QHostAddress, quint16>();
-  }
+  return this->getConnectedServer();
 }
 
 /**
@@ -353,14 +351,30 @@ QPair<QHostAddress, quint16> Client::getAuthedServerOrEmpty() const {
  * @param port Port number
  */
 void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
-  // emit the signal for server found event
-  emit OnServerFound(server);
+  // on Encrypted lambda function to process
+  const auto onEncrypted = [this, server](QNetworkReply *reply) {
+    // get the peer certificate
+    auto cert = reply->sslConfiguration().peerCertificate();
+    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
-  // add the server to the list
-  m_servers.append({server.first, server.second});
+    // emit the signal for server found event
+    emit OnServerFound({server.first, server.second, name, cert});
 
-  // emit the signal
-  emit OnServerListChanged(getServerList());
+    // add the server to the list
+    m_servers.append({server.first, server.second});
+
+    // emit the signal
+    emit OnServerListChanged(getServerList());
+  };
+
+  // create the request
+  auto access = new QNetworkAccessManager(this);
+
+  // connect the signal to the lambda function
+  connect(access, &QNetworkAccessManager::encrypted, onEncrypted);
+
+  // send the request
+  access->connectToHostEncrypted(server.first.toString(), server.second);
 }
 
 /**
@@ -368,13 +382,29 @@ void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
  * discovery client when the server is removed
  */
 void Client::onServiceRemoved(QPair<QHostAddress, quint16> server) {
-  // emit the signal for server gone event
-  emit OnServerGone(server);
+  // on Encrypted lambda function to process
+  const auto onEncrypted = [this, server](QNetworkReply *reply) {
+    // get the peer certificate
+    auto cert = reply->sslConfiguration().peerCertificate();
+    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
-  // remove the server from the list
-  m_servers.removeAll({server.first, server.second});
+    // emit the signal for server found event
+    emit OnServerGone({server.first, server.second, name, cert});
 
-  // emit the signal
-  emit OnServerListChanged(getServerList());
+    // remove the server from the list
+    m_servers.removeAll({server.first, server.second, name, cert});
+
+    // emit the signal
+    emit OnServerListChanged(getServerList());
+  };
+
+  // create the request
+  auto access = new QNetworkAccessManager(this);
+
+  // connect the signal to the lambda function
+  connect(access, &QNetworkAccessManager::encrypted, onEncrypted);
+
+  // send the request
+  access->connectToHostEncrypted(server.first.toString(), server.second);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing
