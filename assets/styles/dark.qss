@@ -8,7 +8,7 @@
 /*********************** Common to All ************************/
 
 QFrame, QWidget {
-  background: #272727;
+  background: #1e1e1e;
   color: #FFFFFF;
   font-family: sans-serif;
   margin: 2px 0px 2px 0px;
@@ -16,7 +16,7 @@ QFrame, QWidget {
 }
 
 QFrame {
-  background: #272727;
+  background: #1e1e1e;
   border-radius: 8px;
 }
 
@@ -49,11 +49,11 @@ QTabWidget::tab-bar {
 }
 
 QTabBar::tab {
-  border-bottom: 3px solid #272727;
+  border-bottom: 3px solid #1e1e1e;
   color: #0000;
   padding: 6px;
   margin: 2px;
-  background-color: #272727;
+  background-color: #1e1e1e;
 }
 
 QTabBar::tab:selected {
@@ -97,7 +97,7 @@ QScrollBar::sub-page:vertical {
 }
 
 QMenu {
-  background-color: #272727;
+  background-color: #1e1e1e;
   border: none;
   border-radius: 5px;
   padding: 6px;
@@ -106,7 +106,7 @@ QMenu {
 }
 
 QMenu::item {
-  background-color: #272727;
+  background-color: #1e1e1e;
   color: #FFFFFF;
   border: none;
   border-radius: 5px;
@@ -121,6 +121,6 @@ QMenu::item:selected {
 }
 
 QMenu::item:disabled {
-  background-color: #272727;
+  background-color: #1e1e1e;
   color: gray;
 }

@@ -8,11 +8,17 @@
 
 namespace srilakshmikanthanp::clipbirdesk::storage {
 class Storage : public QObject {
- private:  // variables
+ private:  // settings
 
   QSettings *settings = new QSettings("srilakshmikanthanp", "clipbird");
-  const char* clientGroup = "client";
-  const char* serverGroup = "server";
+
+ private: // groups
+  const char* clientGroup  = "client";
+  const char* generalGroup = "general";
+  const char* serverGroup  = "server";
+
+ private: // keys
+  const char* hostStateKey = "hostState";
 
  private:  // qt
 
@@ -22,8 +28,6 @@ class Storage : public QObject {
 
   /**
    * @brief Construct a new SQLStore object
-   *
-   * @param parent
    */
   Storage(QObject *parent = nullptr);
 
@@ -33,40 +37,44 @@ class Storage : public QObject {
   virtual ~Storage() = default;
 
   /**
-   * @brief Store Client hostname and JWT token
-   *
-   * @param hostname
-   * @param token
+   * @brief Store Client hostname and JWT cert
    */
-  void setClientToken(const QString &hostname, const QString &token);
+  void setClientCert(const QString &hostname, const QString &cert);
 
   /**
-   * @brief Get the JWT token for the hostname
-   *
-   * @param hostname
-   * @return QString
-   *
-   * @throw std::invalid_argument if hostname not found
+   * @brief has the cert for the hostname
    */
-  QString getClientToken(const QString &hostname);
+  bool hasClientCert(const QString &hostname);
 
   /**
-   * @brief Store the server hostname and JWT token
-   *
-   * @param hostname
-   * @param token
+   * @brief Get the JWT cert for the hostname
    */
-  void setServerToken(const QString &hostname, const QString &token);
+  QString getClientCert(const QString &hostname);
 
   /**
-   * @brief Get the JWT token for the hostname
-   *
-   * @param hostname
-   * @return QString
-   *
-   * @throw std::invalid_argument if hostname not found
+   * @brief Store the server hostname and JWT cert
    */
-  QString getServerToken(const QString &hostname);
+  void setServerCert(const QString &hostname, const QString &cert);
+
+  /**
+   * @brief has the cert for the hostname
+   */
+  bool hasServerCert(const QString &hostname);
+
+  /**
+   * @brief Get the JWT cert for the hostname
+   */
+  QString getServerCert(const QString &hostname);
+
+  /**
+   * @brief Set the current state of the server or client
+   */
+  void setHostIsServer(bool isServer);
+
+  /**
+   * @brief Get the current state of the server or client
+   */
+  bool getHostIsServer();
 };
 
 }  // namespace srilakshmikanthanp::clipbirdesk::storage

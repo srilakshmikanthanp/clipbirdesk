@@ -21,10 +21,21 @@ Storage::Storage(QObject *parent) : QObject(parent) {
  * @param hostname
  * @param token
  */
-void Storage::setClientToken(const QString &hostname, const QString &token) {
+void Storage::setClientCert(const QString &hostname, const QString &token) {
   settings->beginGroup(clientGroup);
   settings->setValue(hostname, token);
   settings->endGroup();
+}
+
+/**
+ * @brief has the cert for the hostname
+ */
+bool Storage::hasClientCert(const QString &hostname) {
+  settings->beginGroup(clientGroup);
+  auto token = settings->value(hostname);
+  settings->endGroup();
+
+  return !token.isNull();
 }
 
 /**
@@ -35,7 +46,7 @@ void Storage::setClientToken(const QString &hostname, const QString &token) {
  *
  * @throw std::invalid_argument if hostname not found
  */
-QString Storage::getClientToken(const QString &hostname) {
+QString Storage::getClientCert(const QString &hostname) {
   settings->beginGroup(clientGroup);
   auto token = settings->value(hostname);
   settings->endGroup();
@@ -53,10 +64,21 @@ QString Storage::getClientToken(const QString &hostname) {
  * @param hostname
  * @param token
  */
-void Storage::setServerToken(const QString &hostname, const QString &token) {
+void Storage::setServerCert(const QString &hostname, const QString &token) {
   settings->beginGroup(serverGroup);
   settings->setValue(hostname, token);
   settings->endGroup();
+}
+
+/**
+ * @brief has the cert for the hostname
+ */
+bool Storage::hasServerCert(const QString &hostname) {
+  settings->beginGroup(serverGroup);
+  auto token = settings->value(hostname);
+  settings->endGroup();
+
+  return !token.isNull();
 }
 
 /**
@@ -67,7 +89,7 @@ void Storage::setServerToken(const QString &hostname, const QString &token) {
  *
  * @throw std::invalid_argument if hostname not found
  */
-QString Storage::getServerToken(const QString &hostname) {
+QString Storage::getServerCert(const QString &hostname) {
   settings->beginGroup(serverGroup);
   auto token = settings->value(hostname);
   settings->endGroup();
@@ -77,5 +99,34 @@ QString Storage::getServerToken(const QString &hostname) {
   }
 
   return token.toString();
+}
+
+/**
+ * @brief Set the current state of the server or client
+ *
+ * @param isServer
+ */
+void Storage::setHostIsServer(bool isServer) {
+  settings->beginGroup(generalGroup);
+  settings->setValue(hostStateKey, isServer);
+  settings->endGroup();
+}
+
+/**
+ * @brief Get the current state of the server or client
+ *
+ * @return true  if server
+ * @return false if client
+ */
+bool Storage::getHostIsServer() {
+  settings->beginGroup(generalGroup);
+  auto isServer = settings->value(hostStateKey);
+  settings->endGroup();
+
+  if (isServer.isNull()) {
+    return false;
+  }
+
+  return isServer.toBool();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::storage
