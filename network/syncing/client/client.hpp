@@ -243,7 +243,7 @@ class Client : public service::mdnsBrowser {
   template <typename Packet>
   void sendToConnectedServer(const Packet& pack) {
     // if not connected
-    if (!m_ssl_socket->isConnected()) {
+    if (m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
       throw std::runtime_error("Not connected to the server");
     }
 

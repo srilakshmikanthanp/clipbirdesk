@@ -75,7 +75,6 @@ Clipbird Software helps you to sync your clipboard data between devices connecte
 
 ### Built With
 
-* POCO C++ Libraries
 * Bonjour
 * C++
 * Qt6
@@ -106,19 +105,10 @@ In the following steps, we will see how to build the project in the Windows plat
 
 #### Prerequisites
 
-* POCO C++ Libraries
 * Bonjour
 * C++
 * Qt6
 * OpenSSL
-
-#### Installing POCO C++ Libraries
-
-Install POCO C++ Libraries using the following command.
-
-~~~sh
-vcpkg install poco --triplet x64-windows
-~~~
 
 #### Installing Qt6
 
@@ -189,7 +179,6 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [POCO C++ Libraries](https://pocoproject.org/)
 * [OpenSSL](https://www.openssl.org/)
 * [Qt](https://www.qt.io/)
 * [C++](https://www.cplusplus.com/)

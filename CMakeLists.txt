@@ -88,9 +88,6 @@ find_package(Qt6 REQUIRED COMPONENTS
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
 
-# Find JWT from pocO
-find_package(POCO REQUIRED JWT)
-
 # Find Bonjour on windows and mac
 if(WIN32 OR APPLE)
   find_package(Bonjour REQUIRED)
@@ -118,7 +115,6 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE Qt6::Sql
-  PRIVATE JWT
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto)
 

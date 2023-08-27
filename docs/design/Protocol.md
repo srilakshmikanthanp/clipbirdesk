@@ -19,20 +19,6 @@ This architecture ensures efficient and organized communication between devices,
 
 Clipbird utilizes a discovery mechanism to identify compatible devices within the local network by utilizing the mdns protocol. This mechanism allows the client to discover the server without requiring the user to manually enter the IP address and port number.
 
-## Connection
-
-Clipbird supports automatic reconnection between already connected devices. Clipbird Achieve this by utilizing JWT token for authentication. When a client connects to the server, the client need to pass JWT token to the server. The following cases are possible.
-
-### Case 1: OnConnect
-
-Upon First Connect the client has to sent an JWT token to the server. So server can store it for future use. Then Server will Send the Authentication packet with JWT token to authenticate the client later on Reconnect.
-
-### Case 2: Reconnect
-
-Upon Reconnect the client has to sent an valid JWT token sent by server on First Connect so Server will accept Request without user intervention. Then Server will send the Authentication packet with JWT token sent by client on FirstConnect to authenticate the server itself.
-
-Note, the server need to send the Authentication packet with JWT token after FirstConnect or Reconnect. If the server does not send the Authentication packet with JWT token to the client in specified time then client can disconnect the connection.
-
 ## Protocol
 
 Clipbird utilizes the TCP/IP protocol for reliable communication between devices. The packets transmitted within the application are in binary format, consisting of a header and a body. The header contains essential information about the packet, such as its type and additional metadata. The body of the packet contains the actual data being transmitted, which typically includes clipboard content. By employing TCP/IP, Clipbird ensures that the packets are sent and received accurately, enabling seamless clipboard synchronization between devices. The use of a structured packet format with a header and body allows for efficient and organized data transmission within the application.
@@ -98,13 +84,9 @@ The **Authentication** is used to indicate the authentication process to the cli
 
 #### Body
 
-- **AuthType**: This field specifies the status of the authentication process. it can be one of the following values.
-  - 0x00: OnConnect
-  - 0x01: Reconnect
-  - 0x02: RespOnCon
-  - 0x03: RespRecon
-- **Token Length**: This field specifies the length of the JWT token.
-- **Token**: This field contains the auth token.
+- **AuthStatus**: This field specifies the status of the authentication process.
+  - AuthFailed: This field specifies the status of the authentication process, which is set to 0x00 if the authentication fails.
+  - AuthSuccess: This field specifies the status of the authentication process, which is set to 0x01 if the authentication succeeds.
 
 #### Structure
 
@@ -112,9 +94,7 @@ The **Authentication** is used to indicate the authentication process to the cli
 |-----------------|-------| ----- |
 | Packet Length   | 4     |       |
 | Packet Type     | 1     | 0x01  |
-| AuthType        | 1     |       |
-| TokenLength     | 4     |       |
-| Token           | varies|       |
+| AuthStatus      | 1     |       |
 
 ### SyncingPacket
 

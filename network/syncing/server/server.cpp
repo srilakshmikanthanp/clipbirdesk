@@ -31,8 +31,6 @@ void Server::processConnections() {
   while (m_ssl_server->hasPendingConnections()) {
     // Get the client that has been connected
     auto client_tcp = (m_ssl_server->nextPendingConnection());
-
-    // Convert the client to SSL client
     auto client_tls = qobject_cast<QSslSocket *>(client_tcp);
 
     // If the client is not SSL client then disconnect
@@ -105,8 +103,7 @@ void Server::processReadyRead() {
 
     // if failed, then rollback
     if (bytes == -1) {
-      get.rollbackTransaction();
-      return;
+      return get.rollbackTransaction();
     }
 
     // if success, then update
@@ -223,10 +220,15 @@ QList<QPair<QHostAddress, quint16>> Server::getConnectedClientsList() const {
  * @param client Client to disconnect
  */
 void Server::disconnectClient(QPair<QHostAddress, quint16> client) {
+  // matcher lambda function to find the client
+  const auto matcher = [&client](QSslSocket *c) {
+    return (c->peerAddress() == client.first) && (c->peerPort() == client.second);
+  };
+
+  // find the client from the list of clients
   for (auto c : m_authed_clients) {
-    if (c->peerAddress() == client.first && c->peerPort() == client.second) {
-      c->disconnectFromHost();
-      return;
+    if (matcher(c)) {
+      return c->disconnectFromHost();
     }
   }
 }
