@@ -33,6 +33,10 @@ class ClipBird : public QObject {
   void OnServerFound(types::device::Device server);
 
  signals:  // signals for this class
+  /// @brief On Server Gone
+  void OnServerGone(types::device::Device);
+
+ signals:  // signals for this class
   /// @brief On Server state changed (From Client)
   void OnServerStatusChanged(bool isConnected);
 
@@ -75,11 +79,17 @@ class ClipBird : public QObject {
 
  private:  // private slots
 
-  /// @brief Handle On Server Authenticated the client (From client)
+  /// @brief Handle On Server Authenticated (From client)
   void handleServerAuthentication(bool isConnected);
 
-  /// @brief Handle On Server Disconnect from Client (From client)
+  /// @brief Handle On Server Disconnect (From client)
   void handleServerStatusChanged(bool status);
+
+  /// @brief Handle the Server Found (From client)
+  void handleServerFound(types::device::Device server);
+
+  /// @brief Handle the Auth Request (From Server)
+  void handleAuthRequest(types::device::Device client);
 
  public:  // Member functions
 

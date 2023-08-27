@@ -51,6 +51,20 @@ void ClipBird::handleServerStatusChanged(bool status) {
 }
 
 /**
+ * @brief Handle the Server Found (From client)
+ */
+void ClipBird::handleServerFound(types::device::Device server) {
+
+}
+
+/**
+ * @brief Handle the Auth Request (From Server)
+ */
+void ClipBird::handleAuthRequest(types::device::Device client) {
+
+}
+
+/**
  * @brief Construct a new ClipBird object and manage
  * the clipboard, server and client
  *
@@ -123,6 +137,11 @@ void ClipBird::setCurrentHostAsClient() {
   const auto signal_fn = &Client::OnServerFound;
   const auto slot_fn   = &ClipBird::OnServerFound;
   connect(client, signal_fn, this, slot_fn);
+
+  // Connect the OnServerGone signal to the signal
+  const auto signal_sg = &Client::OnServerGone;
+  const auto slot_sg   = &ClipBird::OnServerGone;
+  connect(client, signal_sg, this, slot_sg);
 
   // Connect the onServerStateChanged signal to the signal
   const auto slot_hc   = &ClipBird::handleServerStatusChanged;
