@@ -184,6 +184,11 @@ class Client : public service::mdnsBrowser {
   ~Client() override = default;
 
   /**
+   * @brief Set SSL configuration
+   */
+  void setSslConfiguration(const QSslConfiguration& config);
+
+  /**
    * @brief Send the items to the server to sync the
    * clipboard data
    *

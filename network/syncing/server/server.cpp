@@ -81,20 +81,15 @@ void Server::processConnections() {
       this->sendPacket(client_tls, createPacket({packType, code, message}));
       client_tcp->disconnectFromHost();
     } else {
-      // get the peer address ans port of the client
-      const auto peerAddress = client_tls->peerAddress();
-      const auto peerPort    = client_tls->peerPort();
-      const auto certificate = client_tls->peerCertificate();
-
-      // add the client to unauthenticated list
-      m_un_authed_clients.append(client_tls);
-
       // Connect the socket to the callback function that
       // process the ready read when the socket is ready
       // to read so the listener can be notified
       const auto signal_r = &QSslSocket::readyRead;
       const auto slot_r   = &Server::processReadyRead;
       QObject::connect(client_tls, signal_r, this, slot_r);
+
+      // add the client to unauthenticated list
+      m_un_authed_clients.append(client_tls);
     }
   }
 }
@@ -344,7 +339,7 @@ types::device::Device Server::getServerInfo() const {
  *
  * @param config SSL Configuration
  */
-void Server::setSSLConfiguration(QSslConfiguration config) {
+void Server::setSslConfiguration(QSslConfiguration config) {
   m_ssl_server->setSslConfiguration(config);
 }
 

@@ -216,7 +216,7 @@ class Server : public service::mdnsRegister {
    *
    * @param config SSL Configuration
    */
-  void setSSLConfiguration(QSslConfiguration config);
+  void setSslConfiguration(QSslConfiguration config);
   /**
    * @brief Get the SSL Configuration object
    *

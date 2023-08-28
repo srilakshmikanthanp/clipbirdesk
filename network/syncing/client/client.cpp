@@ -220,6 +220,13 @@ Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
 }
 
 /**
+ * @brief Set SSL configuration
+ */
+void Client::setSslConfiguration(const QSslConfiguration& config) {
+  m_ssl_socket->setSslConfiguration(config);
+}
+
+/**
  * @brief Send the items to the server to sync the
  * clipboard data
  *
@@ -328,7 +335,6 @@ types::device::Device Client::getConnectedServer() const {
   return { address, port, name, cert };
 }
 
-
 /**
  * @brief Disconnect from the server
  */
@@ -367,13 +373,21 @@ types::device::Device Client::getAuthedServer() const {
  * @param port Port number
  */
 void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
-  // on Encrypted lambda function to process
-  const auto onEncrypted = [this, server](QNetworkReply *reply) {
-    // get the peer certificate
-    auto cert = reply->sslConfiguration().peerCertificate();
+  // get the server certificate from the ip and port
+  QSslSocket *sslSocket = new QSslSocket(this);
+
+  // set peer verify mode to none
+  sslSocket->setPeerVerifyMode(QSslSocket::VerifyNone);
+
+  // lambda function to get the certificate
+  const auto onEncrypted = [this, sslSocket, server]() {
+    // get the certificate
+    auto cert = sslSocket->peerCertificate();
+
+    // get the common name
     auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
-    // emit the signal for server found event
+    // emit on server found
     emit OnServerFound({server.first, server.second, name, cert});
 
     // add the server to the list
@@ -381,16 +395,23 @@ void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
 
     // emit the signal
     emit OnServerListChanged(getServerList());
+
+    // disconnect the server
+    sslSocket->disconnectFromHost();
+
+    // delete the socket
+    sslSocket->deleteLater();
   };
 
-  // create the request
-  auto access = new QNetworkAccessManager(this);
-
   // connect the signal to the lambda function
-  connect(access, &QNetworkAccessManager::encrypted, onEncrypted);
+  connect(sslSocket, &QSslSocket::encrypted, onEncrypted);
 
-  // send the request
-  access->connectToHostEncrypted(server.first.toString(), server.second);
+  // server details
+  auto address = server.first.toString();
+  auto port    = server.second;
+
+  // connect to the server as encrypted
+  sslSocket->connectToHostEncrypted(address, port);
 }
 
 /**
@@ -398,29 +419,30 @@ void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
  * discovery client when the server is removed
  */
 void Client::onServiceRemoved(QPair<QHostAddress, quint16> server) {
-  // on Encrypted lambda function to process
-  const auto onEncrypted = [this, server](QNetworkReply *reply) {
-    // get the peer certificate
-    auto cert = reply->sslConfiguration().peerCertificate();
-    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
-
-    // emit the signal for server found event
-    emit OnServerGone({server.first, server.second, name, cert});
-
-    // remove the server from the list
-    m_servers.removeAll({server.first, server.second, name, cert});
-
-    // emit the signal
-    emit OnServerListChanged(getServerList());
+  // matcher to get the Device from servers list
+  auto matcher = [server](const types::device::Device& device) {
+    return device.ip == server.first && device.port == server.second;
   };
 
-  // create the request
-  auto access = new QNetworkAccessManager(this);
+  // start and end
+  auto start = m_servers.begin();
+  auto end   = m_servers.end();
 
-  // connect the signal to the lambda function
-  connect(access, &QNetworkAccessManager::encrypted, onEncrypted);
+  // Get the Device
+  auto device = std::find_if(start, end, matcher);
 
-  // send the request
-  access->connectToHostEncrypted(server.first.toString(), server.second);
+  // if device is not found
+  if (device == m_servers.end()) {
+    return;
+  }
+
+  // emit server gone
+  emit OnServerGone(*device);
+
+  // remove the server from the list
+  m_servers.erase(device);
+
+  // emit the signal
+  emit OnServerListChanged(getServerList());
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

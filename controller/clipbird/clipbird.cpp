@@ -134,7 +134,7 @@ void ClipBird::setCurrentHostAsServer() {
   auto *server = &m_host.emplace<Server>(this);
 
   // Set the QSslConfiguration
-  server->setSSLConfiguration(m_sslConfig);
+  server->setSslConfiguration(m_sslConfig);
 
   // Connect the onClientStateChanged signal to the signal
   const auto signal_cs = &Server::OnCLientStateChanged;
@@ -183,6 +183,9 @@ void ClipBird::setCurrentHostAsClient() {
   // Emplace the client into the m_host variant variable
   auto *client         = &m_host.emplace<Client>(this);
 
+  // Set the QSslConfiguration
+  client->setSslConfiguration(m_sslConfig);
+
   // Connect the onServerListChanged signal to the signal
   const auto signal_sl = &Client::OnServerListChanged;
   const auto slot_sl   = &ClipBird::OnServerListChanged;
@@ -190,7 +193,9 @@ void ClipBird::setCurrentHostAsClient() {
 
   // Connect the onServerFound signal to the signal
   const auto signal_fn = &Client::OnServerFound;
+  const auto slot_hfn  = &ClipBird::handleServerFound;
   const auto slot_fn   = &ClipBird::OnServerFound;
+  connect(client, signal_fn, this, slot_hfn);
   connect(client, signal_fn, this, slot_fn);
 
   // Connect the OnServerGone signal to the signal

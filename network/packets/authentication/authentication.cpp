@@ -80,6 +80,11 @@ quint8 Authentication::getAuthType() const noexcept {
  * @param status
  */
 void Authentication::setAuthStatus(quint8 status) {
+  if (status == types::enums::AuthStatus::AuthStart) {
+    this->authStatus = status;
+    return;
+  }
+
   if (status == types::enums::AuthStatus::AuthFail) {
     this->authStatus = status;
     return;
@@ -123,7 +128,7 @@ quint32 Authentication::size() const noexcept {
  * @return QDataStream&
  */
 QDataStream& operator<<(QDataStream& stream, const Authentication packet) {
-  stream << packet.packetLength << packet.packetType << packet.authStatus;
+  stream << packet.packetLength << packet.packetType << packet.authType << packet.authStatus;
   return stream;
 }
 
@@ -136,7 +141,7 @@ QDataStream& operator<<(QDataStream& stream, const Authentication packet) {
  */
 QDataStream& operator>>(QDataStream& stream, Authentication& packet) {
   // Read All the data from the stream
-  stream >> packet.packetLength >> packet.packetType >> packet.authStatus;
+  stream >> packet.packetLength >> packet.packetType >> packet.authType >> packet.authStatus;
 
   // using some types
   using types::enums::AuthStatus;
@@ -154,7 +159,9 @@ QDataStream& operator>>(QDataStream& stream, Authentication& packet) {
   const auto authStatus = packet.authStatus;
 
   // Check the auth status
-  if (authStatus != AuthStatus::AuthFail && authStatus != AuthStatus::AuthOkay) {
+  if (authStatus != AuthStatus::AuthFail &&
+      authStatus != AuthStatus::AuthOkay &&
+      authStatus != AuthStatus::AuthStart) {
     throw MalformedPacket(ErrorCode::CodingError, "Invalid Auth Status");
   }
 
