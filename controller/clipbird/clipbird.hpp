@@ -19,6 +19,7 @@
 #include "clipboard/clipboard.hpp"
 #include "network/syncing/client/client.hpp"
 #include "network/syncing/server/server.hpp"
+#include "store/storage.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::controller {
 class ClipBird : public QObject {
@@ -207,5 +208,12 @@ class ClipBird : public QObject {
    * @return types::device::Device
    */
   types::device::Device getAuthedServer() const;
+
+  //---------------------- General functions -----------------------//
+
+  /**
+   * @brief IS the Host is Lastly Server
+   */
+  bool isLastlyHostIsServer() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::controller

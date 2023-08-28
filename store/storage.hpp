@@ -1,3 +1,5 @@
+#pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -24,12 +26,18 @@ class Storage : public QObject {
 
   Q_OBJECT
 
- public:  // constructor
+ private:  // constructor
 
   /**
    * @brief Construct a new SQLStore object
    */
   Storage(QObject *parent = nullptr);
+
+ private:  // constructor
+
+  Q_DISABLE_COPY_MOVE(Storage)
+
+ public:  // methods
 
   /**
    * @brief Destroy the SQLStore object
@@ -37,34 +45,34 @@ class Storage : public QObject {
   virtual ~Storage() = default;
 
   /**
-   * @brief Store Client hostname and JWT cert
+   * @brief Store Client name and JWT cert
    */
-  void setClientCert(const QString &hostname, const QString &cert);
+  void setClientCert(const QString &name, const QByteArray &cert);
 
   /**
-   * @brief has the cert for the hostname
+   * @brief has the cert for the name
    */
-  bool hasClientCert(const QString &hostname);
+  bool hasClientCert(const QString &name);
 
   /**
-   * @brief Get the JWT cert for the hostname
+   * @brief Get the JWT cert for the name
    */
-  QString getClientCert(const QString &hostname);
+  QByteArray getClientCert(const QString &name);
 
   /**
-   * @brief Store the server hostname and JWT cert
+   * @brief Store the server name and JWT cert
    */
-  void setServerCert(const QString &hostname, const QString &cert);
+  void setServerCert(const QString &name, const QByteArray &cert);
 
   /**
-   * @brief has the cert for the hostname
+   * @brief has the cert for the name
    */
-  bool hasServerCert(const QString &hostname);
+  bool hasServerCert(const QString &name);
 
   /**
-   * @brief Get the JWT cert for the hostname
+   * @brief Get the JWT cert for the name
    */
-  QString getServerCert(const QString &hostname);
+  QByteArray getServerCert(const QString &name);
 
   /**
    * @brief Set the current state of the server or client
@@ -75,6 +83,11 @@ class Storage : public QObject {
    * @brief Get the current state of the server or client
    */
   bool getHostIsServer();
+
+  /**
+   * @brief Instance of the storage
+   */
+  static Storage& instance();
 };
 
 }  // namespace srilakshmikanthanp::clipbirdesk::storage

@@ -465,8 +465,12 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto slot_qc   = [] { qApp->quit(); };
   QObject::connect(trayMenu, signal_qc, this, slot_qc);
 
-  // Set As Client
-  this->setTabAsClient();
+  // if host is lastly server
+  if (controller->isLastlyHostIsServer()) {
+    this->onTabChanged(Tabs::Server);
+  } else {
+    this->setTabAsClient();
+  }
 
   // show tray icon
   trayIcon->show();
