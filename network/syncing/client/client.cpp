@@ -276,16 +276,12 @@ QList<types::device::Device> Client::getServerList() const {
  */
 void Client::connectToServer(types::device::Device client) {
   // on Encrypted lambda function to process
-  const auto onEncrypted = [this]() {
-    // create Authentication packet
-    auto packet = utility::functions::createPacket({
+  const auto onConnected = [this]() {
+    this->sendPacket(utility::functions::createPacket({
         packets::Authentication::PacketType::AuthPacket,
         types::enums::AuthType::AuthReq,
         types::enums::AuthStatus::AuthStart,
-    });
-
-    // send the packet to the server
-    this->sendPacket(packet);
+    }));
   };
 
   // check if the SSL configuration is set
@@ -298,15 +294,15 @@ void Client::connectToServer(types::device::Device client) {
     this->disconnectFromServer();
   }
 
+  // connect the signal to the lambda function
+  connect(m_ssl_socket, &QSslSocket::connected, onConnected);
+
   // create the host address
   const auto host = client.ip.toString();
   const auto port = client.port;
 
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
-
-  // connect the signal to the lambda function
-  connect(m_ssl_socket, &QSslSocket::encrypted, onEncrypted);
 }
 
 /**

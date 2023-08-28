@@ -32,10 +32,9 @@ namespace srilakshmikanthanp::clipbirdesk {
 class ClipbirdApplication : public SingleApplication {
  private:  // Member Functions
   /**
-   * @brief Get the certificate from App Home
-   * or generate new one and store it
+   * @brief Get the certificate by creating new one
    */
-  QSslConfiguration getSslConfiguration(int bits = 2048) {
+  QSslConfiguration getNewSslConfiguration(int bits = 1024) {
     // file path to store the certificate and key
     std::string certPath = (std::filesystem::path(constants::getAppHome()) / "cert.pem").string();
     std::string keyPath  = (std::filesystem::path(constants::getAppHome()) / "key.pem").string();
@@ -43,23 +42,35 @@ class ClipbirdApplication : public SingleApplication {
     // QFile to read the certificate and key
     QFile certFile(certPath.c_str()), pkeyFile(keyPath.c_str());
 
-    // check the certificate exists
-    if (!certFile.exists() || !pkeyFile.exists()) {
-      // generate the certificate and key
-      auto sslConfig = utility::functions::getQSslConfiguration(bits);
+    // generate the certificate and key
+    auto sslConfig = utility::functions::getQSslConfiguration(bits);
 
-      // open the certificate and key
-      if(!certFile.open(QIODevice::WriteOnly) || !pkeyFile.open(QIODevice::WriteOnly)) {
-        throw std::runtime_error("Can't Create Certificate");
-      }
-
-      // write the certificate and key
-      certFile.write(sslConfig.localCertificate().toPem());
-      pkeyFile.write(sslConfig.privateKey().toPem());
-
-      // return the configuration
-      return sslConfig;
+    // open the certificate and key
+    if(!certFile.open(QIODevice::WriteOnly) || !pkeyFile.open(QIODevice::WriteOnly)) {
+      throw std::runtime_error("Can't Create Certificate");
     }
+
+    // write the certificate and key
+    certFile.write(sslConfig.localCertificate().toPem());
+    pkeyFile.write(sslConfig.privateKey().toPem());
+
+    // peer verification
+    sslConfig.setPeerVerifyMode(QSslSocket::VerifyNone);
+
+    // return the configuration
+    return sslConfig;
+  }
+
+  /**
+   * @brief Get the certificate from App Home
+   */
+  QSslConfiguration getOldSslConfiguration(int bits = 1024) {
+    // file path to store the certificate and key
+    std::string certPath = (std::filesystem::path(constants::getAppHome()) / "cert.pem").string();
+    std::string keyPath  = (std::filesystem::path(constants::getAppHome()) / "key.pem").string();
+
+    // QFile to read the certificate and key
+    QFile certFile(certPath.c_str()), pkeyFile(keyPath.c_str());
 
     // open the certificate and key
     if(!certFile.open(QIODevice::ReadOnly) || !pkeyFile.open(QIODevice::ReadOnly)) {
@@ -75,6 +86,9 @@ class ClipbirdApplication : public SingleApplication {
     sslConfig.setLocalCertificate(cert);
     sslConfig.setPrivateKey(key);
 
+    // peer verification
+    sslConfig.setPeerVerifyMode(QSslSocket::VerifyNone);
+
     // if the configuration is null
     if (sslConfig.isNull()) {
       throw std::runtime_error("Can't Create QSslConfiguration");
@@ -82,6 +96,23 @@ class ClipbirdApplication : public SingleApplication {
 
     // return the configuration
     return sslConfig;
+  }
+
+  /**
+   * @brief Get the certificate from App Home
+   * or generate new one and store it
+   */
+  QSslConfiguration getSslConfiguration(int bits = 2048) {
+    // file path to store the certificate and key
+    std::string certPath = (std::filesystem::path(constants::getAppHome()) / "cert.pem").string();
+    std::string keyPath  = (std::filesystem::path(constants::getAppHome()) / "key.pem").string();
+
+    // check the certificate exists
+    if (!std::filesystem::exists(certPath) || !std::filesystem::exists(keyPath)) {
+      return getNewSslConfiguration(bits);
+    } else {
+      return getOldSslConfiguration(bits);
+    }
   }
 
   /**

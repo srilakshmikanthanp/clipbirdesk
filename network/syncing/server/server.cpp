@@ -81,6 +81,13 @@ void Server::processConnections() {
       this->sendPacket(client_tls, createPacket({packType, code, message}));
       client_tcp->disconnectFromHost();
     } else {
+      // Connect the client to the callback function that process
+      // the disconnection when the client is disconnected
+      // so the listener can be notified
+      const auto signal_d = &QSslSocket::disconnected;
+      const auto slot_d   = &Server::processDisconnection;
+      QObject::connect(client_tls, signal_d, this, slot_d);
+
       // Connect the socket to the callback function that
       // process the ready read when the socket is ready
       // to read so the listener can be notified
@@ -207,6 +214,12 @@ void Server::processDisconnection() {
   // Get the client that was disconnected
   auto client = qobject_cast<QSslSocket *>(sender());
 
+  // if client is unauthenticated then remove it from the list
+  if (m_un_authed_clients.contains(client)) {
+    m_un_authed_clients.removeOne(client);
+    return client->deleteLater();
+  }
+
   // peer info of the client
   const auto peerAddress = client->peerAddress();
   const auto peerPort    = client->peerPort();
@@ -238,6 +251,16 @@ void Server::OnServiceRegistered() {
 }
 
 /**
+ * @brief Process SSL Errors
+ */
+void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors) {
+  // if error is self signed then ignore
+  // if (errors.contains(QSslError::SelfSignedCertificate)) {
+    socket->ignoreSslErrors();
+  // }
+}
+
+/**
  * @brief Construct a new Syncing Server object and
  * bind to any available port and any available
  * IP address
@@ -257,6 +280,12 @@ Server::Server(QObject *parent) : service::mdnsRegister(parent) {
   const auto signal = &service::mdnsRegister::OnServiceRegistered;
   const auto slot   = &Server::OnServiceRegistered;
   QObject::connect(this, signal, this, slot);
+
+  // Connect the socket to the callback function that
+  // process the SSL errors
+  const auto signal_e = &QSslServer::sslErrors;
+  const auto slot_e   = &Server::processSslErrors;
+  QObject::connect(m_ssl_server, signal_e, this, slot_e);
 }
 
 /**
@@ -378,13 +407,6 @@ void Server::authSuccess(const types::device::Device &client) {
 
   // Remove the client from the unauthenticated list
   m_un_authed_clients.erase(client_itr);
-
-  // Connect the client to the callback function that process
-  // the disconnection when the client is disconnected
-  // so the listener can be notified
-  const auto signal_d = &QSslSocket::disconnected;
-  const auto slot_d   = &Server::processDisconnection;
-  QObject::connect(client_tls, signal_d, this, slot_d);
 
   // Peer info
   const auto address = client_tls->peerAddress();

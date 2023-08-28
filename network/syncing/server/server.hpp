@@ -162,6 +162,11 @@ class Server : public service::mdnsRegister {
    */
   void OnServiceRegistered();
 
+  /**
+   * @brief Process SSL Errors
+   */
+  void processSslErrors(QSslSocket *, const QList<QSslError>& errors);
+
  public:  // constructors and destructors
 
   /**
