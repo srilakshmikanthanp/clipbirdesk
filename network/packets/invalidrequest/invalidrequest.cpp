@@ -65,6 +65,10 @@ void InvalidRequest::setErrorCode(quint8 code) {
     return;
   }
 
+  if (code == types::enums::ErrorCode::InvalidCert) {
+    this->errorCode = code;
+  }
+
   throw std::invalid_argument("Invalid Error Code");
 }
 
@@ -187,7 +191,8 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
   const auto allowed = std::vector<int>{
     ErrorCode::InvalidPacket,
     ErrorCode::SSLError,
-    ErrorCode::CodingError
+    ErrorCode::CodingError,
+    ErrorCode::InvalidCert
   };
 
   // check the error code
