@@ -157,17 +157,6 @@ void Client::processReadyRead() {
 }
 
 /**
- * @brief Process the SSL error and emit the signal
- *
- * @param errors List of SSL errors
- */
-void Client::processSslError(const QList<QSslError>& errors) {
-  for (auto& error : errors) {
-    qWarning() << (LOG(error.errorString().toStdString()));
-  }
-}
-
-/**
  * @brief Handle client connected
  */
 void Client::handleConnected() {
@@ -178,7 +167,18 @@ void Client::handleConnected() {
  * @brief Handle client disconnected
  */
 void Client::handleDisconnected() {
-  emit OnServerStatusChanged(false);
+  emit OnServerStatusChanged(this->m_is_authed = false);
+}
+
+/**
+ * @brief Process SSL Errors
+ */
+void Client::processSslErrors(const QList<QSslError>& errors) {
+  for (auto& error : errors) {
+    std::cout << LOG(error.errorString().toStdString()) << std::endl;
+  }
+
+  this->m_ssl_socket->ignoreSslErrors();
 }
 
 /**
@@ -206,7 +206,7 @@ Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
   // sslErrors signal to emit the signal for
   // OnErrorOccurred
   const auto signal_s = &QSslSocket::sslErrors;
-  const auto slot_s   = &Client::processSslError;
+  const auto slot_s   = &Client::processSslErrors;
   connect(m_ssl_socket, signal_s, this, slot_s);
 
   // disconnected signal to emit the signal for
@@ -214,16 +214,17 @@ Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
   const auto signal_d = &QSslSocket::disconnected;
   const auto slot_d   = &Client::handleDisconnected;
   connect(m_ssl_socket, signal_d, this, slot_d);
-
-  // set the peer verify mode to none
-  m_ssl_socket->setPeerVerifyMode(QSslSocket::VerifyNone);
 }
 
 /**
  * @brief Set SSL configuration
  */
-void Client::setSslConfiguration(const QSslConfiguration& config) {
+void Client::setSslConfiguration(QSslConfiguration config) {
   m_ssl_socket->setSslConfiguration(config);
+
+  if (this->m_ssl_socket->localCertificate().isNull()) {
+    throw std::runtime_error("Local certificate is not set");
+  }
 }
 
 /**
@@ -275,8 +276,13 @@ QList<types::device::Device> Client::getServerList() const {
  * @param port Port number
  */
 void Client::connectToServer(types::device::Device client) {
+  // matcher to get the Device from servers list
+  auto matcher = [client](const types::device::Device& device) {
+    return device.ip == client.ip && device.port == client.port;
+  };
+
   // on Encrypted lambda function to process
-  const auto onConnected = [this]() {
+  const auto onEncrypted = [this]() {
     this->sendPacket(utility::functions::createPacket({
         packets::Authentication::PacketType::AuthPacket,
         types::enums::AuthType::AuthReq,
@@ -284,22 +290,35 @@ void Client::connectToServer(types::device::Device client) {
     }));
   };
 
-  // check if the SSL configuration is set
-  if (m_ssl_socket->sslConfiguration().isNull()) {
-    throw std::runtime_error("SSL Configuration is not set");
-  }
-
   // check if the socket is connected
-  if (m_ssl_socket->isOpen()) {
+  if (m_ssl_socket->state() == QAbstractSocket::ConnectedState) {
     this->disconnectFromServer();
   }
 
-  // connect the signal to the lambda function
-  connect(m_ssl_socket, &QSslSocket::connected, onConnected);
+  // check if the SSL configuration is set
+  if (m_ssl_socket->localCertificate().isNull()) {
+    throw std::runtime_error("SSL Configuration is not set");
+  }
 
   // create the host address
   const auto host = client.ip.toString();
   const auto port = client.port;
+
+  // get the server certificate from the ip and port
+  auto device = std::find_if(m_servers.begin(), m_servers.end(), matcher);
+
+  // certificate
+  QSslCertificate cert = device->cert;
+
+  // add ssl ignore errors
+  QList<QSslError> expectedErrors;
+  expectedErrors.append(QSslError(QSslError::SelfSignedCertificate, cert));
+  expectedErrors.append(QSslError(QSslError::HostNameMismatch, cert));
+  expectedErrors.append(QSslError(QSslError::CertificateUntrusted, cert));
+  m_ssl_socket->ignoreSslErrors(expectedErrors);
+
+  // connect the signal to the lambda function
+  connect(m_ssl_socket, &QSslSocket::encrypted, onEncrypted);
 
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
@@ -376,7 +395,7 @@ void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
   sslSocket->setPeerVerifyMode(QSslSocket::VerifyNone);
 
   // lambda function to get the certificate
-  const auto onEncrypted = [this, sslSocket, server]() {
+  const auto onEncrypted = [=]() {
     // get the certificate
     auto cert = sslSocket->peerCertificate();
 

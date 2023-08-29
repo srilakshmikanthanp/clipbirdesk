@@ -41,7 +41,7 @@ class ClipbirdApplication : public SingleApplication {
   /**
    * @brief Get the certificate from App Home
    */
-  QSslConfiguration getOldSslConfiguration(int bits = 1024) {
+  QSslConfiguration getOldSslConfiguration() {
     // QFile to read the certificate and key
     QFile certFile(certPath.c_str()), pkeyFile(keyPath.c_str());
 
@@ -59,11 +59,8 @@ class ClipbirdApplication : public SingleApplication {
     sslConfig.setLocalCertificate(cert);
     sslConfig.setPrivateKey(key);
 
-    // peer verification
-    sslConfig.setPeerVerifyMode(QSslSocket::VerifyNone);
-
     // if the configuration is null
-    if (sslConfig.isNull()) {
+    if (cert.isNull() || key.isNull() || sslConfig.isNull()) {
       throw std::runtime_error("Can't Create QSslConfiguration");
     }
 
@@ -74,7 +71,7 @@ class ClipbirdApplication : public SingleApplication {
   /**
    * @brief Get the certificate by creating new one
    */
-  QSslConfiguration getNewSslConfiguration(int bits = 1024) {
+  QSslConfiguration getNewSslConfiguration() {
     // QFile to read the certificate and key
     QFile certFile(certPath.c_str()), pkeyFile(keyPath.c_str());
 
@@ -84,14 +81,11 @@ class ClipbirdApplication : public SingleApplication {
     }
 
     // generate the certificate and key
-    auto sslConfig = utility::functions::getQSslConfiguration(bits);
+    auto sslConfig = utility::functions::getQSslConfiguration();
 
     // write the certificate and key
     certFile.write(sslConfig.localCertificate().toPem());
     pkeyFile.write(sslConfig.privateKey().toPem());
-
-    // peer verification
-    sslConfig.setPeerVerifyMode(QSslSocket::VerifyNone);
 
     // return the configuration
     return sslConfig;
@@ -101,11 +95,11 @@ class ClipbirdApplication : public SingleApplication {
    * @brief Get the certificate from App Home
    * or generate new one and store it
    */
-  QSslConfiguration getSslConfiguration(int bits = 2048) {
+  QSslConfiguration getSslConfiguration() {
     if (!std::filesystem::exists(certPath) || !std::filesystem::exists(keyPath)) {
-      return getNewSslConfiguration(bits);
+      return getNewSslConfiguration();
     } else {
-      return getOldSslConfiguration(bits);
+      return getOldSslConfiguration();
     }
   }
 

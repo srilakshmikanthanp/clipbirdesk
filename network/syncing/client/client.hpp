@@ -7,10 +7,12 @@
 
 // Qt headers
 #include <QByteArray>
+#include <QSslCertificate>
 #include <QDateTime>
 #include <QList>
 #include <QObject>
 #include <QSslConfiguration>
+#include <QSslKey>
 #include <QSslServer>
 #include <QSslSocket>
 #include <QTimer>
@@ -152,11 +154,6 @@ class Client : public service::mdnsBrowser {
   void processReadyRead();
 
   /**
-   * @brief Process the ssl error
-   */
-  void processSslError(const QList<QSslError>& errors);
-
-  /**
    * @brief Handle client connected
    */
   void handleConnected();
@@ -165,6 +162,11 @@ class Client : public service::mdnsBrowser {
    * @brief Handle client disconnected
    */
   void handleDisconnected();
+
+  /**
+   * @brief Process SSL Errors
+   */
+  void processSslErrors(const QList<QSslError>& errors);
 
  public:
 
@@ -186,7 +188,7 @@ class Client : public service::mdnsBrowser {
   /**
    * @brief Set SSL configuration
    */
-  void setSslConfiguration(const QSslConfiguration& config);
+  void setSslConfiguration(QSslConfiguration config);
 
   /**
    * @brief Send the items to the server to sync the
@@ -236,23 +238,6 @@ class Client : public service::mdnsBrowser {
    * @brief Get the Authed Server object
    */
   types::device::Device getAuthedServer() const;
-
-  /**
-   * @brief Send To Connected Server
-   *
-   * @tparam Packet
-   * @param pack
-   */
-  template <typename Packet>
-  void sendToConnectedServer(const Packet& pack) {
-    // if not connected
-    if (m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
-      throw std::runtime_error("Not connected to the server");
-    }
-
-    // send the packet
-    sendPacket(pack);
-  }
 
  protected:  // abstract functions from the base class
 

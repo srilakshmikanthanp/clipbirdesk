@@ -62,7 +62,7 @@ class Server : public service::mdnsRegister {
   QSslServer* m_ssl_server = new QSslServer(this);
 
   /// @brief List of clients unauthenticated
-  QList<QSslSocket*> m_un_authed_clients;
+  QList<QSslSocket*> m_unauthed_clients;
 
   /// @brief List of clients Authenticated
   QList<QSslSocket*> m_authed_clients;
@@ -144,7 +144,7 @@ class Server : public service::mdnsRegister {
   /**
    * @brief Process the connections that are pending
    */
-  void processConnections();
+  void processEncrypted(QSslSocket * client);
 
   /**
    * @brief Callback function that process the ready
@@ -253,35 +253,6 @@ class Server : public service::mdnsRegister {
    * @brief Stop the server
    */
   void stopServer();
-
-  /**
-   * @brief Send the packet to the client
-   *
-   * @param packet Packet to send
-   * @param QPair {QHostAddress, port}
-   */
-  template <typename Packet>
-  void sendToClient(const Packet &packet, const types::device::Device &client) {
-    // Matcher Lambda Function to find the client
-    const auto matcher = [&client](QSslSocket *c) {
-      return (c->peerAddress() == client.ip) && (c->peerPort() == client.port);
-    };
-
-    // Get the iterator to the start and end of the list
-    auto start      = m_authed_clients.begin();
-    auto end        = m_authed_clients.end();
-
-    // Get the client from the unauthenticated list and remove it
-    auto client_itr = std::find_if(start, end, matcher);
-
-    // If the client is not found then return from the function
-    if (client_itr == m_authed_clients.end()) {
-      throw std::runtime_error("Client not found");
-    }
-
-    // send the packet to the client
-    this->sendPacket(packet, (*client_itr));
-  }
 
  protected:  // override functions from the base class
 

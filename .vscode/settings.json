@@ -14,7 +14,8 @@
     "pubkey",
     "qobject",
     "qvariant",
-    "SSLCONFIG"
+    "SSLCONFIG",
+    "unauthed"
   ],
   "files.associations": {
     ".env*": "dotenv",

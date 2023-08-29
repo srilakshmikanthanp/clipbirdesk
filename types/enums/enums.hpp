@@ -19,6 +19,7 @@ enum ErrorCode : quint8 {
   CodingError   = 0x01,
   SSLError      = 0x02,
   InvalidPacket = 0x03,
+  InvalidCert   = 0x04,
 };
 
 /// @brief Allowed Authentication Types

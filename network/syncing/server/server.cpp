@@ -21,7 +21,7 @@ void Server::processAuthenticationPacket(const packets::Authentication &packet) 
   auto client = qobject_cast<QSslSocket *>(sender());
 
   // if not in unauthenticated list then throw
-  if (!m_un_authed_clients.contains(client)) {
+  if (!m_unauthed_clients.contains(client)) {
     throw types::except::MalformedPacket(
       types::enums::ErrorCode::InvalidPacket, "Client is not TLS client"
     );
@@ -65,39 +65,38 @@ void Server::processSyncingPacket(const packets::SyncingPacket &packet) {
 /**
  * @brief Process the connections that are pending
  */
-void Server::processConnections() {
-  while (m_ssl_server->hasPendingConnections()) {
-    // Get the client that has been connected
-    auto client_tcp = (m_ssl_server->nextPendingConnection());
-    auto client_tls = qobject_cast<QSslSocket *>(client_tcp);
+void Server::processEncrypted(QSslSocket * client) {
+  // if the client is not TLS client then send the invalid packet
+  if (client->peerCertificate().isNull()) {
+    // create invalid packet
+    const auto type = packets::InvalidRequest::PacketType::RequestFailed;
+    const auto code = types::enums::ErrorCode::InvalidCert;
+    const auto msg  = "Invalid Certificate";
+    const auto pack = utility::functions::createPacket({type, code, msg});
 
-    // If the client is not SSL client then disconnect
-    if (client_tls == nullptr) {
-      const auto packType = packets::InvalidRequest::PacketType::RequestFailed;
-      const auto code     = types::enums::ErrorCode::SSLError;
-      const auto message  = "Client is not SSL client";
+    // send the invalid packet
+    return this->sendPacket(client, pack);
 
-      using utility::functions::createPacket;
-      this->sendPacket(client_tls, createPacket({packType, code, message}));
-      client_tcp->disconnectFromHost();
-    } else {
-      // Connect the client to the callback function that process
-      // the disconnection when the client is disconnected
-      // so the listener can be notified
-      const auto signal_d = &QSslSocket::disconnected;
-      const auto slot_d   = &Server::processDisconnection;
-      QObject::connect(client_tls, signal_d, this, slot_d);
+    // disconnect and delete the client
+    client->disconnectFromHost();
 
-      // Connect the socket to the callback function that
-      // process the ready read when the socket is ready
-      // to read so the listener can be notified
-      const auto signal_r = &QSslSocket::readyRead;
-      const auto slot_r   = &Server::processReadyRead;
-      QObject::connect(client_tls, signal_r, this, slot_r);
+    // delete the client after the client is disconnected
+    client->deleteLater();
+  } else {
+    // Add the client to the list of unauthenticated clients
+    m_unauthed_clients.append(client);
 
-      // add the client to unauthenticated list
-      m_un_authed_clients.append(client_tls);
-    }
+    // Connect the client to the callback function that process
+    // the disconnection when the client is disconnected
+    const auto signal_d = &QSslSocket::disconnected;
+    const auto slot_d   = &Server::processDisconnection;
+    QObject::connect(client, signal_d, this, slot_d);
+
+    // Connect the socket to the callback function that
+    // process the ready read when the socket is ready
+    const auto signal_r = &QSslSocket::readyRead;
+    const auto slot_r   = &Server::processReadyRead;
+    QObject::connect(client, signal_r, this, slot_r);
   }
 }
 
@@ -160,6 +159,9 @@ void Server::processReadyRead() {
     return;
   }
 
+  // if not in m_un_authed_clients then return
+  if (!m_unauthed_clients.contains(client)) return;
+
   // Deserialize the data to AuthenticationPacket
   try {
     this->processAuthenticationPacket(fromQByteArray<packets::Authentication>(data));
@@ -215,8 +217,7 @@ void Server::processDisconnection() {
   auto client = qobject_cast<QSslSocket *>(sender());
 
   // if client is unauthenticated then remove it from the list
-  if (m_un_authed_clients.contains(client)) {
-    m_un_authed_clients.removeOne(client);
+  if (m_unauthed_clients.removeOne(client)) {
     return client->deleteLater();
   }
 
@@ -254,10 +255,7 @@ void Server::OnServiceRegistered() {
  * @brief Process SSL Errors
  */
 void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors) {
-  // if error is self signed then ignore
-  // if (errors.contains(QSslError::SelfSignedCertificate)) {
-    socket->ignoreSslErrors();
-  // }
+  socket->ignoreSslErrors(errors);
 }
 
 /**
@@ -272,8 +270,8 @@ Server::Server(QObject *parent) : service::mdnsRegister(parent) {
   // Connect the socket to the callback function that
   // process the connections when the socket is ready
   // to read so the listener can be notified
-  const auto signal_c = &QSslServer::pendingConnectionAvailable;
-  const auto slot_c   = &Server::processConnections;
+  const auto signal_c = &QSslServer::startedEncryptionHandshake;
+  const auto slot_c   = &Server::processEncrypted;
   QObject::connect(m_ssl_server, signal_c, this, slot_c);
 
   // Notify the listeners that the server is started
@@ -304,19 +302,21 @@ void Server::syncItems(QVector<QPair<QString, QByteArray>> items) {
  * @return QList<QSslSocket*> List of clients
  */
 QList<types::device::Device> Server::getConnectedClientsList() const {
+  // List of clients that are connected
   QList<types::device::Device> list;
 
   for (auto client : m_authed_clients) {
     // Peer info of the client that is connected
-    const auto address = client->peerAddress();
-    const auto port    = client->peerPort();
-    const auto cert    = client->peerCertificate();
-    const auto name    = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+    auto addr = client->peerAddress();
+    auto port = client->peerPort();
+    auto cert = client->peerCertificate();
+    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
     // add the device to the list
-    list.append({address, port, name, cert});
+    list.append({addr, port, name, cert});
   }
 
+  // return the list
   return list;
 }
 
@@ -393,26 +393,26 @@ void Server::authSuccess(const types::device::Device &client) {
   };
 
   // Get the iterator to the start and end of the list
-  auto start      = m_un_authed_clients.begin();
-  auto end        = m_un_authed_clients.end();
+  auto start      = m_unauthed_clients.begin();
+  auto end        = m_unauthed_clients.end();
 
   // Get the client from the unauthenticated list and remove it
   auto client_itr = std::find_if(start, end, matcher);
 
   // If the client is not found then return from the function
-  if (client_itr == m_un_authed_clients.end()) return;
+  if (client_itr == m_unauthed_clients.end()) return;
 
   // Get the client from the iterator
   auto client_tls = *client_itr;
 
   // Remove the client from the unauthenticated list
-  m_un_authed_clients.erase(client_itr);
+  m_unauthed_clients.erase(client_itr);
 
   // Peer info
-  const auto address = client_tls->peerAddress();
-  const auto port    = client_tls->peerPort();
-  const auto cert    = client_tls->peerCertificate();
-  const auto name    = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+  auto address = client_tls->peerAddress();
+  auto port    = client_tls->peerPort();
+  auto cert    = client_tls->peerCertificate();
+  auto name    = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
   // create the device
   auto device = types::device::Device {
@@ -457,17 +457,17 @@ void Server::authFailed(const types::device::Device&client) {
   };
 
   // Get the iterator to the start and end of the list
-  auto start      = m_un_authed_clients.begin();
-  auto end        = m_un_authed_clients.end();
+  auto start      = m_unauthed_clients.begin();
+  auto end        = m_unauthed_clients.end();
 
   // Get the client from the unauthenticated list and remove it
   auto client_itr = std::find_if(start, end, matcher);
 
   // If the client is not found then return from the function
-  if (client_itr == m_un_authed_clients.end()) return;
+  if (client_itr == m_unauthed_clients.end()) return;
 
   // Remove the client from the unauthenticated list
-  m_un_authed_clients.erase(client_itr);
+  m_unauthed_clients.erase(client_itr);
 
   // using the create packet from namespace
   using utility::functions::createPacket;

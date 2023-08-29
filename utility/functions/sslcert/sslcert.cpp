@@ -62,7 +62,8 @@ std::shared_ptr<EVP_PKEY> generateRSAKey(int bits) {
  * @return X509* - shared pointer to certificate
  */
 std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey) {
-  // Allocate memory for the X509 structure.
+  // Allocate memory for the X509 structure & BIGNUM
+  std::unique_ptr<BIGNUM, decltype(&::BN_free)> sn(BN_new(), ::BN_free);
   std::shared_ptr<X509> x509(X509_new(), X509_free);
 
   // Expiry time
@@ -73,10 +74,30 @@ std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey) {
     throw std::runtime_error("Can't Create X509");
   }
 
+  // if sn is null then throw an error
+  if (sn.get() == NULL) {
+    throw std::runtime_error("Can't Create BIGNUM");
+  }
+
+  // Set the version to 2
+  if (!X509_set_version(x509.get(), 2)) {
+    throw std::runtime_error("Can't Set Version");
+  }
+
+  // Generate random number
+  if (!BN_rand(sn.get(), 160, -1, 0)) {
+    throw std::runtime_error("Can't Generate Random Number");
+  }
+
+  // Set the serial number
+  if (!BN_to_ASN1_INTEGER(sn.get(), X509_get_serialNumber(x509.get()))) {
+    throw std::runtime_error("Can't Set Serial Number");
+  }
+
   // get local host name
-  auto cname   = constants::getMDnsServiceName();
-  auto org     = constants::getAppOrgName();
-  auto orgUnit = constants::getAppName();
+  auto cname = constants::getMDnsServiceName();
+  auto org   = constants::getAppOrgName();
+  auto unit  = constants::getAppName();
 
   // get the subject name
   X509_NAME *name = X509_get_subject_name(x509.get());
@@ -92,7 +113,7 @@ std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey) {
   }
 
   // set the unit name
-  if(!X509_NAME_add_entry_by_txt(name, "OU", MBSTRING_ASC, (const unsigned char *)orgUnit.c_str(), -1, -1, 0)) {
+  if(!X509_NAME_add_entry_by_txt(name, "OU", MBSTRING_ASC, (const unsigned char *)unit.c_str(), -1, -1, 0)) {
     throw std::runtime_error("Can't Set Subject Name");
   }
 

@@ -158,10 +158,15 @@ QDataStream& operator>>(QDataStream& stream, Authentication& packet) {
   // auth status
   const auto authStatus = packet.authStatus;
 
+  // allowed auth status
+  const auto allowed = std::vector<int>{
+    AuthStatus::AuthFail,
+    AuthStatus::AuthOkay,
+    AuthStatus::AuthStart
+  };
+
   // Check the auth status
-  if (authStatus != AuthStatus::AuthFail &&
-      authStatus != AuthStatus::AuthOkay &&
-      authStatus != AuthStatus::AuthStart) {
+  if (std::find(allowed.begin(), allowed.end(), authStatus) == allowed.end()) {
     throw MalformedPacket(ErrorCode::CodingError, "Invalid Auth Status");
   }
 
