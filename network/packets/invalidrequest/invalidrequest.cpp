@@ -67,6 +67,7 @@ void InvalidRequest::setErrorCode(quint8 code) {
 
   if (code == types::enums::ErrorCode::InvalidCert) {
     this->errorCode = code;
+    return;
   }
 
   throw std::invalid_argument("Invalid Error Code");

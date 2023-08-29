@@ -286,19 +286,15 @@ void Client::connectToServer(types::device::Device client) {
     }));
   };
 
-  // check if the socket is connected
-  if (m_ssl_socket->state() == QAbstractSocket::ConnectedState) {
-    this->disconnectFromServer();
-  }
-
   // check if the SSL configuration is set
   if (m_ssl_socket->localCertificate().isNull()) {
     throw std::runtime_error("SSL Configuration is not set");
   }
 
-  // create the host address
-  const auto host = client.ip.toString();
-  const auto port = client.port;
+  // check if the socket is connected
+  if (this->isConnected()) {
+    this->disconnectFromServer();
+  }
 
   // get the server certificate from the ip and port
   auto device = std::find_if(m_servers.begin(), m_servers.end(), matcher);
@@ -315,6 +311,10 @@ void Client::connectToServer(types::device::Device client) {
 
   // connect the signal to the lambda function
   connect(m_ssl_socket, &QSslSocket::encrypted, onEncrypted);
+
+  // create the host address
+  const auto host = device->ip.toString();
+  const auto port = device->port;
 
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
@@ -377,6 +377,13 @@ types::device::Device Client::getAuthedServer() const {
 }
 
 /**
+ * @brief Set Discovery Config
+ */
+void Client::setDiscoveryConfig(QSslConfiguration config) {
+  this->m_dis_config = config;
+}
+
+/**
  * @brief On server found function that That Called by the
  * discovery client when the server is found
  *
@@ -384,25 +391,38 @@ types::device::Device Client::getAuthedServer() const {
  * @param port Port number
  */
 void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
-  // get the server certificate from the ip and port
+  // if Discover Configuration is null the return
+  if (this->m_dis_config.isNull()) {
+    qWarning() << (LOG("Discovery Config is not set")); return;
+  }
+
+  // get the server certificate from the host
   QSslSocket *sslSocket = new QSslSocket(this);
+
+  // set config to the socket
+  sslSocket->setSslConfiguration(m_dis_config);
 
   // set peer verify mode to none
   sslSocket->setPeerVerifyMode(QSslSocket::VerifyNone);
 
-  // lambda function to get the certificate
-  const auto onEncrypted = [=]() {
+  // connect the signal to the lambda function
+  connect(sslSocket, &QSslSocket::encrypted, [=]() {
     // get the certificate
     auto cert = sslSocket->peerCertificate();
 
     // get the common name
     auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
+    // Get the Device Object
+    auto device = types::device::Device {
+      server.first, server.second, name, cert
+    };
+
     // emit on server found
-    emit OnServerFound({server.first, server.second, name, cert});
+    emit OnServerFound(device);
 
     // add the server to the list
-    m_servers.append({server.first, server.second, name, cert});
+    m_servers.append(device);
 
     // emit the signal
     emit OnServerListChanged(getServerList());
@@ -412,10 +432,7 @@ void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
 
     // delete the socket
     sslSocket->deleteLater();
-  };
-
-  // connect the signal to the lambda function
-  connect(sslSocket, &QSslSocket::encrypted, onEncrypted);
+  });
 
   // server details
   auto address = server.first.toString();

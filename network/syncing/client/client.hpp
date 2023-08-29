@@ -73,14 +73,17 @@ class Client : public service::mdnsBrowser {
 
  private:  // Member variables
 
-  /// @brief List of Found servers and timestamp
-  QList<types::device::Device> m_servers;
-
   /// @brief SSL socket
   QSslSocket* m_ssl_socket = new QSslSocket(this);
 
+  /// @brief List of Found servers and timestamp
+  QList<types::device::Device> m_servers;
+
   /// @brief is Server Authenticated Me
   bool m_is_authed = false;
+
+  /// @brief Service Discovery client Config
+  QSslConfiguration m_dis_config;
 
  private:  // private functions
 
@@ -238,6 +241,11 @@ class Client : public service::mdnsBrowser {
    * @brief Get the Authed Server object
    */
   types::device::Device getAuthedServer() const;
+
+  /**
+   * @brief Set Discovery Config
+   */
+  void setDiscoveryConfig(QSslConfiguration config);
 
  protected:  // abstract functions from the base class
 

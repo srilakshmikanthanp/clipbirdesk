@@ -101,7 +101,7 @@ class ClipBird : public QObject {
    * @param board  clipboard that is managed
    * @param parent parent object
    */
-  ClipBird(QSslConfiguration config, QObject *parent = nullptr);
+  ClipBird(QSslConfiguration ssl_config, QObject *parent = nullptr);
 
   /**
    * @brief Destroy the ClipBird object

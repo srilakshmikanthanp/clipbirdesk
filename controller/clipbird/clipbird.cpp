@@ -120,8 +120,14 @@ void ClipBird::handleAuthRequest(types::device::Device client) {
  * @param board  clipboard that is managed
  * @param parent parent object
  */
-ClipBird::ClipBird(QSslConfiguration config, QObject *parent)
-    : QObject(parent), m_clipboard(this), m_sslConfig(config) {}
+ClipBird::ClipBird(
+  QSslConfiguration config,               // Config used for Actual Packet
+  QObject *parent                         // Parent Object
+) :
+  QObject(parent),                        // Call Parent Class
+  m_clipboard(this),                      // parent class as this
+  m_sslConfig(config)                     // init the ssl config
+{}
 
 //---------------------- public slots -----------------------//
 
@@ -185,6 +191,9 @@ void ClipBird::setCurrentHostAsClient() {
 
   // Set the QSslConfiguration
   client->setSslConfiguration(m_sslConfig);
+
+  // set the Discovery Config
+  client->setDiscoveryConfig(m_sslConfig);
 
   // Connect the onServerListChanged signal to the signal
   const auto signal_sl = &Client::OnServerListChanged;
