@@ -24,7 +24,7 @@
 #include <utility>
 
 // Local headers
-#include "network/service/index.hpp"
+#include "network/service/service.hpp"
 #include "types/enums/enums.hpp"
 #include "types/device/device.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"

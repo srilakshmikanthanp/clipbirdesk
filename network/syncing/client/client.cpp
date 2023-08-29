@@ -221,10 +221,6 @@ Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
  */
 void Client::setSslConfiguration(QSslConfiguration config) {
   m_ssl_socket->setSslConfiguration(config);
-
-  if (this->m_ssl_socket->localCertificate().isNull()) {
-    throw std::runtime_error("Local certificate is not set");
-  }
 }
 
 /**
