@@ -73,29 +73,6 @@ The **InvalidRequest** is used to indicate that the packet is invalid. This pack
 | 0x01       | Coding Error  |
 | 0x02       | TLS Error     |
 
-### Authentication
-
-The **Authentication** is used to indicate the authentication process to the client. This packet contains the following fields:
-
-#### Header
-
-- **Packet Length**: This field specifies the length of the packet, for AuthPacket it is length of the auth token.
-- **Packet Type**: This field specifies the type of packet, which is set to 0x01 for the AuthPacket.
-
-#### Body
-
-- **AuthStatus**: This field specifies the status of the authentication process.
-  - AuthFailed: This field specifies the status of the authentication process, which is set to 0x00 if the authentication fails.
-  - AuthSuccess: This field specifies the status of the authentication process, which is set to 0x01 if the authentication succeeds.
-
-#### Structure
-
-| Field           | Bytes | value |
-|-----------------|-------| ----- |
-| Packet Length   | 4     |       |
-| Packet Type     | 1     | 0x01  |
-| AuthStatus      | 1     |       |
-
 ### SyncingPacket
 
 The **SyncingPacket** is used to transfer clipboard data between the client and the server. This packet contains the following fields:

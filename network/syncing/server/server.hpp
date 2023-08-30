@@ -133,7 +133,7 @@ class Server : public service::mdnsRegister {
   /**
    * @brief Process the connections that are pending
    */
-  void processEncrypted(QSslSocket * client);
+  void processPendingConnections();
 
   /**
    * @brief Callback function that process the ready

@@ -29,10 +29,7 @@ void Server::processSyncingPacket(const packets::SyncingPacket &packet) {
  */
 void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors) {
   for (auto error : errors) {
-    // if self signed certificate then ignore the error
-    if (error.error() == QSslError::SelfSignedCertificate) {
-      socket->ignoreSslErrors(QList<QSslError>{error});
-    }
+    std::cout << error.errorString().toStdString() << std::endl;
 
     // if error not not verified certificate
     if (error.error() == QSslError::CertificateUntrusted) {
@@ -59,27 +56,61 @@ void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors
         socket->ignoreSslErrors(QList<QSslError>{error});
       }
     }
+
+    // if self signed certificate then ignore the error
+    else if (error.error() == QSslError::SelfSignedCertificate) {
+      socket->ignoreSslErrors(QList<QSslError>{error});
+    }
+
+    // log and abort
+    else {
+      std::cout << error.errorString().toStdString() << std::endl;
+      socket->abort();
+    }
   }
 }
 
 /**
  * @brief Process the connections that are pending
  */
-void Server::processEncrypted(QSslSocket * client) {
-  // Connect the client to the callback function that process
-  // the disconnection when the client is disconnected
-  const auto signal_d = &QSslSocket::disconnected;
-  const auto slot_d   = &Server::processDisconnection;
-  QObject::connect(client, signal_d, this, slot_d);
+void Server::processPendingConnections() {
+  while (m_ssl_server->hasPendingConnections()) {
+    // Get the client that has been connected
+    auto client_tcp = (m_ssl_server->nextPendingConnection());
 
-  // Connect the socket to the callback function that
-  // process the ready read when the socket is ready
-  const auto signal_r = &QSslSocket::readyRead;
-  const auto slot_r   = &Server::processReadyRead;
-  QObject::connect(client, signal_r, this, slot_r);
+    // Convert the client to SSL client
+    auto client_tls = qobject_cast<QSslSocket *>(client_tcp);
 
-  // Add the client to the list of unauthenticated clients
-  m_authed_clients.append(client);
+    // If the client is not SSL client then disconnect
+    if (client_tls == nullptr) {
+      const auto packType = packets::InvalidRequest::PacketType::RequestFailed;
+      const auto code     = types::enums::ErrorCode::SSLError;
+      const auto message  = "Client is not SSL client";
+
+      using utility::functions::createPacket;
+      this->sendPacket(client_tls, createPacket({packType, code, message}));
+      client_tcp->disconnectFromHost();
+    } else {
+      // Connect the client to the callback function that process
+      // the disconnection when the client is disconnected
+      const auto signal_d = &QSslSocket::disconnected;
+      const auto slot_d   = &Server::processDisconnection;
+      QObject::connect(client_tls, signal_d, this, slot_d);
+
+      // Connect the socket to the callback function that
+      // process the ready read when the socket is ready
+      const auto signal_r = &QSslSocket::readyRead;
+      const auto slot_r   = &Server::processReadyRead;
+      QObject::connect(client_tls, signal_r, this, slot_r);
+
+      if (client_tls->peerCertificate().isNull()) {
+        throw std::runtime_error("Client Certificate is not set");
+      }
+
+      // Add the client to the list of unauthenticated clients
+      m_authed_clients.append(client_tls);
+    }
+  }
 }
 
 /**
@@ -177,6 +208,9 @@ void Server::processDisconnection() {
   // Get the client that was disconnected
   auto client = qobject_cast<QSslSocket *>(sender());
 
+  // if not in authenticated list
+  if (!m_authed_clients.contains(client)) return;
+
   // peer info of the client
   const auto peerAddress = client->peerAddress();
   const auto peerPort    = client->peerPort();
@@ -219,8 +253,8 @@ Server::Server(QObject *parent) : service::mdnsRegister(parent) {
   // Connect the socket to the callback function that
   // process the connections when the socket is ready
   // to read so the listener can be notified
-  const auto signal_c = &QSslServer::startedEncryptionHandshake;
-  const auto slot_c   = &Server::processEncrypted;
+  const auto signal_c = &QSslServer::pendingConnectionAvailable;
+  const auto slot_c   = &Server::processPendingConnections;
   QObject::connect(m_ssl_server, signal_c, this, slot_c);
 
   // Notify the listeners that the server is started
@@ -343,6 +377,9 @@ void Server::startServer() {
   if (!m_ssl_server->listen()) {
     throw std::runtime_error("Failed to start the server");
   }
+
+  // log port
+  std::cout << "Server Started on Port: " + QString::number(m_ssl_server->serverPort()).toStdString();
 
   // start the discovery server
   this->registerServiceAsync();

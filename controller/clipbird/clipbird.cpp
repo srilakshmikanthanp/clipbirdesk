@@ -238,9 +238,6 @@ void ClipBird::updateCaCertificatesFromStore() {
 
   // set ca certificates
   sslConfig.setCaCertificates(caCerts);
-
-  // set the ssl configuration
-  this->setSslConfiguration(sslConfig);
 }
 
 /**
