@@ -259,16 +259,6 @@ void Client::connectToServer(types::device::Device server) {
   // get the server certificate from the ip and port
   auto device = std::find_if(m_servers.begin(), m_servers.end(), matcher);
 
-  // certificate
-  QSslCertificate cert = device->cert;
-
-  // add ssl ignore errors
-  QList<QSslError> expectedErrors;
-  expectedErrors.append(QSslError(QSslError::SelfSignedCertificate, cert));
-  expectedErrors.append(QSslError(QSslError::HostNameMismatch, cert));
-  expectedErrors.append(QSslError(QSslError::CertificateUntrusted, cert));
-  m_ssl_socket->ignoreSslErrors(expectedErrors);
-
   // create the host address
   const auto host = device->ip.toString();
   const auto port = device->port;
@@ -333,6 +323,11 @@ void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
   connect(sslSocket, &QSslSocket::encrypted, [=]() {
     // get the certificate
     auto cert = sslSocket->peerCertificate();
+
+    // if certificate is null or common name is empty
+    if (cert.isNull() || cert.subjectInfo(QSslCertificate::CommonName).isEmpty()) {
+      return;
+    }
 
     // get the common name
     auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();

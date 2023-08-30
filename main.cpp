@@ -218,7 +218,7 @@ class ClipbirdApplication : public SingleApplication {
     controller->setAuthenticator(authenticator);
 
     // update the ca certificates
-    //controller->updateCaCertificatesFromStore();
+    controller->updateCaCertificatesFromStore();
 
     // create the objects of the class
     content    = new ui::gui::Content(controller);

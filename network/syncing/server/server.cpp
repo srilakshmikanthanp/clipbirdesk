@@ -29,14 +29,17 @@ void Server::processSyncingPacket(const packets::SyncingPacket &packet) {
  */
 void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors) {
   for (auto error : errors) {
-    std::cout << error.errorString().toStdString() << std::endl;
-
     // if error not not verified certificate
-    if (error.error() == QSslError::CertificateUntrusted) {
+    if (error.error() == QSslError::SelfSignedCertificate) {
       // peer info of the client
       const auto peerAddress = socket->peerAddress();
       const auto peerPort    = socket->peerPort();
       const auto certificate = socket->peerCertificate();
+
+      // if certificate is null or common name is empty
+      if (certificate.isNull() || certificate.subjectInfo(QSslCertificate::CommonName).isEmpty()) {
+        continue;
+      }
 
       // create the device
       auto device = types::device::Device {
@@ -55,17 +58,6 @@ void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors
       if (m_authenticator(device)) {
         socket->ignoreSslErrors(QList<QSslError>{error});
       }
-    }
-
-    // if self signed certificate then ignore the error
-    else if (error.error() == QSslError::SelfSignedCertificate) {
-      socket->ignoreSslErrors(QList<QSslError>{error});
-    }
-
-    // log and abort
-    else {
-      std::cout << error.errorString().toStdString() << std::endl;
-      socket->abort();
     }
   }
 }
