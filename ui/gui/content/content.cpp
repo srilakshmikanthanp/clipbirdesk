@@ -321,6 +321,14 @@ void Content::onIssueClicked() {
 }
 
 /**
+ * @brief On Reset Clicked
+ */
+void Content::onResetClicked() {
+  controller->clearServerCertificates();
+  controller->clearClientCertificates();
+}
+
+/**
  * @brief Construct a new Content object
  * with parent as QWidget
  *
@@ -460,9 +468,14 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto slot_ic   = &Content::onIssueClicked;
   QObject::connect(trayMenu, signal_ic, this, slot_ic);
 
+  // set the signal for menus Reset click
+  const auto signal_rc = &ui::gui::content::TrayMenu::OnResetClicked;
+  const auto slot_rc   = &Content::onResetClicked;
+  QObject::connect(trayMenu, signal_rc, this, slot_rc);
+
   // set the signal for menus Quit click
   const auto signal_qc = &ui::gui::content::TrayMenu::OnExitClicked;
-  const auto slot_qc   = [] { qApp->quit(); };
+  const auto slot_qc   = [] { QApplication::quit(); };
   QObject::connect(trayMenu, signal_qc, this, slot_qc);
 
   // if host is lastly server

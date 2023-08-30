@@ -174,10 +174,6 @@ void Client::handleDisconnected() {
  * @brief Process SSL Errors
  */
 void Client::processSslErrors(const QList<QSslError>& errors) {
-  for (auto& error : errors) {
-    std::cout << LOG(error.errorString().toStdString()) << std::endl;
-  }
-
   this->m_ssl_socket->ignoreSslErrors();
 }
 
@@ -220,7 +216,7 @@ Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
  * @brief Set SSL configuration
  */
 void Client::setSslConfiguration(QSslConfiguration config) {
-  m_ssl_socket->setSslConfiguration(config);
+  this->m_ssl_config = config;
 }
 
 /**
@@ -271,25 +267,39 @@ QList<types::device::Device> Client::getServerList() const {
  * @param host Host address
  * @param port Port number
  */
-void Client::connectToServer(types::device::Device client) {
+void Client::connectToServer(types::device::Device server) {
   // matcher to get the Device from servers list
-  auto matcher = [client](const types::device::Device& device) {
-    return device.ip == client.ip && device.port == client.port;
+  auto matcher = [server](const types::device::Device& device) {
+    return device.ip == server.ip && device.port == server.port;
   };
 
   // on Encrypted lambda function to process
   const auto onEncrypted = [this]() {
-    this->sendPacket(utility::functions::createPacket({
-        packets::Authentication::PacketType::AuthPacket,
-        types::enums::AuthType::AuthReq,
-        types::enums::AuthStatus::AuthStart,
-    }));
+    // using some of type to create the packet
+    using utility::functions::createPacket;
+    using packets::Authentication;
+    using types::enums::AuthType;
+    using types::enums::AuthStatus;
+
+    // params
+    auto packType = Authentication::PacketType::AuthPacket;
+    auto authType = AuthType::AuthReq;
+    auto authStat = AuthStatus::AuthStart;
+
+    // packet
+    auto packet = createPacket({packType, authType, authStat});
+
+    // send the packet to the server
+    this->sendPacket(packet);
   };
 
-  // check if the SSL configuration is set
-  if (m_ssl_socket->localCertificate().isNull()) {
-    throw std::runtime_error("SSL Configuration is not set");
+  // if Discover Configuration is null the return
+  if (this->m_ssl_config.isNull()) {
+    throw std::runtime_error("SSL Config Config is not set");
   }
+
+  // set the ssl Configuration
+  m_ssl_socket->setSslConfiguration(m_ssl_config);
 
   // check if the socket is connected
   if (this->isConnected()) {
@@ -377,13 +387,6 @@ types::device::Device Client::getAuthedServer() const {
 }
 
 /**
- * @brief Set Discovery Config
- */
-void Client::setDiscoveryConfig(QSslConfiguration config) {
-  this->m_dis_config = config;
-}
-
-/**
  * @brief On server found function that That Called by the
  * discovery client when the server is found
  *
@@ -392,18 +395,15 @@ void Client::setDiscoveryConfig(QSslConfiguration config) {
  */
 void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
   // if Discover Configuration is null the return
-  if (this->m_dis_config.isNull()) {
-    qWarning() << (LOG("Discovery Config is not set")); return;
+  if (this->m_ssl_config.isNull()) {
+    throw std::runtime_error("SSL Config Config is not set");
   }
 
   // get the server certificate from the host
   QSslSocket *sslSocket = new QSslSocket(this);
 
   // set config to the socket
-  sslSocket->setSslConfiguration(m_dis_config);
-
-  // set peer verify mode to none
-  sslSocket->setPeerVerifyMode(QSslSocket::VerifyNone);
+  sslSocket->setSslConfiguration(m_ssl_config);
 
   // connect the signal to the lambda function
   connect(sslSocket, &QSslSocket::encrypted, [=]() {
@@ -432,6 +432,11 @@ void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
 
     // delete the socket
     sslSocket->deleteLater();
+  });
+
+  // connect to ssl errors
+  connect(sslSocket, &QSslSocket::sslErrors, [=]() {
+    sslSocket->ignoreSslErrors();
   });
 
   // server details

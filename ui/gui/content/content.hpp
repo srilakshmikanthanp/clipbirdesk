@@ -174,6 +174,11 @@ class Content : public QFrame {
    */
   void onIssueClicked();
 
+  /**
+   * @brief On Reset Clicked
+   */
+  void onResetClicked();
+
  public:
 
   /**

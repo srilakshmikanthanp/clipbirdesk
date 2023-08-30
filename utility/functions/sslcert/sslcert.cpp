@@ -216,8 +216,8 @@ QSslConfiguration getQSslConfiguration(int bits) {
     throw std::runtime_error("Can't Create QSslConfiguration");
   }
 
-  // set the protocol to TLSv1_2
-  sslConfig.setProtocol(QSsl::TlsV1_2);
+  // set peer verify
+  sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
 
   // return the configuration
   return sslConfig;

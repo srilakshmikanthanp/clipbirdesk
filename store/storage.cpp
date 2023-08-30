@@ -82,6 +82,24 @@ bool Storage::hasServerCert(const QString &name) {
 }
 
 /**
+ * @brief Clear the client cert
+ */
+void Storage::clearClientCert(const QString &name) {
+  settings->beginGroup(clientGroup);
+  settings->remove(name);
+  settings->endGroup();
+}
+
+/**
+ * @brief Clear the client cert
+ */
+void Storage::clearAllClientCert() {
+  settings->beginGroup(clientGroup);
+  settings->remove("");
+  settings->endGroup();
+}
+
+/**
  * @brief Get the JWT token for the name
  *
  * @param name
@@ -109,6 +127,24 @@ QByteArray Storage::getServerCert(const QString &name) {
 void Storage::setHostIsServer(bool isServer) {
   settings->beginGroup(generalGroup);
   settings->setValue(hostStateKey, isServer);
+  settings->endGroup();
+}
+
+/**
+ * @brief Clear the server cert
+ */
+void Storage::clearServerCert(const QString &name) {
+  settings->beginGroup(serverGroup);
+  settings->remove(name);
+  settings->endGroup();
+}
+
+/**
+ * @brief Clear the server cert
+ */
+void Storage::clearAllServerCert() {
+  settings->beginGroup(serverGroup);
+  settings->remove("");
   settings->endGroup();
 }
 

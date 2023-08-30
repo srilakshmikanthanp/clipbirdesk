@@ -83,7 +83,7 @@ class Client : public service::mdnsBrowser {
   bool m_is_authed = false;
 
   /// @brief Service Discovery client Config
-  QSslConfiguration m_dis_config;
+  QSslConfiguration m_ssl_config;
 
  private:  // private functions
 

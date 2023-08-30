@@ -64,6 +64,9 @@ class ClipbirdApplication : public SingleApplication {
       throw std::runtime_error("Can't Create QSslConfiguration");
     }
 
+    // set peer verify
+    sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
+
     // return the configuration
     return sslConfig;
   }

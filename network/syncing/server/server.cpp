@@ -255,6 +255,9 @@ void Server::OnServiceRegistered() {
  * @brief Process SSL Errors
  */
 void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors) {
+  for (auto error : errors) {
+    std::cout << error.errorString().toStdString() << std::endl;
+  }
   socket->ignoreSslErrors(errors);
 }
 

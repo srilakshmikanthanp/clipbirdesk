@@ -55,6 +55,16 @@ class Storage : public QObject {
   bool hasClientCert(const QString &name);
 
   /**
+  * @brief Clear the client cert
+  */
+  void clearClientCert(const QString &name);
+
+  /**
+   * @brief Clear the client cert
+   */
+  void clearAllClientCert();
+
+  /**
    * @brief Get the JWT cert for the name
    */
   QByteArray getClientCert(const QString &name);
@@ -68,6 +78,16 @@ class Storage : public QObject {
    * @brief has the cert for the name
    */
   bool hasServerCert(const QString &name);
+
+  /**
+   * @brief Clear the server cert
+   */
+  void clearServerCert(const QString &name);
+
+  /**
+   * @brief Clear the server cert
+   */
+  void clearAllServerCert();
 
   /**
    * @brief Get the JWT cert for the name

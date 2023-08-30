@@ -192,9 +192,6 @@ void ClipBird::setCurrentHostAsClient() {
   // Set the QSslConfiguration
   client->setSslConfiguration(m_sslConfig);
 
-  // set the Discovery Config
-  client->setDiscoveryConfig(m_sslConfig);
-
   // Connect the onServerListChanged signal to the signal
   const auto signal_sl = &Client::OnServerListChanged;
   const auto slot_sl   = &ClipBird::OnServerListChanged;
@@ -239,6 +236,20 @@ void ClipBird::setCurrentHostAsClient() {
 
   // Start the Discovery
   client->startBrowsing();
+}
+
+/**
+ * @brief Clear the Server Certificates
+ */
+void ClipBird::clearServerCertificates() {
+  storage::Storage::instance().clearAllServerCert();
+}
+
+/**
+ * @brief Clear the Client Certificates
+ */
+void ClipBird::clearClientCertificates() {
+  storage::Storage::instance().clearAllClientCert();
 }
 
 //---------------------- Server functions -----------------------//

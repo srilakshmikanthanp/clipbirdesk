@@ -121,6 +121,19 @@ class ClipBird : public QObject {
    */
   void setCurrentHostAsClient();
 
+  //---------------------- Store functions ------------------------//
+
+  /**
+   * @brief Clear Server Certificates
+   */
+  void clearServerCertificates();
+
+  /**
+   * @brief Clear Client Certificates
+   */
+  void clearClientCertificates();
+
+
   //---------------------- Server functions -----------------------//
 
   /**
