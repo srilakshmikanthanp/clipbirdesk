@@ -14,7 +14,6 @@
 #include <QtTypes>
 
 // Local header files
-#include "network/packets/authentication/authentication.hpp"
 #include "network/packets/invalidrequest/invalidrequest.hpp"
 #include "network/packets/syncingpacket/syncingitem/syncingitem.hpp"
 #include "network/packets/syncingpacket/syncingpacket.hpp"
@@ -22,14 +21,6 @@
 #include "utility/functions/ipconv/ipconv.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions::internals {
-/**
- * @brief parameters for Authentication
- */
-struct AuthenticationParams {
-  quint8 packetType;
-  quint8 authType;
-  quint8 authStatus;
-};
 
 /**
  * @brief Parameters for the ErrorMessage
@@ -58,16 +49,6 @@ struct SyncingPacketParams {
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions::internals
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions {
-/**
- * @brief Create the Authentication
- *
- * @param packetType
- * @param authStatus
- *
- * @return Authentication
- */
-network::packets::Authentication createPacket(internals::AuthenticationParams params);
-
 /**
  * @brief Create the ErrorMessage
  *

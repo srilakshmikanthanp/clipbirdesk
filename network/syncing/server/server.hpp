@@ -13,8 +13,8 @@
 #include <QSslSocket>
 #include <QVector>
 
-#include "network/packets/authentication/authentication.hpp"
 #include "network/service/service.hpp"
+#include "types/callable/Authenticator.hpp"
 #include "types/device/device.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
@@ -30,10 +30,6 @@ class Server : public service::mdnsRegister {
  signals:  // signals
   /// @brief On client state changed
   void OnCLientStateChanged(types::device::Device, bool connected);
-
- signals:  // signals for this class
-  /// @brief On New Host Connected
-  void OnAuthRequested(types::device::Device);
 
  signals:  // signals for this class
   /// @brief On Server State Changed
@@ -58,11 +54,11 @@ class Server : public service::mdnsRegister {
 
  private:  // members of the class
 
+  /// @brief Authenticator
+  types::callable::Authenticator m_authenticator;
+
   /// @brief SSL server
   QSslServer* m_ssl_server = new QSslServer(this);
-
-  /// @brief List of clients unauthenticated
-  QList<QSslSocket*> m_unauthed_clients;
 
   /// @brief List of clients Authenticated
   QList<QSslSocket*> m_authed_clients;
@@ -126,13 +122,6 @@ class Server : public service::mdnsRegister {
       if (client != except) sendPacket(client, pack);
     }
   }
-
-  /**
-   * @brief Process the AuthenticationPacket from the client
-   *
-   * @param packet
-   */
-  void processAuthenticationPacket(const packets::Authentication &packet);
 
   /**
    * @brief Process the SyncingPacket from the client
@@ -230,21 +219,6 @@ class Server : public service::mdnsRegister {
   QSslConfiguration getSSLConfiguration() const;
 
   /**
-   * @brief The function that is called when the client is authenticated
-   *
-   * @param client the client that is currently processed
-   */
-  void authSuccess(const types::device::Device&);
-
-  /**
-   * @brief The function that is called when the client it not
-   * authenticated
-   *
-   * @param client the client that is currently processed
-   */
-  void authFailed(const types::device::Device&);
-
-  /**
    * @brief Start the server
    */
   void startServer();
@@ -253,6 +227,11 @@ class Server : public service::mdnsRegister {
    * @brief Stop the server
    */
   void stopServer();
+
+  /**
+   * @brief Set the Authenticator object
+   */
+  void setAuthenticator(types::callable::Authenticator auth);
 
  protected:  // override functions from the base class
 

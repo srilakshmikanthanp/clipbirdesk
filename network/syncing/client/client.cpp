@@ -7,19 +7,6 @@
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 /**
- * @brief Process the Authentication Packet from the server
- *
- * @param packet Authentication
- */
-void Client::processAuthentication(const packets::Authentication& packet) {
-  if (packet.getAuthStatus() == types::enums::AuthStatus::AuthOkay) {
-    emit OnServerAuthentication((this->m_is_authed = true));
-  } else {
-    emit OnServerAuthentication((this->m_is_authed = false));
-  }
-}
-
-/**
  * @brief Process the packet that has been received
  * from the server and emit the signal
  *
@@ -103,23 +90,6 @@ void Client::processReadyRead() {
 
   // try to parse the packet
   try {
-    processAuthentication(fromQByteArray<packets::Authentication>(data));
-    return;
-  } catch (const types::except::MalformedPacket& e) {
-    qWarning() << (LOG(e.what()));
-    return;
-  } catch (const types::except::NotThisPacket& e) {
-    qWarning() << (LOG(e.what()));
-  } catch (const std::exception& e) {
-    qWarning() << (LOG(e.what()));
-    return;
-  } catch (...) {
-    qWarning() << (LOG("Unknown Error"));
-    return;
-  }
-
-  // try to parse the packet
-  try {
     processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
@@ -167,7 +137,7 @@ void Client::handleConnected() {
  * @brief Handle client disconnected
  */
 void Client::handleDisconnected() {
-  emit OnServerStatusChanged(this->m_is_authed = false);
+  emit OnServerStatusChanged(false);
 }
 
 /**
@@ -273,26 +243,6 @@ void Client::connectToServer(types::device::Device server) {
     return device.ip == server.ip && device.port == server.port;
   };
 
-  // on Encrypted lambda function to process
-  const auto onEncrypted = [this]() {
-    // using some of type to create the packet
-    using utility::functions::createPacket;
-    using packets::Authentication;
-    using types::enums::AuthType;
-    using types::enums::AuthStatus;
-
-    // params
-    auto packType = Authentication::PacketType::AuthPacket;
-    auto authType = AuthType::AuthReq;
-    auto authStat = AuthStatus::AuthStart;
-
-    // packet
-    auto packet = createPacket({packType, authType, authStat});
-
-    // send the packet to the server
-    this->sendPacket(packet);
-  };
-
   // if Discover Configuration is null the return
   if (this->m_ssl_config.isNull()) {
     throw std::runtime_error("SSL Config Config is not set");
@@ -318,9 +268,6 @@ void Client::connectToServer(types::device::Device server) {
   expectedErrors.append(QSslError(QSslError::HostNameMismatch, cert));
   expectedErrors.append(QSslError(QSslError::CertificateUntrusted, cert));
   m_ssl_socket->ignoreSslErrors(expectedErrors);
-
-  // connect the signal to the lambda function
-  connect(m_ssl_socket, &QSslSocket::encrypted, onEncrypted);
 
   // create the host address
   const auto host = device->ip.toString();
@@ -361,29 +308,6 @@ types::device::Device Client::getConnectedServer() const {
  */
 void Client::disconnectFromServer() {
   m_ssl_socket->disconnectFromHost();
-}
-
-/**
- * @brief Is client is authenticated
- */
-bool Client::isAuthenticated() const {
-  return m_is_authed;
-}
-
-/**
- * @brief Get the Authed Server object
- * @return QPair<QHostAddress, quint16>
- */
-types::device::Device Client::getAuthedServer() const {
-  if (this->m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
-    throw std::runtime_error("Socket is not connected");
-  }
-
-  if (!this->m_is_authed) {
-    throw std::runtime_error("Socket is not authenticated");
-  }
-
-  return this->getConnectedServer();
 }
 
 /**

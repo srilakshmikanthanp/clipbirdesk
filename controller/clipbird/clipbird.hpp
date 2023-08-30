@@ -20,6 +20,8 @@
 #include "network/syncing/client/client.hpp"
 #include "network/syncing/server/server.hpp"
 #include "store/storage.hpp"
+#include "types/callable/Authenticator.hpp"
+#include "types/device/device.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::controller {
 class ClipBird : public QObject {
@@ -52,10 +54,6 @@ class ClipBird : public QObject {
   void OnCLientStateChanged(types::device::Device client, bool connected);
 
  signals:  // signals for this class
-  /// @brief On New Host Connected
-  void OnAuthRequested(types::device::Device client);
-
- signals:  // signals for this class
   /// @brief On Server state changed (From Server)
   void OnServerStateChanged(bool isStarted);
 
@@ -77,8 +75,12 @@ class ClipBird : public QObject {
   std::variant<Server, Client> m_host;
   QSslConfiguration m_sslConfig;
   clipboard::Clipboard m_clipboard;
+  types::callable::Authenticator auth;
 
  private:  // private slots
+
+  /// @brief Handle Client State Changes
+  void handleClientStateChanged(types::device::Device client, bool connected);
 
   /// @brief Handle On Server Authenticated (From client)
   void handleServerAuthentication(bool isConnected);
@@ -89,9 +91,6 @@ class ClipBird : public QObject {
   /// @brief Handle the Server Found (From client)
   void handleServerFound(types::device::Device server);
 
-  /// @brief Handle the Auth Request (From Server)
-  void handleAuthRequest(types::device::Device client);
-
  public:  // Member functions
 
   /**
@@ -101,7 +100,7 @@ class ClipBird : public QObject {
    * @param board  clipboard that is managed
    * @param parent parent object
    */
-  ClipBird(QSslConfiguration ssl_config, QObject *parent = nullptr);
+  ClipBird(QObject *parent = nullptr);
 
   /**
    * @brief Destroy the ClipBird object
@@ -120,6 +119,33 @@ class ClipBird : public QObject {
    * @brief set the host as client
    */
   void setCurrentHostAsClient();
+
+  //---------------------- General functions ----------------------//
+
+  /**
+   * @brief Set the SSL Configuration object
+   */
+  void setSslConfiguration(const QSslConfiguration &config);
+
+  /**
+   * @brief Get the SSL Configuration object
+   */
+  QSslConfiguration getSslConfiguration() const;
+
+  /**
+   * @brief Set the Authenticator object
+   */
+  void setAuthenticator(types::callable::Authenticator auth);
+
+  /**
+   * @brief Get the Authenticator object
+   */
+  types::callable::Authenticator getAuthenticator() const;
+
+  /**
+   * @brief Update Ca Certificates
+   */
+  void updateCaCertificatesFromStore();
 
   //---------------------- Store functions ------------------------//
 
@@ -155,21 +181,6 @@ class ClipBird : public QObject {
    * @brief Disconnect the all the clients from the server
    */
   void disconnectAllClients();
-
-  /**
-   * @brief The function that is called when the client is authenticated
-   *
-   * @param client the client that is currently processed
-   */
-  void authSuccess(const types::device::Device &client);
-
-  /**
-   * @brief The function that is called when the client it not
-   * authenticated
-   *
-   * @param client the client that is currently processed
-   */
-  void authFailed(const types::device::Device &client);
 
   /**
    * @brief Get the server QHostAddress and port
@@ -210,17 +221,6 @@ class ClipBird : public QObject {
    * @brief Disconnect from the server
    */
   void disconnectFromServer(const types::device::Device &host);
-
-  /**
-   * @brief Is Client Authed
-   */
-  bool isClientAuthed();
-
-  /**
-   * @brief Get the Authed Server object
-   * @return types::device::Device
-   */
-  types::device::Device getAuthedServer() const;
 
   //---------------------- General functions -----------------------//
 

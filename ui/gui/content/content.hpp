@@ -138,24 +138,12 @@ class Content : public QFrame {
    */
   void handleServerStateChange(bool isStarted);
 
-  /**
-   * @brief On New Host Connected
-   *
-   * @param client
-   */
-  void handleNewHostConnected(const types::device::Device &client);
-
   //----------------------------- slots for Client --------------------------//
 
   /**
    * @brief Handle the Server List Item Clicked
    */
   void handleServerListChange(QList<types::device::Device> servers);
-
-  /**
-   * @brief Handle the Server Authentication
-   */
-  void handleServerAuthentication(bool isAuthed);
 
   /**
    * @brief Handle the server status change

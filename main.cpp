@@ -39,6 +39,57 @@ class ClipbirdApplication : public SingleApplication {
  private:  // Member Functions
 
   /**
+   * @brief On New Host Connected
+   *
+   * @param client
+   */
+  bool authenticator(const types::device::Device& client) {
+    // clang-format off
+    auto message = QString(
+      "A New client Attempting to connect\n"
+      "Host: %1\n"
+      "Accept the connection?"
+    ).arg(client.name);
+    // clang-format on
+
+    // get the user input
+    auto dialog = new QMessageBox();
+
+    // icon for the dialog
+    auto icon = QIcon(constants::getAppLogo().c_str());
+
+    // set the icon
+    dialog->setWindowIcon(icon);
+
+    // set the title
+    dialog->setWindowTitle("Clipbird");
+
+    // set the message
+    dialog->setText(message);
+
+    // set delete on close
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+    // set the buttons
+    dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+    // set the default button
+    dialog->setDefaultButton(QMessageBox::No);
+
+    // set the icon
+    dialog->setIcon(QMessageBox::Question);
+
+    // show and get result
+    auto result = dialog->exec();
+
+    // delete the dialog
+    delete dialog;
+
+    // return the result
+    return result == QMessageBox::Yes;
+  }
+
+  /**
    * @brief Get the certificate from App Home
    */
   QSslConfiguration getOldSslConfiguration() {
@@ -154,8 +205,19 @@ class ClipbirdApplication : public SingleApplication {
    * @param argv argument vector  [unused]
    */
   ClipbirdApplication(int &argc, char **argv) : SingleApplication(argc, argv) {
+    // bind the Authenticator function to this
+    auto authenticator = std::bind(&ClipbirdApplication::authenticator, this, std::placeholders::_1);
+
     // create the objects of the class
-    controller = new controller::ClipBird(getSslConfiguration());
+    controller = new controller::ClipBird();
+
+    // set the ssl configuration
+    controller->setSslConfiguration(this->getSslConfiguration());
+
+    // set the authenticator
+    controller->setAuthenticator(authenticator);
+
+    // create the objects of the class
     content    = new ui::gui::Content(controller);
     window     = new ui::gui::Window();
 

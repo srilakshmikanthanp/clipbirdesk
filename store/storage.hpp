@@ -70,6 +70,11 @@ class Storage : public QObject {
   QByteArray getClientCert(const QString &name);
 
   /**
+   * @brief Get All Client Certificates
+   */
+  QList<QByteArray> getAllClientCert();
+
+  /**
    * @brief Store the server name and JWT cert
    */
   void setServerCert(const QString &name, const QByteArray &cert);
@@ -93,6 +98,11 @@ class Storage : public QObject {
    * @brief Get the JWT cert for the name
    */
   QByteArray getServerCert(const QString &name);
+
+  /**
+   * @brief Get All Server Certificates
+   */
+  QList<QByteArray> getAllServerCert();
 
   /**
    * @brief Set the current state of the server or client

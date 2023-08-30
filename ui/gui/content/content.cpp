@@ -116,65 +116,6 @@ void Content::handleServerStateChange(bool isStarted) {
   this->setClientList(clients_m);
 }
 
-/**
- * @brief On New Host Connected
- *
- * @param client
- */
-void Content::handleNewHostConnected(const types::device::Device& client) {
-  // callback for host info looked up
-  const auto onHostInfoFound = [=](const QHostInfo& info) -> void {
-    // get the message to show
-    // clang-format off
-    auto message = QString(
-      "A New client Attempting to connect\n"
-      "Host: %1\n"
-      "Accept the connection?"
-    ).arg(info.hostName());
-    // clang-format on
-
-    // get the user input
-    auto dialog = new QMessageBox();
-
-    // icon for the dialog
-    auto icon = QIcon(constants::getAppLogo().c_str());
-
-    // set the icon
-    dialog->setWindowIcon(icon);
-
-    // set the title
-    dialog->setWindowTitle("Clipbird");
-
-    // set the message
-    dialog->setText(message);
-
-    // set delete on close
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-
-    // set the buttons
-    dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-
-    // set the default button
-    dialog->setDefaultButton(QMessageBox::No);
-
-    // show the dialog
-    dialog->show();
-
-    // connect the dialog to window AuthSuccess signal
-    const auto signal_s = &QMessageBox::accepted;
-    const auto slot_s   = [=] { controller->authSuccess(client); };
-    connect(dialog, signal_s, slot_s);
-
-    // connect the dialog to window AuthFail signal
-    const auto signal_f = &QMessageBox::rejected;
-    const auto slot_f   = [=] { controller->authFailed(client); };
-    connect(dialog, signal_f, slot_f);
-  };
-
-  // lookup the host info
-  QHostInfo::lookupHost(client.ip.toString(), onHostInfoFound);
-}
-
 //----------------------------- slots for Client --------------------------//
 
 /**
@@ -185,17 +126,17 @@ void Content::handleServerListChange(QList<types::device::Device> servers) {
   QList<components::Device::Value> servers_m;
 
   // get the action for the server
-  const auto getAction = [=](const types::device::Device& s) {
-    // is not authed
-    if (!controller->isClientAuthed()) {
+  const auto getAction = [=](const auto& s) {
+    // if client is connected to server
+    if (!controller->isConnectedToServer()) {
       return Action::Connect;
     }
 
-    // is authed
-    auto authed = controller->getAuthedServer();
+    // get the server
+    auto server = controller->getConnectedServer();
 
     // infer
-    if (s.ip == authed.ip && s.port == authed.port) {
+    if (s.ip == server.ip && s.port == server.port) {
       return Action::Disconnect;
     } else {
       return Action::Connect;
@@ -215,20 +156,17 @@ void Content::handleServerListChange(QList<types::device::Device> servers) {
 }
 
 /**
- * @brief Handle the server authentication
+ * @brief Handle the server status change
  */
-void Content::handleServerAuthentication(bool isAuthed) {
+void Content::handleServerStatusChanged(bool isConnected) {
   // infer the status from the server state
-  auto groupName  = QString("-");
-  auto status_m   = isAuthed ? Status::Connected : Status::Disconnected;
-  auto servers    = controller->getServerList();
+  auto status_m  = isConnected ? Status::Connected : Status::Disconnected;
+  auto servers   = controller->getServerList();
+  auto groupName = QString("-");
 
   // if the client is Authed
-  if (isAuthed) {
-    auto server = controller->getAuthedServer();
-    auto ip     = server.ip.toString();
-    auto port   = server.port;
-    groupName   = QHostInfo::fromName(ip).hostName();
+  if (isConnected) {
+    groupName = controller->getConnectedServer().name;
   }
 
   // set the server status
@@ -241,16 +179,11 @@ void Content::handleServerAuthentication(bool isAuthed) {
 
   // get the action for the server
   const auto getAction = [=](const auto& s) {
-    // is not authed
-    if (!controller->isClientAuthed()) {
-      return Action::Connect;
-    }
-
-    // is authed
-    auto authed = controller->getAuthedServer();
+    // get the server
+    auto server = controller->getConnectedServer();
 
     // infer
-    if (s.ip == authed.ip && s.port == authed.port) {
+    if (s.ip == server.ip && s.port == server.port) {
       return Action::Disconnect;
     } else {
       return Action::Connect;
@@ -259,47 +192,7 @@ void Content::handleServerAuthentication(bool isAuthed) {
 
   // add the server to the list
   for (auto s : servers) {
-    servers_m.append({s, getAction(s)});
-  }
-
-  // set the server list to the window
-  this->setServerList(servers_m);
-}
-
-/**
- * @brief Handle the server status change
- */
-void Content::handleServerStatusChanged(bool status) {
-  if (status) return; // ignore the TSL connection and leave it to authentication
-
-  // if the server is disconnected
-  this->setStatus(c_statusKey, Status::Disconnected);
-  this->setGroupName(c_groupNameKey, "-");
-
-  // Create a list of tuple with Action
-  QList<components::Device::Value> servers_m;
-
-  // get the action for the server
-  const auto getAction = [=](const auto& s) {
-    // is not authed
-    if (!controller->isClientAuthed()) {
-      return Action::Connect;
-    }
-
-    // is authed
-    auto authed = controller->getAuthedServer();
-
-    // infer
-    if (s.ip == authed.ip && s.port == authed.port) {
-      return Action::Disconnect;
-    } else {
-      return Action::Connect;
-    }
-  };
-
-  // add the server to the list
-  for (auto s : controller->getServerList()) {
-    servers_m.append({s, getAction(s)});
+    servers_m.append({s, isConnected ? getAction(s): Action::Connect});
   }
 
   // set the server list to the window
@@ -403,10 +296,25 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   // set tooltip
   trayIcon->setToolTip(constants::getAppName().c_str());
 
-  // set the signal for on new Host
-  const auto signal_nh = &controller::ClipBird::OnAuthRequested;
-  const auto slot_nh   = &Content::handleNewHostConnected;
-  QObject::connect(controller, signal_nh, this, slot_nh);
+  // set the signal for menus About click
+  const auto signal_ac = &ui::gui::content::TrayMenu::OnAboutClicked;
+  const auto slot_ac   = &Content::onAboutClicked;
+  QObject::connect(trayMenu, signal_ac, this, slot_ac);
+
+  // set the signal for menus Issue click
+  const auto signal_ic = &ui::gui::content::TrayMenu::OnIssueClicked;
+  const auto slot_ic   = &Content::onIssueClicked;
+  QObject::connect(trayMenu, signal_ic, this, slot_ic);
+
+  // set the signal for menus Reset click
+  const auto signal_rc = &ui::gui::content::TrayMenu::OnResetClicked;
+  const auto slot_rc   = &Content::onResetClicked;
+  QObject::connect(trayMenu, signal_rc, this, slot_rc);
+
+  // set the signal for menus Quit click
+  const auto signal_qc = &ui::gui::content::TrayMenu::OnExitClicked;
+  const auto slot_qc   = [] { QApplication::quit(); };
+  QObject::connect(trayMenu, signal_qc, this, slot_qc);
 
   // connect server list signal
   const auto signal_so = &content::DeviceList::onAction;
@@ -422,11 +330,6 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto signal_cl = &ClipBird::OnClientListChanged;
   const auto slot_cl   = &Content::handleClientListChange;
   connect(controller, signal_cl, this, slot_cl);
-
-  // Connect the signal and slot for server authentication
-  const auto signal_sa = &ClipBird::OnServerAuthentication;
-  const auto slot_sa   = &Content::handleServerAuthentication;
-  connect(controller, signal_sa, this, slot_sa);
 
   // Connect the signal and slot for server list change
   const auto signal_sl = &ClipBird::OnServerListChanged;
@@ -457,26 +360,6 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto signal_ts = &Content::onTabChanged;
   const auto slot_ts   = &Content::handleTabChangeForServer;
   connect(this, signal_ts, this, slot_ts);
-
-  // set the signal for menus About click
-  const auto signal_ac = &ui::gui::content::TrayMenu::OnAboutClicked;
-  const auto slot_ac   = &Content::onAboutClicked;
-  QObject::connect(trayMenu, signal_ac, this, slot_ac);
-
-  // set the signal for menus Issue click
-  const auto signal_ic = &ui::gui::content::TrayMenu::OnIssueClicked;
-  const auto slot_ic   = &Content::onIssueClicked;
-  QObject::connect(trayMenu, signal_ic, this, slot_ic);
-
-  // set the signal for menus Reset click
-  const auto signal_rc = &ui::gui::content::TrayMenu::OnResetClicked;
-  const auto slot_rc   = &Content::onResetClicked;
-  QObject::connect(trayMenu, signal_rc, this, slot_rc);
-
-  // set the signal for menus Quit click
-  const auto signal_qc = &ui::gui::content::TrayMenu::OnExitClicked;
-  const auto slot_qc   = [] { QApplication::quit(); };
-  QObject::connect(trayMenu, signal_qc, this, slot_qc);
 
   // if host is lastly server
   if (controller->isLastlyHostIsServer()) {

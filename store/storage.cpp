@@ -59,6 +59,22 @@ QByteArray Storage::getClientCert(const QString &name) {
 }
 
 /**
+ * @brief Get All Client Certificates
+ */
+QList<QByteArray> Storage::getAllClientCert() {
+  QList<QByteArray> list;
+
+  settings->beginGroup(clientGroup);
+  for (auto &name : settings->childKeys()) {
+    auto cert = settings->value(name);
+    list.append(cert.toByteArray());
+  }
+  settings->endGroup();
+
+  return list;
+}
+
+/**
  * @brief Store the server name and JWT token
  *
  * @param name
@@ -117,6 +133,22 @@ QByteArray Storage::getServerCert(const QString &name) {
   }
 
   return token.toByteArray();
+}
+
+/**
+ * @brief Get All Server Certificates
+ */
+QList<QByteArray> Storage::getAllServerCert() {
+  QList<QByteArray> list;
+
+  settings->beginGroup(serverGroup);
+  for (auto &name : settings->childKeys()) {
+    auto cert = settings->value(name);
+    list.append(cert.toByteArray());
+  }
+  settings->endGroup();
+
+  return list;
 }
 
 /**

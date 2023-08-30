@@ -7,34 +7,6 @@
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions {
 /**
- * @brief Create the Authentication
- *
- * @param packetType
- * @param authStatus
- *
- * @return Authentication
- */
-network::packets::Authentication createPacket(internals::AuthenticationParams params) {
-  // create the packet
-  network::packets::Authentication packet;
-
-  // set the packet type
-  packet.setPacketType(params.packetType);
-
-  // set the auth type
-  packet.setAuthType(params.authType);
-
-  // set the auth status
-  packet.setAuthStatus(params.authStatus);
-
-  // set the packet length
-  packet.setPacketLength(packet.size());
-
-  // return the packet
-  return packet;
-}
-
-/**
  * @brief Create the ErrorMessage
  *
  * @param packetType

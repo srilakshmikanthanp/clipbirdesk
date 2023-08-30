@@ -7,29 +7,25 @@
 
 namespace srilakshmikanthanp::clipbirdesk::controller {
 /**
- * @brief Handle On Server Authenticated the Client (From client)
- *
- * @param isConnected is connected to the server
+ * @brief Handle On Client State Changed (From server)
  */
-void ClipBird::handleServerAuthentication(bool isSuccess) {
-  // if the host is not client then throw error
-  if (!std::holds_alternative<Client>(m_host)) {
-    throw std::runtime_error("Host is not client");
+void ClipBird::handleClientStateChanged(types::device::Device client, bool connected) {
+  // if the host is not server then throw error
+  if (!std::holds_alternative<Server>(m_host)) {
+    throw std::runtime_error("Host is not server");
   }
 
-  // get the client and disconnect the signals
-  const auto signal = &clipboard::Clipboard::OnClipboardChange;
-  auto *client      = &std::get<Client>(m_host);
-  const auto slot_n = &Client::syncItems;
-  auto &store       = storage::Storage::instance();
-  auto cert         = client->getAuthedServer().cert;
-  auto name         = client->getAuthedServer().name;
+  // if not Connected the return
+  if (!connected) return;
 
-  // if the client is connected then connect the signals
-  if (isSuccess) {
-    connect(&m_clipboard, signal, client, slot_n);
-    store.setServerCert(name, cert.toPem());
-  }
+  // get the store instance to store certificate
+  auto &store = storage::Storage::instance();
+
+  // store the client certificate
+  store.setClientCert(client.name, client.cert.toPem());
+
+  // update the ca certificates
+  this->updateCaCertificatesFromStore();
 }
 
 /**
@@ -44,13 +40,20 @@ void ClipBird::handleServerStatusChanged(bool status) {
   }
 
   // get the client and disconnect the signals
-  const auto signal = &clipboard::Clipboard::OnClipboardChange;
-  auto *client      = &std::get<Client>(m_host);
-  const auto slot_n = &Client::syncItems;
+  auto signal  = &clipboard::Clipboard::OnClipboardChange;
+  auto *client = &std::get<Client>(m_host);
+  auto slot_n  = &Client::syncItems;
+  auto &store  = storage::Storage::instance();
+  auto cert    = client->getConnectedServer().cert;
+  auto name    = client->getConnectedServer().name;
 
   // if the client is connected then connect the signals
   if (!status) {
     disconnect(&m_clipboard, signal, client, slot_n);
+  } else {
+    connect(&m_clipboard, signal, client, slot_n);
+    store.setServerCert(name, cert.toPem());
+    this->updateCaCertificatesFromStore();
   }
 }
 
@@ -63,54 +66,17 @@ void ClipBird::handleServerFound(types::device::Device server) {
     throw std::runtime_error("Host is not client");
   }
 
+  // if already connected then return
+  if (std::get<Client>(m_host).isConnected()) return;
+
   // get the client and store the server
   auto *client = &std::get<Client>(m_host);
   auto &store  = storage::Storage::instance();
 
   // if the server is not found then return
-  if (!store.hasServerCert(server.name)) {
-    return;
-  }
-
-  // get the cert from the storage
-  auto cstr = store.getServerCert(server.name);
-  auto cert = QSslCertificate::fromData(cstr).first();
-
-  // if cert matches and not connected to server
-  if (cert == server.cert && client->isConnected()) {
+  if (store.hasServerCert(server.name)) {
     client->connectToServer(server);
   }
-}
-
-/**
- * @brief Handle the Auth Request (From Server)
- */
-void ClipBird::handleAuthRequest(types::device::Device client) {
-  // if the host is not server then throw error
-  if (!std::holds_alternative<Server>(m_host)) {
-    throw std::runtime_error("Host is not server");
-  }
-
-  // get the server and store
-  auto *server = &std::get<Server>(m_host);
-  auto &store  = storage::Storage::instance();
-
-  // if client is not fount in store
-  if (!store.hasClientCert(client.name)) {
-    return emit this->OnAuthRequested(client);
-  }
-
-  // get the certificate from store
-  auto cstr = store.getClientCert(client.name);
-  auto cert = QSslCertificate::fromData(cstr).first();
-
-  // if certificate matches
-  if (cert == client.cert) {
-    return server->authSuccess(client);
-  }
-
-  // again ask for user to Authenticate
-  return emit this->OnAuthRequested(client);
 }
 
 /**
@@ -120,14 +86,7 @@ void ClipBird::handleAuthRequest(types::device::Device client) {
  * @param board  clipboard that is managed
  * @param parent parent object
  */
-ClipBird::ClipBird(
-  QSslConfiguration config,               // Config used for Actual Packet
-  QObject *parent                         // Parent Object
-) :
-  QObject(parent),                        // Call Parent Class
-  m_clipboard(this),                      // parent class as this
-  m_sslConfig(config)                     // init the ssl config
-{}
+ClipBird::ClipBird(QObject *parent) : QObject(parent), m_clipboard(this) {}
 
 //---------------------- public slots -----------------------//
 
@@ -146,11 +105,6 @@ void ClipBird::setCurrentHostAsServer() {
   const auto signal_cs = &Server::OnCLientStateChanged;
   const auto slot_cs   = &ClipBird::OnCLientStateChanged;
   connect(server, signal_cs, this, slot_cs);
-
-  // Connect the onNewHostConnected signal to the signal
-  const auto signal_nh = &Server::OnAuthRequested;
-  const auto slot_nh   = &ClipBird::handleAuthRequest;
-  connect(server, signal_nh, this, slot_nh);
 
   // Connect the onSyncRequest signal to the clipboard
   const auto signal_sr = &Server::OnSyncRequest;
@@ -216,13 +170,6 @@ void ClipBird::setCurrentHostAsClient() {
   connect(client, signal_sc, this, slot_sc);
   connect(client, signal_sc, this, slot_hc);
 
-  // Connect the onServerAuthentication signal to the signal
-  const auto slot_ha   = &ClipBird::handleServerAuthentication;
-  const auto signal_au = &Client::OnServerAuthentication;
-  const auto slot_au   = &ClipBird::OnServerAuthentication;
-  connect(client, signal_au, this, slot_au);
-  connect(client, signal_au, this, slot_ha);
-
   // Connect the onSyncRequest signal to the clipboard
   const auto signal_rq = &Client::OnSyncRequest;
   const auto slot_rq   = &clipboard::Clipboard::set;
@@ -236,6 +183,64 @@ void ClipBird::setCurrentHostAsClient() {
 
   // Start the Discovery
   client->startBrowsing();
+}
+
+/**
+ * @brief Set the SSL Configuration object
+ */
+void ClipBird::setSslConfiguration(const QSslConfiguration &config) {
+  this->m_sslConfig = config;
+}
+
+/**
+ * @brief Get the SSL Configuration object
+ */
+QSslConfiguration ClipBird::getSslConfiguration() const {
+  return m_sslConfig;
+}
+
+/**
+ * @brief Set the Authenticator object
+ */
+void ClipBird::setAuthenticator(types::callable::Authenticator auth) {
+  this->auth = auth;
+}
+
+/**
+ * @brief Get the Authenticator object
+ */
+types::callable::Authenticator ClipBird::getAuthenticator() const {
+  return auth;
+}
+
+/**
+ * @brief Update Ca Certificates
+ */
+void ClipBird::updateCaCertificatesFromStore() {
+  // configuration
+  auto sslConfig = this->getSslConfiguration();
+
+  // Ca Certificates
+  QList<QSslCertificate> caCerts;
+
+  // storage instance
+  auto &store = storage::Storage::instance();
+
+  // set all ca Client certs from store
+  for (auto certByte : store.getAllClientCert()) {
+    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
+  }
+
+  // set all ca Server certs from store
+  for (auto certByte : store.getAllServerCert()) {
+    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
+  }
+
+  // set ca certificates
+  sslConfig.setCaCertificates(caCerts);
+
+  // set the ssl configuration
+  this->setSslConfiguration(sslConfig);
 }
 
 /**
@@ -304,33 +309,6 @@ void ClipBird::disconnectClient(const types::device::Device &client) {
 void ClipBird::disconnectAllClients() {
   if (std::holds_alternative<Server>(m_host)) {
     std::get<Server>(m_host).disconnectAllClients();
-  } else {
-    throw std::runtime_error("Host is not server");
-  }
-}
-
-/**
- * @brief The function that is called when the client is authenticated
- *
- * @param client the client that is currently processed
- */
-void ClipBird::authSuccess(const types::device::Device &client) {
-  if (std::holds_alternative<Server>(m_host)) {
-    std::get<Server>(m_host).authSuccess(client);
-  } else {
-    throw std::runtime_error("Host is not server");
-  }
-}
-
-/**
- * @brief The function that is called when the client it not
- * authenticated
- *
- * @param client the client that is currently processed
- */
-void ClipBird::authFailed(const types::device::Device &client) {
-  if (std::holds_alternative<Server>(m_host)) {
-    std::get<Server>(m_host).authFailed(client);
   } else {
     throw std::runtime_error("Host is not server");
   }
@@ -423,29 +401,6 @@ void ClipBird::disconnectFromServer(const types::device::Device &host) {
     std::get<Client>(m_host).disconnectFromServer();
   } else {
     throw std::runtime_error("Server not found");
-  }
-}
-
-/**
- * @brief Is Authed Server
- */
-bool ClipBird::isClientAuthed() {
-  if (std::holds_alternative<Client>(m_host)) {
-    return std::get<Client>(m_host).isAuthenticated();
-  } else {
-    throw std::runtime_error("Host is not client");
-  }
-}
-
-/**
- * @brief Get the Authed Server object
- * @return types::device::Device
- */
-types::device::Device ClipBird::getAuthedServer() const {
-  if (std::holds_alternative<Client>(m_host)) {
-    return std::get<Client>(m_host).getAuthedServer();
-  } else {
-    throw std::runtime_error("Host is not client");
   }
 }
 

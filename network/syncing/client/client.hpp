@@ -128,13 +128,6 @@ class Client : public service::mdnsBrowser {
   }
 
   /**
-   * @brief Process the Authentication Packet from the server
-   *
-   * @param packet Authentication
-   */
-  void processAuthentication(const packets::Authentication& packet);
-
-  /**
    * @brief Process the packet that has been received
    * from the server and emit the signal
    *
@@ -231,21 +224,6 @@ class Client : public service::mdnsBrowser {
    * @brief Disconnect from the server
    */
   void disconnectFromServer();
-
-  /**
-   * @brief Is client is authenticated
-   */
-  bool isAuthenticated() const;
-
-  /**
-   * @brief Get the Authed Server object
-   */
-  types::device::Device getAuthedServer() const;
-
-  /**
-   * @brief Set Discovery Config
-   */
-  void setDiscoveryConfig(QSslConfiguration config);
 
  protected:  // abstract functions from the base class
 
