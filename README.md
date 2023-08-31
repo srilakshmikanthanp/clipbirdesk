@@ -110,14 +110,6 @@ In the following steps, we will see how to build the project in the Windows plat
 * Qt6
 * OpenSSL
 
-#### Installing Qt6
-
-Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for windows, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
-
-#### Installing Bonjour
-
-Just go to [bonjour](https://developer.apple.com/bonjour/) and downlod the bonjour SDK for windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
-
 #### Installing OpenSSL
 
 Install OpenSSL using the following command and set the environment variable `OPENSSL_ROOT_DIR` to the OpenSSL installation directory.
@@ -125,6 +117,14 @@ Install OpenSSL using the following command and set the environment variable `OP
 ~~~sh
 choco install openssl
 ~~~
+
+#### Installing Qt6
+
+Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for windows, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
+
+#### Installing Bonjour
+
+Just go to [bonjour](https://developer.apple.com/bonjour/) and downlod the bonjour SDK for windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
 
 #### Environment Variables
 

@@ -114,7 +114,6 @@ target_link_libraries(clipbird
   PRIVATE SingleApplication::SingleApplication
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
-  PRIVATE Qt6::Sql
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto)
 
