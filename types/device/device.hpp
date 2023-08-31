@@ -21,6 +21,5 @@ struct Device {
   QHostAddress ip;
   quint16 port;
   QString name;
-  QSslCertificate cert;
 };
 }  // namespace srilakshmikanthanp::types::device

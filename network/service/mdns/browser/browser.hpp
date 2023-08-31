@@ -27,6 +27,7 @@
 // Local headers
 #include "constants/constants.hpp"
 #include "types/enums/enums.hpp"
+#include "types/device/device.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
@@ -59,7 +60,7 @@ class Browser : public QObject {
    * @param isAdded
    * @param const QHostInfo& info
    */
-  void onHostResolved(bool isAdded, quint16 port, const QHostInfo& info);
+  void onHostResolved(bool isAdded, quint16 port, QString srvName, const QHostInfo& info);
 
   /**
    * @brief Callback function for DNSServiceBrowse function
@@ -142,7 +143,7 @@ class Browser : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServiceAdded(QPair<QHostAddress, quint16>)   = 0;
+  virtual void onServiceAdded(types::device::Device)   = 0;
 
   /**
    * @brief On Server Removed abstract function that
@@ -151,7 +152,7 @@ class Browser : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServiceRemoved(QPair<QHostAddress, quint16>) = 0;
+  virtual void onServiceRemoved(types::device::Device) = 0;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd
 #endif

@@ -10,11 +10,36 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Verify Server
  */
 bool Client::verifyCertificate(const QSslCertificate& certificate) {
+  // check the basic conditions
   if (certificate.isNull() || certificate.subjectInfo(QSslCertificate::CommonName).isEmpty()) {
     return false;
-  } else {
+  }
+
+  // get the client details
+  const auto name = certificate.subjectInfo(QSslCertificate::CommonName).constFirst();
+  const auto addr = this->m_ssl_socket->peerAddress();
+  const auto port = this->m_ssl_socket->peerPort();
+
+  // matcher lambda function
+  auto matcher = [&](const auto &elm) {
+    return elm.ip == addr && elm.port == port;
+  };
+
+  // if name of device not equal to subject name
+  auto device = std::find_if(m_servers.begin(), m_servers.end(), matcher);
+
+  // if device not found
+  if (device == nullptr) {
+    return false;
+  }
+
+  // name matches
+  if (device->name == name) {
     return true;
   }
+
+  // name not matches
+  return false;
 }
 
 /**
@@ -286,7 +311,7 @@ types::device::Device Client::getConnectedServer() const {
   auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
   // return the host address and port number
-  return { addr, port, name, cert };
+  return { addr, port, name };
 }
 
 /**
@@ -303,70 +328,30 @@ void Client::disconnectFromServer() {
  * @param host Host address
  * @param port Port number
  */
-void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
+void Client::onServiceAdded(types::device::Device server) {
   // if Discover Configuration is null the return
   if (this->m_ssl_config.isNull()) {
     throw std::runtime_error("SSL Config Config is not set");
   }
 
-  // get the server certificate from the host
-  QSslSocket *sslSocket = new QSslSocket(this);
+  // emit server found
+  emit OnServerFound(server);
 
-  // set config to the socket
-  sslSocket->setSslConfiguration(m_ssl_config);
+  // add to list
+  this->m_servers.append(server);
 
-  // connect the signal to the lambda function
-  connect(sslSocket, &QSslSocket::encrypted, [=]() {
-    // get the certificate
-    auto cert = sslSocket->peerCertificate();
-
-    // if certificate is null or common name is empty
-    if (cert.isNull() || cert.subjectInfo(QSslCertificate::CommonName).isEmpty()) {
-      return;
-    }
-
-    // get the common name
-    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
-
-    // Get the Device Object
-    auto device = types::device::Device {
-      server.first, server.second, name, cert
-    };
-
-    // emit on server found
-    emit OnServerFound(device);
-
-    // add the server to the list
-    m_servers.append(device);
-
-    // emit the signal
-    emit OnServerListChanged(getServerList());
-
-    // disconnect the server
-    sslSocket->disconnectFromHost();
-  });
-
-  // connect to ssl errors
-  connect(sslSocket, &QSslSocket::sslErrors, [=]() {
-    sslSocket->ignoreSslErrors();
-  });
-
-  // server details
-  auto address = server.first.toString();
-  auto port    = server.second;
-
-  // connect to the server as encrypted
-  sslSocket->connectToHostEncrypted(address, port);
+  // emit the signal
+  emit OnServerListChanged(getServerList());
 }
 
 /**
  * @brief On server removed function that That Called by the
  * discovery client when the server is removed
  */
-void Client::onServiceRemoved(QPair<QHostAddress, quint16> server) {
+void Client::onServiceRemoved(types::device::Device server) {
   // matcher to get the Device from servers list
   auto matcher = [server](const types::device::Device& device) {
-    return device.ip == server.first && device.port == server.second;
+    return device == server;
   };
 
   // start and end

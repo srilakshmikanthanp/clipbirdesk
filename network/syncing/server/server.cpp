@@ -32,7 +32,7 @@ void Server::processPendingConnections() {
 
     // create device object of the client
     auto device = types::device::Device {
-      addr, port, name, cert
+      addr, port, name
     };
 
     // Notify the listeners that the client is connected
@@ -82,7 +82,7 @@ void Server::processDisconnection() {
 
   // create the device
   auto device = types::device::Device {
-    addr, port, name, cert
+    addr, port, name
   };
 
   // Notify the listeners that the client is disconnected
@@ -226,7 +226,7 @@ bool Server::authenticateClient(QSslSocket* client) {
 
   // create the device
   auto device = types::device::Device {
-    addr, port, name.constFirst(), cert
+    addr, port, name.constFirst()
   };
 
   // if authenticator is not set
@@ -294,7 +294,7 @@ QList<types::device::Device> Server::getConnectedClientsList() const {
     auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
     // add the device to the list
-    list.append({addr, port, name, cert});
+    list.append({addr, port, name});
   }
 
   // return the list
@@ -341,7 +341,7 @@ types::device::Device Server::getServerInfo() const {
   auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
   // Return info
-  return { addr, port, name, cert };
+  return { addr, port, name };
 }
 
 /**

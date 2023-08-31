@@ -54,10 +54,6 @@ class Client : public service::mdnsBrowser {
   void OnServerStatusChanged(bool isConnected);
 
  signals:  // signals for this class
-  /// @brief On Server Auth Succeed
-  void OnServerAuthentication(bool isSuccessful);
-
- signals:  // signals for this class
   /// @brief On Sync Request
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
 
@@ -221,7 +217,7 @@ class Client : public service::mdnsBrowser {
    * @param host Host address
    * @param port Port number
    */
-  void onServiceAdded(QPair<QHostAddress, quint16> server) override;
+  void onServiceAdded(types::device::Device server) override;
 
   /**
    * @brief On server removed function that That Called by the
@@ -229,6 +225,6 @@ class Client : public service::mdnsBrowser {
    *
    * @param server
    */
-  void onServiceRemoved(QPair<QHostAddress, quint16> server) override;
+  void onServiceRemoved(types::device::Device server) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing
