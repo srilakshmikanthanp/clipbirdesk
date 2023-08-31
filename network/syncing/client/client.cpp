@@ -24,6 +24,9 @@ void Client::processSslErrors(const QList<QSslError>& errors) {
   for (auto error: errors) {
     if (error.error() == QSslError::SelfSignedCertificate && verifyCertificate(error.certificate())) {
       this->m_ssl_socket->ignoreSslErrors();
+    } else {
+      this->m_ssl_socket->abort();
+      break;
     }
   }
 }

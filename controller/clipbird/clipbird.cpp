@@ -193,13 +193,6 @@ void ClipBird::setCurrentHostAsClient() {
   // set the host is client
   store.setHostIsServer(false);
 
-  client->connectToServer({
-    QHostAddress::LocalHost,
-    8080,
-    "localhost",
-    QSslCertificate()
-  });
-
   // Start the Discovery
   client->startBrowsing();
 }
@@ -417,7 +410,6 @@ void ClipBird::disconnectFromServer(const types::device::Device &host) {
  * @brief IS the Host is Lastly Server
  */
 bool ClipBird::isLastlyHostIsServer() const {
-  auto &store = storage::Storage::instance();
-  return store.getHostIsServer();
+  return storage::Storage::instance().getHostIsServer();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::controller

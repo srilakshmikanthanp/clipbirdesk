@@ -56,7 +56,11 @@ void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors
   for (auto error : errors) {
     if (error.error() == QSslError::SelfSignedCertificate && authenticateClient(socket)) {
       socket->ignoreSslErrors();
+    } else {
+      socket->abort();
+      break;
     }
+    std::cout << error.errorString().toStdString() << std::endl;
   }
 }
 
