@@ -73,17 +73,14 @@ class Client : public service::mdnsBrowser {
 
  private:  // Member variables
 
-  /// @brief SSL socket
+  /// @brief SSL socket for the client
   QSslSocket* m_ssl_socket = new QSslSocket(this);
 
-  /// @brief List of Found servers and timestamp
-  QList<types::device::Device> m_servers;
-
-  /// @brief is Server Authenticated Me
-  bool m_is_authed = false;
-
-  /// @brief Service Discovery client Config
+  /// @brief SSL configuration
   QSslConfiguration m_ssl_config;
+
+  /// @brief List of Found servers
+  QList<types::device::Device> m_servers;
 
  private:  // private functions
 
@@ -108,19 +105,9 @@ class Client : public service::mdnsBrowser {
 
     // write the packet length
     while (wrote < data.size()) {
-      // try to write the data
       auto bytes = stream.writeRawData(data.data() + wrote, data.size() - wrote);
-
-      // if no error occurred
-      if (bytes != -1) {
-        wrote += bytes; continue;
-      }
-
-      // abort the transaction
-      stream.abortTransaction();
-
-      // log
-      qWarning() << LOG(m_ssl_socket->errorString().toStdString());
+      wrote = wrote + bytes;
+      if (bytes == -1) { stream.abortTransaction(); break; }
     }
 
     // commit the transaction
@@ -128,12 +115,14 @@ class Client : public service::mdnsBrowser {
   }
 
   /**
-   * @brief Process the packet that has been received
-   * from the server and emit the signal
-   *
-   * @param packet Syncing packet
+   * @brief Verify Server
    */
-  void processSyncingPacket(const packets::SyncingPacket& packet);
+  bool verifyCertificate(const QSslCertificate& certificate);
+
+  /**
+   * @brief Process SSL Errors
+   */
+  void processSslErrors(const QList<QSslError>& errors);
 
   /**
    * @brief Process the Invalid packet that has been received
@@ -145,24 +134,17 @@ class Client : public service::mdnsBrowser {
 
   /**
    * @brief Process the packet that has been received
+   * from the server and emit the signal
+   *
+   * @param packet Syncing packet
+   */
+  void processSyncingPacket(const packets::SyncingPacket& packet);
+
+  /**
+   * @brief Process the packet that has been received
    * from the server
    */
   void processReadyRead();
-
-  /**
-   * @brief Handle client connected
-   */
-  void handleConnected();
-
-  /**
-   * @brief Handle client disconnected
-   */
-  void handleDisconnected();
-
-  /**
-   * @brief Process SSL Errors
-   */
-  void processSslErrors(const QList<QSslError>& errors);
 
  public:
 
@@ -185,6 +167,11 @@ class Client : public service::mdnsBrowser {
    * @brief Set SSL configuration
    */
   void setSslConfiguration(QSslConfiguration config);
+
+  /**
+   * @brief get the SSL configuration
+   */
+  QSslConfiguration getSslConfiguration() const;
 
   /**
    * @brief Send the items to the server to sync the

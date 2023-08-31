@@ -30,7 +30,7 @@ namespace srilakshmikanthanp::clipbirdesk {
  * for ClipBird Application
  */
 class ClipbirdApplication : public SingleApplication {
- private:
+ private:  // Member Variables and Objects
 
   // file path to store the certificate and key
   std::string certPath = (std::filesystem::path(constants::getAppHome()) / "cert.pem").string();
@@ -39,9 +39,7 @@ class ClipbirdApplication : public SingleApplication {
  private:  // Member Functions
 
   /**
-   * @brief On New Host Connected
-   *
-   * @param client
+   * @brief Authenticator for the client
    */
   bool authenticator(const types::device::Device& client) {
     // clang-format off
@@ -78,6 +76,9 @@ class ClipbirdApplication : public SingleApplication {
 
     // set the icon
     dialog->setIcon(QMessageBox::Question);
+
+    // set always on top
+    dialog->setWindowFlags(Qt::WindowStaysOnTopHint);
 
     // show and get result
     auto result = dialog->exec();
@@ -196,7 +197,7 @@ class ClipbirdApplication : public SingleApplication {
 
   Q_DISABLE_COPY_MOVE(ClipbirdApplication);
 
- public:  // Constructors and Destructors
+ public:   // Constructors and Destructors
 
   /**
    * @brief Construct a new Clipbird Application object
@@ -217,12 +218,9 @@ class ClipbirdApplication : public SingleApplication {
     // set the authenticator
     controller->setAuthenticator(authenticator);
 
-    // update the ca certificates
-    controller->updateCaCertificatesFromStore();
-
     // create the objects of the class
-    content    = new ui::gui::Content(controller);
-    window     = new ui::gui::Window();
+    content = new ui::gui::Content(controller);
+    window  = new ui::gui::Window();
 
     // set the signal handler for all os
     signal(SIGTERM, [](int sig) { qApp->quit(); });
@@ -258,6 +256,11 @@ class ClipbirdApplication : public SingleApplication {
     // using some classes
     using ui::gui::Content;
 
+    // tray icon click from content
+    const auto signal_tic = &QSystemTrayIcon::activated;
+    const auto slot_tic   = &ClipbirdApplication::onTrayIconClicked;
+    QObject::connect(content->getTrayIcon(), signal_tic, this, slot_tic);
+
     // set the signal for instance Started
     const auto signal_is = &SingleApplication::instanceStarted;
     const auto slot_is   = &Content::show;
@@ -267,11 +270,6 @@ class ClipbirdApplication : public SingleApplication {
     const auto signal = &QStyleHints::colorSchemeChanged;
     const auto slot   = &ClipbirdApplication::setQssFile;
     QObject::connect(QGuiApplication::styleHints(), signal, this, slot);
-
-    // tray icon click from content
-    const auto signal_tic = &QSystemTrayIcon::activated;
-    const auto slot_tic   = &ClipbirdApplication::onTrayIconClicked;
-    QObject::connect(content->getTrayIcon(), signal_tic, this, slot_tic);
   }
 
   /**
@@ -297,7 +295,7 @@ class ClipbirdApplication : public SingleApplication {
  * @return int Status code
  */
 auto main(int argc, char **argv) -> int {
-  // using ClipbirdApplication class
+  // using ClipbirdApplication class from namespace
   using srilakshmikanthanp::clipbirdesk::ClipbirdApplication;
   using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;

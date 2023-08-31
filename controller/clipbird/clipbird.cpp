@@ -25,7 +25,16 @@ void ClipBird::handleClientStateChanged(types::device::Device client, bool conne
   store.setClientCert(client.name, client.cert.toPem());
 
   // update the ca certificates
-  this->updateCaCertificatesFromStore();
+  auto sslConfig = this->getSslConfiguration();
+
+  // add ca certificates
+  sslConfig.addCaCertificate(client.cert);
+
+  // set up the ssl configuration
+  this->m_sslConfig = sslConfig;
+
+  // set new config for Server
+  std::get<Server>(m_host).setSslConfiguration(m_sslConfig);
 }
 
 /**
@@ -44,16 +53,19 @@ void ClipBird::handleServerStatusChanged(bool status) {
   auto *client = &std::get<Client>(m_host);
   auto slot_n  = &Client::syncItems;
   auto &store  = storage::Storage::instance();
-  auto cert    = client->getConnectedServer().cert;
-  auto name    = client->getConnectedServer().name;
 
   // if the client is connected then connect the signals
   if (!status) {
     disconnect(&m_clipboard, signal, client, slot_n);
   } else {
     connect(&m_clipboard, signal, client, slot_n);
+    auto cert = client->getConnectedServer().cert;
+    auto name = client->getConnectedServer().name;
     store.setServerCert(name, cert.toPem());
-    this->updateCaCertificatesFromStore();
+    auto sslConfig = this->getSslConfiguration();
+    sslConfig.addCaCertificate(cert);
+    this->m_sslConfig = sslConfig;
+    client->setSslConfiguration(m_sslConfig);
   }
 }
 
@@ -181,6 +193,13 @@ void ClipBird::setCurrentHostAsClient() {
   // set the host is client
   store.setHostIsServer(false);
 
+  client->connectToServer({
+    QHostAddress::LocalHost,
+    8080,
+    "localhost",
+    QSslCertificate()
+  });
+
   // Start the Discovery
   client->startBrowsing();
 }
@@ -188,7 +207,27 @@ void ClipBird::setCurrentHostAsClient() {
 /**
  * @brief Set the SSL Configuration object
  */
-void ClipBird::setSslConfiguration(const QSslConfiguration &config) {
+void ClipBird::setSslConfiguration(QSslConfiguration config) {
+  // storage instance
+  storage::Storage &store = storage::Storage::instance();
+
+  // Ca Certificates
+  QList<QSslCertificate> caCerts;
+
+  // set all ca Client certs from store
+  for (auto certByte : store.getAllClientCert()) {
+    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
+  }
+
+  // set all ca Server certs from store
+  for (auto certByte : store.getAllServerCert()) {
+    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
+  }
+
+  // set ca certificates
+  config.setCaCertificates(caCerts);
+
+  // set the ssl configuration
   this->m_sslConfig = config;
 }
 
@@ -211,33 +250,6 @@ void ClipBird::setAuthenticator(types::callable::Authenticator auth) {
  */
 types::callable::Authenticator ClipBird::getAuthenticator() const {
   return auth;
-}
-
-/**
- * @brief Update Ca Certificates
- */
-void ClipBird::updateCaCertificatesFromStore() {
-  // configuration
-  auto sslConfig = this->getSslConfiguration();
-
-  // Ca Certificates
-  QList<QSslCertificate> caCerts;
-
-  // storage instance
-  auto &store = storage::Storage::instance();
-
-  // set all ca Client certs from store
-  for (auto certByte : store.getAllClientCert()) {
-    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
-  }
-
-  // set all ca Server certs from store
-  for (auto certByte : store.getAllServerCert()) {
-    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
-  }
-
-  // set ca certificates
-  sslConfig.setCaCertificates(caCerts);
 }
 
 /**

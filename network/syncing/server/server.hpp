@@ -57,11 +57,11 @@ class Server : public service::mdnsRegister {
   /// @brief Authenticator
   types::callable::Authenticator m_authenticator;
 
-  /// @brief SSL server
-  QSslServer* m_ssl_server = new QSslServer(this);
-
   /// @brief List of clients Authenticated
-  QList<QSslSocket*> m_authed_clients;
+  QList<QSslSocket*> m_clients;
+
+  /// @brief SSL server
+  QSslServer* m_server = new QSslServer(this);
 
  private:  // some typedefs
 
@@ -87,23 +87,13 @@ class Server : public service::mdnsRegister {
     stream.startTransaction();
 
     // write the data to the stream
-    auto wrote = 0;
+    auto wrote = 0L;
 
     // write the packet length
     while (wrote < data.size()) {
-      // try to write the data
       auto bytes = stream.writeRawData(data.data() + wrote, data.size() - wrote);
-
-      // if no error occurred
-      if (bytes != -1) {
-        wrote += bytes; continue;
-      }
-
-      // abort the transaction
-      stream.abortTransaction();
-
-      //  Notifies the error occurred
-      qWarning() << (LOG(client->errorString().toStdString()));
+      wrote = wrote + bytes;
+      if (bytes == -1) { stream.abortTransaction(); break; }
     }
 
     // commit the transaction
@@ -118,10 +108,25 @@ class Server : public service::mdnsRegister {
    */
   template <typename Packet>
   void sendPacket(const Packet& pack, QSslSocket* except = nullptr) {
-    for (auto client : m_authed_clients) {
+    for (auto client : m_clients) {
       if (client != except) sendPacket(client, pack);
     }
   }
+
+  /**
+   * @brief Process the connections that are pending
+   */
+  void processPendingConnections();
+
+  /**
+   * @brief Process SSL Errors
+   */
+  void processSslErrors(QSslSocket *, const QList<QSslError>& errors);
+
+  /**
+   * @brief Process the disconnection from the client
+   */
+  void processDisconnection();
 
   /**
    * @brief Process the SyncingPacket from the client
@@ -131,30 +136,15 @@ class Server : public service::mdnsRegister {
   void processSyncingPacket(const packets::SyncingPacket& packet);
 
   /**
-   * @brief Process the connections that are pending
-   */
-  void processPendingConnections();
-
-  /**
    * @brief Callback function that process the ready
    * read from the client
    */
   void processReadyRead();
 
   /**
-   * @brief Process the disconnection from the client
+   * @brief Authenticate the client
    */
-  void processDisconnection();
-
-  /**
-   * @brief On Service Registered
-   */
-  void OnServiceRegistered();
-
-  /**
-   * @brief Process SSL Errors
-   */
-  void processSslErrors(QSslSocket *, const QList<QSslError>& errors);
+  bool authenticateClient(QSslSocket* client);
 
  public:  // constructors and destructors
 
@@ -211,6 +201,7 @@ class Server : public service::mdnsRegister {
    * @param config SSL Configuration
    */
   void setSslConfiguration(QSslConfiguration config);
+
   /**
    * @brief Get the SSL Configuration object
    *

@@ -43,10 +43,6 @@ class ClipBird : public QObject {
   /// @brief On Server state changed (From Client)
   void OnServerStatusChanged(bool isConnected);
 
- signals:  // signals for this class
-  /// @brief On Server Auth Succeed (From Client)
-  void OnServerAuthentication(bool isSuccessful);
-
   //----------------------- server Signals ------------------------//
 
  signals:  // signals
@@ -79,11 +75,8 @@ class ClipBird : public QObject {
 
  private:  // private slots
 
-  /// @brief Handle Client State Changes
+  /// @brief Handle Client State Changes (From server)
   void handleClientStateChanged(types::device::Device client, bool connected);
-
-  /// @brief Handle On Server Authenticated (From client)
-  void handleServerAuthentication(bool isConnected);
 
   /// @brief Handle On Server Disconnect (From client)
   void handleServerStatusChanged(bool status);
@@ -107,7 +100,7 @@ class ClipBird : public QObject {
    */
   virtual ~ClipBird() = default;
 
-  //---------------------- public slots ----------------------//
+  //------------------------- public slots -------------------------//
 
   /**
    * @brief set the host as server and start listening
@@ -120,12 +113,12 @@ class ClipBird : public QObject {
    */
   void setCurrentHostAsClient();
 
-  //---------------------- General functions ----------------------//
+  //--------------------- General functions ----------------------//
 
   /**
    * @brief Set the SSL Configuration object
    */
-  void setSslConfiguration(const QSslConfiguration &config);
+  void setSslConfiguration(QSslConfiguration config);
 
   /**
    * @brief Get the SSL Configuration object
@@ -142,12 +135,7 @@ class ClipBird : public QObject {
    */
   types::callable::Authenticator getAuthenticator() const;
 
-  /**
-   * @brief Update Ca Certificates
-   */
-  void updateCaCertificatesFromStore();
-
-  //---------------------- Store functions ------------------------//
+  //------------------- Store functions ------------------------//
 
   /**
    * @brief Clear Server Certificates
@@ -159,8 +147,7 @@ class ClipBird : public QObject {
    */
   void clearClientCertificates();
 
-
-  //---------------------- Server functions -----------------------//
+  //------------------- Server functions ------------------------//
 
   /**
    * @brief Get the Clients that are connected to the server

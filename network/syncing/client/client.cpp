@@ -7,6 +7,38 @@
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 /**
+ * @brief Verify Server
+ */
+bool Client::verifyCertificate(const QSslCertificate& certificate) {
+  if (certificate.isNull() || certificate.subjectInfo(QSslCertificate::CommonName).isEmpty()) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+/**
+ * @brief Process SSL Errors
+ */
+void Client::processSslErrors(const QList<QSslError>& errors) {
+  for (auto error: errors) {
+    if (error.error() == QSslError::SelfSignedCertificate && verifyCertificate(error.certificate())) {
+      this->m_ssl_socket->ignoreSslErrors();
+    }
+  }
+}
+
+/**
+ * @brief Process the Invalid packet that has been received
+ * from the server and emit the signal
+ *
+ * @param packet Invalid packet
+ */
+void Client::processInvalidPacket(const packets::InvalidRequest& packet) {
+  qWarning() << (LOG(packet.getErrorMessage().toStdString()));
+}
+
+/**
  * @brief Process the packet that has been received
  * from the server and emit the signal
  *
@@ -23,16 +55,6 @@ void Client::processSyncingPacket(const packets::SyncingPacket& packet) {
 
   // emit the signal
   emit OnSyncRequest(items);
-}
-
-/**
- * @brief Process the Invalid packet that has been received
- * from the server and emit the signal
- *
- * @param packet Invalid packet
- */
-void Client::processInvalidPacket(const packets::InvalidRequest& packet) {
-  qWarning() << (LOG(packet.getErrorMessage().toStdString()));
 }
 
 /**
@@ -76,8 +98,7 @@ void Client::processReadyRead() {
     auto bytes = get.readRawData(start, toRead);
 
     if (bytes == -1) {
-      get.rollbackTransaction();
-      return;
+      return get.rollbackTransaction();
     }
 
     toRead -= bytes;
@@ -127,27 +148,6 @@ void Client::processReadyRead() {
 }
 
 /**
- * @brief Handle client connected
- */
-void Client::handleConnected() {
-  emit OnServerStatusChanged(true);
-}
-
-/**
- * @brief Handle client disconnected
- */
-void Client::handleDisconnected() {
-  emit OnServerStatusChanged(false);
-}
-
-/**
- * @brief Process SSL Errors
- */
-void Client::processSslErrors(const QList<QSslError>& errors) {
-  this->m_ssl_socket->ignoreSslErrors();
-}
-
-/**
  * @brief Construct a new Syncing Client object
  * and connect the signals and slots and start
  * the timer and Service discovery
@@ -158,8 +158,8 @@ void Client::processSslErrors(const QList<QSslError>& errors) {
 Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
   // connect the signal to emit the signal for
   // server state changed
-  const auto signal_c = &QSslSocket::connected;
-  const auto slot_c   = &Client::handleConnected;
+  const auto signal_c = &QSslSocket::encrypted;
+  const auto slot_c   = [=] {emit OnServerStatusChanged(true); };
   connect(m_ssl_socket, signal_c, this, slot_c);
 
   // connect the signals and slots for the socket
@@ -178,7 +178,7 @@ Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
   // disconnected signal to emit the signal for
   // server state changed
   const auto signal_d = &QSslSocket::disconnected;
-  const auto slot_d   = &Client::handleDisconnected;
+  const auto slot_d   = [=] {emit OnServerStatusChanged(false); };
   connect(m_ssl_socket, signal_d, this, slot_d);
 }
 
@@ -187,6 +187,13 @@ Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
  */
 void Client::setSslConfiguration(QSslConfiguration config) {
   this->m_ssl_config = config;
+}
+
+/**
+ * @brief get the SSL configuration
+ */
+QSslConfiguration Client::getSslConfiguration() const {
+  return this->m_ssl_config;
 }
 
 /**
@@ -206,7 +213,9 @@ void Client::syncItems(QVector<QPair<QString, QByteArray>> items) {
   using utility::functions::createPacket;
 
   // create the packet
-  SyncingPacket packet = createPacket({SyncingPacket::PacketType::SyncPacket, items});
+  SyncingPacket packet = createPacket({
+    SyncingPacket::PacketType::SyncPacket, items
+  });
 
   // send the packet to the server
   this->sendPacket(packet);
@@ -218,16 +227,7 @@ void Client::syncItems(QVector<QPair<QString, QByteArray>> items) {
  * @return QList<QPair<QHostAddress, quint16>> List of servers
  */
 QList<types::device::Device> Client::getServerList() const {
-  // Host address and port number
-  QList<types::device::Device> list;
-
-  // iterate and add the server
-  for (auto& server : m_servers) {
-    list.append(server);
-  }
-
-  // return the list
-  return list;
+  return m_servers;
 }
 
 /**
@@ -238,11 +238,6 @@ QList<types::device::Device> Client::getServerList() const {
  * @param port Port number
  */
 void Client::connectToServer(types::device::Device server) {
-  // matcher to get the Device from servers list
-  auto matcher = [server](const types::device::Device& device) {
-    return device.ip == server.ip && device.port == server.port;
-  };
-
   // if Discover Configuration is null the return
   if (this->m_ssl_config.isNull()) {
     throw std::runtime_error("SSL Config Config is not set");
@@ -256,12 +251,9 @@ void Client::connectToServer(types::device::Device server) {
     this->disconnectFromServer();
   }
 
-  // get the server certificate from the ip and port
-  auto device = std::find_if(m_servers.begin(), m_servers.end(), matcher);
-
   // create the host address
-  const auto host = device->ip.toString();
-  const auto port = device->port;
+  const auto host = server.ip.toString();
+  const auto port = server.port;
 
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
@@ -279,18 +271,19 @@ bool Client::isConnected() const {
  * @return QPair<QHostAddress, quint16>
  */
 types::device::Device Client::getConnectedServer() const {
+  // check if the socket is connected else throw error
   if (this->m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
     throw std::runtime_error("Socket is not connected");
   }
 
   // peer server details
-  auto address = m_ssl_socket->peerAddress();
-  auto port    = m_ssl_socket->peerPort();
-  auto cert    = m_ssl_socket->peerCertificate();
-  auto name    = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+  auto addr = m_ssl_socket->peerAddress();
+  auto port = m_ssl_socket->peerPort();
+  auto cert = m_ssl_socket->peerCertificate();
+  auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
   // return the host address and port number
-  return { address, port, name, cert };
+  return { addr, port, name, cert };
 }
 
 /**
@@ -348,9 +341,6 @@ void Client::onServiceAdded(QPair<QHostAddress, quint16> server) {
 
     // disconnect the server
     sslSocket->disconnectFromHost();
-
-    // delete the socket
-    sslSocket->deleteLater();
   });
 
   // connect to ssl errors

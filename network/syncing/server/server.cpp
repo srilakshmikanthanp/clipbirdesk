@@ -7,6 +7,94 @@
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 /**
+ * @brief Process the connections that are pending
+ */
+void Server::processPendingConnections() {
+  while (m_server->hasPendingConnections()) {
+    // Get the client that has been connected
+    auto client = qobject_cast<QSslSocket *>(m_server->nextPendingConnection());
+
+    // Connect the disconnected signal to the processDisconnection function
+    const auto signal_d = &QSslSocket::disconnected;
+    const auto slot_d   = &Server::processDisconnection;
+    QObject::connect(client, signal_d, this, slot_d);
+
+    // Connect the readyRead signal to the processReadyRead function
+    const auto signal_r = &QSslSocket::readyRead;
+    const auto slot_r   = &Server::processReadyRead;
+    QObject::connect(client, signal_r, this, slot_r);
+
+    // get the device info of the client
+    auto addr = client->peerAddress();
+    auto port = client->peerPort();
+    auto cert = client->peerCertificate();
+    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+
+    // create device object of the client
+    auto device = types::device::Device {
+      addr, port, name, cert
+    };
+
+    // Notify the listeners that the client is connected
+    emit OnCLientStateChanged(device, true);
+
+    // Add the client to the list of unauthenticated clients
+    m_clients.append(client);
+
+    // get connected client list
+    auto list = getConnectedClientsList();
+
+    // Notify the listeners that the client list is changed
+    emit OnClientListChanged(list);
+  }
+}
+
+/**
+ * @brief Process SSL Errors
+ */
+void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors) {
+  for (auto error : errors) {
+    if (error.error() == QSslError::SelfSignedCertificate && authenticateClient(socket)) {
+      socket->ignoreSslErrors();
+    }
+  }
+}
+
+/**
+ * @brief Process the disconnection from the client
+ */
+void Server::processDisconnection() {
+  // Get the client that was disconnected
+  auto client = qobject_cast<QSslSocket *>(sender());
+
+  // if not in authenticated list
+  if (!m_clients.contains(client)) return;
+
+  // peer information of the client
+  auto addr = client->peerAddress();
+  auto port = client->peerPort();
+  auto cert = client->peerCertificate();
+  auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+
+  // create the device
+  auto device = types::device::Device {
+    addr, port, name, cert
+  };
+
+  // Notify the listeners that the client is disconnected
+  emit OnCLientStateChanged(device, false);
+
+  // Remove the client from the list of clients
+  m_clients.removeOne(client);
+
+  // get connected client list
+  auto list = getConnectedClientsList();
+
+  // Notify the listeners that the client list is changed
+  emit OnClientListChanged(list);
+}
+
+/**
  * @brief Process the SyncingPacket from the client
  *
  * @param packet SyncingPacket
@@ -22,87 +110,12 @@ void Server::processSyncingPacket(const packets::SyncingPacket &packet) {
 
   // Notify the listeners to sync the data
   emit OnSyncRequest(items);
-}
 
-/**
- * @brief Process SSL Errors
- */
-void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors) {
-  for (auto error : errors) {
-    // if error not not verified certificate
-    if (error.error() == QSslError::SelfSignedCertificate) {
-      // peer info of the client
-      const auto peerAddress = socket->peerAddress();
-      const auto peerPort    = socket->peerPort();
-      const auto certificate = socket->peerCertificate();
+  // get the Sender of the packet
+  auto client = qobject_cast<QSslSocket *>(sender());
 
-      // if certificate is null or common name is empty
-      if (certificate.isNull() || certificate.subjectInfo(QSslCertificate::CommonName).isEmpty()) {
-        continue;
-      }
-
-      // create the device
-      auto device = types::device::Device {
-        peerAddress,
-        peerPort,
-        certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
-        certificate,
-      };
-
-      // if authenticator is not set then ignore the error
-      if (m_authenticator == nullptr) {
-        throw std::runtime_error("Authenticator is not set");
-      }
-
-      // if authenticator returns true then ignore the error
-      if (m_authenticator(device)) {
-        socket->ignoreSslErrors(QList<QSslError>{error});
-      }
-    }
-  }
-}
-
-/**
- * @brief Process the connections that are pending
- */
-void Server::processPendingConnections() {
-  while (m_ssl_server->hasPendingConnections()) {
-    // Get the client that has been connected
-    auto client_tcp = (m_ssl_server->nextPendingConnection());
-
-    // Convert the client to SSL client
-    auto client_tls = qobject_cast<QSslSocket *>(client_tcp);
-
-    // If the client is not SSL client then disconnect
-    if (client_tls == nullptr) {
-      const auto packType = packets::InvalidRequest::PacketType::RequestFailed;
-      const auto code     = types::enums::ErrorCode::SSLError;
-      const auto message  = "Client is not SSL client";
-
-      using utility::functions::createPacket;
-      this->sendPacket(client_tls, createPacket({packType, code, message}));
-      client_tcp->disconnectFromHost();
-    } else {
-      // Connect the client to the callback function that process
-      // the disconnection when the client is disconnected
-      const auto signal_d = &QSslSocket::disconnected;
-      const auto slot_d   = &Server::processDisconnection;
-      QObject::connect(client_tls, signal_d, this, slot_d);
-
-      // Connect the socket to the callback function that
-      // process the ready read when the socket is ready
-      const auto signal_r = &QSslSocket::readyRead;
-      const auto slot_r   = &Server::processReadyRead;
-      QObject::connect(client_tls, signal_r, this, slot_r);
-
-      if (client_tls->peerCertificate().isNull()) {
-        throw std::runtime_error("Client Certificate is not set");
-      }
-
-      // Add the client to the list of unauthenticated clients
-      m_authed_clients.append(client_tls);
-    }
-  }
+  // send the response packet
+  this->sendPacket(packet, client);
 }
 
 /**
@@ -114,7 +127,7 @@ void Server::processReadyRead() {
   auto client = qobject_cast<QSslSocket *>(sender());
 
   // if not authenticated then return
-  if (!m_authed_clients.contains(client)) return;
+  if (!m_clients.contains(client)) return;
 
   // using the fromQByteArray from namespace
   using utility::functions::createPacket;
@@ -170,7 +183,6 @@ void Server::processReadyRead() {
   // Deserialize the data to SyncingPacket
   try {
     this->processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
-    this->sendPacket(fromQByteArray<packets::SyncingPacket>(data), client);
     return;
   } catch (const types::except::MalformedPacket &e) {
     const auto type = packets::InvalidRequest::PacketType::RequestFailed;
@@ -194,43 +206,32 @@ void Server::processReadyRead() {
 }
 
 /**
- * @brief Process the disconnection from the client
+ * @brief Authenticate the client
  */
-void Server::processDisconnection() {
-  // Get the client that was disconnected
-  auto client = qobject_cast<QSslSocket *>(sender());
+bool Server::authenticateClient(QSslSocket* client) {
+  // peer info of the client that is connected
+  auto addr = client->peerAddress();
+  auto port = client->peerPort();
+  auto cert = client->peerCertificate();
+  auto name = cert.subjectInfo(QSslCertificate::CommonName);
 
-  // if not in authenticated list
-  if (!m_authed_clients.contains(client)) return;
-
-  // peer info of the client
-  const auto peerAddress = client->peerAddress();
-  const auto peerPort    = client->peerPort();
-  const auto certificate = client->peerCertificate();
+  // if certificate is null or common name is empty
+  if (cert.isNull() || name.isEmpty()) {
+    return false;
+  }
 
   // create the device
   auto device = types::device::Device {
-    peerAddress,
-    peerPort,
-    certificate.subjectInfo(QSslCertificate::CommonName).constFirst(),
-    certificate,
+    addr, port, name.constFirst(), cert
   };
 
-  // Notify the listeners that the client is disconnected
-  emit OnCLientStateChanged(device, false);
+  // if authenticator is not set
+  if (m_authenticator == nullptr) {
+    throw std::runtime_error("Authenticator is not set");
+  }
 
-  // Remove the client from the list of clients
-  m_authed_clients.removeOne(client);
-
-  // Notify the listeners that the client list is changed
-  emit OnClientListChanged(getConnectedClientsList());
-}
-
-/**
- * @brief Called when the service is registered
- */
-void Server::OnServiceRegistered() {
-  emit OnServerStateChanged(true);
+  // return the result of the authenticator
+  return m_authenticator(device);
 }
 
 /**
@@ -247,18 +248,18 @@ Server::Server(QObject *parent) : service::mdnsRegister(parent) {
   // to read so the listener can be notified
   const auto signal_c = &QSslServer::pendingConnectionAvailable;
   const auto slot_c   = &Server::processPendingConnections;
-  QObject::connect(m_ssl_server, signal_c, this, slot_c);
+  QObject::connect(m_server, signal_c, this, slot_c);
 
   // Notify the listeners that the server is started
   const auto signal = &service::mdnsRegister::OnServiceRegistered;
-  const auto slot   = &Server::OnServiceRegistered;
+  const auto slot   = [=] { emit OnServerStateChanged(true); };
   QObject::connect(this, signal, this, slot);
 
   // Connect the socket to the callback function that
   // process the SSL errors
   const auto signal_e = &QSslServer::sslErrors;
   const auto slot_e   = &Server::processSslErrors;
-  QObject::connect(m_ssl_server, signal_e, this, slot_e);
+  QObject::connect(m_server, signal_e, this, slot_e);
 }
 
 /**
@@ -280,11 +281,12 @@ QList<types::device::Device> Server::getConnectedClientsList() const {
   // List of clients that are connected
   QList<types::device::Device> list;
 
-  for (auto client : m_authed_clients) {
+  // iterate through the list of clients
+  for (auto c : m_clients) {
     // Peer info of the client that is connected
-    auto addr = client->peerAddress();
-    auto port = client->peerPort();
-    auto cert = client->peerCertificate();
+    auto addr = c->peerAddress();
+    auto port = c->peerPort();
+    auto cert = c->peerCertificate();
     auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
     // add the device to the list
@@ -308,7 +310,7 @@ void Server::disconnectClient(types::device::Device client) {
   };
 
   // find the client from the list of clients
-  for (auto c : m_authed_clients) {
+  for (auto c : m_clients) {
     if (matcher(c)) {
       return c->disconnectFromHost();
     }
@@ -319,7 +321,7 @@ void Server::disconnectClient(types::device::Device client) {
  * @brief Disconnect the all the clients from the server
  */
 void Server::disconnectAllClients() {
-  for (auto client : m_authed_clients) client->disconnectFromHost();
+  for (auto client : m_clients) client->disconnectFromHost();
 }
 
 /**
@@ -329,13 +331,13 @@ void Server::disconnectAllClients() {
  */
 types::device::Device Server::getServerInfo() const {
   // server information
-  auto address = m_ssl_server->serverAddress();
-  auto port = m_ssl_server->serverPort();
-  auto cert = m_ssl_server->sslConfiguration().localCertificate();
+  auto addr = m_server->serverAddress();
+  auto port = m_server->serverPort();
+  auto cert = m_server->sslConfiguration().localCertificate();
   auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
   // Return info
-  return { address, port, name, cert };
+  return { addr, port, name, cert };
 }
 
 /**
@@ -344,7 +346,7 @@ types::device::Device Server::getServerInfo() const {
  * @param config SSL Configuration
  */
 void Server::setSslConfiguration(QSslConfiguration config) {
-  m_ssl_server->setSslConfiguration(config);
+  m_server->setSslConfiguration(config);
 }
 
 /**
@@ -353,7 +355,7 @@ void Server::setSslConfiguration(QSslConfiguration config) {
  * @return QSslConfiguration
  */
 QSslConfiguration Server::getSSLConfiguration() const {
-  return m_ssl_server->sslConfiguration();
+  return m_server->sslConfiguration();
 }
 
 /**
@@ -361,17 +363,17 @@ QSslConfiguration Server::getSSLConfiguration() const {
  */
 void Server::startServer() {
   // check if the SSL configuration is set
-  if (m_ssl_server->sslConfiguration().isNull()) {
+  if (m_server->sslConfiguration().isNull()) {
     throw std::runtime_error("SSL Configuration is not set");
   }
 
   // start the server
-  if (!m_ssl_server->listen()) {
+  if (!m_server->listen()) {
     throw std::runtime_error("Failed to start the server");
   }
 
   // log port
-  std::cout << "Server Started on Port: " + QString::number(m_ssl_server->serverPort()).toStdString();
+  qInfo() << (LOG("Server started at port: " + std::to_string(m_server->serverPort())));
 
   // start the discovery server
   this->registerServiceAsync();
@@ -388,7 +390,7 @@ void Server::stopServer() {
   this->disconnectAllClients();
 
   // stop the server
-  m_ssl_server->close();
+  m_server->close();
 
   // Notify the listeners
   emit OnServerStateChanged(false);
@@ -411,6 +413,6 @@ void Server::setAuthenticator(types::callable::Authenticator auth) {
  * @throw Any Exception If any error occurs
  */
 quint16 Server::getPort() const {
-  return m_ssl_server->serverPort();
+  return m_server->serverPort();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing
