@@ -208,6 +208,11 @@ class Client : public service::mdnsBrowser {
    */
   void disconnectFromServer();
 
+  /**
+   * @brief Get the Server Certificate
+   */
+  QSslCertificate getConnectedServerCertificate() const;
+
  protected:  // abstract functions from the base class
 
   /**

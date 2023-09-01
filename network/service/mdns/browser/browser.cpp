@@ -22,10 +22,12 @@ void Browser::onHostResolved(bool isAdded, quint16 port, QString srvName, const 
   }
 
   // get the ip address
+  // remove the .local from srv name
+  auto name = srvName.replace(".local", "");
   auto ip = info.addresses().first();
 
   // emit the signal
-  isAdded ? emit onServiceAdded({ip, port, srvName}) : emit onServiceRemoved({ip, port, srvName});
+  isAdded ? emit onServiceAdded({ip, port, name}) : emit onServiceRemoved({ip, port, name});
 }
 
 /**

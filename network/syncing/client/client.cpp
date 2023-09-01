@@ -322,6 +322,19 @@ void Client::disconnectFromServer() {
 }
 
 /**
+ * @brief Get the Server Certificate
+ */
+QSslCertificate Client::getConnectedServerCertificate() const{
+  // if not connected throw error
+  if (!this->isConnected()) {
+    throw std::runtime_error("Socket is not connected");
+  }
+
+  // return the server certificate
+  return m_ssl_socket->peerCertificate();
+}
+
+/**
  * @brief On server found function that That Called by the
  * discovery client when the server is found
  *

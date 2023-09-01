@@ -224,6 +224,11 @@ class Server : public service::mdnsRegister {
    */
   void setAuthenticator(types::callable::Authenticator auth);
 
+  /**
+   * @brief Get the Dei=vice Certificate
+   */
+  QSslCertificate getClientCert(types::device::Device device) const;
+
  protected:  // override functions from the base class
 
   /**

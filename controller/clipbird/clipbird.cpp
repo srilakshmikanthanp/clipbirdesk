@@ -18,17 +18,20 @@ void ClipBird::handleClientStateChanged(types::device::Device client, bool conne
   // if not Connected the return
   if (!connected) return;
 
+  // get the device certificate from the server
+  auto cert = std::get<Server>(m_host).getClientCert(client);
+
   // get the store instance to store certificate
   auto &store = storage::Storage::instance();
 
   // store the client certificate
-  // store.setClientCert(client.name, client.cert.toPem());
+  store.setClientCert(client.name, cert.toPem());
 
   // update the ca certificates
   auto sslConfig = this->getSslConfiguration();
 
   // add ca certificates
-  // sslConfig.addCaCertificate(client.cert);
+  sslConfig.addCaCertificate(cert);
 
   // set up the ssl configuration
   this->m_sslConfig = sslConfig;
@@ -59,13 +62,13 @@ void ClipBird::handleServerStatusChanged(bool status) {
     disconnect(&m_clipboard, signal, client, slot_n);
   } else {
     connect(&m_clipboard, signal, client, slot_n);
-    // auto cert = client->getConnectedServer().cert;
-    // auto name = client->getConnectedServer().name;
-    // store.setServerCert(name, cert.toPem());
-    // auto sslConfig = this->getSslConfiguration();
-    // sslConfig.addCaCertificate(cert);
-    // this->m_sslConfig = sslConfig;
-    // client->setSslConfiguration(m_sslConfig);
+    auto cert = client->getConnectedServerCertificate();
+    auto name = client->getConnectedServer().name;
+    store.setServerCert(name, cert.toPem());
+    auto sslConfig = this->getSslConfiguration();
+    sslConfig.addCaCertificate(cert);
+    this->m_sslConfig = sslConfig;
+    client->setSslConfiguration(m_sslConfig);
   }
 }
 

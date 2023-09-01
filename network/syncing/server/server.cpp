@@ -408,6 +408,26 @@ void Server::setAuthenticator(types::callable::Authenticator auth) {
 }
 
 /**
+ * @brief Get the Dei=vice Certificate
+ */
+QSslCertificate Server::getClientCert(types::device::Device device) const {
+  // matcher lambda function to find the client
+  const auto matcher = [&device](QSslSocket *c) {
+    return (c->peerAddress() == device.ip) && (c->peerPort() == device.port);
+  };
+
+  // find the client from the list of clients
+  for (auto c : m_clients) {
+    if (matcher(c)) {
+      return c->peerCertificate();
+    }
+  }
+
+  // if not found
+  throw std::runtime_error("Client not found");
+}
+
+/**
  * @brief Get the Port number of the Server it can be any port
  * number from 0 to 65535 but the port number should be greater than 1024
  * because the port number less than 1024 are reserved for the system
