@@ -111,7 +111,6 @@ std::string getAppIssuePage() {
  * @return std::string
  */
 std::string getMDnsServiceName() {
-  std::cout << QSysInfo::machineHostName().toStdString() << std::endl;
   return QSysInfo::machineHostName().toStdString();
 }
 

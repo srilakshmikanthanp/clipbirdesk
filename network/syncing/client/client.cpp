@@ -47,18 +47,27 @@ bool Client::verifyCert(const QSslCertificate& certificate) {
  */
 void Client::processSslErrors(const QList<QSslError>& errors) {
   // List of ignored SslErrors
-  QList<QSslError> ignoredErrors;
+  QList<QSslError::SslError> ignoredErrors;
 
   // Ignore the errors
-  ignoredErrors.append(QSslError(QSslError::SelfSignedCertificate));
-  ignoredErrors.append(QSslError(QSslError::CertificateUntrusted));
+  ignoredErrors.append(QSslError::SelfSignedCertificate);
+  ignoredErrors.append(QSslError::CertificateUntrusted);
+  ignoredErrors.append(QSslError::HostNameMismatch);
 
   // make copy of errors
   auto errorsCopy = errors;
 
   // remove all the ignored errors
-  for (auto error : ignoredErrors) {
-    errorsCopy.removeOne(error);
+  auto itr = std::remove_if(errorsCopy.begin(), errorsCopy.end(), [&](auto error) {
+    return ignoredErrors.contains(error.error());
+  });
+
+  // remove the ignored errors
+  errorsCopy.erase(itr, errorsCopy.end());
+
+  // log the errors
+  for (auto error : errorsCopy) {
+    qWarning() << (LOG(std::to_string(error.error()).c_str()));
   }
 
   // if errorsCopy is not empty
@@ -73,13 +82,42 @@ void Client::processSslErrors(const QList<QSslError>& errors) {
   if (errors.length() > 0 && !this->verifyCert(certificate)) {
     return this->m_ssl_socket->abort();
   }
+
+  // ignore the errors
+  this->m_ssl_socket->ignoreSslErrors();
 }
 
 /**
  * @brief Process Ssl Error Secured
  */
 void Client::processSslErrorsSecured(const QList<QSslError>& errors) {
-  this->m_ssl_socket->abort();
+  // List of ignored SslErrors
+  QList<QSslError::SslError> ignoredErrors;
+
+  // Ignore the errors
+  ignoredErrors.append(QSslError::HostNameMismatch);
+
+  // make copy of errors
+  auto errorsCopy = errors;
+
+  // remove all the ignored errors
+  auto itr = std::remove_if(errorsCopy.begin(), errorsCopy.end(), [&](auto error) {
+    return ignoredErrors.contains(error.error());
+  });
+
+  // remove the ignored errors
+  errorsCopy.erase(itr, errorsCopy.end());
+
+  // log the errors
+  for (auto error : errorsCopy) {
+    qWarning() << (LOG(std::to_string(error.error()).c_str()));
+  }
+
+  if (!errorsCopy.isEmpty()) {
+    return this->m_ssl_socket->abort();
+  } else {
+    this->m_ssl_socket->ignoreSslErrors();
+  }
 }
 
 /**
@@ -171,6 +209,23 @@ void Client::processReadyRead() {
 
   // commit the transaction
   if (!get.commitTransaction()) {
+    return;
+  }
+
+  // try to parse the packet
+  try {
+    processAuthentication(fromQByteArray<packets::Authentication>(data));
+    return;
+  } catch (const types::except::MalformedPacket& e) {
+    qWarning() << (LOG(e.what()));
+    return;
+  } catch (const types::except::NotThisPacket& e) {
+    qWarning() << (LOG(e.what()));
+  } catch (const std::exception& e) {
+    qWarning() << (LOG(e.what()));
+    return;
+  } catch (...) {
+    qWarning() << (LOG("Unknown Error"));
     return;
   }
 
@@ -317,6 +372,9 @@ void Client::connectToServer(types::device::Device server) {
   const auto host = server.ip.toString();
   const auto port = server.port;
 
+  // log host and port
+  qInfo() << (LOG("Connecting to server: " + host.toStdString() + ":" + std::to_string(port)));
+
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
 }
@@ -351,6 +409,9 @@ void Client::connectToServerSecured(types::device::Device server) {
   // create the host address
   const auto host = server.ip.toString();
   const auto port = server.port;
+
+  // log host and port
+  qInfo() << (LOG("Connecting to server: " + host.toStdString() + ":" + std::to_string(port)));
 
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
