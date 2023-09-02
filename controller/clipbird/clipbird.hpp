@@ -20,7 +20,6 @@
 #include "network/syncing/client/client.hpp"
 #include "network/syncing/server/server.hpp"
 #include "store/storage.hpp"
-#include "types/callable/Authenticator.hpp"
 #include "types/device/device.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::controller {

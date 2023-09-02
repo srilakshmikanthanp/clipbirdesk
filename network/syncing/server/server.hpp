@@ -14,7 +14,6 @@
 #include <QVector>
 
 #include "network/service/service.hpp"
-#include "types/callable/Authenticator.hpp"
 #include "types/device/device.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
