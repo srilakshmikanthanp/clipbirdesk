@@ -55,17 +55,7 @@ void InvalidRequest::setErrorCode(quint8 code) {
     return;
   }
 
-  if (code == types::enums::ErrorCode::SSLError) {
-    this->errorCode = code;
-    return;
-  }
-
   if (code == types::enums::ErrorCode::CodingError) {
-    this->errorCode = code;
-    return;
-  }
-
-  if (code == types::enums::ErrorCode::InvalidCert) {
     this->errorCode = code;
     return;
   }
@@ -191,9 +181,7 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
   // allowed
   const auto allowed = std::vector<int>{
     ErrorCode::InvalidPacket,
-    ErrorCode::SSLError,
-    ErrorCode::CodingError,
-    ErrorCode::InvalidCert
+    ErrorCode::CodingError
   };
 
   // check the error code

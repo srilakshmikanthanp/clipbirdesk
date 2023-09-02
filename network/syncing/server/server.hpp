@@ -119,6 +119,11 @@ class Server : public service::mdnsRegister {
   void processPendingConnections();
 
   /**
+   * @brief Authenticate the client
+   */
+  bool authenticate(QSslSocket* client);
+
+  /**
    * @brief Process SSL Errors
    */
   void processSslErrors(QSslSocket *, const QList<QSslError>& errors);
@@ -140,11 +145,6 @@ class Server : public service::mdnsRegister {
    * read from the client
    */
   void processReadyRead();
-
-  /**
-   * @brief Authenticate the client
-   */
-  bool authenticateClient(QSslSocket* client);
 
  public:  // constructors and destructors
 

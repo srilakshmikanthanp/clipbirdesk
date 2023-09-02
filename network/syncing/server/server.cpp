@@ -35,11 +35,11 @@ void Server::processPendingConnections() {
       addr, port, name
     };
 
+    // Add the client to the list of authenticated clients
+    m_clients.append(client);
+
     // Notify the listeners that the client is connected
     emit OnCLientStateChanged(device, true);
-
-    // Add the client to the list of unauthenticated clients
-    m_clients.append(client);
 
     // get connected client list
     auto list = getConnectedClientsList();
@@ -50,17 +50,71 @@ void Server::processPendingConnections() {
 }
 
 /**
+ * @brief Authenticate the client
+ */
+bool Server::authenticate(QSslSocket* client) {
+  // peer info of the client that is connected
+  auto addr = client->peerAddress();
+  auto port = client->peerPort();
+  auto cert = client->peerCertificate();
+  auto name = cert.subjectInfo(QSslCertificate::CommonName);
+
+  // if certificate is null or common name is empty
+  if (cert.isNull() || name.isEmpty()) {
+    return false;
+  }
+
+  // create the device
+  auto device = types::device::Device {
+    addr, port, name.constFirst()
+  };
+
+  // if authenticator is not set
+  if (m_authenticator == nullptr) {
+    throw std::runtime_error("Authenticator is not set");
+  }
+
+  // return the result of the authenticator
+  return m_authenticator(device);
+}
+
+/**
  * @brief Process SSL Errors
  */
 void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors) {
-  for (auto error : errors) {
-    if (error.error() == QSslError::SelfSignedCertificate && authenticateClient(socket)) {
-      socket->ignoreSslErrors();
-    } else {
-      socket->abort();
-      break;
-    }
-    std::cout << error.errorString().toStdString() << std::endl;
+  // List of ignored SslErrors
+  QList<QSslError::SslError> ignoredErrors;
+
+  // Ignore the errors
+  ignoredErrors.append(QSslError::SelfSignedCertificate);
+  ignoredErrors.append(QSslError::CertificateUntrusted);
+
+  // make copy of errors
+  auto errorsCopy = errors;
+
+  // remove all the ignored errors
+  auto itr = std::remove_if(errorsCopy.begin(), errorsCopy.end(), [&](auto error) {
+    return ignoredErrors.contains(error.error());
+  });
+
+  // remove the ignored errors
+  errorsCopy.erase(itr, errorsCopy.end());
+
+  // log the errors
+  for (auto error : errorsCopy) {
+    qWarning() << (LOG(std::to_string(error.error())));
+  }
+
+  // if errorsCopy is not empty
+  if (!errorsCopy.isEmpty()) {
+    return socket->abort();
+  }
+
+  // if any error occurred
+  if (errors.length() > 0 && !this->authenticate(socket)) {
+    return socket->abort();
+  } else {
+    socket->ignoreSslErrors();
   }
 }
 
@@ -85,11 +139,11 @@ void Server::processDisconnection() {
     addr, port, name
   };
 
-  // Notify the listeners that the client is disconnected
-  emit OnCLientStateChanged(device, false);
-
   // Remove the client from the list of clients
   m_clients.removeOne(client);
+
+  // Notify the listeners that the client is disconnected
+  emit OnCLientStateChanged(device, false);
 
   // get connected client list
   auto list = getConnectedClientsList();
@@ -207,35 +261,6 @@ void Server::processReadyRead() {
   const auto code = types::enums::ErrorCode::InvalidPacket;
   const auto msg  = "Invalid Packet";
   this->sendPacket(client, createPacket({type, code, msg}));
-}
-
-/**
- * @brief Authenticate the client
- */
-bool Server::authenticateClient(QSslSocket* client) {
-  // peer info of the client that is connected
-  auto addr = client->peerAddress();
-  auto port = client->peerPort();
-  auto cert = client->peerCertificate();
-  auto name = cert.subjectInfo(QSslCertificate::CommonName);
-
-  // if certificate is null or common name is empty
-  if (cert.isNull() || name.isEmpty()) {
-    return false;
-  }
-
-  // create the device
-  auto device = types::device::Device {
-    addr, port, name.constFirst()
-  };
-
-  // if authenticator is not set
-  if (m_authenticator == nullptr) {
-    throw std::runtime_error("Authenticator is not set");
-  }
-
-  // return the result of the authenticator
-  return m_authenticator(device);
 }
 
 /**

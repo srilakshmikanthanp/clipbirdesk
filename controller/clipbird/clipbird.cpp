@@ -27,17 +27,11 @@ void ClipBird::handleClientStateChanged(types::device::Device client, bool conne
   // store the client certificate
   store.setClientCert(client.name, cert.toPem());
 
-  // update the ca certificates
-  auto sslConfig = this->getSslConfiguration();
-
   // add ca certificates
-  sslConfig.addCaCertificate(cert);
-
-  // set up the ssl configuration
-  this->m_sslConfig = sslConfig;
+  this->m_sslConfig.addCaCertificate(cert);
 
   // set new config for Server
-  std::get<Server>(m_host).setSslConfiguration(m_sslConfig);
+  std::get<Server>(m_host).setSslConfiguration(this->m_sslConfig);
 }
 
 /**
@@ -65,10 +59,8 @@ void ClipBird::handleServerStatusChanged(bool status) {
     auto cert = client->getConnectedServerCertificate();
     auto name = client->getConnectedServer().name;
     store.setServerCert(name, cert.toPem());
-    auto sslConfig = this->getSslConfiguration();
-    sslConfig.addCaCertificate(cert);
-    this->m_sslConfig = sslConfig;
-    client->setSslConfiguration(m_sslConfig);
+    this->m_sslConfig.addCaCertificate(cert);
+    client->setSslConfiguration(this->m_sslConfig);
   }
 }
 
@@ -90,7 +82,7 @@ void ClipBird::handleServerFound(types::device::Device server) {
 
   // if the server is not found then return
   if (store.hasServerCert(server.name)) {
-    client->connectToServer(server);
+    client->connectToServerSecured(server);
   }
 }
 
@@ -116,10 +108,15 @@ void ClipBird::setCurrentHostAsServer() {
   // Set the QSslConfiguration
   server->setSslConfiguration(m_sslConfig);
 
+  // set the authenticator
+  server->setAuthenticator(auth);
+
   // Connect the onClientStateChanged signal to the signal
   const auto signal_cs = &Server::OnCLientStateChanged;
   const auto slot_cs   = &ClipBird::OnCLientStateChanged;
+  const auto slot_hcs  = &ClipBird::handleClientStateChanged;
   connect(server, signal_cs, this, slot_cs);
+  connect(server, signal_cs, this, slot_hcs);
 
   // Connect the onSyncRequest signal to the clipboard
   const auto signal_sr = &Server::OnSyncRequest;
@@ -252,14 +249,70 @@ types::callable::Authenticator ClipBird::getAuthenticator() const {
  * @brief Clear the Server Certificates
  */
 void ClipBird::clearServerCertificates() {
-  storage::Storage::instance().clearAllServerCert();
+  // storage instance
+  storage::Storage &store = storage::Storage::instance();
+
+  // Ca Certificates
+  QList<QSslCertificate> caCerts;
+
+  // clear all ca Server certs from m_sslconfig
+  this->m_sslConfig.setCaCertificates(caCerts);
+
+  // set all ca Client certs from store
+  for (auto certByte : store.getAllClientCert()) {
+    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
+  }
+
+  // set the ca certificates
+  this->m_sslConfig.setCaCertificates(caCerts);
+
+  // clear all ca Server certs from store
+  store.clearAllServerCert();
+
+  // if the host is server then set the ssl configuration
+  if (std::holds_alternative<Server>(m_host)) {
+    std::get<Server>(m_host).setSslConfiguration(this->m_sslConfig);
+  }
+
+  // if the host is client then set the ssl configuration
+  if (std::holds_alternative<Client>(m_host)) {
+    std::get<Client>(m_host).setSslConfiguration(this->m_sslConfig);
+  }
 }
 
 /**
  * @brief Clear the Client Certificates
  */
 void ClipBird::clearClientCertificates() {
-  storage::Storage::instance().clearAllClientCert();
+ // storage instance
+  storage::Storage &store = storage::Storage::instance();
+
+  // Ca Certificates
+  QList<QSslCertificate> caCerts;
+
+  // clear all ca Server certs from m_sslconfig
+  this->m_sslConfig.setCaCertificates(caCerts);
+
+  // set all ca Client certs from store
+  for (auto certByte : store.getAllServerCert()) {
+    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
+  }
+
+  // set the ca certificates
+  this->m_sslConfig.setCaCertificates(caCerts);
+
+  // clear all ca Server certs from store
+  store.clearAllServerCert();
+
+  // if the host is server then set the ssl configuration
+  if (std::holds_alternative<Server>(m_host)) {
+    std::get<Server>(m_host).setSslConfiguration(this->m_sslConfig);
+  }
+
+  // if the host is client then set the ssl configuration
+  if (std::holds_alternative<Client>(m_host)) {
+    std::get<Client>(m_host).setSslConfiguration(this->m_sslConfig);
+  }
 }
 
 //---------------------- Server functions -----------------------//

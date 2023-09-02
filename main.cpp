@@ -51,40 +51,34 @@ class ClipbirdApplication : public SingleApplication {
     // clang-format on
 
     // get the user input
-    auto dialog = new QMessageBox();
+    auto dialog = QMessageBox();
 
     // icon for the dialog
     auto icon = QIcon(constants::getAppLogo().c_str());
 
     // set the icon
-    dialog->setWindowIcon(icon);
+    dialog.setWindowIcon(icon);
 
     // set the title
-    dialog->setWindowTitle("Clipbird");
+    dialog.setWindowTitle("Clipbird");
 
     // set the message
-    dialog->setText(message);
-
-    // set delete on close
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog.setText(message);
 
     // set the buttons
-    dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    dialog.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
     // set the default button
-    dialog->setDefaultButton(QMessageBox::No);
+    dialog.setDefaultButton(QMessageBox::No);
 
     // set the icon
-    dialog->setIcon(QMessageBox::Question);
+    dialog.setIcon(QMessageBox::Question);
 
     // set always on top
-    dialog->setWindowFlags(Qt::WindowStaysOnTopHint);
+    dialog.setWindowFlags(Qt::WindowStaysOnTopHint);
 
     // show and get result
-    auto result = dialog->exec();
-
-    // delete the dialog
-    delete dialog;
+    auto result = dialog.exec();
 
     // return the result
     return result == QMessageBox::Yes;
@@ -306,14 +300,25 @@ auto main(int argc, char **argv) -> int {
     QDir().mkdir(getAppHome().c_str());
   }
 
+#ifdef NDEBUG
   // log file to record the logs
   QFile logfile(QString::fromStdString(getAppLogFile()));
 
   // open the log file
   logfile.open(QIODevice::WriteOnly | QIODevice::Append);
 
+  // open QStream to write the log file
+  QTextStream logstream(&logfile);
+
   // Set the log file
-  Logger::setLogFile(&logfile);
+  Logger::setLogStream(&logstream);
+#else
+  // open QStream to write the log file
+  QTextStream logstream(stdout);
+
+  // Set the log file as std::cout
+  Logger::setLogStream(&logstream);
+#endif
 
   // Set the custom message handler
   qInstallMessageHandler(Logger::handler);

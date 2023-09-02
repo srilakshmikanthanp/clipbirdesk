@@ -128,9 +128,7 @@ void Content::handleServerListChange(QList<types::device::Device> servers) {
   // get the action for the server
   const auto getAction = [=](const auto& s) {
     // if client is connected to server
-    if (!controller->isConnectedToServer()) {
-      return Action::Connect;
-    }
+    if (!controller->isConnectedToServer()) return Action::Connect;
 
     // get the server
     auto server = controller->getConnectedServer();
@@ -179,6 +177,8 @@ void Content::handleServerStatusChanged(bool isConnected) {
 
   // get the action for the server
   const auto getAction = [=](const auto& s) {
+    if (!controller->isConnectedToServer()) return Action::Connect;
+
     // get the server
     auto server = controller->getConnectedServer();
 
@@ -192,7 +192,7 @@ void Content::handleServerStatusChanged(bool isConnected) {
 
   // add the server to the list
   for (auto s : servers) {
-    servers_m.append({s, isConnected ? getAction(s): Action::Connect});
+    servers_m.append({s, getAction(s)});
   }
 
   // set the server list to the window

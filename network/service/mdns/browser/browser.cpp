@@ -21,9 +21,10 @@ void Browser::onHostResolved(bool isAdded, quint16 port, QString srvName, const 
     return;
   }
 
-  // get the ip address
   // remove the .local from srv name
   auto name = srvName.replace(".local", "");
+
+  // get the ip address
   auto ip = info.addresses().first();
 
   // emit the signal

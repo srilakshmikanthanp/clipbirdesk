@@ -153,6 +153,7 @@
     "queue": "cpp",
     "stack": "cpp",
     "qsslcertificate": "cpp",
-    "qapplication": "cpp"
+    "qapplication": "cpp",
+    "singleapplication": "cpp"
   },
 }

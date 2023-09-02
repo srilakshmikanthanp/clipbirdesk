@@ -110,10 +110,12 @@ class Client : public service::mdnsBrowser {
     stream.commitTransaction();
   }
 
+  void processSslErrorsSecured(const QList<QSslError>& errors);
+
   /**
    * @brief Verify Server
    */
-  bool verifyCertificate(const QSslCertificate& certificate);
+  bool verifyCert(const QSslCertificate& certificate);
 
   /**
    * @brief Process SSL Errors
@@ -183,6 +185,15 @@ class Client : public service::mdnsBrowser {
    * @return QList<QPair<QHostAddress, quint16>> List of servers
    */
   QList<types::device::Device> getServerList() const;
+
+  /**
+   * @brief Connect to the server with the given host and port
+   * number
+   *
+   * @param host Host address
+   * @param port Port number
+   */
+  void connectToServerSecured(types::device::Device server);
 
   /**
    * @brief Connect to the server with the given host and port

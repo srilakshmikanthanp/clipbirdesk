@@ -10,16 +10,14 @@
 namespace srilakshmikanthanp::clipbirdesk::types::enums {
 /// @brief IP type used in the discovery packet
 enum class IPType : quint8 {
-  IPv4 = 0,
-  IPv6 = 1,
+  IPv4 = 0x00,
+  IPv6 = 0x01,
 };
 
 /// @brief Allowed Error Codes
 enum ErrorCode : quint8 {
   CodingError   = 0x01,
-  SSLError      = 0x02,
-  InvalidPacket = 0x03,
-  InvalidCert   = 0x04,
+  InvalidPacket = 0x02,
 };
 
 /// @brief Allowed Authentication Types

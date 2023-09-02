@@ -7,9 +7,16 @@
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 /**
+ * @brief Process Ssl Error Secured
+ */
+void Client::processSslErrorsSecured(const QList<QSslError>& errors) {
+  this->m_ssl_socket->abort();
+}
+
+/**
  * @brief Verify Server
  */
-bool Client::verifyCertificate(const QSslCertificate& certificate) {
+bool Client::verifyCert(const QSslCertificate& certificate) {
   // check the basic conditions
   if (certificate.isNull() || certificate.subjectInfo(QSslCertificate::CommonName).isEmpty()) {
     return false;
@@ -46,13 +53,32 @@ bool Client::verifyCertificate(const QSslCertificate& certificate) {
  * @brief Process SSL Errors
  */
 void Client::processSslErrors(const QList<QSslError>& errors) {
-  for (auto error: errors) {
-    if (error.error() == QSslError::SelfSignedCertificate && verifyCertificate(error.certificate())) {
-      this->m_ssl_socket->ignoreSslErrors();
-    } else {
-      this->m_ssl_socket->abort();
-      break;
-    }
+  // List of ignored SslErrors
+  QList<QSslError> ignoredErrors;
+
+  // Ignore the errors
+  ignoredErrors.append(QSslError(QSslError::SelfSignedCertificate));
+  ignoredErrors.append(QSslError(QSslError::CertificateUntrusted));
+
+  // make copy of errors
+  auto errorsCopy = errors;
+
+  // remove all the ignored errors
+  for (auto error : ignoredErrors) {
+    errorsCopy.removeOne(error);
+  }
+
+  // if errorsCopy is not empty
+  if (!errorsCopy.isEmpty()) {
+    return this->m_ssl_socket->abort();
+  }
+
+  // get certificate
+  const auto certificate = this->m_ssl_socket->peerCertificate();
+
+  // if any error occurred
+  if (errors.length() > 0 && !this->verifyCert(certificate)) {
+    return this->m_ssl_socket->abort();
   }
 }
 
@@ -196,13 +222,6 @@ Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
   const auto slot_r   = &Client::processReadyRead;
   connect(m_ssl_socket, signal_r, this, slot_r);
 
-  // connect the signals and slots for the socket
-  // sslErrors signal to emit the signal for
-  // OnErrorOccurred
-  const auto signal_s = &QSslSocket::sslErrors;
-  const auto slot_s   = &Client::processSslErrors;
-  connect(m_ssl_socket, signal_s, this, slot_s);
-
   // disconnected signal to emit the signal for
   // server state changed
   const auto signal_d = &QSslSocket::disconnected;
@@ -259,6 +278,41 @@ QList<types::device::Device> Client::getServerList() const {
 }
 
 /**
+ * @brief Connect to server Secured
+ */
+void Client::connectToServerSecured(types::device::Device server) {
+  // if Discover Configuration is null the return
+  if (this->m_ssl_config.isNull()) {
+    throw std::runtime_error("SSL Config Config is not set");
+  }
+
+  // set the ssl Configuration
+  m_ssl_socket->setSslConfiguration(m_ssl_config);
+
+  // check if the socket is connected
+  if (this->isConnected()) {
+    this->disconnectFromServer();
+  }
+
+  // disconnect the signals and slots for the socket
+  const auto signal_su = &QSslSocket::sslErrors;
+  const auto slot_su   = &Client::processSslErrors;
+  disconnect(m_ssl_socket, signal_su, this, slot_su);
+
+  // connect the signals and slots for the socket
+  const auto signal_ss = &QSslSocket::sslErrors;
+  const auto slot_ss   = &Client::processSslErrorsSecured;
+  connect(m_ssl_socket, signal_ss, this, slot_ss);
+
+  // create the host address
+  const auto host = server.ip.toString();
+  const auto port = server.port;
+
+  // connect to the server as encrypted
+  m_ssl_socket->connectToHostEncrypted(host, port);
+}
+
+/**
  * @brief Connect to the server with the given host and port
  * number
  *
@@ -278,6 +332,16 @@ void Client::connectToServer(types::device::Device server) {
   if (this->isConnected()) {
     this->disconnectFromServer();
   }
+
+  // disconnect the signals and slots for the socket
+  const auto signal_ss = &QSslSocket::sslErrors;
+  const auto slot_ss   = &Client::processSslErrorsSecured;
+  disconnect(m_ssl_socket, signal_ss, this, slot_ss);
+
+  // connect the signals and slots for the socket
+  const auto signal_su = &QSslSocket::sslErrors;
+  const auto slot_su   = &Client::processSslErrors;
+  connect(m_ssl_socket, signal_su, this, slot_su);
 
   // create the host address
   const auto host = server.ip.toString();
