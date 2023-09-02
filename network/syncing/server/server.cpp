@@ -38,31 +38,8 @@ void Server::processPendingConnections() {
     // add to un authenticated list
     m_unauthenticatedClients.append(client);
 
-    // List of ignored SslErrors
-    QList<QSslError::SslError> ignoredErrors;
-
-    // Ignore the errors
-    ignoredErrors.append(QSslError::SelfSignedCertificate);
-    ignoredErrors.append(QSslError::CertificateUntrusted);
-
-    // make copy of errors
-    auto errorsCopy = client->sslHandshakeErrors();
-
-    // remove all the ignored errors
-    auto itr = std::remove_if(errorsCopy.begin(), errorsCopy.end(), [&](auto error) {
-      return ignoredErrors.contains(error.error());
-    });
-
-    // remove the ignored errors
-    errorsCopy.erase(itr, errorsCopy.end());
-
-    // log the errors
-    for (auto error : errorsCopy) {
-      qWarning() << (LOG(std::to_string(error.error())));
-    }
-
     // Add the client to the list of authenticated clients
-    if (!errorsCopy.isEmpty()) {
+    if (!client->sslHandshakeErrors().isEmpty()) {
       emit OnAuthRequest(device);
     } else {
       this->authSuccess(device);
