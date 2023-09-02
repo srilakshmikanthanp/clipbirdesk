@@ -219,22 +219,9 @@ void Content::handleServerListChange(QList<types::device::Device> servers) {
  */
 void Content::handleServerStatusChanged(bool isConnected) {
   // infer the status from the server state
-  auto status_m  = isConnected ? Status::Connected : Status::Disconnected;
+  auto groupName = isConnected ? QString("-") : controller->getConnectedServer().name;
   auto servers   = controller->getServerList();
-  auto groupName = QString("-");
-
-  // if the client is Authed
-  if (isConnected) {
-    groupName = controller->getConnectedServer().name;
-  }
-
-  // set the server status
-  this->setGroupName(c_groupNameKey, groupName);
-  this->setStatus(c_statusKey, status_m);
-  this->setHostCount(c_hostsKey, servers.size());
-
-  // Create a list of tuple with Action
-  QList<components::Device::Value> servers_m;
+  auto status_m  = isConnected ? Status::Connected : Status::Disconnected;
 
   // get the action for the server
   const auto getAction = [=](const auto& s) {
@@ -250,6 +237,14 @@ void Content::handleServerStatusChanged(bool isConnected) {
       return Action::Connect;
     }
   };
+
+  // set the server status
+  this->setGroupName(c_groupNameKey, groupName);
+  this->setStatus(c_statusKey, status_m);
+  this->setHostCount(c_hostsKey, servers.size());
+
+  // Create a list of tuple with Action
+  QList<components::Device::Value> servers_m;
 
   // add the server to the list
   for (auto s : servers) {
