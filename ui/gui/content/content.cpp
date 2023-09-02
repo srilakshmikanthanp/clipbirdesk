@@ -116,6 +116,67 @@ void Content::handleServerStateChange(bool isStarted) {
   this->setClientList(clients_m);
 }
 
+/**
+ * @brief On New Host Connected
+ *
+ * @param client
+ */
+void Content::handleAuthRequest(const types::device::Device& client) {
+  // callback for host info looked up
+  const auto onHostInfoFound = [=](const QHostInfo& info) -> void {
+    // get the message to show
+    // clang-format off
+    auto message = QString(
+      "A New client Attempting to connect\n"
+      "Host: %1\n"
+      "Accept the connection?"
+    ).arg(
+      info.hostName()
+    );
+    // clang-format on
+
+    // get the user input
+    auto dialog = new QMessageBox();
+
+    // icon for the dialog
+    auto icon = QIcon(constants::getAppLogo().c_str());
+
+    // set the icon
+    dialog->setWindowIcon(icon);
+
+    // set the title
+    dialog->setWindowTitle("Clipbird");
+
+    // set the message
+    dialog->setText(message);
+
+    // set delete on close
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+    // set the buttons
+    dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+    // set the default button
+    dialog->setDefaultButton(QMessageBox::No);
+
+    // show the dialog
+    dialog->show();
+
+    // connect the dialog to window AuthSuccess signal
+    const auto signal_s = &QMessageBox::accepted;
+    const auto slot_s   = [=] { controller->authSuccess(client); };
+    connect(dialog, signal_s, slot_s);
+
+    // connect the dialog to window AuthFail signal
+    const auto signal_f = &QMessageBox::rejected;
+    const auto slot_f   = [=] { controller->authFailed(client); };
+    connect(dialog, signal_f, slot_f);
+  };
+
+  // lookup the host info
+  QHostInfo::lookupHost(client.ip.toString(), onHostInfoFound);
+}
+
 //----------------------------- slots for Client --------------------------//
 
 /**
@@ -340,6 +401,11 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto signal_st = &ClipBird::OnServerStateChanged;
   const auto slot_st   = &Content::handleServerStateChange;
   connect(controller, signal_st, this, slot_st);
+
+  // connect signal and slot for OnAuthRequest
+  const auto signal_or = &ClipBird::OnAuthRequest;
+  const auto slot_or = &Content::handleAuthRequest;
+  connect(controller, signal_or, this, slot_or);
 
   // Connect the signal and slot for server status change
   const auto signal_ss = &ClipBird::OnServerStatusChanged;

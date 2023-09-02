@@ -35,6 +35,10 @@ class Server : public service::mdnsRegister {
   /// @brief On Server State Changed
   void OnServerStateChanged(bool started);
 
+ signals:  // signals for this class
+  /// @brief On Sync Request
+  void OnAuthRequest(types::device::Device client);
+
  signals:  // signals
   /// @brief On Sync Request
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
@@ -54,8 +58,8 @@ class Server : public service::mdnsRegister {
 
  private:  // members of the class
 
-  /// @brief Authenticator
-  types::callable::Authenticator m_authenticator;
+  /// @brief List of clients Unauthenticated
+  QList<QSslSocket*> m_unauthenticatedClients;
 
   /// @brief List of clients Authenticated
   QList<QSslSocket*> m_clients;
@@ -117,11 +121,6 @@ class Server : public service::mdnsRegister {
    * @brief Process the connections that are pending
    */
   void processPendingConnections();
-
-  /**
-   * @brief Authenticate the client
-   */
-  bool authenticate(QSslSocket* client);
 
   /**
    * @brief Process SSL Errors
@@ -220,14 +219,24 @@ class Server : public service::mdnsRegister {
   void stopServer();
 
   /**
-   * @brief Set the Authenticator object
-   */
-  void setAuthenticator(types::callable::Authenticator auth);
-
-  /**
    * @brief Get the Dei=vice Certificate
    */
   QSslCertificate getClientCert(types::device::Device device) const;
+
+  /**
+   * @brief The function that is called when the client is authenticated
+   *
+   * @param client the client that is currently processed
+   */
+  void authSuccess(types::device::Device device);
+
+  /**
+   * @brief The function that is called when the client it not
+   * authenticated
+   *
+   * @param client the client that is currently processed
+   */
+  void authFailed(types::device::Device device);
 
  protected:  // override functions from the base class
 

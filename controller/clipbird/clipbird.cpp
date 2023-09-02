@@ -108,20 +108,23 @@ void ClipBird::setCurrentHostAsServer() {
   // Set the QSslConfiguration
   server->setSslConfiguration(m_sslConfig);
 
-  // set the authenticator
-  server->setAuthenticator(auth);
-
   // Connect the onClientStateChanged signal to the signal
+  const auto slot_hcs  = &ClipBird::handleClientStateChanged;
   const auto signal_cs = &Server::OnCLientStateChanged;
   const auto slot_cs   = &ClipBird::OnCLientStateChanged;
-  const auto slot_hcs  = &ClipBird::handleClientStateChanged;
   connect(server, signal_cs, this, slot_cs);
   connect(server, signal_cs, this, slot_hcs);
 
+  // connect OnAuthRequest to clipbird OnAuthRequest
+  // Connect the onSyncRequest signal to the clipboard
+  const auto signal_sa = &Server::OnAuthRequest;
+  const auto slot_sa   = &ClipBird::OnAuthRequest;
+  connect(server, signal_sa, this, slot_sa);
+
   // Connect the onSyncRequest signal to the clipboard
   const auto signal_sr = &Server::OnSyncRequest;
-  const auto slot_bs   = &clipboard::Clipboard::set;
-  connect(server, signal_sr, &m_clipboard, slot_bs);
+  const auto slot_sr   = &clipboard::Clipboard::set;
+  connect(server, signal_sr, &m_clipboard, slot_sr);
 
   // connect the OnClipboardChange signal to the server
   const auto signal_cc = &clipboard::Clipboard::OnClipboardChange;
@@ -229,20 +232,6 @@ void ClipBird::setSslConfiguration(QSslConfiguration config) {
  */
 QSslConfiguration ClipBird::getSslConfiguration() const {
   return m_sslConfig;
-}
-
-/**
- * @brief Set the Authenticator object
- */
-void ClipBird::setAuthenticator(types::callable::Authenticator auth) {
-  this->auth = auth;
-}
-
-/**
- * @brief Get the Authenticator object
- */
-types::callable::Authenticator ClipBird::getAuthenticator() const {
-  return auth;
 }
 
 /**
@@ -378,6 +367,33 @@ void ClipBird::disconnectAllClients() {
 types::device::Device ClipBird::getServerInfo() const {
   if (std::holds_alternative<Server>(m_host)) {
     return std::get<Server>(m_host).getServerInfo();
+  } else {
+    throw std::runtime_error("Host is not server");
+  }
+}
+
+/**
+ * @brief The function that is called when the client is authenticated
+ *
+ * @param client the client that is currently processed
+ */
+void ClipBird::authSuccess(const types::device::Device &client) {
+  if (std::holds_alternative<Server>(m_host)) {
+    std::get<Server>(m_host).authSuccess(client);
+  } else {
+    throw std::runtime_error("Host is not server");
+  }
+}
+
+/**
+ * @brief The function that is called when the client it not
+ * authenticated
+ *
+ * @param client the client that is currently processed
+ */
+void ClipBird::authFailed(const types::device::Device &client) {
+  if (std::holds_alternative<Server>(m_host)) {
+    std::get<Server>(m_host).authFailed(client);
   } else {
     throw std::runtime_error("Host is not server");
   }

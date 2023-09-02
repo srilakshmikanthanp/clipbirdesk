@@ -123,6 +123,13 @@ class Client : public service::mdnsBrowser {
   void processSslErrors(const QList<QSslError>& errors);
 
   /**
+   * @brief Process the Authentication Packet from the server
+   *
+   * @param packet Authentication
+   */
+  void processAuthentication(const packets::Authentication& packet);
+
+  /**
    * @brief Process the Invalid packet that has been received
    * from the server and emit the signal
    *

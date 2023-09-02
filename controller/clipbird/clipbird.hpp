@@ -54,6 +54,10 @@ class ClipBird : public QObject {
   void OnServerStateChanged(bool isStarted);
 
  signals:  // signals for this class
+  /// @brief On Sync Request
+  void OnAuthRequest(types::device::Device client);
+
+ signals:  // signals for this class
   /// @brief On Sync Request  (From Server)
   void OnClientListChanged(QList<types::device::Device> clients);
 
@@ -71,7 +75,6 @@ class ClipBird : public QObject {
   std::variant<Server, Client> m_host;
   QSslConfiguration m_sslConfig;
   clipboard::Clipboard m_clipboard;
-  types::callable::Authenticator auth;
 
  private:  // private slots
 
@@ -125,16 +128,6 @@ class ClipBird : public QObject {
    */
   QSslConfiguration getSslConfiguration() const;
 
-  /**
-   * @brief Set the Authenticator object
-   */
-  void setAuthenticator(types::callable::Authenticator auth);
-
-  /**
-   * @brief Get the Authenticator object
-   */
-  types::callable::Authenticator getAuthenticator() const;
-
   //------------------- Store functions ------------------------//
 
   /**
@@ -173,6 +166,21 @@ class ClipBird : public QObject {
    * @brief Get the server QHostAddress and port
    */
   types::device::Device getServerInfo() const;
+
+  /**
+   * @brief The function that is called when the client is authenticated
+   *
+   * @param client the client that is currently processed
+   */
+  void authSuccess(const types::device::Device &client);
+
+  /**
+   * @brief The function that is called when the client it not
+   * authenticated
+   *
+   * @param client the client that is currently processed
+   */
+  void authFailed(const types::device::Device &client);
 
   //---------------------- Client functions -----------------------//
 

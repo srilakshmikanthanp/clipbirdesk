@@ -39,52 +39,6 @@ class ClipbirdApplication : public SingleApplication {
  private:  // Member Functions
 
   /**
-   * @brief Authenticator for the client
-   */
-  bool authenticator(const types::device::Device& client) {
-    // clang-format off
-    auto message = QString(
-      "A New client Attempting to connect\n"
-      "Host: %1\n"
-      "Accept the connection?"
-    ).arg(client.name);
-    // clang-format on
-
-    // get the user input
-    auto dialog = QMessageBox();
-
-    // icon for the dialog
-    auto icon = QIcon(constants::getAppLogo().c_str());
-
-    // set the icon
-    dialog.setWindowIcon(icon);
-
-    // set the title
-    dialog.setWindowTitle("Clipbird");
-
-    // set the message
-    dialog.setText(message);
-
-    // set the buttons
-    dialog.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-
-    // set the default button
-    dialog.setDefaultButton(QMessageBox::No);
-
-    // set the icon
-    dialog.setIcon(QMessageBox::Question);
-
-    // set always on top
-    dialog.setWindowFlags(Qt::WindowStaysOnTopHint);
-
-    // show and get result
-    auto result = dialog.exec();
-
-    // return the result
-    return result == QMessageBox::Yes;
-  }
-
-  /**
    * @brief Get the certificate from App Home
    */
   QSslConfiguration getOldSslConfiguration() {
@@ -200,17 +154,11 @@ class ClipbirdApplication : public SingleApplication {
    * @param argv argument vector  [unused]
    */
   ClipbirdApplication(int &argc, char **argv) : SingleApplication(argc, argv) {
-    // bind the Authenticator function to this
-    auto authenticator = std::bind(&ClipbirdApplication::authenticator, this, std::placeholders::_1);
-
     // create the objects of the class
     controller = new controller::ClipBird();
 
     // set the ssl configuration
     controller->setSslConfiguration(this->getSslConfiguration());
-
-    // set the authenticator
-    controller->setAuthenticator(authenticator);
 
     // create the objects of the class
     content = new ui::gui::Content(controller);

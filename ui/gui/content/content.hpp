@@ -138,6 +138,11 @@ class Content : public QFrame {
    */
   void handleServerStateChange(bool isStarted);
 
+  /**
+   * @brief Handle the Client auth Request
+   */
+  void handleAuthRequest(const types::device::Device& client);
+
   //----------------------------- slots for Client --------------------------//
 
   /**
