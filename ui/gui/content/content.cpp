@@ -87,17 +87,9 @@ void Content::handleClientListChange(QList<types::device::Device> clients) {
  */
 void Content::handleServerStateChange(bool isStarted) {
   // infer the status from the server state
-  auto groupName  = QString("-");
+  auto groupName  = isStarted ? controller->getServerInfo().name : QString("-");
   auto status_m   = isStarted ? Status::Active : Status::Inactive;
   auto clients    = controller->getConnectedClientsList();
-
-  // if the server is started
-  if (isStarted) {
-    auto info  = controller->getServerInfo();
-    auto ip    = info.ip.toString();
-    auto port  = info.port;
-    groupName  = QHostInfo::fromName(ip).hostName();
-  }
 
   // set the server status
   this->setGroupName(s_groupNameKey, groupName);

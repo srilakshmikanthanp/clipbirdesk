@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
 # set project name and version
-project(clipbird VERSION 0.0.1 LANGUAGES CXX)
+project(clipbird VERSION 1.1.0 LANGUAGES CXX)
 
 # set c++ standard 17
 set(CMAKE_CXX_STANDARD 17)
@@ -105,6 +105,11 @@ qt_standard_project_setup()
 qt_add_resources(RESOURCES
   ${PROJECT_SOURCE_DIR}/assets/resources.qrc)
 
+# Add windows.rc to project
+if (WIN32)
+  set (RESOURCES ${RESOURCES} ${PROJECT_SOURCE_DIR}/assets/windows.rc)
+endif()
+
 # Add executable
 qt_add_executable(clipbird
   ${main_cpp} ${RESOURCES})
@@ -145,10 +150,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   target_compile_options(clipbird PRIVATE -std=c++17)
 endif()
 
-# add target linker options MSVC /NODEFAULTLIB:library
 # add target compiler options MSVC /std:c++17
 if(MSVC)
-  target_link_options(clipbird PRIVATE /NODEFAULTLIB:library)
   target_compile_options(clipbird PRIVATE /std:c++17)
 endif()
 

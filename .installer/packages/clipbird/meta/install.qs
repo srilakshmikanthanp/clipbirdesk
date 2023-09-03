@@ -61,7 +61,7 @@ Component.prototype.createOperations = function () {
       "@TargetDir@/clipbird.exe",
       "@StartMenuDir@/ClipBird.lnk",
       "workingDirectory=@TargetDir@",
-      "iconPath=@TargetDir@/logo.png",
+      "iconPath=@TargetDir@/logo.ico",
       "IconId=0",
       "description=ClipBird"
     );
