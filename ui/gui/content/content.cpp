@@ -211,7 +211,7 @@ void Content::handleServerListChange(QList<types::device::Device> servers) {
  */
 void Content::handleServerStatusChanged(bool isConnected) {
   // infer the status from the server state
-  auto groupName = isConnected ? QString("-") : controller->getConnectedServer().name;
+  auto groupName = isConnected ? controller->getConnectedServer().name : QString("-");
   auto servers   = controller->getServerList();
   auto status_m  = isConnected ? Status::Connected : Status::Disconnected;
 
