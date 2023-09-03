@@ -16,89 +16,139 @@ Storage::Storage(QObject *parent) : QObject(parent) {
 }
 
 /**
- * @brief Store Client hostname and JWT token
+ * @brief Store Client name and JWT token
  *
- * @param hostname
+ * @param name
  * @param token
  */
-void Storage::setClientCert(const QString &hostname, const QString &token) {
+void Storage::setClientCert(const QString &name, const QByteArray &token) {
   settings->beginGroup(clientGroup);
-  settings->setValue(hostname, token);
+  settings->setValue(name, token);
   settings->endGroup();
 }
 
 /**
- * @brief has the cert for the hostname
+ * @brief has the cert for the name
  */
-bool Storage::hasClientCert(const QString &hostname) {
+bool Storage::hasClientCert(const QString &name) {
   settings->beginGroup(clientGroup);
-  auto token = settings->value(hostname);
+  auto token = settings->value(name);
   settings->endGroup();
 
   return !token.isNull();
 }
 
 /**
- * @brief Get the JWT token for the hostname
+ * @brief Get the JWT token for the name
  *
- * @param hostname
+ * @param name
  * @return QString
  *
- * @throw std::invalid_argument if hostname not found
+ * @throw std::invalid_argument if name not found
  */
-QString Storage::getClientCert(const QString &hostname) {
+QByteArray Storage::getClientCert(const QString &name) {
   settings->beginGroup(clientGroup);
-  auto token = settings->value(hostname);
+  auto token = settings->value(name);
   settings->endGroup();
 
   if (token.isNull()) {
-    throw std::invalid_argument("hostname not found");
+    throw std::invalid_argument("name not found");
   }
 
-  return token.toString();
+  return token.toByteArray();
 }
 
 /**
- * @brief Store the server hostname and JWT token
+ * @brief Get All Client Certificates
+ */
+QList<QByteArray> Storage::getAllClientCert() {
+  QList<QByteArray> list;
+
+  settings->beginGroup(clientGroup);
+  for (auto &name : settings->childKeys()) {
+    auto cert = settings->value(name);
+    list.append(cert.toByteArray());
+  }
+  settings->endGroup();
+
+  return list;
+}
+
+/**
+ * @brief Store the server name and JWT token
  *
- * @param hostname
+ * @param name
  * @param token
  */
-void Storage::setServerCert(const QString &hostname, const QString &token) {
+void Storage::setServerCert(const QString &name, const QByteArray &token) {
   settings->beginGroup(serverGroup);
-  settings->setValue(hostname, token);
+  settings->setValue(name, token);
   settings->endGroup();
 }
 
 /**
- * @brief has the cert for the hostname
+ * @brief has the cert for the name
  */
-bool Storage::hasServerCert(const QString &hostname) {
+bool Storage::hasServerCert(const QString &name) {
   settings->beginGroup(serverGroup);
-  auto token = settings->value(hostname);
+  auto token = settings->value(name);
   settings->endGroup();
 
   return !token.isNull();
 }
 
 /**
- * @brief Get the JWT token for the hostname
+ * @brief Clear the client cert
+ */
+void Storage::clearClientCert(const QString &name) {
+  settings->beginGroup(clientGroup);
+  settings->remove(name);
+  settings->endGroup();
+}
+
+/**
+ * @brief Clear the client cert
+ */
+void Storage::clearAllClientCert() {
+  settings->beginGroup(clientGroup);
+  settings->remove("");
+  settings->endGroup();
+}
+
+/**
+ * @brief Get the JWT token for the name
  *
- * @param hostname
+ * @param name
  * @return QString
  *
- * @throw std::invalid_argument if hostname not found
+ * @throw std::invalid_argument if name not found
  */
-QString Storage::getServerCert(const QString &hostname) {
+QByteArray Storage::getServerCert(const QString &name) {
   settings->beginGroup(serverGroup);
-  auto token = settings->value(hostname);
+  auto token = settings->value(name);
   settings->endGroup();
 
   if (token.isNull()) {
-    throw std::invalid_argument("hostname not found");
+    throw std::invalid_argument("name not found");
   }
 
-  return token.toString();
+  return token.toByteArray();
+}
+
+/**
+ * @brief Get All Server Certificates
+ */
+QList<QByteArray> Storage::getAllServerCert() {
+  QList<QByteArray> list;
+
+  settings->beginGroup(serverGroup);
+  for (auto &name : settings->childKeys()) {
+    auto cert = settings->value(name);
+    list.append(cert.toByteArray());
+  }
+  settings->endGroup();
+
+  return list;
 }
 
 /**
@@ -109,6 +159,24 @@ QString Storage::getServerCert(const QString &hostname) {
 void Storage::setHostIsServer(bool isServer) {
   settings->beginGroup(generalGroup);
   settings->setValue(hostStateKey, isServer);
+  settings->endGroup();
+}
+
+/**
+ * @brief Clear the server cert
+ */
+void Storage::clearServerCert(const QString &name) {
+  settings->beginGroup(serverGroup);
+  settings->remove(name);
+  settings->endGroup();
+}
+
+/**
+ * @brief Clear the server cert
+ */
+void Storage::clearAllServerCert() {
+  settings->beginGroup(serverGroup);
+  settings->remove("");
   settings->endGroup();
 }
 
@@ -126,7 +194,15 @@ bool Storage::getHostIsServer() {
   if (isServer.isNull()) {
     return false;
   }
-
+  const auto s = isServer.toBool();
   return isServer.toBool();
+}
+
+/**
+ * @brief Instance of the storage
+ */
+Storage& Storage::instance() {
+  static Storage instance;
+  return instance;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::storage

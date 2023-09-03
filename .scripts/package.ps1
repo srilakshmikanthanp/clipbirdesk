@@ -24,11 +24,11 @@ Remove-Item -Recurse -Force $ClipbirDir/* -Exclude .gitignore
 
 # Copy All openssl dlls to the package directory
 Write-Host "Copying $env:OPENSSL_ROOT_DIR /bin/*.dll to $ClipbirDir" -ForegroundColor Green
-Copy-Item "$env:OPENSSL_ROOT_DIR /bin/*.dll" $ClipbirDir
+Copy-Item "$env:OPENSSL_ROOT_DIR/bin/*.dll" $ClipbirDir
 
 # copy the Logo to the package directory
-Write-Host "Copying ./assets/images/logo.png to $ClipbirDir" -ForegroundColor Green
-Copy-Item ./assets/images/logo.png $ClipbirDir
+Write-Host "Copying ./assets/images/* to $ClipbirDir" -ForegroundColor Green
+Copy-Item ./assets/images/* $ClipbirDir
 
 # Create the package as BuildType (to lower) version
 Write-Host "Creating the package as Release version" -ForegroundColor Green

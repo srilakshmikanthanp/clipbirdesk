@@ -14,19 +14,21 @@ namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
  * @param isAdded
  * @param const QHostInfo& info
  */
-void Browser::onHostResolved(bool isAdded, quint16 port, const QHostInfo& info) {
+void Browser::onHostResolved(bool isAdded, quint16 port, QString srvName, const QHostInfo& info) {
   // check for error
   if (info.error() != QHostInfo::NoError || info.addresses().isEmpty()) {
-    // log the error with qt
     qWarning() << LOG("Unable to resolve service");
     return;
   }
+
+  // remove the .local from srv name
+  srvName.replace(".local.", "");
 
   // get the ip address
   auto ip = info.addresses().first();
 
   // emit the signal
-  isAdded ? emit onServiceAdded({ip, port}) : emit onServiceRemoved({ip, port});
+  isAdded ? emit onServiceAdded({ip, port, srvName}) : emit onServiceRemoved({ip, port, srvName});
 }
 
 /**
@@ -144,6 +146,7 @@ void Browser::addedCallback(
     browserObj,                                      // this
     true,                                            // Removed
     ntohs(port),                                     // port
+    QString::fromUtf8(hosttarget),                   // srvName
     std::placeholders::_1                            // QHostInfo
   );
 
@@ -190,6 +193,7 @@ void Browser::removeCallback(
     browserObj,                                      // this
     false,                                           // Removed
     ntohs(port),                                     // port
+    QString::fromUtf8(hosttarget),                   // srvName
     std::placeholders::_1                            // QHostInfo
   );
 

@@ -14,6 +14,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
 TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   // set the Menu Items
   this->addAction("About", this, &TrayMenu::OnAboutClicked);
+  this->addAction("Reset", this, &TrayMenu::OnResetClicked);
   this->addAction("Issue", this, &TrayMenu::OnIssueClicked);
   this->addSeparator();
   this->addAction("Exit", this, &TrayMenu::OnExitClicked);

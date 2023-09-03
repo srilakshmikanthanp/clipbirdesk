@@ -24,15 +24,15 @@ void Logger::handler(QtMsgType type, const QMessageLogContext &context, const QS
                      .arg(msg)
                      .toLocal8Bit();
 
-  mutex.lock();         // lock the file so another thread can't write to it
-  logs->write(message); // write the message
-  mutex.unlock();       // unlock the file so another thread can write to it
+  mutex.lock();                     // lock the file so another thread can't write to it
+  (*logs) << message << Qt::endl;   // write the message to the log file
+  mutex.unlock();                   // unlock the file so another thread can write to it
 }
 
 /**
  * @brief Set the log file
  */
-void Logger::setLogFile(QFile *file) {
+void Logger::setLogStream(QTextStream *file) {
   Logger::logs = file;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::logging

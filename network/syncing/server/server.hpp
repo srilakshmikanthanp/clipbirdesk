@@ -13,8 +13,8 @@
 #include <QSslSocket>
 #include <QVector>
 
-#include "network/packets/authentication/authentication.hpp"
-#include "network/service/index.hpp"
+#include "network/service/service.hpp"
+#include "types/device/device.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
@@ -28,15 +28,15 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 class Server : public service::mdnsRegister {
  signals:  // signals
   /// @brief On client state changed
-  void OnCLientStateChanged(QPair<QHostAddress, quint16>, bool connected);
-
- signals:  // signals for this class
-  /// @brief On New Host Connected
-  void OnNewHostConnected(QPair<QHostAddress, quint16>);
+  void OnCLientStateChanged(types::device::Device, bool connected);
 
  signals:  // signals for this class
   /// @brief On Server State Changed
   void OnServerStateChanged(bool started);
+
+ signals:  // signals for this class
+  /// @brief On Sync Request
+  void OnAuthRequest(types::device::Device client);
 
  signals:  // signals
   /// @brief On Sync Request
@@ -44,8 +44,7 @@ class Server : public service::mdnsRegister {
 
  signals:  // signals for this class
   /// @brief On Sync Request
-  void OnClientListChanged(QList<QPair<QHostAddress, quint16>> clients);
-
+  void OnClientListChanged(QList<types::device::Device> clients);
 
  private:  // just for Qt
 
@@ -58,14 +57,14 @@ class Server : public service::mdnsRegister {
 
  private:  // members of the class
 
-  /// @brief SSL server
-  QSslServer* m_ssl_server = new QSslServer(this);
-
-  /// @brief List of clients unauthenticated
-  QList<QSslSocket*> m_un_authed_clients;
+  /// @brief List of clients Unauthenticated
+  QList<QSslSocket*> m_unauthenticatedClients;
 
   /// @brief List of clients Authenticated
-  QList<QSslSocket*> m_authed_clients;
+  QList<QSslSocket*> m_clients;
+
+  /// @brief SSL server
+  QSslServer* m_server = new QSslServer(this);
 
  private:  // some typedefs
 
@@ -91,23 +90,13 @@ class Server : public service::mdnsRegister {
     stream.startTransaction();
 
     // write the data to the stream
-    auto wrote = 0;
+    auto wrote = 0L;
 
     // write the packet length
     while (wrote < data.size()) {
-      // try to write the data
       auto bytes = stream.writeRawData(data.data() + wrote, data.size() - wrote);
-
-      // if no error occurred
-      if (bytes != -1) {
-        wrote += bytes; continue;
-      }
-
-      // abort the transaction
-      stream.abortTransaction();
-
-      //  Notifies the error occurred
-      qWarning() << (LOG(client->errorString().toStdString()));
+      wrote = wrote + bytes;
+      if (bytes == -1) { stream.abortTransaction(); break; }
     }
 
     // commit the transaction
@@ -122,10 +111,25 @@ class Server : public service::mdnsRegister {
    */
   template <typename Packet>
   void sendPacket(const Packet& pack, QSslSocket* except = nullptr) {
-    for (auto client : m_authed_clients) {
+    for (auto client : m_clients) {
       if (client != except) sendPacket(client, pack);
     }
   }
+
+  /**
+   * @brief Process the connections that are pending
+   */
+  void processPendingConnections();
+
+  /**
+   * @brief Process SSL Errors
+   */
+  void processSslErrors(QSslSocket *, const QList<QSslError>& errors);
+
+  /**
+   * @brief Process the disconnection from the client
+   */
+  void processDisconnection();
 
   /**
    * @brief Process the SyncingPacket from the client
@@ -135,25 +139,10 @@ class Server : public service::mdnsRegister {
   void processSyncingPacket(const packets::SyncingPacket& packet);
 
   /**
-   * @brief Process the connections that are pending
-   */
-  void processConnections();
-
-  /**
    * @brief Callback function that process the ready
    * read from the client
    */
   void processReadyRead();
-
-  /**
-   * @brief Process the disconnection from the client
-   */
-  void processDisconnection();
-
-  /**
-   * @brief On Service Registered
-   */
-  void OnServiceRegistered();
 
  public:  // constructors and destructors
 
@@ -181,10 +170,8 @@ class Server : public service::mdnsRegister {
 
   /**
    * @brief Get the Clients that are connected to the server
-   *
-   * @return QList<QSslSocket*> List of clients
    */
-  QList<QPair<QHostAddress, quint16>> getConnectedClientsList() const;
+  QList<types::device::Device> getConnectedClientsList() const;
 
   /**
    * @brief Disconnect the client from the server and delete
@@ -192,7 +179,7 @@ class Server : public service::mdnsRegister {
    *
    * @param client Client to disconnect
    */
-  void disconnectClient(QPair<QHostAddress, quint16> client);
+  void disconnectClient(types::device::Device client);
 
   /**
    * @brief Disconnect the all the clients from the server
@@ -202,37 +189,23 @@ class Server : public service::mdnsRegister {
   /**
    * @brief Get the Server QHostAddress & Port
    *
-   * @return QPair<QHostAddress, quint16>
+   * @return types::device::Device
    */
-  QPair<QHostAddress, quint16> getServerInfo() const;
+  types::device::Device getServerInfo() const;
 
   /**
    * @brief Set the SSL Configuration object
    *
    * @param config SSL Configuration
    */
-  void setSSLConfiguration(QSslConfiguration config);
+  void setSslConfiguration(QSslConfiguration config);
+
   /**
    * @brief Get the SSL Configuration object
    *
    * @return QSslConfiguration
    */
   QSslConfiguration getSSLConfiguration() const;
-
-  /**
-   * @brief The function that is called when the client is authenticated
-   *
-   * @param client the client that is currently processed
-   */
-  void authSuccess(const QPair<QHostAddress, quint16>&);
-
-  /**
-   * @brief The function that is called when the client it not
-   * authenticated
-   *
-   * @param client the client that is currently processed
-   */
-  void authFailed(const QPair<QHostAddress, quint16>&);
 
   /**
    * @brief Start the server
@@ -245,33 +218,24 @@ class Server : public service::mdnsRegister {
   void stopServer();
 
   /**
-   * @brief Send the packet to the client
-   *
-   * @param packet Packet to send
-   * @param QPair {QHostAddress, port}
+   * @brief Get the Dei=vice Certificate
    */
-  template <typename Packet>
-  void sendToClient(const Packet &packet, const QPair<QHostAddress, quint16> &client) {
-    // Matcher Lambda Function to find the client
-    const auto matcher = [&client](QSslSocket *c) {
-      return (c->peerAddress() == client.first) && (c->peerPort() == client.second);
-    };
+  QSslCertificate getClientCert(types::device::Device device) const;
 
-    // Get the iterator to the start and end of the list
-    auto start      = m_authed_clients.begin();
-    auto end        = m_authed_clients.end();
+  /**
+   * @brief The function that is called when the client is authenticated
+   *
+   * @param client the client that is currently processed
+   */
+  void authSuccess(types::device::Device device);
 
-    // Get the client from the unauthenticated list and remove it
-    auto client_itr = std::find_if(start, end, matcher);
-
-    // If the client is not found then return from the function
-    if (client_itr == m_authed_clients.end()) {
-      throw std::runtime_error("Client not found");
-    }
-
-    // send the packet to the client
-    this->sendPacket(packet, (*client_itr));
-  }
+  /**
+   * @brief The function that is called when the client it not
+   * authenticated
+   *
+   * @param client the client that is currently processed
+   */
+  void authFailed(types::device::Device device);
 
  protected:  // override functions from the base class
 

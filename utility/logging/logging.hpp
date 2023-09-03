@@ -30,7 +30,7 @@ class Logger {
   };
 
   /// @brief log file to log the messages
-  inline static QFile *logs = Q_NULLPTR;
+  inline static QTextStream *logs = Q_NULLPTR;
 
   /// @brief mutex to lock the file
   inline static QMutex mutex;
@@ -40,11 +40,15 @@ class Logger {
   /**
    * @brief Custom Logger message handler for Qt
    */
-  static void handler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+  static void handler(
+    QtMsgType type,                      // type of the message
+    const QMessageLogContext &context,   // context of the message
+    const QString &msg                   // message
+  );
 
   /**
    * @brief Set the log file
    */
-  static void setLogFile(QFile *file);
+  static void setLogStream(QTextStream *file);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::logging

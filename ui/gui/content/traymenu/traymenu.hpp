@@ -26,6 +26,9 @@ class TrayMenu : public QMenu {
   void OnIssueClicked();
 
  signals:  // signals
+  void OnResetClicked();
+
+ signals:  // signals
   void OnExitClicked();
 
  public:  // Member function

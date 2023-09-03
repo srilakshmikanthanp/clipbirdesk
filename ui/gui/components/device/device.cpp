@@ -7,19 +7,6 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 /**
- * @brief Called when host is resolved
- *
- * @param info
- */
-void Device::onHostResolved(const QHostInfo &info) {
-  if (info.error() != QHostInfo::NoError) {
-    this->hostName->setText("Unknown");
-  }
-
-  this->hostName->setText(info.hostName());
-}
-
-/**
  * @brief Construct a new Device object
  * with parent as QWidget
  * @param parent parent object
@@ -27,7 +14,7 @@ void Device::onHostResolved(const QHostInfo &info) {
 Device::Device(QWidget *parent) : QWidget(parent) {
   // connect the button signal to this signal
   QObject::connect(actBtn, &QPushButton::clicked, [this]() {
-    emit onAction({address, port, action});
+    emit onAction({device, action});
   });
 
   // vertical alignment of the labels as center
@@ -51,17 +38,14 @@ Device::Device(QWidget *parent) : QWidget(parent) {
 
 /**
  * @brief Set the Device
- *
- * @param QPair<QHostAddress, quint16>
  */
 void Device::setHost(Device::Value host) {
   // set the address and port
-  this->address = std::get<0>(host);
-  this->port    = std::get<1>(host);
-  this->action  = std::get<2>(host);
+  this->device  = std::get<0>(host);
+  this->action  = std::get<1>(host);
 
   // set the host name
-  this->hostName->setText("Resolving...");
+  this->hostName->setText(device.name);
 
   // action text to set
   const auto a = action == Action::Disconnect ? disconnect : connect;
@@ -71,17 +55,12 @@ void Device::setHost(Device::Value host) {
 
   // set the object name to identify
   this->actBtn->setObjectName(a);
-
-  // lookup the host name and change
-  QHostInfo::lookupHost(address.toString(), this, &Device::onHostResolved);
 }
 
 /**
  * @brief Get the Device
- *
- * @return QPair<QHostAddress, quint16>
  */
 Device::Value Device::getHost() const {
-  return std::make_tuple(address, port, action);
+  return std::make_tuple(device, action);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

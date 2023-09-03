@@ -50,11 +50,17 @@ quint8 InvalidRequest::getPacketType() const noexcept {
  * @param code
  */
 void InvalidRequest::setErrorCode(quint8 code) {
-  if (code != types::enums::ErrorCode::CodingError) {
-    throw std::invalid_argument("Invalid Error Code");
+  if (code == types::enums::ErrorCode::InvalidPacket) {
+    this->errorCode = code;
+    return;
   }
 
-  this->errorCode = code;
+  if (code == types::enums::ErrorCode::CodingError) {
+    this->errorCode = code;
+    return;
+  }
+
+  throw std::invalid_argument("Invalid Error Code");
 }
 
 /**
@@ -172,8 +178,14 @@ QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
   // using some types
   using types::enums::ErrorCode;
 
+  // allowed
+  const auto allowed = std::vector<int>{
+    ErrorCode::InvalidPacket,
+    ErrorCode::CodingError
+  };
+
   // check the error code
-  if (packet.errorCode != ErrorCode::CodingError && packet.errorCode != ErrorCode::SSLError) {
+  if (std::find(allowed.begin(), allowed.end(), packet.errorCode) == allowed.end()) {
     throw MalformedPacket(types::enums::CodingError, "Invalid Error Code");
   }
 

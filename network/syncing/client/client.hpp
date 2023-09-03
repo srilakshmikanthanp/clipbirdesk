@@ -7,22 +7,26 @@
 
 // Qt headers
 #include <QByteArray>
+#include <QSslCertificate>
 #include <QDateTime>
 #include <QList>
 #include <QObject>
 #include <QSslConfiguration>
+#include <QSslKey>
 #include <QSslServer>
 #include <QSslSocket>
 #include <QTimer>
 #include <QVector>
+#include <QNetworkReply>
 
 // standard headers
 #include <tuple>
 #include <utility>
 
 // Local headers
-#include "network/service/index.hpp"
+#include "network/service/service.hpp"
 #include "types/enums/enums.hpp"
+#include "types/device/device.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"
@@ -35,23 +39,19 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 class Client : public service::mdnsBrowser {
  signals:  // signals for this class
   /// @brief On Server List Changed
-  void OnServerListChanged(QList<QPair<QHostAddress, quint16>> servers);
+  void OnServerListChanged(QList<types::device::Device> servers);
 
  signals:  // signals for this class
   /// @brief On Server Found
-  void OnServerFound(QPair<QHostAddress, quint16>);
+  void OnServerFound(types::device::Device);
 
  signals:  // signals for this class
   /// @brief On Server Gone
-  void OnServerGone(QPair<QHostAddress, quint16>);
+  void OnServerGone(types::device::Device);
 
  signals:  // signals for this class
   /// @brief On Server state changed
   void OnServerStatusChanged(bool isConnected);
-
- signals:  // signals for this class
-  /// @brief On Server Auth Succeed
-  void OnServerAuthentication(bool isSuccessful);
 
  signals:  // signals for this class
   /// @brief On Sync Request
@@ -69,14 +69,14 @@ class Client : public service::mdnsBrowser {
 
  private:  // Member variables
 
-  /// @brief List of Found servers and timestamp
-  QList<std::tuple<QHostAddress, quint16>> m_servers;
-
-  /// @brief SSL socket
+  /// @brief SSL socket for the client
   QSslSocket* m_ssl_socket = new QSslSocket(this);
 
-  /// @brief is Server Authenticated Me
-  bool m_is_authed = false;
+  /// @brief SSL configuration
+  QSslConfiguration m_ssl_config;
+
+  /// @brief List of Found servers
+  QList<types::device::Device> m_servers;
 
  private:  // private functions
 
@@ -101,24 +101,26 @@ class Client : public service::mdnsBrowser {
 
     // write the packet length
     while (wrote < data.size()) {
-      // try to write the data
       auto bytes = stream.writeRawData(data.data() + wrote, data.size() - wrote);
-
-      // if no error occurred
-      if (bytes != -1) {
-        wrote += bytes; continue;
-      }
-
-      // abort the transaction
-      stream.abortTransaction();
-
-      // log
-      qWarning() << LOG(m_ssl_socket->errorString().toStdString());
+      wrote = wrote + bytes;
+      if (bytes == -1) { stream.abortTransaction(); break; }
     }
 
     // commit the transaction
     stream.commitTransaction();
   }
+
+  void processSslErrorsSecured(const QList<QSslError>& errors);
+
+  /**
+   * @brief Verify Server
+   */
+  bool verifyCert(const QSslCertificate& certificate);
+
+  /**
+   * @brief Process SSL Errors
+   */
+  void processSslErrors(const QList<QSslError>& errors);
 
   /**
    * @brief Process the Authentication Packet from the server
@@ -126,14 +128,6 @@ class Client : public service::mdnsBrowser {
    * @param packet Authentication
    */
   void processAuthentication(const packets::Authentication& packet);
-
-  /**
-   * @brief Process the packet that has been received
-   * from the server and emit the signal
-   *
-   * @param packet Syncing packet
-   */
-  void processSyncingPacket(const packets::SyncingPacket& packet);
 
   /**
    * @brief Process the Invalid packet that has been received
@@ -145,24 +139,17 @@ class Client : public service::mdnsBrowser {
 
   /**
    * @brief Process the packet that has been received
+   * from the server and emit the signal
+   *
+   * @param packet Syncing packet
+   */
+  void processSyncingPacket(const packets::SyncingPacket& packet);
+
+  /**
+   * @brief Process the packet that has been received
    * from the server
    */
   void processReadyRead();
-
-  /**
-   * @brief Process the ssl error
-   */
-  void processSslError(const QList<QSslError>& errors);
-
-  /**
-   * @brief Handle client connected
-   */
-  void handleConnected();
-
-  /**
-   * @brief Handle client disconnected
-   */
-  void handleDisconnected();
 
  public:
 
@@ -182,6 +169,16 @@ class Client : public service::mdnsBrowser {
   ~Client() override = default;
 
   /**
+   * @brief Set SSL configuration
+   */
+  void setSslConfiguration(QSslConfiguration config);
+
+  /**
+   * @brief get the SSL configuration
+   */
+  QSslConfiguration getSslConfiguration() const;
+
+  /**
    * @brief Send the items to the server to sync the
    * clipboard data
    *
@@ -194,7 +191,7 @@ class Client : public service::mdnsBrowser {
    *
    * @return QList<QPair<QHostAddress, quint16>> List of servers
    */
-  QList<QPair<QHostAddress, quint16>> getServerList() const;
+  QList<types::device::Device> getServerList() const;
 
   /**
    * @brief Connect to the server with the given host and port
@@ -203,19 +200,26 @@ class Client : public service::mdnsBrowser {
    * @param host Host address
    * @param port Port number
    */
-  void connectToServer(QPair<QHostAddress, quint16> client);
+  void connectToServerSecured(types::device::Device server);
+
+  /**
+   * @brief Connect to the server with the given host and port
+   * number
+   *
+   * @param host Host address
+   * @param port Port number
+   */
+  void connectToServer(types::device::Device client);
+
+  /**
+   * @brief IS connected to the server
+   */
+  bool isConnected() const;
 
   /**
    * @brief Get the Connection Host and Port object
-   * @return QPair<QHostAddress, quint16>
    */
-  QPair<QHostAddress, quint16> getConnectedServer() const;
-
-  /**
-   * @brief Get the Connection Host and Port object Or Empty
-   * @return QPair<QHostAddress, quint16>
-   */
-  QPair<QHostAddress, quint16> getConnectedServerOrEmpty() const;
+  types::device::Device getConnectedServer() const;
 
   /**
    * @brief Disconnect from the server
@@ -223,33 +227,9 @@ class Client : public service::mdnsBrowser {
   void disconnectFromServer();
 
   /**
-   * @brief Get the Authed Server object
-   * @return QPair<QHostAddress, quint16>
+   * @brief Get the Server Certificate
    */
-  QPair<QHostAddress, quint16> getAuthedServer() const;
-
-  /**
-   * @brief Get the Authed Server object Or Empty
-   * @return QPair<QHostAddress, quint16>
-   */
-  QPair<QHostAddress, quint16> getAuthedServerOrEmpty() const;
-
-  /**
-   * @brief Send To Connected Server
-   *
-   * @tparam Packet
-   * @param pack
-   */
-  template <typename Packet>
-  void sendToConnectedServer(const Packet& pack) {
-    // if not connected
-    if (m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
-      throw std::runtime_error("Not connected to the server");
-    }
-
-    // send the packet
-    sendPacket(pack);
-  }
+  QSslCertificate getConnectedServerCertificate() const;
 
  protected:  // abstract functions from the base class
 
@@ -260,7 +240,7 @@ class Client : public service::mdnsBrowser {
    * @param host Host address
    * @param port Port number
    */
-  void onServiceAdded(QPair<QHostAddress, quint16> server) override;
+  void onServiceAdded(types::device::Device server) override;
 
   /**
    * @brief On server removed function that That Called by the
@@ -268,6 +248,6 @@ class Client : public service::mdnsBrowser {
    *
    * @param server
    */
-  void onServiceRemoved(QPair<QHostAddress, quint16> server) override;
+  void onServiceRemoved(types::device::Device server) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

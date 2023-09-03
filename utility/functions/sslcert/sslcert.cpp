@@ -62,7 +62,8 @@ std::shared_ptr<EVP_PKEY> generateRSAKey(int bits) {
  * @return X509* - shared pointer to certificate
  */
 std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey) {
-  // Allocate memory for the X509 structure.
+  // Allocate memory for the X509 structure & BIGNUM
+  std::unique_ptr<BIGNUM, decltype(&::BN_free)> sn(BN_new(), ::BN_free);
   std::shared_ptr<X509> x509(X509_new(), X509_free);
 
   // Expiry time
@@ -71,6 +72,59 @@ std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey) {
   // if x509 is null then throw an error
   if (x509.get() == NULL) {
     throw std::runtime_error("Can't Create X509");
+  }
+
+  // if sn is null then throw an error
+  if (sn.get() == NULL) {
+    throw std::runtime_error("Can't Create BIGNUM");
+  }
+
+  // Set the version to 2
+  if (!X509_set_version(x509.get(), 2)) {
+    throw std::runtime_error("Can't Set Version");
+  }
+
+  // Generate random number
+  if (!BN_rand(sn.get(), 160, -1, 0)) {
+    throw std::runtime_error("Can't Generate Random Number");
+  }
+
+  // Set the serial number
+  if (!BN_to_ASN1_INTEGER(sn.get(), X509_get_serialNumber(x509.get()))) {
+    throw std::runtime_error("Can't Set Serial Number");
+  }
+
+  // get local host name
+  auto cname = constants::getMDnsServiceName();
+  auto org   = constants::getAppOrgName();
+  auto unit  = constants::getAppName();
+
+  // get the subject name
+  X509_NAME *name = X509_get_subject_name(x509.get());
+
+  // set the common name
+  if(!X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, (const unsigned char *)cname.data(), -1, -1, 0)) {
+    throw std::runtime_error("Can't Set Subject Name");
+  }
+
+  // set the organization name
+  if(!X509_NAME_add_entry_by_txt(name, "O", MBSTRING_ASC, (const unsigned char *)org.c_str(), -1, -1, 0)) {
+    throw std::runtime_error("Can't Set Subject Name");
+  }
+
+  // set the unit name
+  if(!X509_NAME_add_entry_by_txt(name, "OU", MBSTRING_ASC, (const unsigned char *)unit.c_str(), -1, -1, 0)) {
+    throw std::runtime_error("Can't Set Subject Name");
+  }
+
+  // try to set the subject name
+  if (!X509_set_subject_name(x509.get(), name)) {
+    throw std::runtime_error("Can't Set Subject Name");
+  }
+
+  // Set the issuer name
+  if (!X509_set_issuer_name(x509.get(), name)) {
+    throw std::runtime_error("Can't Set Issuer Name");
   }
 
   // set Expiry date to 1 year
@@ -162,8 +216,8 @@ QSslConfiguration getQSslConfiguration(int bits) {
     throw std::runtime_error("Can't Create QSslConfiguration");
   }
 
-  // set the protocol to TLSv1_2
-  sslConfig.setProtocol(QSsl::TlsV1_2);
+  // set peer verify
+  sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
 
   // return the configuration
   return sslConfig;

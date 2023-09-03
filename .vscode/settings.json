@@ -14,7 +14,8 @@
     "pubkey",
     "qobject",
     "qvariant",
-    "SSLCONFIG"
+    "SSLCONFIG",
+    "unauthed"
   ],
   "files.associations": {
     ".env*": "dotenv",
@@ -148,6 +149,11 @@
     "*.qs": "javascript",
     ".qs": "javascript",
     "qsystemtrayicon": "cpp",
-    "qsettings": "cpp"
+    "qsettings": "cpp",
+    "queue": "cpp",
+    "stack": "cpp",
+    "qsslcertificate": "cpp",
+    "qapplication": "cpp",
+    "singleapplication": "cpp"
   },
 }

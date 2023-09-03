@@ -31,6 +31,7 @@
 
 // project headers
 #include "controller/clipbird/clipbird.hpp"
+#include "types/device/device.hpp"
 #include "ui/gui/components/device/device.hpp"
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/content/deviceinfo/deviceinfo.hpp"
@@ -87,7 +88,7 @@ class Content : public QFrame {
   ClipBird* controller;
 
  signals:  // signals
-  void onHostAction(Tabs tab, std::tuple<QHostAddress, quint16, Action>);
+  void onHostAction(Tabs tab, std::tuple<types::device::Device, Action>);
 
  signals:  // signals
   void onTabChanged(Tabs tab);  // emit when tab changed
@@ -113,7 +114,7 @@ class Content : public QFrame {
   /**
    * @brief handle the host action from the window
    */
-  void handleHostAction(Tabs t, std::tuple<QHostAddress, quint16, Action> h);
+  void handleHostAction(Tabs t, std::tuple<types::device::Device, Action> h);
 
   /**
    * @brief On Tab Changed for Client
@@ -130,7 +131,7 @@ class Content : public QFrame {
   /**
    * @brief Handle the Client List Item Clicked
    */
-  void handleClientListChange(QList<QPair<QHostAddress, quint16>> clients);
+  void handleClientListChange(QList<types::device::Device> clients);
 
   /**
    * @brief Handle the Server State Change
@@ -138,23 +139,16 @@ class Content : public QFrame {
   void handleServerStateChange(bool isStarted);
 
   /**
-   * @brief On New Host Connected
-   *
-   * @param client
+   * @brief Handle the Client auth Request
    */
-  void handleNewHostConnected(const QPair<QHostAddress, quint16> &client);
+  void handleAuthRequest(const types::device::Device& client);
 
   //----------------------------- slots for Client --------------------------//
 
   /**
    * @brief Handle the Server List Item Clicked
    */
-  void handleServerListChange(QList<QPair<QHostAddress, quint16>> servers);
-
-  /**
-   * @brief Handle the Server Authentication
-   */
-  void handleServerAuthentication(bool isAuthed);
+  void handleServerListChange(QList<types::device::Device> servers);
 
   /**
    * @brief Handle the server status change
@@ -172,6 +166,11 @@ class Content : public QFrame {
    * @brief On Issue Clicked
    */
   void onIssueClicked();
+
+  /**
+   * @brief On Reset Clicked
+   */
+  void onResetClicked();
 
  public:
 
@@ -231,22 +230,22 @@ class Content : public QFrame {
   /**
    * @brief Set the Server List object
    */
-  void setClientList(const QList<std::tuple<QHostAddress, quint16, Action>>& hosts);
+  void setClientList(const QList<std::tuple<types::device::Device, Action>>& hosts);
 
   /**
    * @brief Get the Server List object
    */
-  QList<std::tuple<QHostAddress, quint16, Action>> getClientList();
+  QList<std::tuple<types::device::Device, Action>> getClientList();
 
   /**
    * @brief Add Server to the list
    */
-  void addClient(std::tuple<QHostAddress, quint16, Action> host);
+  void addClient(std::tuple<types::device::Device, Action> host);
 
   /**
    * @brief Remove a Server from the list
    */
-  void removeClient(std::tuple<QHostAddress, quint16, Action> host);
+  void removeClient(std::tuple<types::device::Device, Action> host);
 
   /**
    * @brief Remove all servers from the list
@@ -258,22 +257,22 @@ class Content : public QFrame {
   /**
    * @brief Set the Server List object
    */
-  void setServerList(const QList<std::tuple<QHostAddress, quint16, Action>>& hosts);
+  void setServerList(const QList<std::tuple<types::device::Device, Action>>& hosts);
 
   /**
    * @brief Get the Server List from the tab
    */
-  QList<std::tuple<QHostAddress, quint16, Action>> getServerList();
+  QList<std::tuple<types::device::Device, Action>> getServerList();
 
   /**
    * @brief Add Server to the list
    */
-  void addServer(std::tuple<QHostAddress, quint16, Action> host);
+  void addServer(std::tuple<types::device::Device, Action> host);
 
   /**
    * @brief Remove a Server from the list
    */
-  void removeServer(std::tuple<QHostAddress, quint16, Action> host);
+  void removeServer(std::tuple<types::device::Device, Action> host);
 
   /**
    * @brief Remove all servers from the list

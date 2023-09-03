@@ -7,6 +7,138 @@
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 /**
+ * @brief Process the connections that are pending
+ */
+void Server::processPendingConnections() {
+  while (m_server->hasPendingConnections()) {
+    // Get the client that has been connected
+    auto client = qobject_cast<QSslSocket *>(m_server->nextPendingConnection());
+
+    // Connect the disconnected signal to the processDisconnection function
+    const auto signal_d = &QSslSocket::disconnected;
+    const auto slot_d   = &Server::processDisconnection;
+    QObject::connect(client, signal_d, this, slot_d);
+
+    // Connect the readyRead signal to the processReadyRead function
+    const auto signal_r = &QSslSocket::readyRead;
+    const auto slot_r   = &Server::processReadyRead;
+    QObject::connect(client, signal_r, this, slot_r);
+
+    // get the device info of the client
+    auto addr = client->peerAddress();
+    auto port = client->peerPort();
+    auto cert = client->peerCertificate();
+    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+
+    // create device object of the client
+    auto device = types::device::Device {
+      addr, port, name
+    };
+
+    // add to un authenticated list
+    m_unauthenticatedClients.append(client);
+
+    // Add the client to the list of authenticated clients
+    if (!client->sslHandshakeErrors().isEmpty()) {
+      emit OnAuthRequest(device);
+    } else {
+      this->authSuccess(device);
+    }
+  }
+}
+
+/**
+ * @brief Process SSL Errors
+ */
+void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors) {
+  // List of ignored SslErrors
+  QList<QSslError::SslError> ignoredErrors;
+
+  // Ignore the errors
+  ignoredErrors.append(QSslError::SelfSignedCertificate);
+  ignoredErrors.append(QSslError::CertificateUntrusted);
+
+  // make copy of errors
+  auto errorsCopy = errors;
+
+  // remove all the ignored errors
+  auto itr = std::remove_if(errorsCopy.begin(), errorsCopy.end(), [&](auto error) {
+    return ignoredErrors.contains(error.error());
+  });
+
+  // remove the ignored errors
+  errorsCopy.erase(itr, errorsCopy.end());
+
+  // log the errors
+  for (auto error : errorsCopy) {
+    qWarning() << (LOG(std::to_string(error.error())));
+  }
+
+  // if errorsCopy is not empty
+  if (!errorsCopy.isEmpty()) {
+    return socket->abort();
+  }
+
+  // peer info of the client that is connected
+  auto addr = socket->peerAddress();
+  auto port = socket->peerPort();
+  auto cert = socket->peerCertificate();
+  auto name = cert.subjectInfo(QSslCertificate::CommonName);
+
+  // if certificate is null or common name is empty
+  if (cert.isNull() || name.isEmpty()) {
+    return socket->abort();
+  }
+
+  // create the device
+  auto device = types::device::Device {
+    addr, port, name.constFirst()
+  };
+
+  // just ignore wait for user
+  socket->ignoreSslErrors();
+}
+
+/**
+ * @brief Process the disconnection from the client
+ */
+void Server::processDisconnection() {
+  // Get the client that was disconnected
+  auto client = qobject_cast<QSslSocket *>(sender());
+
+  // if in unauthenticated list
+  if (m_unauthenticatedClients.removeOne(client)) {
+    return;
+  }
+
+  // if not in authenticated list
+  if (!m_clients.contains(client)) return;
+
+  // peer information of the client
+  auto addr = client->peerAddress();
+  auto port = client->peerPort();
+  auto cert = client->peerCertificate();
+  auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+
+  // create the device
+  auto device = types::device::Device {
+    addr, port, name
+  };
+
+  // Remove the client from the list of clients
+  m_clients.removeOne(client);
+
+  // Notify the listeners that the client is disconnected
+  emit OnCLientStateChanged(device, false);
+
+  // get connected client list
+  auto list = getConnectedClientsList();
+
+  // Notify the listeners that the client list is changed
+  emit OnClientListChanged(list);
+}
+
+/**
  * @brief Process the SyncingPacket from the client
  *
  * @param packet SyncingPacket
@@ -22,38 +154,12 @@ void Server::processSyncingPacket(const packets::SyncingPacket &packet) {
 
   // Notify the listeners to sync the data
   emit OnSyncRequest(items);
-}
 
-/**
- * @brief Process the connections that are pending
- */
-void Server::processConnections() {
-  while (m_ssl_server->hasPendingConnections()) {
-    // Get the client that has been connected
-    auto client_tcp = (m_ssl_server->nextPendingConnection());
-    auto client_tls = qobject_cast<QSslSocket *>(client_tcp);
+  // get the Sender of the packet
+  auto client = qobject_cast<QSslSocket *>(sender());
 
-    // If the client is not SSL client then disconnect
-    if (client_tls == nullptr) {
-      const auto packType = packets::InvalidRequest::PacketType::RequestFailed;
-      const auto code     = types::enums::ErrorCode::SSLError;
-      const auto message  = "Client is not SSL client";
-
-      using utility::functions::createPacket;
-      this->sendPacket(client_tls, createPacket({packType, code, message}));
-      client_tcp->disconnectFromHost();
-    } else {
-      // add the client to unauthenticated list
-      m_un_authed_clients.append(client_tls);
-
-      // get the peer address ans port
-      const auto peerAddress = client_tls->peerAddress();
-      const auto peerPort    = client_tls->peerPort();
-
-      // emit the signal that new host is connected
-      emit OnNewHostConnected({peerAddress, peerPort});
-    }
-  }
+  // send the response packet
+  this->sendPacket(packet, client);
 }
 
 /**
@@ -63,6 +169,9 @@ void Server::processConnections() {
 void Server::processReadyRead() {
   // Get the client that was ready to read
   auto client = qobject_cast<QSslSocket *>(sender());
+
+  // if not authenticated then return
+  if (!m_clients.contains(client)) return;
 
   // using the fromQByteArray from namespace
   using utility::functions::createPacket;
@@ -115,10 +224,12 @@ void Server::processReadyRead() {
     return;
   }
 
+  // if not in authenticated client
+  if (!this->m_clients.contains(client)) return;
+
   // Deserialize the data to SyncingPacket
   try {
     this->processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
-    this->sendPacket(fromQByteArray<packets::SyncingPacket>(data), client);
     return;
   } catch (const types::except::MalformedPacket &e) {
     const auto type = packets::InvalidRequest::PacketType::RequestFailed;
@@ -142,33 +253,6 @@ void Server::processReadyRead() {
 }
 
 /**
- * @brief Process the disconnection from the client
- */
-void Server::processDisconnection() {
-  // Get the client that was disconnected
-  auto client = qobject_cast<QSslSocket *>(sender());
-
-  // convert to QPair<QHostAddress, quint16>
-  auto info   = QPair<QHostAddress, quint16>(client->peerAddress(), client->peerPort());
-
-  // Notify the listeners that the client is disconnected
-  emit OnCLientStateChanged(info, false);
-
-  // Remove the client from the list of clients
-  m_authed_clients.removeOne(client);
-
-  // Notify the listeners that the client list is changed
-  emit OnClientListChanged(getConnectedClientsList());
-}
-
-/**
- * @brief Called when the service is registered
- */
-void Server::OnServiceRegistered() {
-  emit OnServerStateChanged(true);
-}
-
-/**
  * @brief Construct a new Syncing Server object and
  * bind to any available port and any available
  * IP address
@@ -181,13 +265,19 @@ Server::Server(QObject *parent) : service::mdnsRegister(parent) {
   // process the connections when the socket is ready
   // to read so the listener can be notified
   const auto signal_c = &QSslServer::pendingConnectionAvailable;
-  const auto slot_c   = &Server::processConnections;
-  QObject::connect(m_ssl_server, signal_c, this, slot_c);
+  const auto slot_c   = &Server::processPendingConnections;
+  QObject::connect(m_server, signal_c, this, slot_c);
 
   // Notify the listeners that the server is started
   const auto signal = &service::mdnsRegister::OnServiceRegistered;
-  const auto slot   = &Server::OnServiceRegistered;
+  const auto slot   = [=] { emit OnServerStateChanged(true); };
   QObject::connect(this, signal, this, slot);
+
+  // Connect the socket to the callback function that
+  // process the SSL errors
+  const auto signal_e = &QSslServer::sslErrors;
+  const auto slot_e   = &Server::processSslErrors;
+  QObject::connect(m_server, signal_e, this, slot_e);
 }
 
 /**
@@ -205,11 +295,23 @@ void Server::syncItems(QVector<QPair<QString, QByteArray>> items) {
  *
  * @return QList<QSslSocket*> List of clients
  */
-QList<QPair<QHostAddress, quint16>> Server::getConnectedClientsList() const {
-  QList<QPair<QHostAddress, quint16>> list;
-  for (auto client : m_authed_clients) {
-    list.append({client->peerAddress(), client->peerPort()});
+QList<types::device::Device> Server::getConnectedClientsList() const {
+  // List of clients that are connected
+  QList<types::device::Device> list;
+
+  // iterate through the list of clients
+  for (auto c : m_clients) {
+    // Peer info of the client that is connected
+    auto addr = c->peerAddress();
+    auto port = c->peerPort();
+    auto cert = c->peerCertificate();
+    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+
+    // add the device to the list
+    list.append({addr, port, name});
   }
+
+  // return the list
   return list;
 }
 
@@ -219,14 +321,14 @@ QList<QPair<QHostAddress, quint16>> Server::getConnectedClientsList() const {
  *
  * @param client Client to disconnect
  */
-void Server::disconnectClient(QPair<QHostAddress, quint16> client) {
+void Server::disconnectClient(types::device::Device client) {
   // matcher lambda function to find the client
   const auto matcher = [&client](QSslSocket *c) {
-    return (c->peerAddress() == client.first) && (c->peerPort() == client.second);
+    return (c->peerAddress() == client.ip) && (c->peerPort() == client.port);
   };
 
   // find the client from the list of clients
-  for (auto c : m_authed_clients) {
+  for (auto c : m_clients) {
     if (matcher(c)) {
       return c->disconnectFromHost();
     }
@@ -237,16 +339,23 @@ void Server::disconnectClient(QPair<QHostAddress, quint16> client) {
  * @brief Disconnect the all the clients from the server
  */
 void Server::disconnectAllClients() {
-  for (auto client : m_authed_clients) client->disconnectFromHost();
+  for (auto client : m_clients) client->disconnectFromHost();
 }
 
 /**
  * @brief Get the Server QHostAddress & Port
  *
- * @return QPair<QHostAddress, quint16>
+ * @return types::device::Device
  */
-QPair<QHostAddress, quint16> Server::getServerInfo() const {
-  return {m_ssl_server->serverAddress(), m_ssl_server->serverPort()};
+types::device::Device Server::getServerInfo() const {
+  // server information
+  auto addr = m_server->serverAddress();
+  auto port = m_server->serverPort();
+  auto cert = m_server->sslConfiguration().localCertificate();
+  auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+
+  // Return info
+  return { addr, port, name };
 }
 
 /**
@@ -254,8 +363,8 @@ QPair<QHostAddress, quint16> Server::getServerInfo() const {
  *
  * @param config SSL Configuration
  */
-void Server::setSSLConfiguration(QSslConfiguration config) {
-  m_ssl_server->setSslConfiguration(config);
+void Server::setSslConfiguration(QSslConfiguration config) {
+  m_server->setSslConfiguration(config);
 }
 
 /**
@@ -264,120 +373,7 @@ void Server::setSSLConfiguration(QSslConfiguration config) {
  * @return QSslConfiguration
  */
 QSslConfiguration Server::getSSLConfiguration() const {
-  return m_ssl_server->sslConfiguration();
-}
-
-/**
- * @brief The function that is called when the client is authenticated
- *
- * @param client the client that is currently processed
- */
-void Server::authSuccess(const QPair<QHostAddress, quint16> &client) {
-  // Matcher Lambda Function to find the client
-  const auto matcher = [&client](QSslSocket *c) {
-    return (c->peerAddress() == client.first) && (c->peerPort() == client.second);
-  };
-
-  // Get the iterator to the start and end of the list
-  auto start      = m_un_authed_clients.begin();
-  auto end        = m_un_authed_clients.end();
-
-  // Get the client from the unauthenticated list and remove it
-  auto client_itr = std::find_if(start, end, matcher);
-
-  // If the client is not found then return from the function
-  if (client_itr == m_un_authed_clients.end()) return;
-
-  // Get the client from the iterator
-  auto client_tls = *client_itr;
-
-  // Remove the client from the unauthenticated list
-  m_un_authed_clients.erase(client_itr);
-
-  // Connect the client to the callback function that process
-  // the disconnection when the client is disconnected
-  // so the listener can be notified
-  const auto signal_d = &QSslSocket::disconnected;
-  const auto slot_d   = &Server::processDisconnection;
-  QObject::connect(client_tls, signal_d, this, slot_d);
-
-  // Connect the socket to the callback function that
-  // process the ready read when the socket is ready
-  // to read so the listener can be notified
-  const auto signal_r = &QSslSocket::readyRead;
-  const auto slot_r   = &Server::processReadyRead;
-  QObject::connect(client_tls, signal_r, this, slot_r);
-
-  // Peer info
-  const auto peerAddress = client_tls->peerAddress();
-  const auto peerPort    = client_tls->peerPort();
-
-  // convert to QPair<QHostAddress, quint16>
-  auto client_info       = QPair<QHostAddress, quint16>(peerAddress, peerPort);
-
-  // Notify the listeners that the client is connected
-  emit OnCLientStateChanged(client_info, true);
-
-  // Add the client to the list of clients
-  m_authed_clients.append(client_tls);
-
-  // Notify the listeners that the client list is changed
-  emit OnClientListChanged(getConnectedClientsList());
-
-  // using the create packet from namespace
-  using utility::functions::createPacket;
-
-  // create the Authentication packet
-  packets::Authentication packet = createPacket({
-      packets::Authentication::PacketType::AuthStatus,
-      types::enums::AuthStatus::AuthSuccess,
-  });
-
-  // send the packet to the client
-  this->sendPacket(client_tls, packet);
-}
-
-/**
- * @brief The function that is called when the client is not authenticated
- *
- * @param client the client that is currently processed
- */
-void Server::authFailed(const QPair<QHostAddress, quint16> &client) {
-  // Matcher Lambda Function to find the client
-  const auto matcher = [&client](QSslSocket *c) {
-    return (c->peerAddress() == client.first) && (c->peerPort() == client.second);
-  };
-
-  // Get the iterator to the start and end of the list
-  auto start      = m_un_authed_clients.begin();
-  auto end        = m_un_authed_clients.end();
-
-  // Get the client from the unauthenticated list and remove it
-  auto client_itr = std::find_if(start, end, matcher);
-
-  // If the client is not found then return from the function
-  if (client_itr == m_un_authed_clients.end()) return;
-
-  // Remove the client from the unauthenticated list
-  m_un_authed_clients.erase(client_itr);
-
-  // using the create packet from namespace
-  using utility::functions::createPacket;
-
-  // create the Authentication packet
-  packets::Authentication packet = createPacket({
-      packets::Authentication::PacketType::AuthStatus,
-      types::enums::AuthStatus::AuthFailed,
-  });
-
-  // send the packet to the client
-  this->sendPacket((*client_itr), packet);
-
-  // disconnect and delete the client
-  (*client_itr)->disconnectFromHost();
-
-  // delete the client after the client is disconnected
-  (*client_itr)->deleteLater();
+  return m_server->sslConfiguration();
 }
 
 /**
@@ -385,14 +381,17 @@ void Server::authFailed(const QPair<QHostAddress, quint16> &client) {
  */
 void Server::startServer() {
   // check if the SSL configuration is set
-  if (m_ssl_server->sslConfiguration().isNull()) {
+  if (m_server->sslConfiguration().isNull()) {
     throw std::runtime_error("SSL Configuration is not set");
   }
 
   // start the server
-  if (!m_ssl_server->listen()) {
+  if (!m_server->listen()) {
     throw std::runtime_error("Failed to start the server");
   }
+
+  // log port
+  qInfo() << (LOG("Server started at port: " + std::to_string(m_server->serverPort())));
 
   // start the discovery server
   this->registerServiceAsync();
@@ -409,10 +408,119 @@ void Server::stopServer() {
   this->disconnectAllClients();
 
   // stop the server
-  m_ssl_server->close();
+  m_server->close();
 
   // Notify the listeners
   emit OnServerStateChanged(false);
+}
+
+/**
+ * @brief Get the Dei=vice Certificate
+ */
+QSslCertificate Server::getClientCert(types::device::Device device) const {
+  // matcher lambda function to find the client
+  const auto matcher = [&device](QSslSocket *c) {
+    return (c->peerAddress() == device.ip) && (c->peerPort() == device.port);
+  };
+
+  // find the client from the list of clients
+  for (auto c : m_clients) {
+    if (matcher(c)) {
+      return c->peerCertificate();
+    }
+  }
+
+  // if not found
+  throw std::runtime_error("Client not found");
+}
+
+/**
+ * @brief The function that is called when the client is authenticated
+ *
+ * @param client the client that is currently processed
+ */
+void Server::authSuccess(types::device::Device device) {
+  // Matcher Lambda Function to find the client
+  const auto matcher = [&device](QSslSocket *c) {
+    return (c->peerAddress() == device.ip) && (c->peerPort() == device.port);
+  };
+
+  // Get the iterator to the start and end of the list
+  auto start      = m_unauthenticatedClients.begin();
+  auto end        = m_unauthenticatedClients.end();
+
+  // Get the client from the unauthenticated list and remove it
+  auto client_itr = std::find_if(start, end, matcher);
+
+  // If the client is not found then return from the function
+  if (client_itr == m_unauthenticatedClients.end()) return;
+
+  // Get the client from the iterator
+  auto client_tls = *client_itr;
+
+  // Remove the client from the unauthenticated list
+  m_unauthenticatedClients.erase(client_itr);
+
+  // Add the client to the list of clients
+  m_clients.append(client_tls);
+
+  // Notify the listeners that the client is connected
+  emit OnCLientStateChanged(device, true);
+
+  // Notify the listeners that the client list is changed
+  emit OnClientListChanged(getConnectedClientsList());
+
+  // using the create packet from namespace
+  using utility::functions::createPacket;
+
+  // create the Authentication packet
+  packets::Authentication packet = createPacket({
+      packets::Authentication::PacketType::AuthStatus,
+      types::enums::AuthStatus::AuthOkay,
+  });
+
+  // send the packet to the client
+  this->sendPacket(client_tls, packet);
+}
+
+/**
+ * @brief The function that is called when the client is not authenticated
+ *
+ * @param client the client that is currently processed
+ */
+void Server::authFailed(types::device::Device device) {
+  // Matcher Lambda Function to find the client
+  const auto matcher = [&device](QSslSocket *c) {
+    return (c->peerAddress() == device.ip) && (c->peerPort() == device.port);
+  };
+
+  // Get the iterator to the start and end of the list
+  auto start      = m_unauthenticatedClients.begin();
+  auto end        = m_unauthenticatedClients.end();
+
+  // Get the client from the unauthenticated list and remove it
+  auto client_itr = std::find_if(start, end, matcher);
+
+  // If the client is not found then return from the function
+  if (client_itr == m_unauthenticatedClients.end()) return;
+
+  // Remove the client from the unauthenticated list
+  m_unauthenticatedClients.erase(client_itr);
+
+  // using the create packet from namespace
+  using utility::functions::createPacket;
+
+  // create the Authentication packet
+  packets::Authentication packet = createPacket({
+      packets::Authentication::PacketType::AuthStatus,
+      types::enums::AuthStatus::AuthFail,
+  });
+
+  // send the packet to the client
+  this->sendPacket((*client_itr), packet);
+
+  // disconnect and delete the client
+  (*client_itr)->disconnectFromHost();
 }
 
 /**
@@ -425,6 +533,6 @@ void Server::stopServer() {
  * @throw Any Exception If any error occurs
  */
 quint16 Server::getPort() const {
-  return m_ssl_server->serverPort();
+  return m_server->serverPort();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

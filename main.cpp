@@ -4,6 +4,8 @@
 // https://opensource.org/licenses/MIT
 
 // Qt Headers
+#include <QApplication>
+#include <QHostInfo>
 #include <QFile>
 #include <QStyleHints>
 #include <QGraphicsDropShadowEffect>
@@ -28,7 +30,81 @@ namespace srilakshmikanthanp::clipbirdesk {
  * for ClipBird Application
  */
 class ClipbirdApplication : public SingleApplication {
+ private:  // Member Variables and Objects
+
+  // file path to store the certificate and key
+  std::string certPath = (std::filesystem::path(constants::getAppHome()) / "cert.pem").string();
+  std::string keyPath  = (std::filesystem::path(constants::getAppHome()) / "key.pem").string();
+
  private:  // Member Functions
+
+  /**
+   * @brief Get the certificate from App Home
+   */
+  QSslConfiguration getOldSslConfiguration() {
+    // QFile to read the certificate and key
+    QFile certFile(certPath.c_str()), pkeyFile(keyPath.c_str());
+
+    // open the certificate and key
+    if(!certFile.open(QIODevice::ReadOnly) || !pkeyFile.open(QIODevice::ReadOnly)) {
+      throw std::runtime_error("Can't Create Certificate");
+    }
+
+    // read the certificate and key
+    QSslCertificate cert = QSslCertificate(certFile.readAll(), QSsl::Pem);
+    QSslKey key = QSslKey(pkeyFile.readAll(), QSsl::Rsa);
+    QSslConfiguration sslConfig;
+
+    // set the certificate and key
+    sslConfig.setLocalCertificate(cert);
+    sslConfig.setPrivateKey(key);
+
+    // if the configuration is null
+    if (cert.isNull() || key.isNull() || sslConfig.isNull()) {
+      throw std::runtime_error("Can't Create QSslConfiguration");
+    }
+
+    // set peer verify
+    sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
+
+    // return the configuration
+    return sslConfig;
+  }
+
+  /**
+   * @brief Get the certificate by creating new one
+   */
+  QSslConfiguration getNewSslConfiguration() {
+    // QFile to read the certificate and key
+    QFile certFile(certPath.c_str()), pkeyFile(keyPath.c_str());
+
+    // open the certificate and key
+    if(!certFile.open(QIODevice::WriteOnly) || !pkeyFile.open(QIODevice::WriteOnly)) {
+      throw std::runtime_error("Can't Create Certificate");
+    }
+
+    // generate the certificate and key
+    auto sslConfig = utility::functions::getQSslConfiguration();
+
+    // write the certificate and key
+    certFile.write(sslConfig.localCertificate().toPem());
+    pkeyFile.write(sslConfig.privateKey().toPem());
+
+    // return the configuration
+    return sslConfig;
+  }
+
+  /**
+   * @brief Get the certificate from App Home
+   * or generate new one and store it
+   */
+  QSslConfiguration getSslConfiguration() {
+    if (!std::filesystem::exists(certPath) || !std::filesystem::exists(keyPath)) {
+      return getNewSslConfiguration();
+    } else {
+      return getOldSslConfiguration();
+    }
+  }
 
   /**
    * @brief On Tray Icon Clicked
@@ -69,7 +145,7 @@ class ClipbirdApplication : public SingleApplication {
 
   Q_DISABLE_COPY_MOVE(ClipbirdApplication);
 
- public:  // Constructors and Destructors
+ public:   // Constructors and Destructors
 
   /**
    * @brief Construct a new Clipbird Application object
@@ -79,9 +155,14 @@ class ClipbirdApplication : public SingleApplication {
    */
   ClipbirdApplication(int &argc, char **argv) : SingleApplication(argc, argv) {
     // create the objects of the class
-    controller = new controller::ClipBird(utility::functions::getQSslConfiguration());
-    content    = new ui::gui::Content(controller);
-    window     = new ui::gui::Window();
+    controller = new controller::ClipBird();
+
+    // set the ssl configuration
+    controller->setSslConfiguration(this->getSslConfiguration());
+
+    // create the objects of the class
+    content = new ui::gui::Content(controller);
+    window  = new ui::gui::Window();
 
     // set the signal handler for all os
     signal(SIGTERM, [](int sig) { qApp->quit(); });
@@ -117,6 +198,11 @@ class ClipbirdApplication : public SingleApplication {
     // using some classes
     using ui::gui::Content;
 
+    // tray icon click from content
+    const auto signal_tic = &QSystemTrayIcon::activated;
+    const auto slot_tic   = &ClipbirdApplication::onTrayIconClicked;
+    QObject::connect(content->getTrayIcon(), signal_tic, this, slot_tic);
+
     // set the signal for instance Started
     const auto signal_is = &SingleApplication::instanceStarted;
     const auto slot_is   = &Content::show;
@@ -126,11 +212,6 @@ class ClipbirdApplication : public SingleApplication {
     const auto signal = &QStyleHints::colorSchemeChanged;
     const auto slot   = &ClipbirdApplication::setQssFile;
     QObject::connect(QGuiApplication::styleHints(), signal, this, slot);
-
-    // tray icon click from content
-    const auto signal_tic = &QSystemTrayIcon::activated;
-    const auto slot_tic   = &ClipbirdApplication::onTrayIconClicked;
-    QObject::connect(content->getTrayIcon(), signal_tic, this, slot_tic);
   }
 
   /**
@@ -156,7 +237,7 @@ class ClipbirdApplication : public SingleApplication {
  * @return int Status code
  */
 auto main(int argc, char **argv) -> int {
-  // using ClipbirdApplication class
+  // using ClipbirdApplication class from namespace
   using srilakshmikanthanp::clipbirdesk::ClipbirdApplication;
   using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
@@ -167,14 +248,25 @@ auto main(int argc, char **argv) -> int {
     QDir().mkdir(getAppHome().c_str());
   }
 
+#ifdef NDEBUG
   // log file to record the logs
   QFile logfile(QString::fromStdString(getAppLogFile()));
 
   // open the log file
   logfile.open(QIODevice::WriteOnly | QIODevice::Append);
 
+  // open QStream to write the log file
+  QTextStream logstream(&logfile);
+
   // Set the log file
-  Logger::setLogFile(&logfile);
+  Logger::setLogStream(&logstream);
+#else
+  // open QStream to write the log file
+  QTextStream logstream(stdout);
+
+  // Set the log file as std::cout
+  Logger::setLogStream(&logstream);
+#endif
 
   // Set the custom message handler
   qInstallMessageHandler(Logger::handler);

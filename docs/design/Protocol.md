@@ -33,7 +33,7 @@ Clipbird utilizes a variety of packet types for different purposes. These packet
 
 ### What are the packets Required for Clipbird
 
-First we need to Send the authenticate Request to the server, for that we need to send the **Authentication** packet to the server. This packet may contains the JWT token if it has a valid JWT token the server will accept the connection without user intervention. If the token is invalid the server will send the **Authentication** packet with **AuthStatus** set to 0x00. If the token is valid the server will send the **Authentication** packet with **AuthStatus** set to 0x01. If the server is not configured to use JWT token it will send the **Authentication** packet with **AuthStatus** set to 0x01. If the server is configured to use JWT token but the client does not send the **Authentication** packet with JWT token the server will send the **Authentication** packet with **AuthStatus** set to 0x00.
+When Client connected to server The serve need to send an Response Called Authentication Success or failed for this purpose we use **Authentication**.
 
 Once the server has been identified, clipboard data is transmitted between the client and the server using a single type of packet known as the **SyncingPacket**. This packet is responsible for transferring clipboard data from the client to the server and vice versa, ensuring seamless sharing of clipboard content between the two devices.
 
@@ -71,7 +71,7 @@ The **InvalidRequest** is used to indicate that the packet is invalid. This pack
 | Error Code | Error Message |
 |------------|---------------|
 | 0x01       | Coding Error  |
-| 0x02       | TLS Error     |
+| 0x02       | InvalidPacket |
 
 ### Authentication
 
@@ -84,9 +84,9 @@ The **Authentication** is used to indicate the authentication process to the cli
 
 #### Body
 
-- **AuthStatus**: This field specifies the status of the authentication process.
-  - AuthFailed: This field specifies the status of the authentication process, which is set to 0x00 if the authentication fails.
-  - AuthSuccess: This field specifies the status of the authentication process, which is set to 0x01 if the authentication succeeds.
+- **AuthStatus**: This field specifies the status of the authentication process. it can be one of the following values.
+  - 0x00: Auth Failed
+  - 0x01: Auth Success
 
 #### Structure
 

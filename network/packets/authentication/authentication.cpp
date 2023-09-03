@@ -52,12 +52,12 @@ quint8 Authentication::getPacketType() const noexcept {
  * @param status
  */
 void Authentication::setAuthStatus(quint8 status) {
-  if (status == types::enums::AuthStatus::AuthFailed) {
+  if (status == types::enums::AuthStatus::AuthFail) {
     this->authStatus = status;
     return;
   }
 
-  if (status == types::enums::AuthStatus::AuthSuccess) {
+  if (status == types::enums::AuthStatus::AuthOkay) {
     this->authStatus = status;
     return;
   }
@@ -125,8 +125,14 @@ QDataStream& operator>>(QDataStream& stream, Authentication& packet) {
   // auth status
   const auto authStatus = packet.authStatus;
 
+  // allowed status
+  const QList<int> allowedStatus = {
+    AuthStatus::AuthOkay,
+    AuthStatus::AuthFail,
+  };
+
   // Check the auth status
-  if (authStatus != AuthStatus::AuthFailed && authStatus != AuthStatus::AuthSuccess) {
+  if (!allowedStatus.contains(authStatus)) {
     throw MalformedPacket(ErrorCode::CodingError, "Invalid Auth Status");
   }
 
