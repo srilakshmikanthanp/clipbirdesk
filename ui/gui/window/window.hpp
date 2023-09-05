@@ -8,6 +8,8 @@
 #include <QScreen>
 #include <QVBoxLayout>
 
+#include "ui/gui/content/content.hpp"
+
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 class Window : public QMainWindow {
  private:  // Member variable
@@ -17,6 +19,11 @@ class Window : public QMainWindow {
  private:  // Disable copy, move and assignment
 
   Q_DISABLE_COPY_MOVE(Window);
+
+ private:  // make setcentral Widget and centralWidget private
+
+  using QMainWindow::setCentralWidget;
+  using QMainWindow::centralWidget;
 
  public:  // Constructor and Destructor
 
@@ -32,6 +39,16 @@ class Window : public QMainWindow {
    *
    */
   ~Window() noexcept = default;
+
+  /**
+   * @brief Set Content
+   */
+  void setContent(ui::gui::Content* content);
+
+  /**
+   * @brief get Content
+   */
+  ui::gui::Content* getContent() const;
 
  protected:  // protected functions
 

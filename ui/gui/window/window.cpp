@@ -13,11 +13,25 @@ Window::Window(QWidget* parent) : QMainWindow(parent) {
   // set mainWindow attributes
   this->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
+  // set padding as 20px
+  this->setContentsMargins(10, 5, 10, 5);
+
   // set as Translucent background
   this->setAttribute(Qt::WA_TranslucentBackground);
+}
 
-  // set padding as 20px
-  this->setContentsMargins(20, 20, 20, 20);
+/**
+ * @brief Set Content
+ */
+void Window::setContent(ui::gui::Content* content) {
+  this->setCentralWidget(content);
+}
+
+/**
+ * @brief get Content
+ */
+ui::gui::Content* Window::getContent() const {
+  return dynamic_cast<ui::gui::Content*>(this->centralWidget());
 }
 
 /**
@@ -27,14 +41,26 @@ void Window::setVisible(bool visible) {
   // if visible is false return
   if (!visible) return QWidget::setVisible(visible);
 
-  // screen center
-  auto center = QGuiApplication::primaryScreen()->geometry().center();
-
-  // set the window to center
-  QWidget::move(center - QWidget::rect().center());
-
-  // show the Window
+  // just show the window in left bottom corner
   QWidget::setVisible(visible);
+
+  // get the screen size
+  auto screen = QGuiApplication::primaryScreen()->availableGeometry();
+
+  // get the window size
+  auto size = this->size();
+
+  // QPoint
+  auto point = QPoint();
+
+  // set the x
+  point.setX(screen.width() - size.width());
+
+  // set the y
+  point.setY(screen.height() - size.height());
+
+  // set the window position
+  this->move(point);
 }
 
 /**

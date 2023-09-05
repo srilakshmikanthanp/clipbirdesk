@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QHostInfo>
 #include <QFile>
+#include <QNetworkProxy>
 #include <QStyleHints>
 #include <QGraphicsDropShadowEffect>
 #include <QMessageBox>
@@ -190,7 +191,7 @@ class ClipbirdApplication : public SingleApplication {
     window->setFixedSize(constants::getAppWindowSize());
 
     // set the content
-    window->setCentralWidget(content);
+    window->setContent(content);
 
     // set the icon to content
     window->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
@@ -244,9 +245,13 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
   // make app home directory if not exists
-  if (!QDir(getAppHome().c_str()).exists()) {
-    QDir().mkdir(getAppHome().c_str());
+  if (!QDir(getAppHome().c_str()).exists() && !QDir().mkdir(getAppHome().c_str())) {
+    QMessageBox::critical(nullptr, "Error", "Can't Create App Home");
+    return EXIT_FAILURE;
   }
+
+  // set proxy for the application (No Proxy)
+  QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
 
 #ifdef NDEBUG
   // log file to record the logs
