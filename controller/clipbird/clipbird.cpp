@@ -198,6 +198,12 @@ void ClipBird::setCurrentHostAsClient() {
 
   // Start the Discovery
   client->startBrowsing();
+
+  client->connectToServer({
+      QHostAddress::LocalHost,
+      8080,
+      "localhost"
+  });
 }
 
 /**

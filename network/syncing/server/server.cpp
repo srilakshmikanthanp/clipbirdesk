@@ -56,7 +56,6 @@ void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors
 
   // Ignore the errors
   ignoredErrors.append(QSslError::SelfSignedCertificate);
-  ignoredErrors.append(QSslError::CertificateUntrusted);
 
   // make copy of errors
   auto errorsCopy = errors;
@@ -69,9 +68,9 @@ void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors
   // remove the ignored errors
   errorsCopy.erase(itr, errorsCopy.end());
 
-  // log the errors
-  for (auto error : errorsCopy) {
-    qWarning() << (LOG(std::to_string(error.error())));
+  // log the errors for debugging
+  for (auto error : errors) {
+    qWarning() << (LOG(std::to_string(error.error()) + " : " + error.errorString().toStdString()));
   }
 
   // if errorsCopy is not empty
@@ -89,11 +88,6 @@ void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors
   if (cert.isNull() || name.isEmpty()) {
     return socket->abort();
   }
-
-  // create the device
-  auto device = types::device::Device {
-    addr, port, name.constFirst()
-  };
 
   // just ignore wait for user
   socket->ignoreSslErrors();

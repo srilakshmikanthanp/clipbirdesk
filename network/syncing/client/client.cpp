@@ -10,36 +10,15 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Verify Server
  */
 bool Client::verifyCert(const QSslCertificate& certificate) {
+  // common name of the server
+  auto name = certificate.subjectInfo(QSslCertificate::CommonName);
+
   // check the basic conditions
-  if (certificate.isNull() || certificate.subjectInfo(QSslCertificate::CommonName).isEmpty()) {
+  if (certificate.isNull() || name.isEmpty()) {
     return false;
-  }
-
-  // get the client details
-  const auto name = certificate.subjectInfo(QSslCertificate::CommonName).constFirst();
-  const auto addr = this->m_ssl_socket->peerAddress();
-  const auto port = this->m_ssl_socket->peerPort();
-
-  // matcher lambda function
-  auto matcher = [&](const auto &elm) {
-    return elm.ip == addr && elm.port == port;
-  };
-
-  // if name of device not equal to subject name
-  auto device = std::find_if(m_servers.begin(), m_servers.end(), matcher);
-
-  // if device not found
-  if (device == nullptr) {
-    return false;
-  }
-
-  // name matches
-  if (device->name == name) {
+  } else {
     return true;
   }
-
-  // name not matches
-  return false;
 }
 
 /**
@@ -51,8 +30,8 @@ void Client::processSslErrors(const QList<QSslError>& errors) {
 
   // Ignore the errors
   ignoredErrors.append(QSslError::SelfSignedCertificate);
-  ignoredErrors.append(QSslError::CertificateUntrusted);
   ignoredErrors.append(QSslError::HostNameMismatch);
+  ignoredErrors.append(QSslError::CertificateUntrusted);
 
   // make copy of errors
   auto errorsCopy = errors;
@@ -67,7 +46,7 @@ void Client::processSslErrors(const QList<QSslError>& errors) {
 
   // log the errors
   for (auto error : errorsCopy) {
-    qWarning() << (LOG(std::to_string(error.error()).c_str()));
+    qWarning() << (LOG(std::to_string(error.error()) + " : " + error.errorString().toStdString()));
   }
 
   // if errorsCopy is not empty
@@ -113,11 +92,13 @@ void Client::processSslErrorsSecured(const QList<QSslError>& errors) {
     qWarning() << (LOG(std::to_string(error.error()).c_str()));
   }
 
+  // if errors are not empty abort the connection
   if (!errorsCopy.isEmpty()) {
     return this->m_ssl_socket->abort();
-  } else {
-    this->m_ssl_socket->ignoreSslErrors();
   }
+
+  // ignore the ssl errors
+  this->m_ssl_socket->ignoreSslErrors();
 }
 
 /**
