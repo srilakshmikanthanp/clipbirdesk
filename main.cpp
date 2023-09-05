@@ -244,8 +244,11 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
+  // Home Directory of the application
+  auto path = getAppHome().c_str();
+
   // make app home directory if not exists
-  if (!QDir(getAppHome().c_str()).exists() && !QDir().mkdir(getAppHome().c_str())) {
+  if (!QDir(path).exists() && !QDir().mkdir(path)) {
     QMessageBox::critical(nullptr, "Error", "Can't Create App Home");
     return EXIT_FAILURE;
   }
