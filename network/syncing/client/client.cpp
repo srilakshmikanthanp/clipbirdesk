@@ -336,7 +336,7 @@ void Client::connectToServer(types::device::Device server) {
 
   // check if the socket is connected
   if (this->isConnected()) {
-    this->disconnectFromServer();
+    this->m_ssl_socket->abort();
   }
 
   // disconnect the signals and slots for the socket
@@ -374,7 +374,7 @@ void Client::connectToServerSecured(types::device::Device server) {
 
   // check if the socket is connected
   if (this->isConnected()) {
-    this->disconnectFromServer();
+    this->m_ssl_socket->abort();
   }
 
   // disconnect the signals and slots for the socket

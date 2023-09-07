@@ -14,7 +14,10 @@
 #include <QHBoxLayout>
 #include <QHostAddress>
 #include <QHostInfo>
+#include <QLineEdit>
+#include <QPaintEngine>
 #include <QMessageBox>
+#include <QNetworkInterface>
 #include <QScrollArea>
 #include <QScreen>
 #include <QSystemTrayIcon>
@@ -33,6 +36,7 @@
 #include "controller/clipbird/clipbird.hpp"
 #include "types/device/device.hpp"
 #include "ui/gui/components/device/device.hpp"
+#include "ui/gui/components/qrcode/qrcode.hpp"
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/content/deviceinfo/deviceinfo.hpp"
 #include "ui/gui/content/devicelist/devicelist.hpp"
@@ -156,6 +160,16 @@ class Content : public QFrame {
   void handleServerStatusChanged(bool status);
 
   //----------------------------- slots for Tray ----------------------------//
+
+  /**
+   * @brief On Qr Code Clicked
+   */
+  void onQrCodeClicked();
+
+  /**
+   * @brief On Connect Clicked
+   */
+  void onConnectClicked();
 
   /**
    * @brief On About Clicked

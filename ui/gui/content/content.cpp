@@ -39,6 +39,10 @@ void Content::handleTabChangeForClient(Tabs tab) {
   // reset the device list
   this->removeAllClient();
 
+  // update tray menu state
+  this->trayMenu->setQrCodeEnabled(false);
+  this->trayMenu->setConnectEnabled(true);
+
   // notify the controller
   controller->setCurrentHostAsClient();
 }
@@ -56,6 +60,10 @@ void Content::handleTabChangeForServer(Tabs tab) {
 
   // reset the device list
   this->removeAllServers();
+
+  // update tray menu state
+  this->trayMenu->setConnectEnabled(false);
+  this->trayMenu->setQrCodeEnabled(true);
 
   // notify the controller
   controller->setCurrentHostAsServer();
@@ -242,6 +250,202 @@ void Content::handleServerStatusChanged(bool isConnected) {
 }
 
 /**
+ * @brief On Qr Code Clicked
+ */
+void Content::onQrCodeClicked() {
+  // generate the qr code with all inteface ip and port in format
+  // ip1;ip2;ip3;...;ipn;port
+  auto interfaces = QNetworkInterface::allInterfaces();
+
+  // get server info
+  auto server = controller->getServerInfo();
+
+  // accumulator
+  const auto acc = [](const auto& a, const auto& b) {
+    return a + ";" + b.toString().toStdString();
+  };
+
+  // address
+  const auto addrs = QNetworkInterface::allAddresses();
+
+  // accumulate the ip address
+  auto info = std::accumulate(addrs.begin(), addrs.end(), std::string(), acc);
+
+  // add port to the info
+  info += ":" + std::to_string(server.port);
+
+  // remove first char
+  info.erase(info.begin());
+
+  // log
+  qDebug() << "QR Code Info: " << info.c_str();
+
+  // color if in dark mode them white else black
+  auto color = QApplication::palette().color(QPalette::Window);
+
+  // create a dialog
+  auto dialog = new QDialog();
+
+  // create layout
+  auto root = new QVBoxLayout();
+
+  // create label
+  auto qrcode = new components::QrCode(dialog);
+
+  // create label
+  auto port = new QLabel(dialog);
+
+  // set the size
+  qrcode->setFixedSize(200, 200);
+
+  // set the text
+  qrcode->setText(info.c_str());
+
+  // set the color
+  qrcode->setColor(color);
+
+  // set the text
+  port->setText(QString::number(server.port));
+
+  // set center alignment
+  port->setAlignment(Qt::AlignCenter);
+
+  // set the style sheet
+  port->setStyleSheet("QLabel { color : gray; }");
+
+  // add the ip and port input to layout
+  root->addWidget(qrcode);
+  root->addWidget(port);
+
+  // size policy
+  root->setSizeConstraint(QLayout::SetFixedSize);
+
+  // center alignment of qrcode
+  root->setAlignment(qrcode, Qt::AlignCenter);
+
+  // set the icon
+  dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+
+  // set the title
+  dialog->setWindowTitle("Clipbird");
+
+  // set the root layout to dialog
+  dialog->setLayout(root);
+
+  // set delete on close
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+  // show the dialog
+  dialog->show();
+
+  // set as not resizable
+  dialog->setFixedSize(dialog->sizeHint());
+}
+
+/**
+ * @brief On Connect Clicked
+ */
+void Content::onConnectClicked() {
+  // On HostName successfully resolved
+  const auto slot_hr = [=](const auto dialog, quint16 port, const auto& host) {
+    // if host name is not resolved
+    if (host.error() != QHostInfo::NoError) {
+      return;
+    }
+
+    // close the dialog
+    dialog->close();
+
+    // connect to server
+    controller->connectToServer({
+      host.addresses().first(), port, host.hostName()
+    });
+  };
+
+  // validate the ip and port
+  const auto validator = [](auto ip, auto port) -> bool {
+    if (!QHostAddress(ip).isNull() && port > 0 && port < 65535) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  // get the ip and port from user
+  auto dialog = new QDialog();
+
+  // create root layout
+  auto root = new QVBoxLayout(dialog);
+
+  // create label
+  auto label = new QLabel("Enter the IP and Port of the server", dialog);
+
+  // create the ip and port input
+  auto ipv4 = new QLineEdit(dialog);
+
+  // create the ip and port input
+  auto port = new QLineEdit(dialog);
+
+  // create the button
+  auto button = new QPushButton("Connect");
+
+  // set the placeholder
+  ipv4->setPlaceholderText("IPv4");
+
+  // set the placeholder
+  port->setPlaceholderText("Port");
+
+  // add the ip and port input to layout
+  root->addWidget(label);
+  root->addWidget(ipv4);
+  root->addWidget(port);
+  root->addWidget(button);
+
+  // set the icon
+  dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+
+  // set the title
+  dialog->setWindowTitle("Clipbird");
+
+  // set the root layout to dialog
+  dialog->setLayout(root);
+
+  // set delete on close
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+  // show the dialog
+  dialog->show();
+
+  // set as not resizable
+  dialog->setFixedSize(dialog->size());
+
+  // connect the dialog to window AuthFail signal
+  const auto signal_f = &QDialog::rejected;
+  const auto slot_f   = [=] { dialog->close(); };
+  connect(dialog, signal_f, slot_f);
+
+  // connect the dialog to window clicked signal
+  connect(button, &QPushButton::clicked, [=] {
+    // get the ip and port
+    auto port_s = port->text().toShort();
+    auto ipv4_s = ipv4->text();
+
+    // validate the ip and port
+    if (!validator(ipv4_s, port_s)) {
+      return;
+    }
+
+    // bind the port
+    auto slot = std::bind(
+      slot_hr, dialog, port_s, std::placeholders::_1
+    );
+
+    // resolve the host name
+    QHostInfo::lookupHost(ipv4_s, this, slot);
+  });
+}
+
+/**
  * @brief On About Clicked
  */
 void Content::onAboutClicked() {
@@ -338,6 +542,16 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   // set tooltip
   trayIcon->setToolTip(constants::getAppName().c_str());
 
+  // set the signal for menus QrCode click
+  const auto signal_qc = &ui::gui::content::TrayMenu::OnQrCodeClicked;
+  const auto slot_qc   = &Content::onQrCodeClicked;
+  QObject::connect(trayMenu, signal_qc, this, slot_qc);
+
+  // set the signal for menus Connect click
+  const auto signal_cc = &ui::gui::content::TrayMenu::OnConnectClicked;
+  const auto slot_cc   = &Content::onConnectClicked;
+  QObject::connect(trayMenu, signal_cc, this, slot_cc);
+
   // set the signal for menus About click
   const auto signal_ac = &ui::gui::content::TrayMenu::OnAboutClicked;
   const auto slot_ac   = &Content::onAboutClicked;
@@ -354,9 +568,9 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   QObject::connect(trayMenu, signal_rc, this, slot_rc);
 
   // set the signal for menus Quit click
-  const auto signal_qc = &ui::gui::content::TrayMenu::OnExitClicked;
-  const auto slot_qc   = [] { QApplication::quit(); };
-  QObject::connect(trayMenu, signal_qc, this, slot_qc);
+  const auto signal_ec = &ui::gui::content::TrayMenu::OnExitClicked;
+  const auto slot_ec   = [] { QApplication::quit(); };
+  QObject::connect(trayMenu, signal_ec, this, slot_ec);
 
   // connect server list signal
   const auto signal_so = &content::DeviceList::onAction;

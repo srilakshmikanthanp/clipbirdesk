@@ -8,11 +8,13 @@
     "Cilp",
     "Clipbird",
     "clipbirdesk",
+    "ECLEVEL",
     "ipconv",
     "ISSUEPAGE",
     "KDNSSD",
     "pubkey",
     "qobject",
+    "qrcode",
     "qvariant",
     "SSLCONFIG",
     "unauthed"

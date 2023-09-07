@@ -19,14 +19,29 @@ class TrayMenu : public QMenu {
 
   Q_OBJECT
 
+ private:  // Actions
+
+  QAction connect = QAction("Connect to Server");
+  QAction qrCode  = QAction("Server Qr Code");
+  QAction reset   = QAction("Clear Certificates");
+  QAction about   = QAction("About ClipBird");
+  QAction issue   = QAction("Raise An Issue");
+  QAction exitApp = QAction("Exit ClipBird");
+
+ signals:  // signals
+  void OnConnectClicked();
+
+ signals:  // signals
+  void OnQrCodeClicked();
+
+ signals:  // signals
+  void OnResetClicked();
+
  signals:  // signals
   void OnAboutClicked();
 
  signals:  // signals
   void OnIssueClicked();
-
- signals:  // signals
-  void OnResetClicked();
 
  signals:  // signals
   void OnExitClicked();
@@ -43,5 +58,65 @@ class TrayMenu : public QMenu {
    * @brief Destroy the Sys Tray object
    */
   virtual ~TrayMenu() = default;
+
+  /**
+   * @brief set Qr Code Enabled or Disabled
+   */
+  void setQrCodeEnabled(bool);
+
+  /**
+   * @brief set Connect Enabled or Disabled
+   */
+  void setConnectEnabled(bool);
+
+  /**
+   * @brief set About Enabled or Disabled
+   */
+  void setAboutEnabled(bool);
+
+  /**
+   * @brief set Issue Enabled or Disabled
+   */
+  void setIssueEnabled(bool);
+
+  /**
+   * @brief set Reset Enabled or Disabled
+   */
+  void setResetEnabled(bool);
+
+  /**
+   * @brief set Exit Enabled or Disabled
+   */
+  void setExitEnabled(bool);
+
+  /**
+   * @brief Is Qr Code Enabled
+   */
+  bool isQrCodeEnabled() const;
+
+  /**
+   * @brief Is Connect Enabled
+   */
+  bool isConnectEnabled() const;
+
+  /**
+   * @brief Is About Enabled
+   */
+  bool isAboutEnabled() const;
+
+  /**
+   * @brief Is Issue Enabled
+   */
+  bool isIssueEnabled() const;
+
+  /**
+   * @brief Is Reset Enabled
+   */
+  bool isResetEnabled() const;
+
+  /**
+   * @brief Is Exit Enabled
+   */
+  bool isExitEnabled() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

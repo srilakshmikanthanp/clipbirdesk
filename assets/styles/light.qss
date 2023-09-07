@@ -50,7 +50,7 @@ QTabWidget::tab-bar {
 
 QTabBar::tab {
   border-bottom: 3px solid #FFFFFF;
-  color: #0000;
+  color: #000000;
   padding: 6px;
   margin: 2px;
   background-color: #FFFFFF;
@@ -107,12 +107,12 @@ QMenu {
 
 QMenu::item {
   background-color: #FFFFFF;
-  color: #0000;
+  color: #000000;
   border: none;
   border-radius: 5px;
-  padding: 6px;
+  padding: 2px 20px 2px 20px;
   margin: 2px;
-  width: 60px;
+  font-size: 11px;
 }
 
 QMenu::item:selected {
@@ -123,4 +123,13 @@ QMenu::item:selected {
 QMenu::item:disabled {
   background-color: #FFFFFF;
   color: gray;
+}
+
+QLineEdit {
+  background-color: #FFFFFF;
+  color: #000000;
+  border: 1px solid gray;
+  border-radius: 5px;
+  margin: 2px;
+  padding: 6px;
 }

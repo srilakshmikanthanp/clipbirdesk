@@ -65,6 +65,18 @@ set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleAp
 # Make Available SingleApplication
 FetchContent_MakeAvailable(SingleApplication)
 
+# Fetch qzxing from libqrencode
+FetchContent_Declare(libqrencode
+  GIT_REPOSITORY https://github.com/fukuchi/libqrencode.git
+  GIT_TAG        v4.1.1
+)
+
+# WITH_TOOLS
+set(WITH_TOOLS OFF CACHE BOOL "" FORCE)
+
+# Make Available qzxing
+FetchContent_MakeAvailable(libqrencode)
+
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
 
@@ -114,13 +126,19 @@ endif()
 qt_add_executable(clipbird
   ${main_cpp} ${RESOURCES})
 
+# Include Directories for libqrencode
+target_include_directories(clipbird
+  PRIVATE ${libqrencode_SOURCE_DIR}
+)
+
 # Link libraries
 target_link_libraries(clipbird
   PRIVATE SingleApplication::SingleApplication
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
-  PRIVATE OpenSSL::Crypto)
+  PRIVATE OpenSSL::Crypto
+  PRIVATE qrencode)
 
 # link bonjour if windows or Mac
 if(WIN32 OR APPLE)

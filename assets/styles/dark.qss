@@ -21,7 +21,7 @@ QFrame {
 }
 
 QLabel {
-  color: #0000;
+  color: #FFFFFF;
 }
 
 QPushButton {
@@ -50,7 +50,7 @@ QTabWidget::tab-bar {
 
 QTabBar::tab {
   border-bottom: 3px solid #1e1e1e;
-  color: #0000;
+  color: #FFFFFF;
   padding: 6px;
   margin: 2px;
   background-color: #1e1e1e;
@@ -110,9 +110,9 @@ QMenu::item {
   color: #FFFFFF;
   border: none;
   border-radius: 5px;
-  padding: 6px;
+  padding: 2px 20px 2px 20px;
   margin: 2px;
-  width: 60px;
+  font-size: 11px;
 }
 
 QMenu::item:selected {
@@ -123,4 +123,13 @@ QMenu::item:selected {
 QMenu::item:disabled {
   background-color: #1e1e1e;
   color: gray;
+}
+
+QLineEdit {
+  background-color: #1e1e1e;
+  color: #FFFFFF;
+  border: 1px solid gray;
+  border-radius: 5px;
+  margin: 2px;
+  padding: 6px;
 }
