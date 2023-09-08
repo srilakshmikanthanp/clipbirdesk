@@ -24,9 +24,9 @@ class TrayMenu : public QMenu {
   QAction connect = QAction("Join to Group");
   QAction qrCode  = QAction("Group QrCode");
   QAction reset   = QAction("Reset Devices");
-  QAction about   = QAction("About ClipBird");
+  QAction about   = QAction("About");
   QAction issue   = QAction("Report Issue");
-  QAction exitApp = QAction("Exit ClipBird");
+  QAction exitApp = QAction("Exit");
 
  signals:  // signals
   void OnConnectClicked();
