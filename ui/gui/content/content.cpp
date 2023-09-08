@@ -254,7 +254,7 @@ void Content::handleServerStatusChanged(bool isConnected) {
  */
 void Content::onQrCodeClicked() {
   // generate the qr code with all inteface ip and port in format
-  // (ip1;ip2;ip3;...;ipn)port
+  // [ip1;ip2;ip3;...;ipn;]port
   auto interfaces = QNetworkInterface::allInterfaces();
 
   // get server info
@@ -262,20 +262,17 @@ void Content::onQrCodeClicked() {
 
   // accumulator
   const auto acc = [](const auto& a, const auto& b) {
-    return a + ";" + b.toString().toStdString();
+    return a + b.toString().toStdString() + ";";
   };
 
   // address
   const auto addrs = QNetworkInterface::allAddresses();
 
   // accumulate the ip address
-  auto info = std::accumulate(addrs.begin(), addrs.end(), std::string(), acc);
+  auto info = std::accumulate(addrs.begin(), addrs.end(), std::string("["), acc);
 
   // add port to the info
-  info += ":" + std::to_string(server.port);
-
-  // remove first char
-  info.erase(info.begin());
+  info += "]" + std::to_string(server.port);
 
   // log
   qDebug() << "QR Code Info: " << info.c_str();
@@ -351,6 +348,11 @@ void Content::onQrCodeClicked() {
   const auto signal = &QStyleHints::colorSchemeChanged;
   const auto slot = onStyleChanged;
   QObject::connect(QGuiApplication::styleHints(), signal, slot);
+
+  // close on tab change
+  const auto signal_tc = &QTabWidget::currentChanged;
+  const auto slot_tc   = [=](int) { dialog->close(); };
+  QObject::connect(tab, signal_tc, slot_tc);
 }
 
 /**
@@ -430,10 +432,10 @@ void Content::onConnectClicked() {
   // set as not resizable
   dialog->setFixedSize(dialog->size());
 
-  // connect the dialog to window AuthFail signal
-  const auto signal_f = &QDialog::rejected;
-  const auto slot_f   = [=] { dialog->close(); };
-  connect(dialog, signal_f, slot_f);
+  // close on tab change
+  const auto signal_tc = &QTabWidget::currentChanged;
+  const auto slot_tc   = [=](int) { dialog->close(); };
+  QObject::connect(tab, signal_tc, slot_tc);
 
   // connect the dialog to window clicked signal
   connect(button, &QPushButton::clicked, [=] {
