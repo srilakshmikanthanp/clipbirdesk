@@ -254,7 +254,7 @@ void Content::handleServerStatusChanged(bool isConnected) {
  */
 void Content::onQrCodeClicked() {
   // generate the qr code with all inteface ip and port in format
-  // ip1;ip2;ip3;...;ipn;port
+  // (ip1;ip2;ip3;...;ipn)port
   auto interfaces = QNetworkInterface::allInterfaces();
 
   // get server info
@@ -280,9 +280,6 @@ void Content::onQrCodeClicked() {
   // log
   qDebug() << "QR Code Info: " << info.c_str();
 
-  // color if in dark mode them white else black
-  auto color = QApplication::palette().color(QPalette::Window);
-
   // create a dialog
   auto dialog = new QDialog();
 
@@ -300,9 +297,6 @@ void Content::onQrCodeClicked() {
 
   // set the text
   qrcode->setText(info.c_str());
-
-  // set the color
-  qrcode->setColor(color);
 
   // set the text
   port->setText(QString::number(server.port));
@@ -340,6 +334,23 @@ void Content::onQrCodeClicked() {
 
   // set as not resizable
   dialog->setFixedSize(dialog->sizeHint());
+
+  // theme changer
+  auto onStyleChanged = [=]() {
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+      qrcode->setColor(Qt::white);
+    } else {
+      qrcode->setColor(Qt::black);
+    }
+  };
+
+  // initial theme
+  onStyleChanged();
+
+  // detect the system theme
+  const auto signal = &QStyleHints::colorSchemeChanged;
+  const auto slot = onStyleChanged;
+  QObject::connect(QGuiApplication::styleHints(), signal, slot);
 }
 
 /**

@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QNetworkInterface>
 #include <QScrollArea>
+#include <QStyleHints>
 #include <QScreen>
 #include <QSystemTrayIcon>
 #include <QTabBar>
