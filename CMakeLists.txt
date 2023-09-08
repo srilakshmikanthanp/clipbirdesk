@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
 # set project name and version
-project(clipbird VERSION 1.1.0 LANGUAGES CXX)
+project(clipbird VERSION 1.2.0 LANGUAGES CXX)
 
 # set c++ standard 17
 set(CMAKE_CXX_STANDARD 17)
@@ -45,9 +45,6 @@ set(QT_MAJOR_VERSION 6)
 
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
-
-# Append POCO
-list(APPEND CMAKE_PREFIX_PATH $ENV{POCO_CMAKE_DIR})
 
 # --------------------------------- Main Project ---------------------------------#
 # Fetch SingleApplication from github

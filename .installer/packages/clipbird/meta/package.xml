@@ -15,7 +15,7 @@
     on your network.
   </Description>
   <ReleaseDate>2023-07-29</ReleaseDate>
-  <Version>1.1.0</Version>
+  <Version>1.2.0</Version>
   <Script>install.qs</Script>
   <Licenses>
     <License name="MIT LICENSE" file="LICENSE" />

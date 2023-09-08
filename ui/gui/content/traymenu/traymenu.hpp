@@ -21,11 +21,11 @@ class TrayMenu : public QMenu {
 
  private:  // Actions
 
-  QAction connect = QAction("Connect to Server");
-  QAction qrCode  = QAction("Server Qr Code");
-  QAction reset   = QAction("Clear Certificates");
+  QAction connect = QAction("Join to Group");
+  QAction qrCode  = QAction("Group QrCode");
+  QAction reset   = QAction("Reset Devices");
   QAction about   = QAction("About ClipBird");
-  QAction issue   = QAction("Raise An Issue");
+  QAction issue   = QAction("Report Issue");
   QAction exitApp = QAction("Exit ClipBird");
 
  signals:  // signals

@@ -21,8 +21,8 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   QObject::connect(&exitApp, &QAction::triggered, this, &TrayMenu::OnExitClicked);
 
   // set the Menu Items
-  this->addAction(&connect);
   this->addAction(&qrCode);
+  this->addAction(&connect);
   this->addAction(&reset);
   this->addSeparator();
   this->addAction(&about);

@@ -27,7 +27,7 @@ class Authentication {
  private:
 
   quint32 packetLength;
-  quint8 packetType = 0x00;
+  quint8 packetType = 0x01;
   quint8 authStatus;
 
  public:
