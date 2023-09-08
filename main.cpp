@@ -245,7 +245,7 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
   // Home Directory of the application
-  auto path = getAppHome().c_str();
+  auto path = QString::fromStdString(getAppHome());
 
   // make app home directory if not exists
   if (!QDir(path).exists() && !QDir().mkdir(path)) {

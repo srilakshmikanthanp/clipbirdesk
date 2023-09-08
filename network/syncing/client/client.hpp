@@ -54,6 +54,10 @@ class Client : public service::mdnsBrowser {
   void OnServerStatusChanged(bool isConnected);
 
  signals:  // signals for this class
+  /// @brief On Connection Error
+  void OnConnectionError(QString error);
+
+ signals:  // signals for this class
   /// @brief On Sync Request
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
 

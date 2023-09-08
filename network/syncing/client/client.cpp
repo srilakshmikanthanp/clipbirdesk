@@ -257,6 +257,11 @@ void Client::processReadyRead() {
  * @param parent Parent
  */
 Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
+  // connect the signals and slots for the errorOccurred
+  const auto signal_e = &QSslSocket::errorOccurred;
+  const auto slot_e   = [=]{ this->OnConnectionError(this->m_ssl_socket->errorString()); };
+  connect(m_ssl_socket, signal_e, this, slot_e);
+
   // connect the signals and slots for the socket
   // readyRead signal to process the packet
   const auto signal_r = &QSslSocket::readyRead;

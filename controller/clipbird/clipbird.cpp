@@ -190,6 +190,11 @@ void ClipBird::setCurrentHostAsClient() {
   const auto slot_rq   = &clipboard::Clipboard::set;
   connect(client, signal_rq, &m_clipboard, slot_rq);
 
+  // connect onConnectionError to the signal
+  const auto signal_ce = &Client::OnConnectionError;
+  const auto slot_ce   = &ClipBird::OnConnectionError;
+  connect(client, signal_ce, this, slot_ce);
+
   // get the storage instance
   auto &store = storage::Storage::instance();
 

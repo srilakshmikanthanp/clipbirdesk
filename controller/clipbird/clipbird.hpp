@@ -39,6 +39,10 @@ class ClipBird : public QObject {
   void OnServerGone(types::device::Device);
 
  signals:  // signals for this class
+  /// @brief On Connection Error
+  void OnConnectionError(QString error);
+
+ signals:  // signals for this class
   /// @brief On Server state changed (From Client)
   void OnServerStatusChanged(bool isConnected);
 

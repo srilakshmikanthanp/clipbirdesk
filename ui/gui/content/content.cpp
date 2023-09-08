@@ -184,11 +184,7 @@ void Content::handleServerListChange(QList<types::device::Device> servers) {
   const auto getAction = [=](const auto& s) {
     // if client is connected to server
     if (!controller->isConnectedToServer()) return Action::Connect;
-
-    // get the server
     auto server = controller->getConnectedServer();
-
-    // infer
     if (s.ip == server.ip && s.port == server.port) {
       return Action::Disconnect;
     } else {
@@ -220,11 +216,7 @@ void Content::handleServerStatusChanged(bool isConnected) {
   // get the action for the server
   const auto getAction = [=](const auto& s) {
     if (!controller->isConnectedToServer()) return Action::Connect;
-
-    // get the server
     auto server = controller->getConnectedServer();
-
-    // infer
     if (s.ip == server.ip && s.port == server.port) {
       return Action::Disconnect;
     } else {
@@ -248,6 +240,44 @@ void Content::handleServerStatusChanged(bool isConnected) {
   // set the server list to the window
   this->setServerList(servers_m);
 }
+
+/**
+ * @brief handle onConnectionError
+ */
+void Content::handleConnectionError(QString error) {
+  // Just Show the error info to user via Dialog
+  // clang-format off
+  auto message = QString(
+    "Connection Error\n"
+    "Error Message: %1"
+  ).arg(
+    error
+  );
+  // clang-format on
+
+  // Dialog Instance
+  auto dialog = new QMessageBox();
+
+  // icon for the dialog
+  auto icon = QIcon(constants::getAppLogo().c_str());
+
+  // set the icon
+  dialog->setWindowIcon(icon);
+
+  // set the title
+  dialog->setWindowTitle(constants::getAppName().c_str());
+
+  // set the message
+  dialog->setText(message);
+
+  // set delete on close
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+  // show the dialog
+  dialog->show();
+}
+
+//----------------------------- slots for Tray ----------------------------//
 
 /**
  * @brief On Qr Code Clicked
@@ -318,7 +348,7 @@ void Content::onQrCodeClicked() {
   dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
 
   // set the title
-  dialog->setWindowTitle("Clipbird");
+  dialog->setWindowTitle(constants::getAppName().c_str());
 
   // set the root layout to dialog
   dialog->setLayout(root);
@@ -332,27 +362,27 @@ void Content::onQrCodeClicked() {
   // set as not resizable
   dialog->setFixedSize(dialog->sizeHint());
 
-  // theme changer
-  auto onStyleChanged = [=]() {
-    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
-      qrcode->setColor(Qt::white);
-    } else {
-      qrcode->setColor(Qt::black);
-    }
-  };
-
   // initial theme
-  onStyleChanged();
-
-  // detect the system theme
-  const auto signal = &QStyleHints::colorSchemeChanged;
-  const auto slot = onStyleChanged;
-  QObject::connect(QGuiApplication::styleHints(), signal, slot);
+  if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+    qrcode->setColor(Qt::white);
+  } else {
+    qrcode->setColor(Qt::black);
+  }
 
   // close on tab change
   const auto signal_tc = &QTabWidget::currentChanged;
   const auto slot_tc   = [=](int) { dialog->close(); };
   QObject::connect(tab, signal_tc, slot_tc);
+
+  // detect the system theme
+  const auto signal = &QStyleHints::colorSchemeChanged;
+  QObject::connect(QGuiApplication::styleHints(), signal, [=](auto scheme) {
+    if (scheme == Qt::ColorScheme::Dark) {
+      qrcode->setColor(Qt::white);
+    } else {
+      qrcode->setColor(Qt::black);
+    }
+  });
 }
 
 /**
@@ -418,7 +448,7 @@ void Content::onConnectClicked() {
   dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
 
   // set the title
-  dialog->setWindowTitle("Clipbird");
+  dialog->setWindowTitle(constants::getAppName().c_str());
 
   // set the root layout to dialog
   dialog->setLayout(root);
@@ -634,6 +664,11 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto signal_ts = &Content::onTabChanged;
   const auto slot_ts   = &Content::handleTabChangeForServer;
   connect(this, signal_ts, this, slot_ts);
+
+  // Connect the signal and slot for OnConnectionError
+  const auto signal_ce = &ClipBird::OnConnectionError;
+  const auto slot_ce   = &Content::handleConnectionError;
+  connect(controller, signal_ce, this, slot_ce);
 
   // if host is lastly server
   if (controller->isLastlyHostIsServer()) {

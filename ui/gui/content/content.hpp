@@ -160,6 +160,11 @@ class Content : public QFrame {
    */
   void handleServerStatusChanged(bool status);
 
+  /**
+   * @brief handle onConnectionError
+   */
+  void handleConnectionError(QString error);
+
   //----------------------------- slots for Tray ----------------------------//
 
   /**
