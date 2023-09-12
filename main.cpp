@@ -244,6 +244,9 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
+  // create the application
+  ClipbirdApplication app(argc, argv);
+
   // Home Directory of the application
   auto path = QString::fromStdString(getAppHome());
 
@@ -278,9 +281,6 @@ auto main(int argc, char **argv) -> int {
 
   // Set the custom message handler
   qInstallMessageHandler(Logger::handler);
-
-  // create the application
-  ClipbirdApplication app(argc, argv);
 
   // start application and return status code
   return app.exec();
