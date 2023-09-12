@@ -370,9 +370,7 @@ void Content::onQrCodeClicked() {
   }
 
   // close on tab change
-  const auto signal_tc = &QTabWidget::currentChanged;
-  const auto slot_tc   = [=](int) { dialog->close(); };
-  QObject::connect(tab, signal_tc, slot_tc);
+  QObject::connect(tab, &QTabWidget::currentChanged, dialog, &QDialog::close);
 
   // detect the system theme
   const auto signal = &QStyleHints::colorSchemeChanged;
@@ -463,9 +461,7 @@ void Content::onConnectClicked() {
   dialog->setFixedSize(dialog->size());
 
   // close on tab change
-  const auto signal_tc = &QTabWidget::currentChanged;
-  const auto slot_tc   = [=](int) { dialog->close(); };
-  QObject::connect(tab, signal_tc, slot_tc);
+  QObject::connect(tab, &QTabWidget::currentChanged, dialog, &QDialog::close);
 
   // connect the dialog to window clicked signal
   connect(button, &QPushButton::clicked, [=] {
