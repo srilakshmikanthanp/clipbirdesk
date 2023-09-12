@@ -33,7 +33,7 @@ Clipbird utilizes a variety of packet types for different purposes. These packet
 
 ### What are the packets Required for Clipbird
 
-When Client connected to server The server need to send an Response that weather the Authentication is Success or failure for this purpose we use **Authentication** Packet.
+When Client connected to server The server need to send an Response that weather the User is Accepted or Rejected the Client for this purpose we use **Authentication** Packet until this Event No Clipboard data is sent and Any Received Clipboard packet from client will be dropped.
 
 Once the server has been identified, clipboard data is transmitted between the client and the server using a single type of packet known as the **SyncingPacket**. This packet is responsible for transferring clipboard data from the client to the server and vice versa, ensuring seamless sharing of clipboard content between the two devices.
 
