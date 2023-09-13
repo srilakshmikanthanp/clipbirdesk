@@ -222,7 +222,7 @@ target_include_directories(check
   PUBLIC ${PROJECT_SOURCE_DIR}
   PUBLIC ${PROJECT_BINARY_DIR})
 
-#link test executable to gtest & gtest_main
+# link test executable to gtest & gtest_main
 target_link_libraries(check
   PRIVATE GTest::gtest_main
   PRIVATE Qt6::Core
