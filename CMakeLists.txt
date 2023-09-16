@@ -74,6 +74,9 @@ set(WITH_TOOLS OFF CACHE BOOL "" FORCE)
 # Make Available qzxing
 FetchContent_MakeAvailable(libqrencode)
 
+# glob pattern for .proto files
+file(GLOB_RECURSE proto_files proto/*.proto)
+
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
 
@@ -88,11 +91,19 @@ list(FILTER main_cpp EXCLUDE REGEX "tests/")
 # remove build/**.cpp from list
 list(FILTER main_cpp EXCLUDE REGEX "build/")
 
+# Configure config.hpp
+configure_file(
+  ${PROJECT_SOURCE_DIR}/config/config.hpp.in
+  ${PROJECT_BINARY_DIR}/config/config.hpp)
+
 # Find Qt packages
 find_package(Qt6 REQUIRED COMPONENTS
   Widgets
   Network
   Sql)
+
+# Find protobuf
+find_package(Protobuf REQUIRED)
 
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
@@ -101,11 +112,6 @@ find_package(OpenSSL REQUIRED)
 if(WIN32 OR APPLE)
   find_package(Bonjour REQUIRED)
 endif()
-
-# Configure config.hpp
-configure_file(
-  ${PROJECT_SOURCE_DIR}/config/config.hpp.in
-  ${PROJECT_BINARY_DIR}/config/config.hpp)
 
 # set up project using Qt
 qt_standard_project_setup()
@@ -119,9 +125,12 @@ if (WIN32)
   set (RESOURCES ${RESOURCES} ${PROJECT_SOURCE_DIR}/assets/windows.rc)
 endif()
 
+# generate protobuf files
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${proto_files})
+
 # Add executable
 qt_add_executable(clipbird
-  ${main_cpp} ${RESOURCES})
+  ${main_cpp} ${RESOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
 
 # Include Directories for libqrencode
 target_include_directories(clipbird
@@ -140,11 +149,13 @@ target_link_libraries(clipbird
 # link bonjour if windows or Mac
 if(WIN32 OR APPLE)
   target_link_libraries(clipbird
-    PRIVATE ${BONJOUR_LIBRARIES})
+    PRIVATE ${BONJOUR_LIBRARIES}
+    PRIVATE ${Protobuf_LIBRARIES})
 endif()
 
 # Include directories
 target_include_directories(clipbird
+  PUBLIC ${Protobuf_INCLUDE_DIRS}
   PUBLIC ${PROJECT_SOURCE_DIR}
   PUBLIC ${PROJECT_BINARY_DIR})
 
