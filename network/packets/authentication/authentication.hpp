@@ -18,6 +18,9 @@
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 
+// Protobuf
+#include "authentication.pb.h"
+
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
  * @brief Authentication Packet used to indicate the status
@@ -87,21 +90,13 @@ class Authentication {
   quint32 size() const noexcept;
 
   /**
-   * @brief Input stream operator for QDataStream
-   *
-   * @param stream
-   * @param packet
-   * @return QDataStream&
+   * @brief Create Authentication Packet from Bytes
    */
-  friend QDataStream& operator<<(QDataStream& stream, const Authentication packet);
+  static Authentication fromBytes(QByteArray array);
 
   /**
-   * @brief Output stream operator for QDataStream
-   *
-   * @param stream
-   * @param packet
-   * @return QDataStream&
+   * @brief Convert Authentication Packet to Bytes
    */
-  friend QDataStream& operator>>(QDataStream& stream, Authentication& packet);
+  static QByteArray toBytes(const Authentication& packet);
 };
 } // namespace srilakshmikanthanp::clipbirdesk::network::packets

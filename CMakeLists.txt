@@ -46,6 +46,9 @@ set(QT_MAJOR_VERSION 6)
 # Append Qt cmake dir to CMAKE_PREFIX_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
 
+# set CMP0071 to NEW
+cmake_policy(SET CMP0071 OLD)
+
 # --------------------------------- Main Project ---------------------------------#
 # Fetch SingleApplication from github
 FetchContent_Declare(SingleApplication
@@ -137,6 +140,10 @@ target_include_directories(clipbird
   PRIVATE ${libqrencode_SOURCE_DIR}
 )
 
+# Include Directories for Protobuf
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${Protobuf_INCLUDE_DIRS})
+
 # Link libraries
 target_link_libraries(clipbird
   PRIVATE SingleApplication::SingleApplication
@@ -144,18 +151,17 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto
-  PRIVATE qrencode)
+  PRIVATE qrencode
+  PRIVATE protobuf::libprotobuf)
 
 # link bonjour if windows or Mac
 if(WIN32 OR APPLE)
   target_link_libraries(clipbird
-    PRIVATE ${BONJOUR_LIBRARIES}
-    PRIVATE ${Protobuf_LIBRARIES})
+    PRIVATE ${BONJOUR_LIBRARIES})
 endif()
 
 # Include directories
 target_include_directories(clipbird
-  PUBLIC ${Protobuf_INCLUDE_DIRS}
   PUBLIC ${PROJECT_SOURCE_DIR}
   PUBLIC ${PROJECT_BINARY_DIR})
 

@@ -1,8 +1,21 @@
-syntax = "proto3";
-
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+syntax = "proto3";
+
 package srilakshmikanthanp.clipbirdesk.proto.syncingpacket;
+
+message SyncingItem {
+  uint32 mime_length = 1;
+  bytes mime_type = 2;
+  uint32 payload_length = 3;
+  bytes payload = 4;
+}
+
+message SyncingPacket {
+  uint32 packet_length = 1;
+  uint32 item_count = 2;
+  repeated SyncingItem items = 3;
+}

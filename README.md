@@ -118,6 +118,14 @@ Install OpenSSL using the following command and set the environment variable `OP
 choco install openssl
 ~~~
 
+#### Installing Protobuf
+
+Install Protobuf using the following command using vcpgk nad make sure you have set `VCPKG_TOOLCHAIN` to the vcpkg toolchain file.
+
+~~~sh
+vcpkg install protobuf protobuf:x64-windows
+~~~
+
 #### Installing Qt6
 
 Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for windows, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
@@ -133,6 +141,7 @@ Just go to [bonjour](https://developer.apple.com/bonjour/) and downlod the bonjo
 | `OPENSSL_ROOT_DIR`  | OpenSSL installation directory     |
 | `QT_CMAKE_DIR`      | Qt6 cmake directory                |
 | `BONJOUR_SDK_HOME`  | Bonjour SDK directory              |
+| `VCPKG_TOOLCHAIN`   | vcpkg toolchain file               |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

@@ -49,10 +49,8 @@ QVector<QPair<QString, QByteArray>> Clipboard::get() {
 
   // has Color
   if (mimeData->hasColor()) {
-    auto colors = qvariant_cast<QColor>(mimeData->colorData());
-    QByteArray data; QDataStream stream(&data, QIODevice::WriteOnly);
-    stream << colors;
-    items.append({MIME_TYPE_COLOR, data});
+    auto color = qvariant_cast<QColor>(mimeData->colorData());
+    items.append({MIME_TYPE_COLOR, color.name().toUtf8()});
   }
 
   // has HTML
@@ -72,13 +70,6 @@ QVector<QPair<QString, QByteArray>> Clipboard::get() {
   // has Text
   if (mimeData->hasText()) {
     items.append({MIME_TYPE_TEXT, mimeData->text().toUtf8()});
-  }
-
-  // has URLs
-  if (mimeData->hasUrls()) {
-    QByteArray data; QDataStream stream(&data, QIODevice::WriteOnly);
-    stream << mimeData->urls();
-    items.append({MIME_TYPE_URL, data});
   }
 
   // return the data
@@ -119,19 +110,9 @@ void Clipboard::set(const QVector<QPair<QString, QByteArray>> data) {
       mimeData->setText(QString::fromUtf8(data));
     }
 
-    // has URLs
-    if (mime == MIME_TYPE_URL) {
-      QDataStream stream(data);
-      QList<QUrl> urls;
-      stream >> urls;
-      mimeData->setUrls(urls);
-    }
-
     // has Color
     if (mime == MIME_TYPE_COLOR) {
-      QDataStream stream(data);
-      QColor color;
-      stream >> color;
+      auto color = QColor(QString::fromUtf8(data));
       mimeData->setColorData(color);
     }
   }

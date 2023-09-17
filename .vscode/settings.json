@@ -3,6 +3,9 @@
   "grammarly.files.exclude": [
     "**/CMakeLists.txt"
   ],
+  "cmake.configureArgs": [
+    "-DCMAKE_TOOLCHAIN_FILE=${env:VCPKG_TOOLCHAIN}"
+  ],
   "cSpell.words": [
     "Antialiasing",
     "Cilp",
@@ -156,6 +159,8 @@
     "stack": "cpp",
     "qsslcertificate": "cpp",
     "qapplication": "cpp",
-    "singleapplication": "cpp"
+    "singleapplication": "cpp",
+    "ta_test_priv.h": "c",
+    "qbytearray": "cpp"
   },
 }

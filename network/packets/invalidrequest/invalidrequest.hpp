@@ -18,6 +18,9 @@
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 
+// protobuf
+#include "invalidrequest.pb.h"
+
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
  * @brief Invalid Packet used to indicate the error
@@ -102,21 +105,13 @@ class InvalidRequest {
   quint32 size() const noexcept;
 
   /**
-   * @brief Input stream operator for QDataStream
-   *
-   * @param stream
-   * @param packet
-   * @return QDataStream&
+   * @brief Convert the QByteArray to InvalidRequest
    */
-  friend QDataStream& operator<<(QDataStream& stream, const InvalidRequest packet);
+  static InvalidRequest fromByteArray(QByteArray data);
 
   /**
-   * @brief Output stream operator for QDataStream
-   *
-   * @param stream
-   * @param packet
-   * @return QDataStream&
+   * @brief Convert the InvalidRequest to QByteArray
    */
-  friend QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet);
+  static QByteArray toByteArray(InvalidRequest packet);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets

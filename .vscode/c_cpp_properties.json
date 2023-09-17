@@ -13,13 +13,16 @@
         "${workspaceFolder}/build/_deps/singleapplication-src",
         "${workspaceFolder}/build",
         "C:\\Program Files\\Bonjour SDK\\Include",
-        "C:\\kderoot\\include\\KF6\\KGuiAddons\\**"
+        "C:\\dev\\vcpkg\\packages\\protobuf_x64-windows\\include"
       ],
-      "defines": [ "_UNICODE", "_DEBUG", "UNICODE" ],
+      "defines": [
+        "_UNICODE",
+        "_DEBUG",
+        "UNICODE"
+      ],
       "cStandard": "c17",
       "cppStandard": "c++17",
-      "intelliSenseMode": "msvc-x64",
-      "configurationProvider": "ms-vscode.cpptools"
+      "intelliSenseMode": "msvc-x64"
     }
   ],
   "version": 4

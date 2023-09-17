@@ -100,114 +100,70 @@ quint32 InvalidRequest::size() const noexcept {
 }
 
 /**
- * @brief Input stream operator for QDataStream
- *
- * @param stream
- * @param packet
- * @return QDataStream&
+ * @brief Convert the QByteArray to InvalidRequest
  */
-QDataStream& operator<<(QDataStream& stream, const InvalidRequest packet) {
-  // write the packet length
-  stream << packet.packetLength;
+InvalidRequest InvalidRequest::fromByteArray(QByteArray data) {
+  // using InvalidRequest from Protobuf
+  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::invalidrequest::InvalidRequest;
 
-  // write the packet type
-  stream << packet.packetType;
+  // create the protobuf packet
+  ProtoPacket protoPacket;
 
-  // write the error code
-  stream << packet.errorCode;
-
-  // Msg Len
-  auto msgLen = packet.packetLength - (
-    sizeof(packet.packetType) +
-    sizeof(packet.packetLength) +
-    sizeof(packet.errorCode)
-  );
-
-  // check the error message size
-  if (packet.errorMessage.size() != msgLen) {
-    throw std::invalid_argument("Invalid Error Message");
+  // parse the packet
+  if(!protoPacket.ParseFromString(data.toStdString())) {
+    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet");
   }
 
-  // write the error message
-  stream.writeRawData(packet.errorMessage.data(), packet.errorMessage.size());
+  // create the InvalidRequest packet
+  InvalidRequest packet;
 
-  // return the stream
-  return stream;
+  // set the packet length
+  packet.setPacketLength(protoPacket.packet_length());
+
+  // set the packet type
+  packet.setPacketType(protoPacket.packet_type());
+
+  // set the error code
+  packet.setErrorCode(protoPacket.error_code());
+
+  // set the error message
+  packet.setErrorMessage(protoPacket.error_message());
+
+  // return the packet
+  return packet;
 }
 
 /**
- * @brief Output stream operator for QDataStream
- *
- * @param stream
- * @param packet
- * @return QDataStream&
+ * @brief Convert the InvalidRequest to QByteArray
  */
-QDataStream& operator>>(QDataStream& stream, InvalidRequest& packet) {
-  // using malformed packet exception
-  using types::except::MalformedPacket;
+QByteArray InvalidRequest::toByteArray(InvalidRequest packet) {
+  // using InvalidRequest from Protobuf
+  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::invalidrequest::InvalidRequest;
 
-  // read the packet length
-  stream >> packet.packetLength;
+  // create the protobuf packet
+  ProtoPacket protoPacket;
 
-  // is the stream status is bad
-  if (stream.status() != QDataStream::Ok) {
-    throw MalformedPacket(types::enums::CodingError, "Invalid Packet Length");
+  // set the packet length
+  protoPacket.set_packet_length(packet.getPacketLength());
+
+  // set the packet type
+  protoPacket.set_packet_type(packet.getPacketType());
+
+  // set the error code
+  protoPacket.set_error_code(packet.getErrorCode());
+
+  // set the error message
+  protoPacket.set_error_message(packet.getErrorMessage().toStdString());
+
+  // create the string
+  std::string buffer;
+
+  // serialize the packet
+  if (!protoPacket.SerializeToString(&buffer)) {
+    throw throw std::runtime_error("Failed to serialize the packet");
   }
 
-  // read the packet type
-  stream >> packet.packetType;
-
-  // is the stream status is bad
-  if (stream.status() != QDataStream::Ok) {
-    throw MalformedPacket(types::enums::CodingError, "Invalid Packet Type");
-  }
-
-  // check the packet type
-  if (packet.packetType != InvalidRequest::PacketType::RequestFailed) {
-    throw types::except::NotThisPacket("Not Authentication Packet");
-  }
-
-  // read the error code
-  stream >> packet.errorCode;
-
-  // is the stream status is bad
-  if (stream.status() != QDataStream::Ok) {
-    throw MalformedPacket(types::enums::CodingError, "Invalid Error Code");
-  }
-
-  // using some types
-  using types::enums::ErrorCode;
-
-  // allowed
-  const auto allowed = std::vector<int>{
-    ErrorCode::InvalidPacket,
-    ErrorCode::CodingError
-  };
-
-  // check the error code
-  if (std::find(allowed.begin(), allowed.end(), packet.errorCode) == allowed.end()) {
-    throw MalformedPacket(types::enums::CodingError, "Invalid Error Code");
-  }
-
-  // Extract the error message length
-  auto msgLen = packet.packetLength - (
-    sizeof(packet.packetType) +
-    sizeof(packet.packetLength) +
-    sizeof(packet.errorCode)
-  );
-
-  // resize the error message
-  packet.errorMessage.resize(msgLen);
-
-  // read the error message
-  stream.readRawData(packet.errorMessage.data(), packet.errorMessage.size());
-
-  // is the stream status is bad
-  if (stream.status() != QDataStream::Ok) {
-    throw MalformedPacket(types::enums::CodingError, "Invalid Error Message");
-  }
-
-  // return the stream
-  return stream;
+  // return the QByteArray
+  return QByteArray::fromStdString(buffer);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets
