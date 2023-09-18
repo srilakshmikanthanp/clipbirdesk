@@ -39,6 +39,8 @@ Once the server has been identified, clipboard data is transmitted between the c
 
 Finally we have **InvalidRequest** which is used to indicate that the packet sent by client is invalid so it provides a way to indicate that the packet status. This packet should only sent from server to client not from client to server.
 
+Note: Clipbird internally uses google's protobuf for encoding and decoding the packets. so the packet structure described below is not the actual packet structure. the actual packet structure is defined in the protobuf files.
+
 #### Packet Length
 
 The **Packet Length** field specifies the length of the packet, which is the sum of the length of the header and the length of the body. This field is used to determine the size of the packet, allowing for efficient and organized data transmission within the application. This field is First field in all of the packets.
@@ -62,8 +64,8 @@ The **InvalidRequest** is used to indicate that the packet is invalid. This pack
 | Field           | Bytes  | value |
 |-----------------|--------| ----- |
 | Packet Length   | 4      |       |
-| Packet Type     | 1      | 0x00  |
-| Error Code      | 1      |       |
+| Packet Type     | 4      | 0x00  |
+| Error Code      | 4      |       |
 | Error Message   | varies |       |
 
 #### Possible Error Codes
@@ -93,8 +95,8 @@ The **Authentication** is used to indicate the authentication process to the cli
 | Field           | Bytes | value |
 |-----------------|-------| ----- |
 | Packet Length   | 4     |       |
-| Packet Type     | 1     | 0x01  |
-| AuthStatus      | 1     |       |
+| Packet Type     | 4     | 0x01  |
+| AuthStatus      | 4     |       |
 
 ### SyncingPacket
 
@@ -118,7 +120,7 @@ The **SyncingPacket** is used to transfer clipboard data between the client and 
 | Field           | Bytes | value |
 |-----------------|-------| ----- |
 | Packet Length   | 4     |       |
-| Packet Type     | 1     | 0x02  |
+| Packet Type     | 4     | 0x02  |
 | itemCount       | 4     |       |
 | MimeLength      | 4     |       |
 | MimeType        | varies|       |

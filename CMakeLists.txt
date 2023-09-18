@@ -119,9 +119,6 @@ if(WIN32 OR APPLE)
   find_package(Bonjour REQUIRED)
 endif()
 
-# Use Static lib of protobuf
-set(Protobuf_USE_STATIC_LIBS ON)
-
 # generate protobuf files
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${proto_files})
 
