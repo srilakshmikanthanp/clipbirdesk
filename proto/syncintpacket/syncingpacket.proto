@@ -16,6 +16,7 @@ message SyncingItem {
 
 message SyncingPacket {
   uint32 packet_length = 1;
-  uint32 item_count = 2;
-  repeated SyncingItem items = 3;
+  uint32 packet_type = 2;
+  uint32 item_count = 3;
+  repeated SyncingItem items = 4;
 }

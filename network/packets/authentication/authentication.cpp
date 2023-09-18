@@ -29,7 +29,7 @@ quint32 Authentication::getPacketLength() const noexcept {
  *
  * @param type
  */
-void Authentication::setPacketType(quint8 type) {
+void Authentication::setPacketType(quint32 type) {
   if (type != PacketType::AuthStatus) {
     throw std::invalid_argument("Invalid Packet Type");
   }
@@ -40,9 +40,9 @@ void Authentication::setPacketType(quint8 type) {
 /**
  * @brief Get the Packet Type object
  *
- * @return quint8
+ * @return quint32
  */
-quint8 Authentication::getPacketType() const noexcept {
+quint32 Authentication::getPacketType() const noexcept {
   return this->packetType;
 }
 
@@ -51,7 +51,7 @@ quint8 Authentication::getPacketType() const noexcept {
  *
  * @param status
  */
-void Authentication::setAuthStatus(quint8 status) {
+void Authentication::setAuthStatus(quint32 status) {
   if (status == types::enums::AuthStatus::AuthFail) {
     this->authStatus = status;
     return;
@@ -68,9 +68,9 @@ void Authentication::setAuthStatus(quint8 status) {
 /**
  * @brief Get the Auth Status object
  *
- * @return quint8
+ * @return quint32
  */
-quint8 Authentication::getAuthStatus() const noexcept {
+quint32 Authentication::getAuthStatus() const noexcept {
   return this->authStatus;
 }
 
@@ -90,7 +90,7 @@ quint32 Authentication::size() const noexcept {
 /**
  * @brief Create Authentication Packet from Bytes
  */
-Authentication Authentication::fromBytes(QByteArray array) {
+Authentication Authentication::fromBytes(const QByteArray &array) {
   // using Authentication packet from protobuf
   using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::authentication::Authentication;
   using ProtoStatus = srilakshmikanthanp::clipbirdesk::proto::authentication::AuthStatus;

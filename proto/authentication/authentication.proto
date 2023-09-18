@@ -13,7 +13,7 @@ enum AuthStatus {
 }
 
 message Authentication {
-  uint32     packet_length = 1;
-  uint32     packet_type   = 2;
-  AuthStatus status        = 3;
+  uint32 packet_length = 1;
+  uint32 packet_type = 2;
+  AuthStatus status = 3;
 }

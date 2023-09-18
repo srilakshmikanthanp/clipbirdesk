@@ -27,9 +27,6 @@ TEST(AuthenticationTest, TestingAuthentication) {
   // using the ErrorCode
   using srilakshmikanthanp::clipbirdesk::types::enums::AuthStatus;
 
-  // using the AuthType
-  using srilakshmikanthanp::clipbirdesk::types::enums::AuthType;
-
   // using functions namespace
   using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
 

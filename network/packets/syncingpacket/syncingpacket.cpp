@@ -7,6 +7,185 @@
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
+ * @brief From Proto Packet
+ */
+SyncingItem SyncingItem::fromProtoPacket(proto::syncingpacket::SyncingItem item) {
+  // create the payload
+  SyncingItem payload;
+
+  // set the mime length
+  payload.setMimeLength(item.mime_length());
+
+  // set the mime type
+  payload.setMimeType(QByteArray::fromStdString(item.mime_type()));
+
+  // set the payload length
+  payload.setPayloadLength(item.payload_length());
+
+  // set the payload
+  payload.setPayload(QByteArray::fromStdString(item.payload()));
+
+  // return the payload
+  return payload;
+}
+
+/**
+ * @brief to Proto Packet
+ */
+proto::syncingpacket::SyncingItem SyncingItem::toProtoPacket(const SyncingItem& item) {
+  // create proto packet
+  proto::syncingpacket::SyncingItem packet;
+
+  // set the mime length
+  packet.set_mime_length(item.getMimeLength());
+
+  // set the mime type
+  packet.set_mime_type(item.getMimeType().toStdString());
+
+  // set the payload length
+  packet.set_payload_length(item.getPayloadLength());
+
+  // set the payload
+  packet.set_payload(item.getPayload().toStdString());
+
+  // return the packet
+  return packet;
+}
+
+/**
+ * @brief Set the Mime Length object
+ */
+void SyncingItem::setMimeLength(quint32 length) {
+  this->mimeLength = length;
+}
+
+/**
+ * @brief Get the Mime Length object
+ *
+ * @return qint32
+ */
+quint32 SyncingItem::getMimeLength() const noexcept {
+  return this->mimeLength;
+}
+
+/**
+ * @brief Set the Mime Type object
+ *
+ * @param type
+ */
+void SyncingItem::setMimeType(const QByteArray& type) {
+  if (type.size() != this->mimeLength) {
+    throw std::invalid_argument("Invalid Mime Type");
+  } else {
+    this->mimeType = type;
+  }
+}
+
+/**
+ * @brief Get the Mime Type object
+ *
+ * @return QByteArray
+ */
+QByteArray SyncingItem::getMimeType() const noexcept {
+  return this->mimeType;
+}
+
+/**
+ * @brief Set the Payload Length object
+ *
+ * @param length
+ */
+void SyncingItem::setPayloadLength(quint32 length) {
+  this->payloadLength = length;
+}
+
+/**
+ * @brief Get the Payload Length object
+ *
+ * @return qint32
+ */
+quint32 SyncingItem::getPayloadLength() const noexcept {
+  return this->payloadLength;
+}
+
+/**
+ * @brief Set the Payload object
+ *
+ * @param payload
+ */
+void SyncingItem::setPayload(const QByteArray& payload) {
+  if (payload.size() != this->payloadLength) {
+    throw std::invalid_argument("Invalid Payload");
+  } else {
+    this->payload = payload;
+  }
+}
+
+/**
+ * @brief Get the Payload object
+ *
+ * @return QByteArray
+ */
+QByteArray SyncingItem::getPayload() const noexcept {
+  return this->payload;
+}
+
+/**
+ * @brief Get the size of the packet
+ *
+ * @return size_t
+ */
+quint32 SyncingItem::size() const noexcept {
+  return quint32(
+    sizeof(this->mimeLength) +
+    this->mimeType.size() +
+    sizeof(this->payloadLength) +
+    this->payload.size()
+  );
+}
+
+/**
+ * @brief From Bytes
+ */
+SyncingItem SyncingItem::fromBytes(const QByteArray &array) {
+  // using syncing item from protobuf
+  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::syncingpacket::SyncingItem;
+
+  // create proto packet
+  ProtoPacket packet;
+
+  // parse the packet
+  if (!packet.ParseFromArray(array.data(), array.size())) {
+    throw std::invalid_argument("Invalid Packet");
+  }
+
+  // return the payload
+  return fromProtoPacket(packet);
+}
+
+/**
+ * @brief to Bytes
+ */
+QByteArray SyncingItem::toBytes(const SyncingItem& payload) {
+  // using syncing item from protobuf
+  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::syncingpacket::SyncingItem;
+
+  // create proto packet
+  ProtoPacket packet = toProtoPacket(payload);
+
+  // create the array
+  QByteArray array(packet.ByteSizeLong(), 0);
+
+  // serialize the packet
+  if (!packet.SerializeToArray(array.data(), array.size())) {
+    throw std::invalid_argument("Invalid Packet");
+  }
+
+  // return the array
+  return array;
+}
+
+/**
  * @brief Set the Packet Length object
  *
  * @param length
@@ -29,7 +208,7 @@ quint32 SyncingPacket::getPacketLength() const noexcept {
  *
  * @param type
  */
-void SyncingPacket::setPacketType(quint8 type) {
+void SyncingPacket::setPacketType(quint32 type) {
   if (type != PacketType::SyncPacket) {
     throw std::invalid_argument("Invalid Packet Type");
   }
@@ -38,9 +217,9 @@ void SyncingPacket::setPacketType(quint8 type) {
 /**
  * @brief Get the Packet Type object
  *
- * @return quint8
+ * @return quint32
  */
-quint8 SyncingPacket::getPacketType() const noexcept {
+quint32 SyncingPacket::getPacketType() const noexcept {
   return this->packetType;
 }
 
@@ -102,89 +281,80 @@ quint32 SyncingPacket::size() const noexcept {
 }
 
 /**
- * @brief Overloaded operator<< for QDataStream
- *
- * @param out
- * @param packet
+ * @brief From Bytes
  */
-QDataStream& operator<<(QDataStream& out, const SyncingPacket& packet) {
-  // write the packet length
-  out << packet.packetLength;
+SyncingPacket SyncingPacket::fromBytes(const QByteArray &array) {
+  // using syncing packet from protobuf
+  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::syncingpacket::SyncingPacket;
 
-  // write the packet type
-  out << packet.packetType;
+  // create proto packet
+  ProtoPacket packet;
 
-  // write the item count
-  out << packet.itemCount;
-
-  // check enough payloads
-  if (packet.itemCount != packet.items.size()) {
-    throw std::invalid_argument("Invalid Payloads");
+  // parse the packet
+  if (!packet.ParseFromArray(array.data(), array.size())) {
+    throw std::invalid_argument("Invalid Packet");
   }
 
-  // write the payloads
-  for (const auto& payload : packet.items) {
-    out << payload;
+  // create the packet
+  SyncingPacket payload;
+
+  // set the packet length
+  payload.setPacketLength(packet.packet_length());
+
+  // set the packet type
+  payload.setPacketType(packet.packet_type());
+
+  // set the item count
+  payload.setItemCount(packet.item_count());
+
+  // set the payloads
+  QVector<SyncingItem> payloads;
+
+  // set the payloads
+  for (const auto& item : packet.items()) {
+    payloads.push_back(SyncingItem::fromProtoPacket(item));
   }
 
-  // return the stream
-  return out;
+  // set the payloads
+  payload.setItems(payloads);
+
+  // return the payload
+  return payload;
 }
 
 /**
- * @brief Overloaded operator>> for QDataStream
- *
- * @param in
- * @param packet
+ * @brief to Bytes
  */
-QDataStream& operator>>(QDataStream& in, SyncingPacket& packet) {
-  // using malformed packet exception
-  using types::except::MalformedPacket;
+QByteArray SyncingPacket::toBytes(const SyncingPacket& packet) {
+  // using syncing packet from protobuf
+  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::syncingpacket::SyncingPacket;
 
-  // read the packet length
-  in >> packet.packetLength;
+  // create proto packet
+  ProtoPacket protoPacket;
 
-  // check if stream is valid
-  if (in.status() != QDataStream::Ok) {
-    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Packet Length");
+  // set the packet length
+  protoPacket.set_packet_length(packet.getPacketLength());
+
+  // set the packet type
+  protoPacket.set_packet_type(packet.getPacketType());
+
+  // set the item count
+  protoPacket.set_item_count(packet.getItemCount());
+
+  // set the payloads
+  for (const auto& item : packet.getItems()) {
+    protoPacket.add_items()->CopyFrom(SyncingItem::toProtoPacket(item));
   }
 
-  // read the packet type
-  in >> packet.packetType;
+  // create the array
+  QByteArray array(protoPacket.ByteSizeLong(), 0);
 
-  // check if stream is valid
-  if (in.status() != QDataStream::Ok) {
-    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Packet Type");
+  // serialize the packet
+  if (!protoPacket.SerializeToArray(array.data(), array.size())) {
+    throw std::invalid_argument("Invalid Packet");
   }
 
-  // check the packet type
-  if (packet.packetType != SyncingPacket::PacketType::SyncPacket) {
-    throw types::except::NotThisPacket("Not Authentication Packet");
-  }
-
-  // read the item count
-  in >> packet.itemCount;
-
-  // check if stream is valid
-  if (in.status() != QDataStream::Ok) {
-    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Item Count");
-  }
-
-  // read the payloads
-  for (auto i = 0U; i < packet.itemCount; i++) {
-    SyncingItem payload;
-
-    in >> payload;
-
-    packet.items.push_back(payload);
-  }
-
-  // check if stream is valid
-  if (in.status() != QDataStream::Ok) {
-    throw MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Payloads");
-  }
-
-  // return the stream
-  return in;
+  // return the array
+  return array;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets

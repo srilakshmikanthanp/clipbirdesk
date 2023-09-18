@@ -16,26 +16,129 @@
 #include <QtTypes>
 
 // Local header files
-#include "syncingitem/syncingitem.hpp"
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 
+// proto buf
+#include "syncingpacket.pb.h"
+
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
+/**
+ * @brief Clipboard Sync Packet's Payload
+ */
+class SyncingItem {
+ private:
+
+  quint32 mimeLength;
+  QByteArray mimeType;
+  quint32 payloadLength;
+  QByteArray payload;
+
+ private:
+
+  friend class SyncingPacket;
+
+ private:
+
+  /**
+   * @brief From Proto Packet
+   */
+  static SyncingItem fromProtoPacket(proto::syncingpacket::SyncingItem item);
+
+  /**
+   * @brief to Proto Packet
+   */
+  static proto::syncingpacket::SyncingItem toProtoPacket(const SyncingItem& item);
+
+ public:
+
+  /**
+   * @brief Set the Mime Length object
+   */
+  void setMimeLength(quint32 length);
+
+  /**
+   * @brief Get the Mime Length object
+   *
+   * @return qint32
+   */
+  quint32 getMimeLength() const noexcept;
+
+  /**
+   * @brief Set the Mime Type object
+   *
+   * @param type
+   */
+  void setMimeType(const QByteArray& type);
+
+  /**
+   * @brief Get the Mime Type object
+   *
+   * @return QByteArray
+   */
+  QByteArray getMimeType() const noexcept;
+
+  /**
+   * @brief Set the Payload Length object
+   *
+   * @param length
+   */
+  void setPayloadLength(quint32 length);
+
+  /**
+   * @brief Get the Payload Length object
+   *
+   * @return qint32
+   */
+  quint32 getPayloadLength() const noexcept;
+
+  /**
+   * @brief Set the Payload object
+   *
+   * @param payload
+   */
+  void setPayload(const QByteArray& payload);
+
+  /**
+   * @brief Get the Payload object
+   *
+   * @return QByteArray
+   */
+  QByteArray getPayload() const noexcept;
+
+  /**
+   * @brief Get the size of the packet
+   *
+   * @return size_t
+   */
+  quint32 size() const noexcept;
+
+  /**
+   * @brief From Bytes
+   */
+  static SyncingItem fromBytes(const QByteArray &array);
+
+  /**
+   * @brief to Bytes
+   */
+  static QByteArray toBytes(const SyncingItem& payload);
+};
+
 /**
  * @brief Clipboard Sync Packet
  */
 class SyncingPacket {
  private:  // private members
 
-  quint8 packetType = 0x02;
   quint32 packetLength;
+  quint32 packetType = 0x02;
   quint32 itemCount;
   QVector<SyncingItem> items;
 
  public:
 
   /// @brief Allowed Packet Types
-  enum PacketType : quint8 { SyncPacket = 0x02 };
+  enum PacketType : quint32 { SyncPacket = 0x02 };
 
  public:
 
@@ -58,14 +161,14 @@ class SyncingPacket {
    *
    * @param type
    */
-  void setPacketType(quint8 type);
+  void setPacketType(quint32 type);
 
   /**
    * @brief Get the Packet Type object
    *
-   * @return quint8
+   * @return quint32
    */
-  quint8 getPacketType() const noexcept;
+  quint32 getPacketType() const noexcept;
 
   /**
    * @brief Set the Item Count object
@@ -103,19 +206,13 @@ class SyncingPacket {
   quint32 size() const noexcept;
 
   /**
-   * @brief Overloaded operator<< for QDataStream
-   *
-   * @param out
-   * @param packet
+   * @brief From Bytes
    */
-  friend QDataStream& operator<<(QDataStream& out, const SyncingPacket& packet);
+  static SyncingPacket fromBytes(const QByteArray &array);
 
   /**
-   * @brief Overloaded operator>> for QDataStream
-   *
-   * @param in
-   * @param packet
+   * @brief to Bytes
    */
-  friend QDataStream& operator>>(QDataStream& in, SyncingPacket& packet);
+  static QByteArray toBytes(const SyncingPacket& packet);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets

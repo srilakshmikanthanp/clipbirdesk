@@ -18,7 +18,7 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions {
  */
 template <typename Packet>
 QByteArray toQByteArray(const Packet& packet) {
-  return Packet::toByteArray(packet);
+  return Packet::toBytes(packet);
 }
 
 /**
@@ -30,6 +30,6 @@ QByteArray toQByteArray(const Packet& packet) {
  */
 template <typename Packet>
 Packet fromQByteArray(const QByteArray& data) {
-  return Packet::fromByteArray(data);
+  return Packet::fromBytes(data);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

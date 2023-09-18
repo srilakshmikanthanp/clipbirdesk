@@ -30,14 +30,14 @@ class InvalidRequest {
  private:
 
   quint32 packetLength;
-  quint8 packetType = 0x00;
-  quint8 errorCode;
+  quint32 packetType = 0x00;
+  quint32 errorCode;
   QByteArray errorMessage;
 
  public:
 
   /// @brief Allowed Packet Types
-  enum PacketType : quint8 { RequestFailed = 0x00 };
+  enum PacketType : quint32 { RequestFailed = 0x00 };
 
  public:
 
@@ -60,28 +60,28 @@ class InvalidRequest {
    *
    * @param type
    */
-  void setPacketType(quint8 type);
+  void setPacketType(quint32 type);
 
   /**
    * @brief Get the Packet Type object
    *
-   * @return quint8
+   * @return quint32
    */
-  quint8 getPacketType() const noexcept;
+  quint32 getPacketType() const noexcept;
 
   /**
    * @brief Set the Error Code object
    *
    * @param code
    */
-  void setErrorCode(quint8 code);
+  void setErrorCode(quint32 code);
 
   /**
    * @brief Get the Error Code object
    *
-   * @return quint8
+   * @return quint32
    */
-  quint8 getErrorCode() const noexcept;
+  quint32 getErrorCode() const noexcept;
 
   /**
    * @brief Set the Error Message object
@@ -107,11 +107,11 @@ class InvalidRequest {
   /**
    * @brief Convert the QByteArray to InvalidRequest
    */
-  static InvalidRequest fromByteArray(QByteArray data);
+  static InvalidRequest fromBytes(const QByteArray &array);
 
   /**
    * @brief Convert the InvalidRequest to QByteArray
    */
-  static QByteArray toByteArray(InvalidRequest packet);
+  static QByteArray toBytes(InvalidRequest packet);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets

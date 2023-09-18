@@ -16,7 +16,6 @@
 // Local header files
 #include "network/packets/authentication/authentication.hpp"
 #include "network/packets/invalidrequest/invalidrequest.hpp"
-#include "network/packets/syncingpacket/syncingitem/syncingitem.hpp"
 #include "network/packets/syncingpacket/syncingpacket.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"

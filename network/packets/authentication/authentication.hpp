@@ -30,8 +30,8 @@ class Authentication {
  private:
 
   quint32 packetLength;
-  quint8 packetType = 0x01;
-  quint8 authStatus;
+  quint32 packetType = 0x01;
+  quint32 authStatus;
 
  public:
 
@@ -59,28 +59,28 @@ class Authentication {
    *
    * @param type
    */
-  void setPacketType(quint8 type);
+  void setPacketType(quint32 type);
 
   /**
    * @brief Get the Packet Type object
    *
-   * @return quint8
+   * @return quint32
    */
-  quint8 getPacketType() const noexcept;
+  quint32 getPacketType() const noexcept;
 
   /**
    * @brief Set the Auth Status object
    *
    * @param status
    */
-  void setAuthStatus(quint8 status);
+  void setAuthStatus(quint32 status);
 
   /**
    * @brief Get the Auth Status object
    *
-   * @return quint8
+   * @return quint32
    */
-  quint8 getAuthStatus() const noexcept;
+  quint32 getAuthStatus() const noexcept;
 
   /**
    * @brief Get the Size of the Packet
@@ -92,7 +92,7 @@ class Authentication {
   /**
    * @brief Create Authentication Packet from Bytes
    */
-  static Authentication fromBytes(QByteArray array);
+  static Authentication fromBytes(const QByteArray &array);
 
   /**
    * @brief Convert Authentication Packet to Bytes

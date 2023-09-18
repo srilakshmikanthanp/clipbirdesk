@@ -47,7 +47,10 @@ set(QT_MAJOR_VERSION 6)
 list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
 
 # set CMP0071 to NEW
-cmake_policy(SET CMP0071 OLD)
+cmake_policy(SET CMP0071 NEW)
+
+# set CMP0135 to NEW
+cmake_policy(SET CMP0135 NEW)
 
 # --------------------------------- Main Project ---------------------------------#
 # Fetch SingleApplication from github
@@ -116,6 +119,18 @@ if(WIN32 OR APPLE)
   find_package(Bonjour REQUIRED)
 endif()
 
+# Use Static lib of protobuf
+set(Protobuf_USE_STATIC_LIBS ON)
+
+# generate protobuf files
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${proto_files})
+
+# Combine the srcs and hdrs
+set(PROTO_GEN_SRCS "${PROTO_SRCS};${PROTO_HDRS}")
+
+# set protobuf files as generated
+set_source_files_properties(${PROTO_GEN_SRCS} PROPERTIES GENERATED TRUE)
+
 # set up project using Qt
 qt_standard_project_setup()
 
@@ -128,12 +143,16 @@ if (WIN32)
   set (RESOURCES ${RESOURCES} ${PROJECT_SOURCE_DIR}/assets/windows.rc)
 endif()
 
-# generate protobuf files
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${proto_files})
-
 # Add executable
 qt_add_executable(clipbird
   ${main_cpp} ${RESOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
+
+# set clipbird depends on protobuf files
+add_custom_target(protobuf_srcs
+  DEPENDS ${PROTO_SRCS} ${PROTO_HDRS})
+
+# add protobuf_srcs to clipbird
+add_dependencies(clipbird protobuf_srcs)
 
 # Include Directories for libqrencode
 target_include_directories(clipbird
@@ -143,22 +162,6 @@ target_include_directories(clipbird
 # Include Directories for Protobuf
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${Protobuf_INCLUDE_DIRS})
-
-# Link libraries
-target_link_libraries(clipbird
-  PRIVATE SingleApplication::SingleApplication
-  PRIVATE Qt6::Widgets
-  PRIVATE Qt6::Network
-  PRIVATE OpenSSL::SSL
-  PRIVATE OpenSSL::Crypto
-  PRIVATE qrencode
-  PRIVATE protobuf::libprotobuf)
-
-# link bonjour if windows or Mac
-if(WIN32 OR APPLE)
-  target_link_libraries(clipbird
-    PRIVATE ${BONJOUR_LIBRARIES})
-endif()
 
 # Include directories
 target_include_directories(clipbird
@@ -171,21 +174,27 @@ if (WIN32 OR APPLE)
     PUBLIC ${BONJOUR_INCLUDE_DIR})
 endif()
 
+# Link libraries
+target_link_libraries(clipbird
+  PRIVATE SingleApplication::SingleApplication
+  PRIVATE Qt6::Widgets
+  PRIVATE Qt6::Network
+  PRIVATE OpenSSL::SSL
+  PRIVATE OpenSSL::Crypto
+  PRIVATE qrencode
+  PRIVATE ${Protobuf_LIBRARIES})
+
+# link bonjour if windows or Mac
+if(WIN32 OR APPLE)
+  target_link_libraries(clipbird
+    PRIVATE ${BONJOUR_LIBRARIES})
+endif()
+
 # set target properties
 set_target_properties(clipbird PROPERTIES
   WIN32_EXECUTABLE TRUE
   MACOSX_BUNDLE TRUE
 )
-
-# add target compiler options GCC -std=c++17
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  target_compile_options(clipbird PRIVATE -std=c++17)
-endif()
-
-# add target compiler options MSVC /std:c++17
-if(MSVC)
-  target_compile_options(clipbird PRIVATE /std:c++17)
-endif()
 
 # Add Platform specific definitions for apple
 if(APPLE)
@@ -200,6 +209,16 @@ endif()
 # Add Platform specific definitions for linux
 if(UNIX AND NOT APPLE)
   add_definitions(-D__linux__)
+endif()
+
+# add target compiler options GCC -std=c++17
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  target_compile_options(clipbird PRIVATE -std=c++17)
+endif()
+
+# add target compiler options MSVC /std:c++17
+if(MSVC)
+  target_compile_options(clipbird PRIVATE /std:c++17)
 endif()
 
 # --------------------------------- Unit Tests ---------------------------------#
@@ -223,7 +242,10 @@ file(GLOB_RECURSE test_cpp
 
 # Add Executable to test
 qt_add_executable(check
-  ${test_cpp})
+  ${test_cpp} ${PROTO_SRCS} ${PROTO_HDRS})
+
+# add protobuf_srcs to check
+add_dependencies(check protobuf_srcs)
 
 # Enable testing
 enable_testing()
@@ -243,4 +265,5 @@ target_include_directories(check
 target_link_libraries(check
   PRIVATE GTest::gtest_main
   PRIVATE Qt6::Core
-  PRIVATE Qt6::Network)
+  PRIVATE Qt6::Network
+  PRIVATE ${Protobuf_LIBRARIES})
