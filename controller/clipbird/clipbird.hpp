@@ -90,6 +90,13 @@ class ClipBird : public QObject {
   /// @brief Handle the Server Found (From client)
   void handleServerFound(types::device::Device server);
 
+ private: // private functions
+
+  /**
+   * @brief Set the SSL Configuration object
+   */
+  void setSslConfiguration(QSslConfiguration config);
+
  public:  // Member functions
 
   /**
@@ -99,7 +106,7 @@ class ClipBird : public QObject {
    * @param board  clipboard that is managed
    * @param parent parent object
    */
-  ClipBird(QObject *parent = nullptr);
+  ClipBird(QSslConfiguration config, QObject *parent = nullptr);
 
   /**
    * @brief Destroy the ClipBird object
@@ -118,18 +125,6 @@ class ClipBird : public QObject {
    * @brief set the host as client
    */
   void setCurrentHostAsClient();
-
-  //--------------------- General functions ----------------------//
-
-  /**
-   * @brief Set the SSL Configuration object
-   */
-  void setSslConfiguration(QSslConfiguration config);
-
-  /**
-   * @brief Get the SSL Configuration object
-   */
-  QSslConfiguration getSslConfiguration() const;
 
   //------------------- Store functions ------------------------//
 

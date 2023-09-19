@@ -151,17 +151,19 @@ class ClipbirdApplication : public SingleApplication {
   /**
    * @brief Construct a new Clipbird Application object
    *
-   * @param argc argument count   [unused]
-   * @param argv argument vector  [unused]
+   * @param argc argument count
+   * @param argv argument vector
    */
   ClipbirdApplication(int &argc, char **argv) : SingleApplication(argc, argv) {
-    // create the objects of the class
-    controller = new controller::ClipBird();
+    // Nothing to do here
+  }
 
-    // set the ssl configuration
-    controller->setSslConfiguration(this->getSslConfiguration());
-
+  /**
+   * @brief Initialize the Application
+   */
+  void initialize() {
     // create the objects of the class
+    controller = new controller::ClipBird(this->getSslConfiguration());
     content = new ui::gui::Content(controller);
     window  = new ui::gui::Window();
 
@@ -281,6 +283,9 @@ auto main(int argc, char **argv) -> int {
 
   // Set the custom message handler
   qInstallMessageHandler(Logger::handler);
+
+  // Initialize the application
+  app.initialize();
 
   // start application and return status code
   return app.exec();

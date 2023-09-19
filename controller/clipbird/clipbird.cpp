@@ -87,13 +87,42 @@ void ClipBird::handleServerFound(types::device::Device server) {
 }
 
 /**
+ * @brief Set the SSL Configuration object
+ */
+void ClipBird::setSslConfiguration(QSslConfiguration config) {
+  // storage instance
+  storage::Storage &store = storage::Storage::instance();
+
+  // Ca Certificates
+  QList<QSslCertificate> caCerts;
+
+  // set all ca Client certs from store
+  for (auto certByte : store.getAllClientCert()) {
+    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
+  }
+
+  // set all ca Server certs from store
+  for (auto certByte : store.getAllServerCert()) {
+    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
+  }
+
+  // set ca certificates
+  config.setCaCertificates(caCerts);
+
+  // set the ssl configuration
+  this->m_sslConfig = config;
+}
+
+/**
  * @brief Construct a new ClipBird object and manage
  * the clipboard, server and client
  *
  * @param board  clipboard that is managed
  * @param parent parent object
  */
-ClipBird::ClipBird(QObject *parent) : QObject(parent), m_clipboard(this) {}
+ClipBird::ClipBird(QSslConfiguration config, QObject *parent) : QObject(parent), m_clipboard(this) {
+  this->setSslConfiguration(config);
+}
 
 //---------------------- public slots -----------------------//
 
@@ -203,40 +232,6 @@ void ClipBird::setCurrentHostAsClient() {
 
   // Start the Discovery
   client->startBrowsing();
-}
-
-/**
- * @brief Set the SSL Configuration object
- */
-void ClipBird::setSslConfiguration(QSslConfiguration config) {
-  // storage instance
-  storage::Storage &store = storage::Storage::instance();
-
-  // Ca Certificates
-  QList<QSslCertificate> caCerts;
-
-  // set all ca Client certs from store
-  for (auto certByte : store.getAllClientCert()) {
-    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
-  }
-
-  // set all ca Server certs from store
-  for (auto certByte : store.getAllServerCert()) {
-    caCerts.append(QSslCertificate(certByte, QSsl::Pem));
-  }
-
-  // set ca certificates
-  config.setCaCertificates(caCerts);
-
-  // set the ssl configuration
-  this->m_sslConfig = config;
-}
-
-/**
- * @brief Get the SSL Configuration object
- */
-QSslConfiguration ClipBird::getSslConfiguration() const {
-  return m_sslConfig;
 }
 
 /**
