@@ -18,9 +18,7 @@
 // Local header files
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
-
-// proto buf
-#include "syncingpacket.pb.h"
+#include "utility/functions/helpers/helpers.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
@@ -33,22 +31,6 @@ class SyncingItem {
   QByteArray mimeType;
   quint32 payloadLength;
   QByteArray payload;
-
- private:
-
-  friend class SyncingPacket;
-
- private:
-
-  /**
-   * @brief From Proto Packet
-   */
-  static SyncingItem fromProtoPacket(proto::syncingpacket::SyncingItem item);
-
-  /**
-   * @brief to Proto Packet
-   */
-  static proto::syncingpacket::SyncingItem toProtoPacket(const SyncingItem& item);
 
  public:
 

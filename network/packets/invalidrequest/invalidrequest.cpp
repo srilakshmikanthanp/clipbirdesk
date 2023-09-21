@@ -103,33 +103,49 @@ quint32 InvalidRequest::size() const noexcept {
  * @brief Convert the QByteArray to InvalidRequest
  */
 InvalidRequest InvalidRequest::fromBytes(const QByteArray &array) {
-  // using InvalidRequest from Protobuf
-  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::invalidrequest::InvalidRequest;
+  // using the utility functions
+  using utility::functions::fromQByteArray;
+  using types::except::MalformedPacket;
+  using types::enums::ErrorCode;
 
-  // create the protobuf packet
-  ProtoPacket protoPacket;
-
-  // parse the packet
-  if(!protoPacket.ParseFromString(array.toStdString())) {
-    throw types::except::MalformedPacket(types::enums::CodingError, "Invalid Packet");
-  }
-
-  // create the InvalidRequest packet
+  // Create the InvalidRequest
   InvalidRequest packet;
 
-  // set the packet length
-  packet.setPacketLength(protoPacket.packet_length());
+  // check length
+  if (array.size() != 12) {
+    throw types::except::NotThisPacket("Not InvalidRequest Packet");
+  }
 
-  // set the packet type
-  packet.setPacketType(protoPacket.packet_type());
+  // Set the Packet Length
+  packet.packetLength = fromQByteArray<quint32>(array.mid(0, 4));
 
-  // set the error code
-  packet.setErrorCode(protoPacket.error_code());
+  // Set the Packet Type
+  packet.packetType = fromQByteArray<quint32>(array.mid(4, 4));
 
-  // set the error message
-  packet.setErrorMessage(QByteArray::fromStdString(protoPacket.error_message()));
+  // Set the Error Code
+  packet.errorCode = fromQByteArray<quint32>(array.mid(8, 4));
 
-  // return the packet
+  // Msg Len
+  auto msgLen = packet.packetLength - (
+    sizeof(packet.packetType) +
+    sizeof(packet.packetLength) +
+    sizeof(packet.errorCode)
+  );
+
+  // check the error message size
+  if (array.mid(12).size() != msgLen) {
+    throw MalformedPacket(ErrorCode::CodingError, "Invalid Error Message Size");
+  }
+
+  // Set the Error Message
+  packet.errorMessage = array.mid(12);
+
+  // check packet type
+  if (packet.packetType != PacketType::RequestFailed) {
+    throw types::except::NotThisPacket("Not InvalidRequest Packet");
+  }
+
+  // Return the InvalidRequest
   return packet;
 }
 
@@ -137,33 +153,19 @@ InvalidRequest InvalidRequest::fromBytes(const QByteArray &array) {
  * @brief Convert the InvalidRequest to QByteArray
  */
 QByteArray InvalidRequest::toBytes(InvalidRequest packet) {
-  // using InvalidRequest from Protobuf
-  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::invalidrequest::InvalidRequest;
+  // using the utility functions
+  using utility::functions::toQByteArray;
 
-  // create the protobuf packet
-  ProtoPacket protoPacket;
+  // Create the QByteArray
+  QByteArray array;
 
-  // set the packet length
-  protoPacket.set_packet_length(packet.getPacketLength());
+  // Append the Packet Type
+  array.append(toQByteArray(packet.packetLength));
+  array.append(toQByteArray(packet.packetType));
+  array.append(toQByteArray(packet.errorCode));
+  array.append(packet.errorMessage);
 
-  // set the packet type
-  protoPacket.set_packet_type(packet.getPacketType());
-
-  // set the error code
-  protoPacket.set_error_code(packet.getErrorCode());
-
-  // set the error message
-  protoPacket.set_error_message(packet.getErrorMessage().toStdString());
-
-  // create the string
-  std::string buffer;
-
-  // serialize the packet
-  if (!protoPacket.SerializeToString(&buffer)) {
-    throw std::runtime_error("Failed to serialize the packet");
-  }
-
-  // return the QByteArray
-  return QByteArray::fromStdString(buffer);
+  // Return the QByteArray
+  return array;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets

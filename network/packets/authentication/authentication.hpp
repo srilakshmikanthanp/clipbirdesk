@@ -11,15 +11,14 @@
 // Qt header files
 #include <QByteArray>
 #include <QDataStream>
+#include <QtEndian>
 #include <QIODevice>
 #include <QtTypes>
 
 // Local header files
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
-
-// Protobuf
-#include "authentication.pb.h"
+#include "utility/functions/helpers/helpers.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**

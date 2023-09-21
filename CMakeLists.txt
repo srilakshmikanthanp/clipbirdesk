@@ -80,9 +80,6 @@ set(WITH_TOOLS OFF CACHE BOOL "" FORCE)
 # Make Available qzxing
 FetchContent_MakeAvailable(libqrencode)
 
-# glob pattern for .proto files
-file(GLOB_RECURSE proto_files proto/*.proto)
-
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
 
@@ -108,9 +105,6 @@ find_package(Qt6 REQUIRED COMPONENTS
   Network
   Sql)
 
-# Find protobuf
-find_package(Protobuf REQUIRED)
-
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
 
@@ -118,15 +112,6 @@ find_package(OpenSSL REQUIRED)
 if(WIN32 OR APPLE)
   find_package(Bonjour REQUIRED)
 endif()
-
-# generate protobuf files
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${proto_files})
-
-# Combine the srcs and hdrs
-set(PROTO_GEN_SRCS "${PROTO_SRCS};${PROTO_HDRS}")
-
-# set protobuf files as generated
-set_source_files_properties(${PROTO_GEN_SRCS} PROPERTIES GENERATED TRUE)
 
 # set up project using Qt
 qt_standard_project_setup()
@@ -142,14 +127,7 @@ endif()
 
 # Add executable
 qt_add_executable(clipbird
-  ${main_cpp} ${RESOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
-
-# set clipbird depends on protobuf files
-add_custom_target(protobuf_srcs
-  DEPENDS ${PROTO_SRCS} ${PROTO_HDRS})
-
-# add protobuf_srcs to clipbird
-add_dependencies(clipbird protobuf_srcs)
+  ${main_cpp} ${RESOURCES})
 
 # Include Directories for libqrencode
 target_include_directories(clipbird
@@ -178,8 +156,7 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Network
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto
-  PRIVATE qrencode
-  PRIVATE ${Protobuf_LIBRARIES})
+  PRIVATE qrencode)
 
 # link bonjour if windows or Mac
 if(WIN32 OR APPLE)
@@ -241,9 +218,6 @@ file(GLOB_RECURSE test_cpp
 qt_add_executable(check
   ${test_cpp} ${PROTO_SRCS} ${PROTO_HDRS})
 
-# add protobuf_srcs to check
-add_dependencies(check protobuf_srcs)
-
 # Enable testing
 enable_testing()
 
@@ -262,5 +236,4 @@ target_include_directories(check
 target_link_libraries(check
   PRIVATE GTest::gtest_main
   PRIVATE Qt6::Core
-  PRIVATE Qt6::Network
-  PRIVATE ${Protobuf_LIBRARIES})
+  PRIVATE Qt6::Network)

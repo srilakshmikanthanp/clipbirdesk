@@ -88,79 +88,66 @@ quint32 Authentication::size() const noexcept {
 }
 
 /**
- * @brief Create Authentication Packet from Bytes
+ * @brief Create Authentication Packet from Bytes BigEndian
  */
 Authentication Authentication::fromBytes(const QByteArray &array) {
-  // using Authentication packet from protobuf
-  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::authentication::Authentication;
-  using ProtoStatus = srilakshmikanthanp::clipbirdesk::proto::authentication::AuthStatus;
+  // Using Utility Functions
+  using utility::functions::fromQByteArray;
+  using types::except::MalformedPacket;
+  using types::enums::ErrorCode;
 
-  // create the Authentication Packet
-  auto packet = ProtoPacket();
-
-  // parse the packet
-  if(!packet.ParseFromString(array.toStdString())) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Packet");
+  // check the array length
+  if (array.size() != 12) {
+    throw types::except::NotThisPacket("Not Authentication Packet");
   }
 
-  // check the packet type
-  if (packet.packet_type() != PacketType::AuthStatus) {
-    throw types::except::MalformedPacket(types::enums::ErrorCode::CodingError, "Invalid Packet");
+  // Create Packet
+  Authentication packet;
+
+  // init the packet
+  packet.packetLength = fromQByteArray<quint32>(array.mid(0, 4));
+  packet.packetType = fromQByteArray<quint32>(array.mid(4, 4));
+  packet.authStatus = fromQByteArray<quint32>(array.mid(8, 4));
+
+  // check packet type
+  if (packet.packetType != PacketType::AuthStatus) {
+    throw types::except::NotThisPacket("Not Authentication Packet");
   }
 
-  // create the Authentication Packet
-  Authentication authPacket;
+  // auth status
+  const auto authStatus = packet.authStatus;
 
-  // set the packet length
-  authPacket.setPacketLength(packet.packet_length());
+  // allowed status
+  const QList<int> allowedStatus = {
+    types::enums::AuthStatus::AuthOkay,
+    types::enums::AuthStatus::AuthFail,
+  };
 
-  // set the packet type
-  authPacket.setPacketType(packet.packet_type());
-
-  // set the auth status
-  if (packet.status() == ProtoStatus::AUTH_FAIL) {
-    authPacket.setAuthStatus(types::enums::AuthStatus::AuthFail);
-  } else {
-    authPacket.setAuthStatus(types::enums::AuthStatus::AuthOkay);
+  // Check the auth status
+  if (!allowedStatus.contains(authStatus)) {
+    throw MalformedPacket(ErrorCode::CodingError, "Invalid Auth Status");
   }
 
-  // return the packet
-  return authPacket;
+  // return packet
+  return packet;
 }
 
 /**
- * @brief Convert Authentication Packet to Bytes
+ * @brief Convert Authentication Packet to Bytes BigEndian
  */
 QByteArray Authentication::toBytes(const Authentication& packet) {
-  // using Authentication packet from protobuf
-  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::authentication::Authentication;
-  using ProtoStatus = srilakshmikanthanp::clipbirdesk::proto::authentication::AuthStatus;
+  // Using Utility Functions
+  using utility::functions::toQByteArray;
 
-  // create the Authentication Packet
-  auto authPacket = ProtoPacket();
+  // Create Array
+  QByteArray array;
 
-  // set the packet length
-  authPacket.set_packet_length(packet.getPacketLength());
+  // append to array
+  array.append(toQByteArray(packet.packetLength));
+  array.append(toQByteArray(packet.packetType));
+  array.append(toQByteArray(packet.authStatus));
 
-  // set the packet type
-  authPacket.set_packet_type(packet.getPacketType());
-
-  // set the auth status
-  if (packet.getAuthStatus() == types::enums::AuthStatus::AuthFail) {
-    authPacket.set_status(ProtoStatus::AUTH_FAIL);
-  } else {
-    authPacket.set_status(ProtoStatus::AUTH_OKAY);
-  }
-
-  // create the byte array
-  std::string array;
-
-  // serialize the packet
-  if (!authPacket.SerializeToString(&array)) {
-    throw std::runtime_error("Failed to serialize the packet");
-  }
-
-  // return the byte array
-  return QByteArray::fromStdString(array);
+  // return array
+  return array;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets

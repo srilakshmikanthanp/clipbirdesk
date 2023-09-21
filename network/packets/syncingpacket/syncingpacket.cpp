@@ -7,52 +7,6 @@
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
- * @brief From Proto Packet
- */
-SyncingItem SyncingItem::fromProtoPacket(proto::syncingpacket::SyncingItem item) {
-  // create the payload
-  SyncingItem payload;
-
-  // set the mime length
-  payload.setMimeLength(item.mime_length());
-
-  // set the mime type
-  payload.setMimeType(QByteArray::fromStdString(item.mime_type()));
-
-  // set the payload length
-  payload.setPayloadLength(item.payload_length());
-
-  // set the payload
-  payload.setPayload(QByteArray::fromStdString(item.payload()));
-
-  // return the payload
-  return payload;
-}
-
-/**
- * @brief to Proto Packet
- */
-proto::syncingpacket::SyncingItem SyncingItem::toProtoPacket(const SyncingItem& item) {
-  // create proto packet
-  proto::syncingpacket::SyncingItem packet;
-
-  // set the mime length
-  packet.set_mime_length(item.getMimeLength());
-
-  // set the mime type
-  packet.set_mime_type(item.getMimeType().toStdString());
-
-  // set the payload length
-  packet.set_payload_length(item.getPayloadLength());
-
-  // set the payload
-  packet.set_payload(item.getPayload().toStdString());
-
-  // return the packet
-  return packet;
-}
-
-/**
  * @brief Set the Mime Length object
  */
 void SyncingItem::setMimeLength(quint32 length) {
@@ -148,40 +102,39 @@ quint32 SyncingItem::size() const noexcept {
  * @brief From Bytes
  */
 SyncingItem SyncingItem::fromBytes(const QByteArray &array) {
-  // using syncing item from protobuf
-  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::syncingpacket::SyncingItem;
+  // using the utility functions
+  using utility::functions::fromQByteArray;
 
-  // create proto packet
-  ProtoPacket packet;
+  // Create the SyncingItem
+  SyncingItem payload;
 
-  // parse the packet
-  if (!packet.ParseFromArray(array.data(), array.size())) {
-    throw std::invalid_argument("Invalid Packet");
-  }
+  // Set the Mime Length
+  payload.mimeLength = fromQByteArray<quint32>(array.mid(0, 4));
+  payload.mimeType = array.mid(4, payload.mimeLength);
+  payload.payloadLength = fromQByteArray<quint32>(array.mid(4 + payload.mimeLength, 4));
+  payload.payload = array.mid(8 + payload.mimeLength, payload.payloadLength);
 
-  // return the payload
-  return fromProtoPacket(packet);
+  // Return the SyncingItem
+  return payload;
 }
 
 /**
  * @brief to Bytes
  */
 QByteArray SyncingItem::toBytes(const SyncingItem& payload) {
-  // using syncing item from protobuf
-  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::syncingpacket::SyncingItem;
+  // using the toQByteArray function
+  using utility::functions::toQByteArray;
 
-  // create proto packet
-  ProtoPacket packet = toProtoPacket(payload);
+  // Create the QByteArray
+  QByteArray array;
 
-  // create the array
-  QByteArray array(packet.ByteSizeLong(), 0);
+  // Set the Mime Length
+  array.append(toQByteArray(payload.mimeLength));
+  array.append(payload.mimeType);
+  array.append(toQByteArray(payload.payloadLength));
+  array.append(payload.payload);
 
-  // serialize the packet
-  if (!packet.SerializeToArray(array.data(), array.size())) {
-    throw std::invalid_argument("Invalid Packet");
-  }
-
-  // return the array
+  // Return the QByteArray
   return array;
 }
 
@@ -284,77 +237,13 @@ quint32 SyncingPacket::size() const noexcept {
  * @brief From Bytes
  */
 SyncingPacket SyncingPacket::fromBytes(const QByteArray &array) {
-  // using syncing packet from protobuf
-  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::syncingpacket::SyncingPacket;
 
-  // create proto packet
-  ProtoPacket packet;
-
-  // parse the packet
-  if (!packet.ParseFromArray(array.data(), array.size())) {
-    throw std::invalid_argument("Invalid Packet");
-  }
-
-  // create the packet
-  SyncingPacket payload;
-
-  // set the packet length
-  payload.setPacketLength(packet.packet_length());
-
-  // set the packet type
-  payload.setPacketType(packet.packet_type());
-
-  // set the item count
-  payload.setItemCount(packet.item_count());
-
-  // set the payloads
-  QVector<SyncingItem> payloads;
-
-  // set the payloads
-  for (const auto& item : packet.items()) {
-    payloads.push_back(SyncingItem::fromProtoPacket(item));
-  }
-
-  // set the payloads
-  payload.setItems(payloads);
-
-  // return the payload
-  return payload;
 }
 
 /**
  * @brief to Bytes
  */
 QByteArray SyncingPacket::toBytes(const SyncingPacket& packet) {
-  // using syncing packet from protobuf
-  using ProtoPacket = srilakshmikanthanp::clipbirdesk::proto::syncingpacket::SyncingPacket;
 
-  // create proto packet
-  ProtoPacket protoPacket;
-
-  // set the packet length
-  protoPacket.set_packet_length(packet.getPacketLength());
-
-  // set the packet type
-  protoPacket.set_packet_type(packet.getPacketType());
-
-  // set the item count
-  protoPacket.set_item_count(packet.getItemCount());
-
-  // set the payloads
-  for (const auto& item : packet.getItems()) {
-    protoPacket.add_items()->CopyFrom(SyncingItem::toProtoPacket(item));
-  }
-
-  // create the array
-  QByteArray array(protoPacket.ByteSizeLong(), 0);
-
-  // serialize the packet
-  if (!protoPacket.SerializeToArray(array.data(), array.size())) {
-    throw std::invalid_argument("Invalid Packet");
-  }
-
-  // return the array
-  return array;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets
