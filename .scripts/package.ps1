@@ -9,6 +9,12 @@ if (-not (Test-Path ./CMakeLists.txt)) {
   exit 1
 }
 
+# if is not Developer Command Prompt for VS 2022
+if ($env:VSCMD_ARG_TGT_ARCH -ne "x64") {
+  Write-Host "Please run this script in Developer Command Prompt for VS 2022" -ForegroundColor Red
+  exit 1
+}
+
 #-------------------------- clipbird package --------------------------#
 
 # Buil the clipbird with release configuration
