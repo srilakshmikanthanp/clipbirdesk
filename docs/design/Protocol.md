@@ -39,8 +39,6 @@ Once the server has been identified, clipboard data is transmitted between the c
 
 Finally we have **InvalidRequest** which is used to indicate that the packet sent by client is invalid so it provides a way to indicate that the packet status. This packet should only sent from server to client not from client to server.
 
-Note: Clipbird internally uses google's protobuf for encoding and decoding the packets. so the packet structure described below is not the actual packet structure. the actual packet structure is defined in the protobuf files.
-
 #### Packet Length
 
 The **Packet Length** field specifies the length of the packet, which is the sum of the length of the header and the length of the body. This field is used to determine the size of the packet, allowing for efficient and organized data transmission within the application. This field is First field in all of the packets.

@@ -100,72 +100,79 @@ quint32 InvalidRequest::size() const noexcept {
 }
 
 /**
+ * @brief Convert the InvalidRequest to QByteArray
+ */
+QByteArray InvalidRequest::toBytes() const {
+  // create the stream
+  auto byteArr = QByteArray();
+  auto stream  = QDataStream(&byteArr, QIODevice::WriteOnly);
+
+  // set the byte order
+  stream.setByteOrder(QDataStream::BigEndian);
+
+  // Write the fields
+  stream << this->packetLength;
+  stream << this->packetType;
+  stream << this->errorCode;
+  stream.writeRawData(this->errorMessage.data(), this->errorMessage.size());
+
+  // Return the QByteArray
+  return byteArr;
+}
+
+/**
  * @brief Convert the QByteArray to InvalidRequest
  */
 InvalidRequest InvalidRequest::fromBytes(const QByteArray &array) {
+  // create the stream
+  auto stream = QDataStream(array);
+
   // using the utility functions
-  using utility::functions::fromQByteArray;
   using types::except::MalformedPacket;
   using types::enums::ErrorCode;
 
   // Create the InvalidRequest
   InvalidRequest packet;
 
-  // check length
-  if (array.size() != 12) {
-    throw types::except::NotThisPacket("Not InvalidRequest Packet");
-  }
+  // set the byte order
+  stream.setByteOrder(QDataStream::BigEndian);
 
-  // Set the Packet Length
-  packet.packetLength = fromQByteArray<quint32>(array.mid(0, 4));
+  // Read the fields
+  stream >> packet.packetLength;
+  stream >> packet.packetType;
+  stream >> packet.errorCode;
 
-  // Set the Packet Type
-  packet.packetType = fromQByteArray<quint32>(array.mid(4, 4));
-
-  // Set the Error Code
-  packet.errorCode = fromQByteArray<quint32>(array.mid(8, 4));
-
-  // Msg Len
-  auto msgLen = packet.packetLength - (
+  // Read the message
+  packet.errorMessage.resize(packet.packetLength - (
     sizeof(packet.packetType) +
     sizeof(packet.packetLength) +
     sizeof(packet.errorCode)
-  );
+  ));
 
-  // check the error message size
-  if (array.mid(12).size() != msgLen) {
-    throw MalformedPacket(ErrorCode::CodingError, "Invalid Error Message Size");
+  // Read the message
+  stream.readRawData(packet.errorMessage.data(), packet.errorMessage.size());
+
+  // if stream is not good
+  if (stream.status() != QDataStream::Ok) {
+    throw MalformedPacket(ErrorCode::CodingError, "InvalidRequest");
   }
-
-  // Set the Error Message
-  packet.errorMessage = array.mid(12);
 
   // check packet type
   if (packet.packetType != PacketType::RequestFailed) {
     throw types::except::NotThisPacket("Not InvalidRequest Packet");
   }
 
+  // check error code
+  auto allowed = QVector<quint32>{
+    types::enums::ErrorCode::InvalidPacket,
+    types::enums::ErrorCode::CodingError
+  };
+
+  if (!allowed.contains(packet.errorCode)) {
+    throw std::invalid_argument("Invalid Error Code");
+  }
+
   // Return the InvalidRequest
   return packet;
-}
-
-/**
- * @brief Convert the InvalidRequest to QByteArray
- */
-QByteArray InvalidRequest::toBytes(InvalidRequest packet) {
-  // using the utility functions
-  using utility::functions::toQByteArray;
-
-  // Create the QByteArray
-  QByteArray array;
-
-  // Append the Packet Type
-  array.append(toQByteArray(packet.packetLength));
-  array.append(toQByteArray(packet.packetType));
-  array.append(toQByteArray(packet.errorCode));
-  array.append(packet.errorMessage);
-
-  // Return the QByteArray
-  return array;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets

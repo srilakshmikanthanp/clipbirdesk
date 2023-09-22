@@ -18,7 +18,6 @@
 // Local header files
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
-#include "utility/functions/helpers/helpers.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
@@ -96,14 +95,24 @@ class SyncingItem {
   quint32 size() const noexcept;
 
   /**
-   * @brief From Bytes
+   * @brief To Stream
    */
-  static SyncingItem fromBytes(const QByteArray &array);
+  void toStream(QDataStream& stream) const;
 
   /**
    * @brief to Bytes
    */
-  static QByteArray toBytes(const SyncingItem& payload);
+  QByteArray toBytes() const;
+
+  /**
+   * @brief From Stream
+   */
+  static SyncingItem fromStream(QDataStream& stream);
+
+  /**
+   * @brief From Bytes
+   */
+  static SyncingItem fromBytes(const QByteArray &array);
 };
 
 /**
@@ -188,13 +197,13 @@ class SyncingPacket {
   quint32 size() const noexcept;
 
   /**
+   * @brief to Bytes
+   */
+  QByteArray toBytes() const;
+
+  /**
    * @brief From Bytes
    */
   static SyncingPacket fromBytes(const QByteArray &array);
-
-  /**
-   * @brief to Bytes
-   */
-  static QByteArray toBytes(const SyncingPacket& packet);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets

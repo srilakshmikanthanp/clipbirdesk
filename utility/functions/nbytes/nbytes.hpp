@@ -18,7 +18,7 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions {
  */
 template <typename Packet>
 QByteArray toQByteArray(const Packet& packet) {
-  return Packet::toBytes(packet);
+  return packet.toBytes();
 }
 
 /**

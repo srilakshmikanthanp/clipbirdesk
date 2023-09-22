@@ -17,7 +17,6 @@
 // Local header files
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
-#include "utility/functions/helpers/helpers.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
@@ -103,13 +102,13 @@ class InvalidRequest {
   quint32 size() const noexcept;
 
   /**
+   * @brief Convert the InvalidRequest to QByteArray
+   */
+  QByteArray toBytes() const;
+
+  /**
    * @brief Convert the QByteArray to InvalidRequest
    */
   static InvalidRequest fromBytes(const QByteArray &array);
-
-  /**
-   * @brief Convert the InvalidRequest to QByteArray
-   */
-  static QByteArray toBytes(InvalidRequest packet);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets

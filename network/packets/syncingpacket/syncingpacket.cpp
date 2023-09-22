@@ -99,43 +99,71 @@ quint32 SyncingItem::size() const noexcept {
 }
 
 /**
- * @brief From Bytes
+ * @brief To Stream
  */
-SyncingItem SyncingItem::fromBytes(const QByteArray &array) {
-  // using the utility functions
-  using utility::functions::fromQByteArray;
-
-  // Create the SyncingItem
-  SyncingItem payload;
-
-  // Set the Mime Length
-  payload.mimeLength = fromQByteArray<quint32>(array.mid(0, 4));
-  payload.mimeType = array.mid(4, payload.mimeLength);
-  payload.payloadLength = fromQByteArray<quint32>(array.mid(4 + payload.mimeLength, 4));
-  payload.payload = array.mid(8 + payload.mimeLength, payload.payloadLength);
-
-  // Return the SyncingItem
-  return payload;
+void SyncingItem::toStream(QDataStream& stream) const {
+  stream << this->mimeLength;
+  stream.writeRawData(this->mimeType.data(), this->mimeLength);
+  stream << this->payloadLength;
+  stream.writeRawData(this->payload.data(), this->payloadLength);
 }
 
 /**
  * @brief to Bytes
  */
-QByteArray SyncingItem::toBytes(const SyncingItem& payload) {
-  // using the toQByteArray function
-  using utility::functions::toQByteArray;
+QByteArray SyncingItem::toBytes() const {
+  // create the stream
+  auto byteArr = QByteArray();
+  auto stream  = QDataStream(&byteArr, QIODevice::WriteOnly);
 
-  // Create the QByteArray
-  QByteArray array;
+  // set the byte order
+  stream.setByteOrder(QDataStream::BigEndian);
 
-  // Set the Mime Length
-  array.append(toQByteArray(payload.mimeLength));
-  array.append(payload.mimeType);
-  array.append(toQByteArray(payload.payloadLength));
-  array.append(payload.payload);
+  // serialize the packet
+  this->toStream(stream);
 
   // Return the QByteArray
-  return array;
+  return byteArr;
+}
+
+/**
+ * @brief From Stream
+ */
+SyncingItem SyncingItem::fromStream(QDataStream& stream) {
+  // using the utility functions
+  using types::except::MalformedPacket;
+  using types::enums::ErrorCode;
+
+  // Create the SyncingItem
+  SyncingItem pack;
+
+  // Read the Packet Fields
+  stream >> pack.mimeLength; pack.mimeType.resize(pack.mimeLength);
+  stream.readRawData(pack.mimeType.data(), pack.mimeLength);
+  stream >> pack.payloadLength;pack.payload.resize(pack.payloadLength);
+  stream.readRawData(pack.payload.data(), pack.payloadLength);
+
+  // if the stream is not good
+  if (stream.status() != QDataStream::Ok) {
+    throw MalformedPacket(ErrorCode::CodingError, "SyncingItem");
+  }
+
+  // return the payload
+  return pack;
+}
+
+/**
+ * @brief From Bytes
+ */
+SyncingItem SyncingItem::fromBytes(const QByteArray &array) {
+  // create the stream
+  auto stream = QDataStream(array);
+
+  // set the byte order
+  stream.setByteOrder(QDataStream::BigEndian);
+
+  // return the payload
+  return SyncingItem::fromStream(stream);
 }
 
 /**
@@ -222,9 +250,7 @@ QVector<SyncingItem> SyncingPacket::getItems() const noexcept {
  * @return size_t
  */
 quint32 SyncingPacket::size() const noexcept {
-  size_t size = (
-    sizeof(this->packetType) + sizeof(this->packetLength) + sizeof(this->itemCount)
-  );
+  size_t size = (sizeof(this->packetType) + sizeof(this->packetLength) + sizeof(this->itemCount));
 
   for (const auto& payload : this->items) {
     size += payload.size();
@@ -234,16 +260,63 @@ quint32 SyncingPacket::size() const noexcept {
 }
 
 /**
- * @brief From Bytes
+ * @brief to Bytes
  */
-SyncingPacket SyncingPacket::fromBytes(const QByteArray &array) {
+QByteArray SyncingPacket::toBytes() const {
+  // create the stream
+  auto byteArr = QByteArray();
+  auto stream  = QDataStream(&byteArr, QIODevice::WriteOnly);
 
+  // set the byte order
+  stream.setByteOrder(QDataStream::BigEndian);
+
+  // Write the fields
+  stream << this->packetLength;
+  stream << this->packetType;
+  stream << this->itemCount;
+
+  // Write the Payloads
+  for (const auto& payload : this->items) {
+    payload.toStream(stream);
+  }
+
+  // Return the QByteArray
+  return byteArr;
 }
 
 /**
- * @brief to Bytes
+ * @brief From Bytes
  */
-QByteArray SyncingPacket::toBytes(const SyncingPacket& packet) {
+SyncingPacket SyncingPacket::fromBytes(const QByteArray &array) {
+  // create the stream
+  auto stream = QDataStream(array);
 
+  // using the utility functions
+  using types::except::MalformedPacket;
+  using types::enums::ErrorCode;
+
+  // set the byte order
+  stream.setByteOrder(QDataStream::BigEndian);
+
+  // Create the SyncingPacket
+  SyncingPacket packet;
+
+  // Read the Packet Fields
+  stream >> packet.packetLength;
+  stream >> packet.packetType;
+  stream >> packet.itemCount;
+
+  // Read the Payloads
+  for (quint32 i = 0; i < packet.itemCount; i++) {
+    packet.items.push_back(SyncingItem::fromStream(stream));
+  }
+
+  // if the stream is not good
+  if (stream.status() != QDataStream::Ok) {
+    throw MalformedPacket(ErrorCode::CodingError, "SyncingPacket");
+  }
+
+  // return the packet
+  return packet;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets

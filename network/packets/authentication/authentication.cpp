@@ -88,34 +88,56 @@ quint32 Authentication::size() const noexcept {
 }
 
 /**
+ * @brief Convert Authentication Packet to Bytes BigEndian
+ */
+QByteArray Authentication::toBytes() const {
+  // create a ostream
+  auto byteArr = QByteArray();
+  auto stream  = QDataStream(&byteArr, QIODevice::WriteOnly);
+
+  // set the byte order
+  stream.setByteOrder(QDataStream::BigEndian);
+
+  // write the fields
+  stream << this->packetLength;
+  stream << this->packetType;
+  stream << this->authStatus;
+
+  // return QByteArray
+  return byteArr;
+}
+
+/**
  * @brief Create Authentication Packet from Bytes BigEndian
  */
 Authentication Authentication::fromBytes(const QByteArray &array) {
+  // create binary iostream with byte array
+  auto stream = QDataStream(array);
+
+  // set the byte order
+  stream.setByteOrder(QDataStream::BigEndian);
+
   // Using Utility Functions
-  using utility::functions::fromQByteArray;
   using types::except::MalformedPacket;
   using types::enums::ErrorCode;
-
-  // check the array length
-  if (array.size() != 12) {
-    throw types::except::NotThisPacket("Not Authentication Packet");
-  }
 
   // Create Packet
   Authentication packet;
 
-  // init the packet
-  packet.packetLength = fromQByteArray<quint32>(array.mid(0, 4));
-  packet.packetType = fromQByteArray<quint32>(array.mid(4, 4));
-  packet.authStatus = fromQByteArray<quint32>(array.mid(8, 4));
+  // read the Packet
+  stream >> packet.packetLength;
+  stream >> packet.packetType;
+  stream >> packet.authStatus;
+
+  // if stream is not in good state
+  if (stream.status() != QDataStream::Ok) {
+    throw MalformedPacket(ErrorCode::CodingError, "Invalid Packet");
+  }
 
   // check packet type
   if (packet.packetType != PacketType::AuthStatus) {
     throw types::except::NotThisPacket("Not Authentication Packet");
   }
-
-  // auth status
-  const auto authStatus = packet.authStatus;
 
   // allowed status
   const QList<int> allowedStatus = {
@@ -124,30 +146,11 @@ Authentication Authentication::fromBytes(const QByteArray &array) {
   };
 
   // Check the auth status
-  if (!allowedStatus.contains(authStatus)) {
+  if (!allowedStatus.contains(packet.authStatus)) {
     throw MalformedPacket(ErrorCode::CodingError, "Invalid Auth Status");
   }
 
   // return packet
   return packet;
-}
-
-/**
- * @brief Convert Authentication Packet to Bytes BigEndian
- */
-QByteArray Authentication::toBytes(const Authentication& packet) {
-  // Using Utility Functions
-  using utility::functions::toQByteArray;
-
-  // Create Array
-  QByteArray array;
-
-  // append to array
-  array.append(toQByteArray(packet.packetLength));
-  array.append(toQByteArray(packet.packetType));
-  array.append(toQByteArray(packet.authStatus));
-
-  // return array
-  return array;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::packets

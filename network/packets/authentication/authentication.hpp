@@ -18,7 +18,6 @@
 // Local header files
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
-#include "utility/functions/helpers/helpers.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
@@ -89,13 +88,13 @@ class Authentication {
   quint32 size() const noexcept;
 
   /**
+   * @brief Convert Authentication Packet to Bytes
+   */
+  QByteArray toBytes() const;
+
+  /**
    * @brief Create Authentication Packet from Bytes
    */
   static Authentication fromBytes(const QByteArray &array);
-
-  /**
-   * @brief Convert Authentication Packet to Bytes
-   */
-  static QByteArray toBytes(const Authentication& packet);
 };
 } // namespace srilakshmikanthanp::clipbirdesk::network::packets
