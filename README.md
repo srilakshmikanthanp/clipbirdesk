@@ -185,7 +185,7 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 
 * [OpenSSL](https://www.openssl.org/)
 * [Qt](https://www.qt.io/)
-* [C++](https://www.cplusplus.com/)
+* [C++](https://isocpp.org/)
 * [Bonjour](https://developer.apple.com/bonjour/)
 
 <!-- Contributors -->
