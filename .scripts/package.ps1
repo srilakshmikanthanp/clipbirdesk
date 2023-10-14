@@ -3,15 +3,15 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
-# Check if current directory has CMakeLists.txt
-if (-not (Test-Path ./CMakeLists.txt)) {
-  Write-Host "CMakeLists.txt not found in current working directory" -ForegroundColor Red
+# if is not Developer Command Prompt for VS 2022
+if ($env:VSCMD_ARG_app_plat -ne  "Desktop") {
+  Write-Host "Please run this script in Developer Command Prompt for VS 2022" -ForegroundColor Red
   exit 1
 }
 
-# if is not Developer Command Prompt for VS 2022
-if ($env:VSCMD_ARG_TGT_ARCH -ne "x64") {
-  Write-Host "Please run this script in Developer Command Prompt for VS 2022" -ForegroundColor Red
+# Check if current directory has CMakeLists.txt
+if (-not (Test-Path ./CMakeLists.txt)) {
+  Write-Host "CMakeLists.txt not found in current working directory" -ForegroundColor Red
   exit 1
 }
 
