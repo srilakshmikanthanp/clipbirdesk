@@ -13,9 +13,6 @@ Window::Window(QWidget* parent) : QMainWindow(parent) {
   // set mainWindow attributes
   this->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
-  // set padding as 20px
-  this->setContentsMargins(10, 5, 10, 5);
-
   // set as Translucent background
   this->setAttribute(Qt::WA_TranslucentBackground);
 }

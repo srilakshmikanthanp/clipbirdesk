@@ -178,12 +178,15 @@ class ClipbirdApplication : public SingleApplication {
     // set not to quit on last content closed
     qApp->setQuitOnLastWindowClosed(false);
 
+    // set padding as 20px
+    window->setContentsMargins(20, 20, 5, 5);
+
     // BackDrop Shadow
     auto shadow = new QGraphicsDropShadowEffect();
 
     // set the shadow Properties
-    shadow->setBlurRadius(10);
-    shadow->setOffset(2, 2);
+    shadow->setBlurRadius(20);
+    shadow->setOffset(0, 0);
     shadow->setColor(QColor(0, 0, 0, 100));
 
     // set the shadow to content
