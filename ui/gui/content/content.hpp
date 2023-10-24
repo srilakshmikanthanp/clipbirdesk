@@ -27,6 +27,9 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QFrame>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 // standard headers
 #include <algorithm>
@@ -181,6 +184,16 @@ class Content : public QFrame {
    * @brief On About Clicked
    */
   void onAboutClicked();
+
+  /**
+   * @brief On Send Clicked
+   */
+  void onSendClicked();
+
+  /**
+   * @brief On Received Clicked
+   */
+  void onReceivedClicked();
 
   /**
    * @brief On Issue Clicked

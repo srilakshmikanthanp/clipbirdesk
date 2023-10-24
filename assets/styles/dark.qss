@@ -8,37 +8,33 @@
 /*********************** Common to All ************************/
 
 QFrame, QWidget {
-  background: #272727;
-  color: #FFFFFF;
-  font-family: sans-serif;
+  background: #1E1E1E; /* Dark background color */
+  color: #E0E0E0; /* Light text color */
+  font-family: Segoe UI, sans-serif; /* Windows 11 font */
   margin: 2px 0px 2px 0px;
   font-weight: 500;
 }
 
 QFrame {
-  background: #272727;
+  background: #1E1E1E;
   border-radius: 8px;
 }
 
-QLabel {
-  color: #FFFFFF;
-}
-
 QPushButton {
-  background-color: #404040;
-  color: #FFFFFF;
+  background-color: #0277FA; /* Windows 11 accent color */
+  color: #FFFFFF; /* Light text on the button */
   border: none;
   border-radius: 5px;
   padding: 6px;
 }
 
 QPushButton:hover {
-  background-color: #0277fa;
+  background-color: #0359C8; /* Slightly darker accent color on hover */
   color: #FFFFFF;
 }
 
 QTabWidget::pane {
-  background-color: #191919;
+  background-color: #1E1E1E;
   border: none;
   margin: 0px;
   padding: 0px;
@@ -49,19 +45,19 @@ QTabWidget::tab-bar {
 }
 
 QTabBar::tab {
-  border-bottom: 3px solid #272727;
-  color: #FFFFFF;
+  border-bottom: 3px solid #1E1E1E;
+  color: #E0E0E0;
   padding: 6px;
   margin: 2px;
-  background-color: #272727;
+  background-color: #1E1E1E;
 }
 
 QTabBar::tab:selected {
-  border-bottom: 3px solid #0277fa;
+  border-bottom: 3px solid #0277FA;
 }
 
 QTabBar::tab:hover {
-  border-bottom: 3px solid #0277fa;
+  border-bottom: 3px solid #0359C8;
 }
 
 QScrollArea {
@@ -70,14 +66,14 @@ QScrollArea {
 }
 
 QScrollBar:vertical {
-  background: #191919;
+  background: #1E1E1E;
   border: none;
   width: 10px;
   margin: 0px;
 }
 
 QScrollBar::handle:vertical {
-  background: #959595;
+  background: #959595; /* Windows 11 scrollbar handle color */
   border-radius: 5px;
 }
 
@@ -97,7 +93,7 @@ QScrollBar::sub-page:vertical {
 }
 
 QMenu {
-  background-color: #272727;
+  background-color: #1E1E1E;
   border: none;
   border-radius: 5px;
   padding: 6px;
@@ -106,29 +102,28 @@ QMenu {
 }
 
 QMenu::item {
-  background-color: #272727;
-  color: #FFFFFF;
+  background-color: #1E1E1E;
+  color: #E0E0E0;
   border: none;
   border-radius: 5px;
   padding: 2px 20px 2px 20px;
-  margin: 2px;
   font-size: 11px;
 }
 
 QMenu::item:selected {
-  background-color: #0277fa;
+  background-color: #0277FA;
   color: #FFFFFF;
 }
 
 QMenu::item:disabled {
-  background-color: #272727;
-  color: gray;
+  background-color: #1E1E1E;
+  color: #808080;
 }
 
 QLineEdit {
-  background-color: #272727;
-  color: #FFFFFF;
-  border: 1px solid gray;
+  background-color: #1E1E1E;
+  color: #E0E0E0;
+  border: 1px solid #808080;
   border-radius: 5px;
   margin: 2px;
   padding: 6px;

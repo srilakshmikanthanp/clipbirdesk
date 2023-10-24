@@ -19,11 +19,16 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   QObject::connect(&issue, &QAction::triggered, this, &TrayMenu::OnIssueClicked);
   QObject::connect(&reset, &QAction::triggered, this, &TrayMenu::OnResetClicked);
   QObject::connect(&exitApp, &QAction::triggered, this, &TrayMenu::OnExitClicked);
+  QObject::connect(&send, &QAction::triggered, this, &TrayMenu::OnSendClicked);
+  QObject::connect(&received, &QAction::triggered, this, &TrayMenu::OnReceivedClicked);
 
   // set the Menu Items
   this->addAction(&qrCode);
   this->addAction(&connect);
   this->addAction(&reset);
+  this->addSeparator();
+  this->addAction(&send);
+  this->addAction(&received);
   this->addSeparator();
   this->addAction(&about);
   this->addAction(&issue);
@@ -74,6 +79,20 @@ void TrayMenu::setExitEnabled(bool isenabled) {
 }
 
 /**
+ * @brief set Send Enabled or Disabled
+ */
+void TrayMenu::setSendEnabled(bool isenabled) {
+  send.setEnabled(isenabled);
+}
+
+/**
+ * @brief set Received Enabled or Disabled
+ */
+void TrayMenu::setReceivedEnabled(bool isenabled) {
+  received.setEnabled(isenabled);
+}
+
+/**
  * @brief Is Connect Enabled
  */
 bool TrayMenu::isConnectEnabled() const {
@@ -113,5 +132,19 @@ bool TrayMenu::isResetEnabled() const {
  */
 bool TrayMenu::isExitEnabled() const {
   return exitApp.isEnabled();
+}
+
+/**
+ * @brief is Send Enabled
+ */
+bool TrayMenu::isSendEnabled() const {
+  return send.isEnabled();
+}
+
+/**
+ * @brief is Received Enabled
+ */
+bool TrayMenu::isReceivedEnabled() const {
+  return received.isEnabled();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::content

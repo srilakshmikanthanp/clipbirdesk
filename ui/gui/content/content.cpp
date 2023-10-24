@@ -284,28 +284,36 @@ void Content::handleConnectionError(QString error) {
  */
 void Content::onQrCodeClicked() {
   // generate the qr code with all inteface ip and port in format
-  // [ip1;ip2;ip3;...;ipn;]port
   auto interfaces = QNetworkInterface::allInterfaces();
 
   // get server info
   auto server = controller->getServerInfo();
 
-  // accumulator
-  const auto acc = [](const auto& a, const auto& b) {
-    return a + b.toString().toStdString() + ";";
-  };
-
   // address
   const auto addrs = QNetworkInterface::allAddresses();
 
-  // accumulate the ip address
-  auto info = std::accumulate(addrs.begin(), addrs.end(), std::string("["), acc);
+  // construct json object { "port": 1234, "ips": [...]  }
+  QJsonObject json;
 
-  // add port to the info
-  info += "]" + std::to_string(server.port);
+  // add port
+  json.insert("port", server.port);
+
+  // add ips
+  QJsonArray ips;
+
+  // add all the ip address
+  for (auto addr : addrs) {
+    ips.append(addr.toString());
+  }
+
+  // add the ips to json
+  json.insert("ips", ips);
+
+  // json to string
+  auto info = QJsonDocument(json).toJson(QJsonDocument::Compact);
 
   // log
-  qDebug() << "QR Code Info: " << info.c_str();
+  qDebug() << "QR Code Info: " << QString(info);
 
   // create a dialog
   auto dialog = new QDialog();
@@ -323,7 +331,7 @@ void Content::onQrCodeClicked() {
   qrcode->setFixedSize(200, 200);
 
   // set the text
-  qrcode->setText(info.c_str());
+  qrcode->setText(QString(info));
 
   // set the text
   port->setText(QString::number(server.port));
@@ -507,6 +515,20 @@ void Content::onResetClicked() {
 }
 
 /**
+ * @brief On Send Clicked
+ */
+void Content::onSendClicked() {
+  // TODO: implement
+}
+
+/**
+ * @brief On Received Clicked
+ */
+void Content::onReceivedClicked() {
+  // TODO: implement
+}
+
+/**
  * @brief Construct a new Content object
  * with parent as QWidget
  *
@@ -600,6 +622,16 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto signal_ic = &ui::gui::content::TrayMenu::OnIssueClicked;
   const auto slot_ic   = &Content::onIssueClicked;
   QObject::connect(trayMenu, signal_ic, this, slot_ic);
+
+  // set the signal for menus Send click
+  const auto signal_sc = &ui::gui::content::TrayMenu::OnSendClicked;
+  const auto slot_sc   = &Content::onSendClicked;
+  QObject::connect(trayMenu, signal_sc, this, slot_sc);
+
+  // send the signal for menus Received click
+  const auto signal_rcv = &ui::gui::content::TrayMenu::OnReceivedClicked;
+  const auto slot_rcv   = &Content::onReceivedClicked;
+  QObject::connect(trayMenu, signal_rcv, this, slot_rcv);
 
   // set the signal for menus Reset click
   const auto signal_rc = &ui::gui::content::TrayMenu::OnResetClicked;

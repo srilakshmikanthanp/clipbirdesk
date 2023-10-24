@@ -61,16 +61,6 @@ void Window::setVisible(bool visible) {
 }
 
 /**
- * @brief On Show Event
- */
-void Window::showEvent(QShowEvent* event) {
-  QWidget::showEvent(event);
-  QWidget::setFocus();
-  QWidget::activateWindow();
-  QWidget::raise();
-}
-
-/**
  * @brief Override the focusOutEvent
  *
  * @param event
@@ -83,5 +73,15 @@ bool Window::event(QEvent* event) {
 
   // call the base class event
   return QWidget::event(event);
+}
+
+/**
+ * @brief On Show Event
+ */
+void Window::showEvent(QShowEvent* event) {
+  QWidget::showEvent(event);
+  QWidget::setFocus();
+  QWidget::activateWindow();
+  QWidget::raise();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

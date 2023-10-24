@@ -20,7 +20,7 @@ class Window : public QMainWindow {
 
   Q_DISABLE_COPY_MOVE(Window);
 
- private:  // make setcentral Widget and centralWidget private
+ private:  // make setCentral Widget and centralWidget private
 
   using QMainWindow::setCentralWidget;
   using QMainWindow::centralWidget;
@@ -58,13 +58,13 @@ class Window : public QMainWindow {
   void setVisible(bool visible) override;
 
   /**
-   * @brief On Show Event
-   */
-  void showEvent(QShowEvent* event) override;
-
-  /**
    * @brief Focus lost event
    */
   bool event(QEvent* event) override;
+
+  /**
+   * @brief On Show Event
+   */
+  void showEvent(QShowEvent* event) override;
 };  // class Window
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui
