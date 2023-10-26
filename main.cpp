@@ -185,8 +185,8 @@ class ClipbirdApplication : public SingleApplication {
     auto shadow = new QGraphicsDropShadowEffect();
 
     // set the shadow Properties
-    shadow->setBlurRadius(20);
-    shadow->setOffset(0, 0);
+    shadow->setBlurRadius(10);
+    shadow->setOffset(5, 5);
     shadow->setColor(QColor(0, 0, 0, 100));
 
     // set the shadow to content

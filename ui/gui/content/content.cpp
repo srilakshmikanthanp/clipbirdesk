@@ -545,6 +545,9 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   // add top layout to  layout
   root->addWidget(this->deviceInfo);
 
+  // set the cursor as arrow
+  tab->tabBar()->setCursor(Qt::PointingHandCursor);
+
   // Set the Expanding & Document Mode
   tab->tabBar()->setExpanding(true);
   tab->tabBar()->setDocumentMode(true);

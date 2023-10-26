@@ -3,6 +3,7 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
+
 # if is not Developer Command Prompt for VS 2022
 if ($env:VSCMD_ARG_app_plat -ne  "Desktop") {
   Write-Host "Please run this script in Developer Command Prompt for VS 2022" -ForegroundColor Red
