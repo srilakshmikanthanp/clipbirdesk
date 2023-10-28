@@ -153,6 +153,8 @@ void ClipBird::setCurrentHostAsServer() {
   // Connect the onSyncRequest signal to the clipboard
   const auto signal_sr = &Server::OnSyncRequest;
   const auto slot_sr   = &clipboard::Clipboard::set;
+  const auto slot_hsr  = &ClipBird::OnSyncRequest;
+  connect(server, signal_sr, this, slot_hsr);
   connect(server, signal_sr, &m_clipboard, slot_sr);
 
   // connect the OnClipboardChange signal to the server
@@ -217,6 +219,8 @@ void ClipBird::setCurrentHostAsClient() {
   // Connect the onSyncRequest signal to the clipboard
   const auto signal_rq = &Client::OnSyncRequest;
   const auto slot_rq   = &clipboard::Clipboard::set;
+  const auto slot_hrq  = &ClipBird::OnSyncRequest;
+  connect(client, signal_rq, this, slot_hrq);
   connect(client, signal_rq, &m_clipboard, slot_rq);
 
   // connect onConnectionError to the signal

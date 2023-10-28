@@ -64,6 +64,12 @@ class ClipBird : public QObject {
   /// @brief On Sync Request  (From Server)
   void OnClientListChanged(QList<types::device::Device> clients);
 
+  //----------------------- Common Signals ------------------------//
+
+ signals:  // signals for this class
+  /// @brief On Sync Request  (From Server)
+  void OnSyncRequest(QVector<QPair<QString, QByteArray>> data);
+
  private:  // typedefs for this class
 
   using Server = network::syncing::Server;
