@@ -24,5 +24,59 @@ class ClipHist : public QWidget {
  private:  // Member variable
 
   QList<QVector<QPair<QString, QByteArray>>> history;
+  qsizetype bucket = 30;
+
+ signals:
+
+  void onClipSelected(const QVector<QPair<QString, QByteArray>> &);
+
+ public:  // Constructor and Destructor
+
+  /**
+   * @brief Construct a new Clip Hist object
+   *
+   * @param parent
+   */
+  ClipHist(QWidget *parent = nullptr);
+
+  /**
+   * @brief Destroy the Clip Hist object
+   */
+  ~ClipHist() = default;
+
+ public:  // public member function
+
+  /**
+   * @brief Set the History
+   */
+  void setHistory(const QList<QVector<QPair<QString, QByteArray>>> &);
+
+  /**
+   * @brief Get the History
+   */
+  const QList<QVector<QPair<QString, QByteArray>>> &getHistory() const;
+
+  /**
+   * @brief Set the Bucket
+   */
+  void setBucket(size_t);
+
+  /**
+   * @brief Get the Bucket
+   *
+   * @return size_t
+   */
+  size_t getBucket() const;
+
+  /**
+   * @brief Clear the history
+   *
+   */
+  void clear();
+
+  /**
+   * @brief Add clip to history
+   */
+  void addClip(const QVector<QPair<QString, QByteArray>> &);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

@@ -503,6 +503,13 @@ void Content::onResetClicked() {
 }
 
 /**
+ * @brief On Open App Clicked
+ */
+void Content::onOpenAppClicked() {
+  this->parentWidget()->show();
+}
+
+/**
  * @brief On Send Clicked
  */
 void Content::onSendClicked() {
@@ -620,13 +627,18 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   const auto slot_ic   = &Content::onIssueClicked;
   QObject::connect(trayMenu, signal_ic, this, slot_ic);
 
+  // set the signal for menus Open App click
+  const auto signal_oc = &ui::gui::content::TrayMenu::OnOpenAppClicked;
+  const auto slot_oc   = &Content::onOpenAppClicked;
+  QObject::connect(trayMenu, signal_oc, this, slot_oc);
+
   // set the signal for menus Send click
   const auto signal_sc = &ui::gui::content::TrayMenu::OnSendClicked;
   const auto slot_sc   = &Content::onSendClicked;
   QObject::connect(trayMenu, signal_sc, this, slot_sc);
 
   // send the signal for menus Received click
-  const auto signal_rcv = &ui::gui::content::TrayMenu::OnReceivedClicked;
+  const auto signal_rcv = &ui::gui::content::TrayMenu::OnHistoryClicked;
   const auto slot_rcv   = &Content::onReceivedClicked;
   QObject::connect(trayMenu, signal_rcv, this, slot_rcv);
 

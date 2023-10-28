@@ -24,8 +24,9 @@ class TrayMenu : public QMenu {
   QAction connect   =   QAction("Join to Group");
   QAction qrCode    =   QAction("Group QrCode");
   QAction reset     =   QAction("Reset Devices");
+  QAction openApp   =   QAction("ClipBird");
   QAction send      =   QAction("Send");
-  QAction received  =   QAction("Received");
+  QAction history  =   QAction("History");
   QAction about     =   QAction("About");
   QAction issue     =   QAction("Report Issue");
   QAction exitApp   =   QAction("Exit");
@@ -40,10 +41,13 @@ class TrayMenu : public QMenu {
   void OnResetClicked();
 
  signals:  // signals
+  void OnOpenAppClicked();
+
+ signals:  // signals
   void OnSendClicked();
 
  signals:  // signals
-  void OnReceivedClicked();
+  void OnHistoryClicked();
 
  signals:  // signals
   void OnAboutClicked();
@@ -98,6 +102,11 @@ class TrayMenu : public QMenu {
   void setExitEnabled(bool);
 
   /**
+   * @brief set Open App Enabled or Disabled
+   */
+  void setOpenAppEnabled(bool);
+
+  /**
    * @brief set Send Enabled or Disabled
    */
   void setSendEnabled(bool);
@@ -105,7 +114,7 @@ class TrayMenu : public QMenu {
   /**
    * @brief set Received Enabled or Disabled
    */
-  void setReceivedEnabled(bool);
+  void setHistoryEnabled(bool);
 
   /**
    * @brief Is Qr Code Enabled
@@ -138,6 +147,11 @@ class TrayMenu : public QMenu {
   bool isExitEnabled() const;
 
   /**
+   * @brief is Open App Enabled
+   */
+  bool isOpenAppEnabled() const;
+
+  /**
    * @brief Is Send Enabled
    */
   bool isSendEnabled() const;
@@ -145,6 +159,6 @@ class TrayMenu : public QMenu {
   /**
    * @brief Is Received Enabled
    */
-  bool isReceivedEnabled() const;
+  bool isHistoryEnabled() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

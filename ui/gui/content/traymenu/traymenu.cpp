@@ -19,16 +19,18 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   QObject::connect(&issue, &QAction::triggered, this, &TrayMenu::OnIssueClicked);
   QObject::connect(&reset, &QAction::triggered, this, &TrayMenu::OnResetClicked);
   QObject::connect(&exitApp, &QAction::triggered, this, &TrayMenu::OnExitClicked);
+  QObject::connect(&openApp, &QAction::triggered, this, &TrayMenu::OnOpenAppClicked);
   QObject::connect(&send, &QAction::triggered, this, &TrayMenu::OnSendClicked);
-  QObject::connect(&received, &QAction::triggered, this, &TrayMenu::OnReceivedClicked);
+  QObject::connect(&history, &QAction::triggered, this, &TrayMenu::OnHistoryClicked);
 
   // set the Menu Items
   this->addAction(&qrCode);
   this->addAction(&connect);
   this->addAction(&reset);
   this->addSeparator();
+  this->addAction(&openApp);
   this->addAction(&send);
-  this->addAction(&received);
+  this->addAction(&history);
   this->addSeparator();
   this->addAction(&about);
   this->addAction(&issue);
@@ -79,6 +81,13 @@ void TrayMenu::setExitEnabled(bool isenabled) {
 }
 
 /**
+ * @brief set open app Enabled or Disabled
+ */
+void TrayMenu::setOpenAppEnabled(bool isenabled) {
+  openApp.setEnabled(isenabled);
+}
+
+/**
  * @brief set Send Enabled or Disabled
  */
 void TrayMenu::setSendEnabled(bool isenabled) {
@@ -88,8 +97,8 @@ void TrayMenu::setSendEnabled(bool isenabled) {
 /**
  * @brief set Received Enabled or Disabled
  */
-void TrayMenu::setReceivedEnabled(bool isenabled) {
-  received.setEnabled(isenabled);
+void TrayMenu::setHistoryEnabled(bool isenabled) {
+  history.setEnabled(isenabled);
 }
 
 /**
@@ -135,6 +144,13 @@ bool TrayMenu::isExitEnabled() const {
 }
 
 /**
+ * @brief Is Open App Enabled
+ */
+bool TrayMenu::isOpenAppEnabled() const {
+  return openApp.isEnabled();
+}
+
+/**
  * @brief is Send Enabled
  */
 bool TrayMenu::isSendEnabled() const {
@@ -144,7 +160,7 @@ bool TrayMenu::isSendEnabled() const {
 /**
  * @brief is Received Enabled
  */
-bool TrayMenu::isReceivedEnabled() const {
-  return received.isEnabled();
+bool TrayMenu::isHistoryEnabled() const {
+  return history.isEnabled();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::content

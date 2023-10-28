@@ -176,6 +176,11 @@ class Content : public QFrame {
   void onAboutClicked();
 
   /**
+   * @brief On Open App Clicked
+   */
+  void onOpenAppClicked();
+
+  /**
    * @brief On Send Clicked
    */
   void onSendClicked();
