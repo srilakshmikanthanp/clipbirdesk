@@ -42,7 +42,6 @@
 #include "ui/gui/components/device/device.hpp"
 #include "ui/gui/components/qrcode/qrcode.hpp"
 #include "ui/gui/components/status/status.hpp"
-#include "ui/gui/content/deviceinfo/deviceinfo.hpp"
 #include "ui/gui/content/devicelist/devicelist.hpp"
 #include "ui/gui/content/traymenu/traymenu.hpp"
 
@@ -52,10 +51,7 @@ class Content : public QFrame {
 
   ui::gui::content::TrayMenu *trayMenu = new ui::gui::content::TrayMenu(this);  // Tray Menu
   QSystemTrayIcon *trayIcon = new QSystemTrayIcon(this);      // Tray Icon
-
- private:  // Member variable
-
-  content::DeviceInfo* deviceInfo = new content::DeviceInfo();  // Device Info
+  ui::gui::components::Status *status = new ui::gui::components::Status(this);  // Status
 
  private:  // Member variable (Tabs)
 
@@ -103,16 +99,10 @@ class Content : public QFrame {
 
  private:  // constant for keys (Server)
 
-  static constexpr const char* const s_groupNameKey = "Group Name";
-  static constexpr const char* const s_statusKey    = "Status";
-  static constexpr const char* const s_hostsKey     = "Devices";
   static constexpr const char* const s_tabTitle     = "Create Group";
 
  private:  // constant for keys (Client)
 
-  static constexpr const char* const c_groupNameKey = "Group Name";
-  static constexpr const char* const c_statusKey    = "Status";
-  static constexpr const char* const c_hostsKey     = "Groups";
   static constexpr const char* const c_tabTitle     = "Join Group";
 
  private:  // private slots
@@ -222,26 +212,6 @@ class Content : public QFrame {
    * @brief Get the Host Status object
    */
   QPair<QString, components::Status::Value> getStatus();
-
-  /**
-   * @brief Set the Server Name object
-   */
-  void setGroupName(const QString& key, const QString& val);
-
-  /**
-   * @brief Get the Server Name object
-   */
-  QPair<QString, QString> getServerHostName();
-
-  /**
-   * @brief Set the Hosts object
-   */
-  void setHostCount(const QString& key, int val);
-
-  /**
-   * @brief Get the Hosts object
-   */
-  QPair<QString, int> getHostCount();
 
   /**
    * @brief Set tab as client

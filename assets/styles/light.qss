@@ -5,7 +5,9 @@
  * https://opensource.org/licenses/MIT
  */
 
- QFrame, QWidget {
+/*********************** Common to All ************************/
+
+QFrame, QWidget {
   background: #F0F0F0; /* Light background color */
   color: #000000; /* Dark text color */
   font-family: Segoe UI, sans-serif; /* Windows 11 font */
@@ -55,11 +57,11 @@ QTabBar::tab {
 }
 
 QTabBar::tab:selected {
-  border-bottom: 3px solid #0277fa;
+  border-bottom: 3px solid #0359C8;
 }
 
 QTabBar::tab:hover {
-  border-bottom: 3px solid #0359C8;
+  border-bottom: 3px solid #0277fa;
 }
 
 QScrollArea {
@@ -118,7 +120,6 @@ QMenu::item:selected {
 }
 
 QMenu::item:disabled {
-  background-color: #F0F0F0;
   color: gray;
 }
 
@@ -129,4 +130,13 @@ QLineEdit {
   border-radius: 5px;
   margin: 2px;
   padding: 6px;
+}
+
+/***************** Object Names *****************/
+
+#Status {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 600;
 }

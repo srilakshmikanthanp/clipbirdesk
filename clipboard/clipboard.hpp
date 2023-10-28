@@ -84,7 +84,7 @@ class Clipboard : public QObject {
    *
    * @return mime type and data
    */
-  QVector<QPair<QString, QByteArray>> get();
+  QVector<QPair<QString, QByteArray>> get() const;
 
   /**
    * @brief Clear the clipboard content

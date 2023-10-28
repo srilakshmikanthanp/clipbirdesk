@@ -479,6 +479,35 @@ void ClipBird::disconnectFromServer(const types::device::Device &host) {
 }
 
 /**
+ * @brief Sync the clipboard data with the Group
+ */
+void ClipBird::syncClipboard(const QVector<QPair<QString, QByteArray>> &data) {
+  if (std::holds_alternative<Server>(m_host)) {
+    std::get<Server>(m_host).syncItems(data);
+  } else if(std::get<Client>(m_host).isConnected()) {
+    std::get<Client>(m_host).syncItems(data);
+  }
+}
+
+/**
+ * @brief Get the Clipboard data
+ *
+ * @return clipboard::Clipboard& clipboard
+ */
+QVector<QPair<QString, QByteArray>> ClipBird::getClipboard() const {
+  return m_clipboard.get();
+}
+
+/**
+ * @brief Set the Clipboard data
+ *
+ * @param data clipboard data
+ */
+void ClipBird::setClipboard(const QVector<QPair<QString, QByteArray>> &data) {
+  m_clipboard.set(data);
+}
+
+/**
  * @brief IS the Host is Lastly Server
  */
 bool ClipBird::isLastlyHostIsServer() const {
