@@ -53,11 +53,11 @@ QTabBar::tab {
 }
 
 QTabBar::tab:selected {
-  border-bottom: 3px solid #0277FA;
+  border-bottom: 3px solid #0359C8;
 }
 
 QTabBar::tab:hover {
-  border-bottom: 3px solid #0359C8;
+  border-bottom: 3px solid #0277fa;
 }
 
 QScrollArea {
@@ -116,7 +116,6 @@ QMenu::item:selected {
 }
 
 QMenu::item:disabled {
-  background-color: #1E1E1E;
   color: #808080;
 }
 
@@ -127,4 +126,13 @@ QLineEdit {
   border-radius: 5px;
   margin: 2px;
   padding: 6px;
+}
+
+/***************** Object Names *****************/
+
+#Status {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 600;
 }

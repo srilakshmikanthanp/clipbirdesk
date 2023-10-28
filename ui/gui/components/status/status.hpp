@@ -54,5 +54,15 @@ class Status : public QLabel {
    * @return QString value
    */
   Value getStatus() const;
+
+  /**
+   * @brief Set Both at one time
+   */
+  void set(const QString& text, Value val);
+
+  /**
+   * @brief Get Both at one time
+   */
+  QPair<QString, Value> get() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

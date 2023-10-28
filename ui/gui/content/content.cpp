@@ -32,9 +32,7 @@ void Content::handleTabChangeForClient(Tabs tab) {
   if (tab != Tabs::Client) return;  // if not client tab return
 
   // initialize the client Content
-  this->setGroupName(c_groupNameKey, "-");
-  this->setStatus(c_statusKey, Status::Disconnected);
-  this->setHostCount(c_hostsKey, 0);
+  this->setStatus("Join to a Group", Status::Disconnected);
 
   // reset the device list
   this->removeAllClient();
@@ -53,10 +51,11 @@ void Content::handleTabChangeForClient(Tabs tab) {
 void Content::handleTabChangeForServer(Tabs tab) {
   if (tab != Tabs::Server) return;  // if not server tab return
 
+  // Device mDns name
+  auto name = QString::fromStdString(constants::getMDnsServiceName());
+
   // initialize the server Content
-  this->setGroupName(s_groupNameKey, "-");
-  this->setStatus(s_statusKey, Status::Inactive);
-  this->setHostCount(s_hostsKey, 0);
+  this->setStatus(name, Status::Inactive);
 
   // reset the device list
   this->removeAllServers();
@@ -85,9 +84,6 @@ void Content::handleClientListChange(QList<types::device::Device> clients) {
 
   // set the client list to the window
   this->setClientList(clients_m);
-
-  // set the host count
-  this->setHostCount(s_hostsKey, clients_m.size());
 }
 
 /**
@@ -100,9 +96,7 @@ void Content::handleServerStateChange(bool isStarted) {
   auto clients    = controller->getConnectedClientsList();
 
   // set the server status
-  this->setGroupName(s_groupNameKey, groupName);
-  this->setStatus(s_statusKey, status_m);
-  this->setHostCount(s_hostsKey, clients.size());
+  this->setStatus(groupName, status_m);
 
   // Create a list of tuple with Action
   QList<components::Device::Value> clients_m;
@@ -182,7 +176,6 @@ void Content::handleServerListChange(QList<types::device::Device> servers) {
 
   // get the action for the server
   const auto getAction = [=](const auto& s) {
-    // if client is connected to server
     if (!controller->isConnectedToServer()) return Action::Connect;
     auto server = controller->getConnectedServer();
     if (s.ip == server.ip && s.port == server.port) {
@@ -199,9 +192,6 @@ void Content::handleServerListChange(QList<types::device::Device> servers) {
 
   // set the server list to the window
   this->setServerList(servers_m);
-
-  // set the host count
-  this->setHostCount(c_hostsKey, servers_m.size());
 }
 
 /**
@@ -224,13 +214,11 @@ void Content::handleServerStatusChanged(bool isConnected) {
     }
   };
 
-  // set the server status
-  this->setGroupName(c_groupNameKey, groupName);
-  this->setStatus(c_statusKey, status_m);
-  this->setHostCount(c_hostsKey, servers.size());
-
   // Create a list of tuple with Action
   QList<components::Device::Value> servers_m;
+
+  // set the server status
+  this->setStatus(groupName, status_m);
 
   // add the server to the list
   for (auto s : servers) {
@@ -518,7 +506,7 @@ void Content::onResetClicked() {
  * @brief On Send Clicked
  */
 void Content::onSendClicked() {
-  // TODO: implement
+  this->controller->syncClipboard(controller->getClipboard());
 }
 
 /**
@@ -542,8 +530,14 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   // create the  layout
   QVBoxLayout* root = new QVBoxLayout();
 
-  // add top layout to  layout
-  root->addWidget(this->deviceInfo);
+  // status text alignment center
+  this->status->setAlignment(Qt::AlignCenter);
+
+  // add top layout to layout
+  root->addWidget(this->status);
+
+  // set status center both horizontally and vertically
+  root->setAlignment(this->status, Qt::AlignCenter);
 
   // set the cursor as arrow
   tab->tabBar()->setCursor(Qt::PointingHandCursor);
@@ -716,43 +710,14 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
  * @brief Set the Status object
  */
 void Content::setStatus(const QString& key, components::Status::Value val) {
-  this->deviceInfo->setHostStatus({key, val});
+  this->status->set(key, val);
 }
 
 /**
  * @brief Get the Host Status object
  */
 QPair<QString, components::Status::Value> Content::getStatus() {
-  return this->deviceInfo->getHostStatus();
-}
-
-/**
- * @brief Set the Server Name object
- */
-void Content::setGroupName(const QString& key, const QString& val) {
-  this->deviceInfo->setGroupName({key, val});
-}
-
-/**
- * @brief Get the Server Name object
- */
-QPair<QString, QString> Content::getServerHostName() {
-  return this->deviceInfo->getGroupName();
-}
-
-/**
- * @brief Set the Hosts object
- */
-void Content::setHostCount(const QString& key, int val) {
-  this->deviceInfo->setHostCount({key, QString::number(val)});
-}
-
-/**
- * @brief Get the Hosts object
- */
-QPair<QString, int> Content::getHostCount() {
-  const auto hostCount = this->deviceInfo->getHostCount();
-  return {hostCount.first, hostCount.second.toInt()};
+  return this->status->get();
 }
 
 /**

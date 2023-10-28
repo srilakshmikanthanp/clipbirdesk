@@ -37,7 +37,7 @@ Clipboard::Clipboard(QObject* parent) : QObject(parent) {
  *
  * @return mime type and data
  */
-QVector<QPair<QString, QByteArray>> Clipboard::get() {
+QVector<QPair<QString, QByteArray>> Clipboard::get() const {
   // Default clipboard data & mime data
   QVector<QPair<QString, QByteArray>> items;
 

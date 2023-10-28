@@ -11,7 +11,7 @@ DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
   verticalLayout->setAlignment(Qt::AlignTop);
 
   // create a label
-  QLabel *label = new QLabel("No Hosts Found");
+  QLabel *label = new QLabel("No Hosts");
 
   // set alignment as center
   label->setAlignment(Qt::AlignCenter);

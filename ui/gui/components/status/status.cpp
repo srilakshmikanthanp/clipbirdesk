@@ -20,26 +20,15 @@ Status::Status(QWidget* parent) : QLabel(parent) {
  * @param val Status
  */
 void Status::setStatus(Value val) {
-  // set the color of the status
-  if (val == Value::Disconnected || val == Value::Inactive) {
-    this->setStyleSheet("color: red");
-  } else {
-    this->setStyleSheet("color: green");
-  }
-
-  // set the text of the status
-  switch (val) {
+  switch ((this->value = val))
+  {
   case Value::Disconnected:
-    this->setText("Disconnected");
+  case Value::Inactive:
+    this->setStyleSheet("color: gray");
     break;
   case Value::Connected:
-    this->setText("Connected");
-    break;
   case Value::Active:
-    this->setText("Active");
-    break;
-  case Value::Inactive:
-    this->setText("Inactive");
+    this->setStyleSheet(QString());
     break;
   }
 }
@@ -50,5 +39,19 @@ void Status::setStatus(Value val) {
  */
 Status::Value Status::getStatus() const {
   return value;
+}
+
+/**
+ * @brief Set Both at one time
+ */
+void Status::set(const QString& text, Value val) {
+  this->setText(text); this->setStatus(val);
+}
+
+/**
+ * @brief Get Both at one time
+ */
+QPair<QString, Status::Value> Status::get() const {
+  return {this->text(), this->value};
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

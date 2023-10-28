@@ -215,6 +215,30 @@ class ClipBird : public QObject {
    */
   void disconnectFromServer(const types::device::Device &host);
 
+  //----------------------- Common functions -------------------------//
+
+  /**
+   * @brief Sync the clipboard data with the Group
+   */
+  void syncClipboard(const QVector<QPair<QString, QByteArray>> &data);
+
+
+  //---------------------- Clipboard functions -----------------------//
+
+  /**
+   * @brief Get the Clipboard data
+   *
+   * @return clipboard::Clipboard& clipboard
+   */
+  QVector<QPair<QString, QByteArray>> getClipboard() const;
+
+  /**
+   * @brief Set the Clipboard data
+   *
+   * @param data clipboard data
+   */
+  void setClipboard(const QVector<QPair<QString, QByteArray>> &data);
+
   //---------------------- General functions -----------------------//
 
   /**
