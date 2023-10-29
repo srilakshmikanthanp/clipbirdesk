@@ -136,5 +136,4 @@ The **SyncingPacket** is used to transfer clipboard data between the client and 
 |---------------------|-------------|
 | text/plain          | Text        |
 | image/png           | Image       |
-| application/x-color | Color       |
 | text/html           | HTML        |

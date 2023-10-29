@@ -47,12 +47,6 @@ QVector<QPair<QString, QByteArray>> Clipboard::get() const {
   // if mime data is not supported
   if (mimeData == nullptr) return items;
 
-  // has Color
-  if (mimeData->hasColor()) {
-    auto color = qvariant_cast<QColor>(mimeData->colorData());
-    items.append({MIME_TYPE_COLOR, color.name().toUtf8()});
-  }
-
   // has HTML
   if (mimeData->hasHtml()) {
     items.append({MIME_TYPE_HTML, mimeData->html().toUtf8()});
@@ -108,12 +102,6 @@ void Clipboard::set(const QVector<QPair<QString, QByteArray>> data) {
     // has Text
     if (mime == MIME_TYPE_TEXT) {
       mimeData->setText(QString::fromUtf8(data));
-    }
-
-    // has Color
-    if (mime == MIME_TYPE_COLOR) {
-      auto color = QColor(QString::fromUtf8(data));
-      mimeData->setColorData(color);
     }
   }
 

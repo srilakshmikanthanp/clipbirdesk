@@ -59,9 +59,7 @@ class Clipboard : public QObject {
  private:  // mime types
 
   const QString MIME_TYPE_TEXT  = "text/plain";
-  const QString MIME_TYPE_URL   = "text/uri-list";
   const QString MIME_TYPE_PNG   = "image/png";
-  const QString MIME_TYPE_COLOR = "application/x-color";
   const QString MIME_TYPE_HTML  = "text/html";
 
  private: // image type
