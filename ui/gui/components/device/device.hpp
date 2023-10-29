@@ -73,6 +73,11 @@ class Device : public QWidget {
    */
   Value getHost() const;
 
+  /**
+   * @brief Override paint for custom style
+   */
+  void paintEvent(QPaintEvent *event) override;
+
  private:  // disable copy and move
 
   Q_DISABLE_COPY_MOVE(Device)

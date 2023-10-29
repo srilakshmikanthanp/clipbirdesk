@@ -12,7 +12,7 @@ QFrame, QWidget {
   color: #000000; /* Dark text color */
   font-family: Segoe UI, sans-serif; /* Windows 11 font */
   margin: 2px 0px 2px 0px;
-  font-weight: 500;
+  font-weight: 550;
 }
 
 QFrame {
@@ -25,7 +25,7 @@ QLabel {
 }
 
 QPushButton {
-  background-color: #0277fa; /* Windows 11 accent color */
+  background-color: #167dff; /* Windows 11 accent color */
   color: #FFFFFF; /* Light text on the button */
   border: none;
   border-radius: 5px;
@@ -33,7 +33,7 @@ QPushButton {
 }
 
 QPushButton:hover {
-  background-color: #0359C8; /* Slightly darker accent color on hover */
+  background-color: #167dff; /* Slightly darker accent color on hover */
   color: #FFFFFF;
 }
 
@@ -50,18 +50,20 @@ QTabWidget::tab-bar {
 
 QTabBar::tab {
   border-bottom: 3px solid #FFFFFF;
-  color: #000000;
   padding: 6px;
+  color: gray;
   margin: 2px;
+  font-weight: 650;
   background: #FFFFFF;
 }
 
 QTabBar::tab:selected {
-  border-bottom: 3px solid #0359C8;
+  color: black;
+  border-bottom: 3px solid #167dff;
 }
 
 QTabBar::tab:hover {
-  border-bottom: 3px solid #0277fa;
+  color: black;
 }
 
 QScrollArea {
@@ -115,7 +117,7 @@ QMenu::item {
 }
 
 QMenu::item:selected {
-  background-color: #0277fa;
+  background-color: #167dff;
   color: #FFFFFF;
 }
 
@@ -138,5 +140,9 @@ QLineEdit {
   margin-top: 10px;
   margin-bottom: 10px;
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+#Device > * {
+  font-weight: 550;
 }

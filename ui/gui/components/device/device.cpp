@@ -29,6 +29,9 @@ Device::Device(QWidget *parent) : QWidget(parent) {
   // add the button to right
   layout->addWidget(actBtn, 0, Qt::AlignRight);
 
+  // ActBtn cursor as pointer
+  actBtn->setCursor(Qt::PointingHandCursor);
+
   // set the layout
   this->setLayout(layout);
 
@@ -62,5 +65,15 @@ void Device::setHost(Device::Value host) {
  */
 Device::Value Device::getHost() const {
   return std::make_tuple(device, action);
+}
+
+/**
+ * @brief Override paint for custom style
+ */
+void Device::paintEvent(QPaintEvent *event) {
+  QStyleOption opt;
+  opt.initFrom(this);
+  QPainter p(this);
+  style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

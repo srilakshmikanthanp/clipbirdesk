@@ -555,8 +555,8 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   tab->tabBar()->setCursor(Qt::PointingHandCursor);
 
   // Set the Expanding & Document Mode
-  tab->tabBar()->setExpanding(true);
   tab->tabBar()->setDocumentMode(true);
+  tab->tabBar()->setExpanding(true);
 
   // Create QScrollArea
   auto serverArea = new QScrollArea();
@@ -573,6 +573,10 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   // set the widget to scroll area
   serverArea->setWidget(this->serverList);
   clientArea->setWidget(this->clientList);
+
+  // Align center the List
+  serverArea->setAlignment(Qt::AlignCenter);
+  clientArea->setAlignment(Qt::AlignCenter);
 
   // add server list to tab
   tab->addTab(clientArea, s_tabTitle);
