@@ -91,9 +91,14 @@ void Content::handleClientListChange(QList<types::device::Device> clients) {
  */
 void Content::handleServerStateChange(bool isStarted) {
   // infer the status from the server state
-  auto groupName  = isStarted ? controller->getServerInfo().name : QString("-");
+  auto groupName  = QString::fromStdString(constants::getMDnsServiceName());
   auto status_m   = isStarted ? Status::Active : Status::Inactive;
   auto clients    = controller->getConnectedClientsList();
+
+  // If the server is started
+  if (isStarted) {
+    groupName = controller->getServerInfo().name;
+  }
 
   // set the server status
   this->setStatus(groupName, status_m);
@@ -199,7 +204,7 @@ void Content::handleServerListChange(QList<types::device::Device> servers) {
  */
 void Content::handleServerStatusChanged(bool isConnected) {
   // infer the status from the server state
-  auto groupName = isConnected ? controller->getConnectedServer().name : QString("-");
+  auto groupName = isConnected ? controller->getConnectedServer().name : QString("Join to a Group");
   auto servers   = controller->getServerList();
   auto status_m  = isConnected ? Status::Connected : Status::Disconnected;
 
