@@ -141,6 +141,7 @@ class ClipbirdApplication : public SingleApplication {
   controller::ClipBird *controller;
   ui::gui::Content *content;
   ui::gui::Window *window;
+  QSystemTrayIcon *trayIcon;
 
  private:  // Disable Copy, Move and Assignment
 
@@ -164,8 +165,9 @@ class ClipbirdApplication : public SingleApplication {
   void initialize() {
     // create the objects of the class
     controller = new controller::ClipBird(this->getSslConfiguration());
-    content = new ui::gui::Content(controller);
-    window  = new ui::gui::Window();
+    content    = new ui::gui::Content(controller);
+    window     = new ui::gui::Window();
+    trayIcon   = new QSystemTrayIcon(this);
 
     // set the signal handler for all os
     signal(SIGTERM, [](int sig) { qApp->quit(); });
@@ -192,6 +194,9 @@ class ClipbirdApplication : public SingleApplication {
     // set the shadow to content
     content->setGraphicsEffect(shadow);
 
+    // set the QSystemTrayIcon
+    content->setTrayIcon(trayIcon);
+
     // set the content Ratio
     window->setFixedSize(constants::getAppWindowSize());
 
@@ -207,7 +212,7 @@ class ClipbirdApplication : public SingleApplication {
     // tray icon click from content
     const auto signal_tic = &QSystemTrayIcon::activated;
     const auto slot_tic   = &ClipbirdApplication::onTrayIconClicked;
-    QObject::connect(content->getTrayIcon(), signal_tic, this, slot_tic);
+    QObject::connect(trayIcon, signal_tic, this, slot_tic);
 
     // set the signal for instance Started
     const auto signal_is = &SingleApplication::instanceStarted;

@@ -14,7 +14,7 @@
 #include "ui/gui/components/device/device.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
-class DeviceList : public QWidget {
+class HostList : public QWidget {
  signals:  // Signals
   void onAction(components::Device::Value host);
 
@@ -24,7 +24,7 @@ class DeviceList : public QWidget {
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(DeviceList)
+  Q_DISABLE_COPY_MOVE(HostList)
 
  public:  // Type alias
 
@@ -38,7 +38,7 @@ class DeviceList : public QWidget {
 
  public:  // Member Functions
 
-  explicit DeviceList(QWidget* parent = nullptr);
+  explicit HostList(QWidget* parent = nullptr);
 
   /**
    * @brief Set the Hosts to the list

@@ -26,7 +26,7 @@ class TrayMenu : public QMenu {
   QAction reset     =   QAction("Reset Devices");
   QAction openApp   =   QAction("ClipBird");
   QAction send      =   QAction("Send");
-  QAction history  =   QAction("History");
+  QAction history   =   QAction("History");
   QAction about     =   QAction("About");
   QAction issue     =   QAction("Report Issue");
   QAction exitApp   =   QAction("Exit");

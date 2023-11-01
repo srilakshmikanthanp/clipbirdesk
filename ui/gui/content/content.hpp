@@ -42,21 +42,21 @@
 #include "ui/gui/components/device/device.hpp"
 #include "ui/gui/components/qrcode/qrcode.hpp"
 #include "ui/gui/components/status/status.hpp"
-#include "ui/gui/content/devicelist/devicelist.hpp"
-#include "ui/gui/content/traymenu/traymenu.hpp"
+#include "ui/gui/components/hostlist/hostlist.hpp"
+#include "ui/gui/traymenu/traymenu.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 class Content : public QFrame {
  private:  // Member variable (Tray)
 
   ui::gui::content::TrayMenu *trayMenu = new ui::gui::content::TrayMenu(this);  // Tray Menu
-  QSystemTrayIcon *trayIcon = new QSystemTrayIcon(this);      // Tray Icon
+  QSystemTrayIcon *trayIcon = nullptr;  // Tray Icon
   ui::gui::components::Status *status = new ui::gui::components::Status(this);  // Status
 
  private:  // Member variable (Tabs)
 
-  content::DeviceList* clientList = new content::DeviceList();  // Server Tab
-  content::DeviceList* serverList = new content::DeviceList();  // Client Tab
+  content::HostList* clientList = new content::HostList();  // Server Tab
+  content::HostList* serverList = new content::HostList();  // Client Tab
 
  private:  // Member variable (Layout)
 
@@ -227,6 +227,11 @@ class Content : public QFrame {
    * @brief Set tab as server
    */
   void setTabAsServer();
+
+  /**
+   * @brief Set the QSystemTrayIcon
+   */
+  void setTrayIcon(QSystemTrayIcon* trayIcon);
 
   /**
    * @brief Get System Tray Icon

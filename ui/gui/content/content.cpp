@@ -607,15 +607,6 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   };
   // clang-format on
 
-  // set the icon to tray
-  trayIcon->setIcon(QIcon(constants::getAppLogo().c_str()));
-
-  // set the tray menu
-  trayIcon->setContextMenu(trayMenu);
-
-  // set tooltip
-  trayIcon->setToolTip(constants::getAppName().c_str());
-
   // set the signal for menus QrCode click
   const auto signal_qc = &ui::gui::content::TrayMenu::OnQrCodeClicked;
   const auto slot_qc   = &Content::onQrCodeClicked;
@@ -662,12 +653,12 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   QObject::connect(trayMenu, signal_ec, this, slot_ec);
 
   // connect server list signal
-  const auto signal_so = &content::DeviceList::onAction;
+  const auto signal_so = &content::HostList::onAction;
   const auto slot_so   = serverListSlot;
   connect(serverList, signal_so, slot_so);
 
   // connect client list signal
-  const auto signal_co = &content::DeviceList::onAction;
+  const auto signal_co = &content::HostList::onAction;
   const auto slot_co   = clientListSlot;
   connect(clientList, signal_co, slot_co);
 
@@ -722,9 +713,6 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   } else {
     this->setTabAsClient();
   }
-
-  // show tray icon
-  trayIcon->show();
 }
 
 /**
@@ -753,6 +741,25 @@ void Content::setTabAsClient() {
  */
 void Content::setTabAsServer() {
   this->tab->setCurrentIndex(0);
+}
+
+/**
+ * @brief Set the QSystemTrayIcon
+ */
+void Content::setTrayIcon(QSystemTrayIcon* trayIcon) {
+  this->trayIcon = trayIcon;
+
+  // set the icon to tray
+  trayIcon->setIcon(QIcon(constants::getAppLogo().c_str()));
+
+  // set the tray menu
+  trayIcon->setContextMenu(trayMenu);
+
+  // set tooltip
+  trayIcon->setToolTip(constants::getAppName().c_str());
+
+  // show tray icon
+  trayIcon->show();
 }
 
 /**

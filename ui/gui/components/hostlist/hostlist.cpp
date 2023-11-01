@@ -3,10 +3,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "devicelist.hpp"
+#include "hostlist.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
-DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
+HostList::HostList(QWidget* parent) : QWidget(parent) {
   // set alignment from start and center
   verticalLayout->setAlignment(Qt::AlignTop);
 
@@ -35,7 +35,7 @@ DeviceList::DeviceList(QWidget* parent) : QWidget(parent) {
 /**
  * @brief Set the Hosts to the list
  */
-void DeviceList::setHosts(QList<components::Device::Value> hosts) {
+void HostList::setHosts(QList<components::Device::Value> hosts) {
   // get All Hosts from the list and compare with the given list
   auto currHosts = getHosts();
 
@@ -60,7 +60,7 @@ void DeviceList::setHosts(QList<components::Device::Value> hosts) {
 /**
  * @brief Get the All Hosts from the list
  */
-QList<components::Device::Value> DeviceList::getHosts() {
+QList<components::Device::Value> HostList::getHosts() {
   // create a list of hosts
   QList<components::Device::Value> hosts;
 
@@ -76,7 +76,7 @@ QList<components::Device::Value> DeviceList::getHosts() {
 /**
  * @brief Remove all Hosts from the list
  */
-void DeviceList::removeHosts() {
+void HostList::removeHosts() {
   // iterate over the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
@@ -92,7 +92,7 @@ void DeviceList::removeHosts() {
 /**
  * @brief Add Device to the list
  */
-void DeviceList::addHost(components::Device::Value host) {
+void HostList::addHost(components::Device::Value host) {
   // create a new host view
   auto hostView = new components::Device();
 
@@ -114,7 +114,7 @@ void DeviceList::addHost(components::Device::Value host) {
 /**
  * @brief Remove All the Device as same as the given host
  */
-void DeviceList::removeHost(components::Device::Value host) {
+void HostList::removeHost(components::Device::Value host) {
   // iterate over the layout and remove all the host as same as the given host
   for (int i = 0; i < verticalLayout->count(); i++) {
     auto hostView = dynamic_cast<components::Device*>(verticalLayout->itemAt(i)->widget());
@@ -131,7 +131,7 @@ void DeviceList::removeHost(components::Device::Value host) {
 /**
  * @brief Override the showEvent
  */
-void DeviceList::paintEvent(QPaintEvent *event) {
+void HostList::paintEvent(QPaintEvent *event) {
   // if the vertical layout is empty then add a label
   if (verticalLayout->count() == 0) {
     this->stackLayout->setCurrentIndex(0);
