@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "device.hpp"
+#include "host.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 /**
@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
  * with parent as QWidget
  * @param parent parent object
  */
-Device::Device(QWidget *parent) : QWidget(parent) {
+Host::Host(QWidget *parent) : QWidget(parent) {
   // connect the button signal to this signal
   QObject::connect(actBtn, &QPushButton::clicked, [this]() {
     emit onAction({device, action});
@@ -42,7 +42,7 @@ Device::Device(QWidget *parent) : QWidget(parent) {
 /**
  * @brief Set the Device
  */
-void Device::setHost(Device::Value host) {
+void Host::setHost(Host::Value host) {
   // set the address and port
   this->device  = std::get<0>(host);
   this->action  = std::get<1>(host);
@@ -63,14 +63,14 @@ void Device::setHost(Device::Value host) {
 /**
  * @brief Get the Device
  */
-Device::Value Device::getHost() const {
+Host::Value Host::getHost() const {
   return std::make_tuple(device, action);
 }
 
 /**
  * @brief Override paint for custom style
  */
-void Device::paintEvent(QPaintEvent *event) {
+void Host::paintEvent(QPaintEvent *event) {
   QStyleOption opt;
   opt.initFrom(this);
   QPainter p(this);

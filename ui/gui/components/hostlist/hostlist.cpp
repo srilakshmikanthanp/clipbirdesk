@@ -35,7 +35,7 @@ HostList::HostList(QWidget* parent) : QWidget(parent) {
 /**
  * @brief Set the Hosts to the list
  */
-void HostList::setHosts(QList<components::Device::Value> hosts) {
+void HostList::setHosts(QList<components::Host::Value> hosts) {
   // get All Hosts from the list and compare with the given list
   auto currHosts = getHosts();
 
@@ -60,13 +60,13 @@ void HostList::setHosts(QList<components::Device::Value> hosts) {
 /**
  * @brief Get the All Hosts from the list
  */
-QList<components::Device::Value> HostList::getHosts() {
+QList<components::Host::Value> HostList::getHosts() {
   // create a list of hosts
-  QList<components::Device::Value> hosts;
+  QList<components::Host::Value> hosts;
 
   // iterate over the layout
   for (int i = 0; i < verticalLayout->count(); i++) {
-    hosts.append(dynamic_cast<components::Device*>(verticalLayout->itemAt(i)->widget())->getHost());
+    hosts.append(dynamic_cast<components::Host*>(verticalLayout->itemAt(i)->widget())->getHost());
   }
 
   // return the list of hosts
@@ -92,15 +92,15 @@ void HostList::removeHosts() {
 /**
  * @brief Add Device to the list
  */
-void HostList::addHost(components::Device::Value host) {
+void HostList::addHost(components::Host::Value host) {
   // create a new host view
-  auto hostView = new components::Device();
+  auto hostView = new components::Host();
 
   // set the host
   hostView->setHost(host);
 
   // connect the host view signal to this signal
-  const auto signal = &components::Device::onAction;
+  const auto signal = &components::Host::onAction;
   const auto slot   = [&](auto h) { emit onAction(h); };
   QObject::connect(hostView, signal, slot);
 
@@ -114,10 +114,10 @@ void HostList::addHost(components::Device::Value host) {
 /**
  * @brief Remove All the Device as same as the given host
  */
-void HostList::removeHost(components::Device::Value host) {
+void HostList::removeHost(components::Host::Value host) {
   // iterate over the layout and remove all the host as same as the given host
   for (int i = 0; i < verticalLayout->count(); i++) {
-    auto hostView = dynamic_cast<components::Device*>(verticalLayout->itemAt(i)->widget());
+    auto hostView = dynamic_cast<components::Host*>(verticalLayout->itemAt(i)->widget());
     if (hostView->getHost() == host) {
       verticalLayout->removeWidget(hostView);
       delete hostView;

@@ -39,7 +39,7 @@
 // project headers
 #include "controller/clipbird/clipbird.hpp"
 #include "types/device/device.hpp"
-#include "ui/gui/components/device/device.hpp"
+#include "ui/gui/components/host/host.hpp"
 #include "ui/gui/components/qrcode/qrcode.hpp"
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/components/hostlist/hostlist.hpp"
@@ -65,7 +65,7 @@ class Content : public QFrame {
  public:  // typedefs used in this class
 
   using Status = components::Status::Value;
-  using Action = components::Device::Action;
+  using Action = components::Host::Action;
 
  private:  // typedefs used in this class
 

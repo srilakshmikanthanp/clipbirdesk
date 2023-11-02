@@ -11,12 +11,12 @@
 #include <QWidget>
 
 // Project headers
-#include "ui/gui/components/device/device.hpp"
+#include "ui/gui/components/host/host.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
 class HostList : public QWidget {
  signals:  // Signals
-  void onAction(components::Device::Value host);
+  void onAction(components::Host::Value host);
 
  private:  // just for Qt
 
@@ -28,7 +28,7 @@ class HostList : public QWidget {
 
  public:  // Type alias
 
-  using Action = components::Device::Action;
+  using Action = components::Host::Action;
 
  private:  // Member Variables
 
@@ -43,12 +43,12 @@ class HostList : public QWidget {
   /**
    * @brief Set the Hosts to the list
    */
-  void setHosts(QList<components::Device::Value> hosts);
+  void setHosts(QList<components::Host::Value> hosts);
 
   /**
    * @brief Get the All Hosts from the list
    */
-  QList<components::Device::Value> getHosts();
+  QList<components::Host::Value> getHosts();
 
   /**
    * @brief Remove all Hosts from the list
@@ -58,12 +58,12 @@ class HostList : public QWidget {
   /**
    * @brief Add Device to the list
    */
-  void addHost(components::Device::Value host);
+  void addHost(components::Host::Value host);
 
   /**
    * @brief Remove a Device from the list
    */
-  void removeHost(components::Device::Value host);
+  void removeHost(components::Host::Value host);
 
  protected:  // Member Functions
 

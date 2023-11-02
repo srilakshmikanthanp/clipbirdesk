@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 /**
  * @brief handle the host action from the window
  */
-void Content::handleHostAction(Tabs t, components::Device::Value h) {
+void Content::handleHostAction(Tabs t, components::Host::Value h) {
   if (t == Tabs::Server && std::get<1>(h) == Action::Disconnect) {
     controller->disconnectClient(std::get<0>(h));
   }
@@ -75,7 +75,7 @@ void Content::handleTabChangeForServer(Tabs tab) {
  */
 void Content::handleClientListChange(QList<types::device::Device> clients) {
   // Create a list of tuple with Action
-  QList<components::Device::Value> clients_m;
+  QList<components::Host::Value> clients_m;
 
   // Add the clients to the list
   for (auto c : clients) {
@@ -104,7 +104,7 @@ void Content::handleServerStateChange(bool isStarted) {
   this->setStatus(groupName, status_m);
 
   // Create a list of tuple with Action
-  QList<components::Device::Value> clients_m;
+  QList<components::Host::Value> clients_m;
 
   // Add the clients to the list
   for (auto c : clients) {
@@ -177,7 +177,7 @@ void Content::handleAuthRequest(const types::device::Device& client) {
  */
 void Content::handleServerListChange(QList<types::device::Device> servers) {
   // Create a list of tuple with Action
-  QList<components::Device::Value> servers_m;
+  QList<components::Host::Value> servers_m;
 
   // get the action for the server
   const auto getAction = [=](const auto& s) {
@@ -220,7 +220,7 @@ void Content::handleServerStatusChanged(bool isConnected) {
   };
 
   // Create a list of tuple with Action
-  QList<components::Device::Value> servers_m;
+  QList<components::Host::Value> servers_m;
 
   // set the server status
   this->setStatus(groupName, status_m);
@@ -774,28 +774,28 @@ QSystemTrayIcon* Content::getTrayIcon() {
 /**
  * @brief Set the Server List object
  */
-void Content::setClientList(const QList<components::Device::Value>& hosts) {
+void Content::setClientList(const QList<components::Host::Value>& hosts) {
   clientList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List object
  */
-QList<components::Device::Value> Content::getClientList() {
+QList<components::Host::Value> Content::getClientList() {
   return clientList->getHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
-void Content::addClient(components::Device::Value host) {
+void Content::addClient(components::Host::Value host) {
   clientList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
-void Content::removeClient(components::Device::Value host) {
+void Content::removeClient(components::Host::Value host) {
   clientList->removeHost(host);
 }
 
@@ -811,28 +811,28 @@ void Content::removeAllClient() {
 /**
  * @brief Set the Server List object
  */
-void Content::setServerList(const QList<components::Device::Value>& hosts) {
+void Content::setServerList(const QList<components::Host::Value>& hosts) {
   serverList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List from the tab
  */
-QList<components::Device::Value> Content::getServerList() {
+QList<components::Host::Value> Content::getServerList() {
   return serverList->getHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
-void Content::addServer(components::Device::Value host) {
+void Content::addServer(components::Host::Value host) {
   serverList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
-void Content::removeServer(components::Device::Value host) {
+void Content::removeServer(components::Host::Value host) {
   serverList->removeHost(host);
 }
 

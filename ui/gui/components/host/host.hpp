@@ -24,7 +24,7 @@
 #include "types/device/device.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
-class Device : public QWidget {
+class Host : public QWidget {
  private:  // constant values for text
 
   const QString connect = "Connect", disconnect = "Disconnect";
@@ -61,7 +61,7 @@ class Device : public QWidget {
    * with parent as QWidget
    * @param parent parent object
    */
-  explicit Device(QWidget *parent = nullptr);
+  explicit Host(QWidget *parent = nullptr);
 
   /**
    * @brief Set the Host
@@ -80,6 +80,6 @@ class Device : public QWidget {
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(Device)
+  Q_DISABLE_COPY_MOVE(Host)
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components
