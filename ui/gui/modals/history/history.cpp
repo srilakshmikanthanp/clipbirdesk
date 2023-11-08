@@ -7,11 +7,11 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
 /**
- * @brief Construct a new Modal object
+ * @brief Construct a new Abstract object
  *
  * @param parent
  */
-History::History(QWidget * parent) : Modal(parent) {
+History::History(QWidget * parent) : QDialog(parent) {
 
 }
 }

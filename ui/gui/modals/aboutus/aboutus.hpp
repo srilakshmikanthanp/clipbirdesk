@@ -15,10 +15,9 @@
 
 // project header
 #include "constants/constants.hpp"
-#include "ui/gui/modals/modal/modal.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class AboutUs : public Modal {
+class AboutUs : public QDialog {
  private:  // disable copy and move for this class
 
   Q_DISABLE_COPY_MOVE(AboutUs)
@@ -30,7 +29,7 @@ class AboutUs : public Modal {
  public:
 
  /**
-  * @brief Construct a new Modal object
+  * @brief Construct a new Abstract object
   *
   * @param parent
   */

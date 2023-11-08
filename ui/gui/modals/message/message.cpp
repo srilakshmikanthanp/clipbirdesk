@@ -3,15 +3,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "error.hpp"
+#include "message.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
 /**
- * @brief Construct a new Modal object
+ * @brief Construct a new Abstract object
  *
  * @param parent
  */
-Error::Error(QWidget *parent) : Modal(parent) {
+Message::Message(QWidget *parent) : QDialog(parent) {
   // Set the errorMessage label to center
   this->errorMessage->setAlignment(Qt::AlignCenter);
 
@@ -28,7 +28,7 @@ Error::Error(QWidget *parent) : Modal(parent) {
 /**
  * @brief set the error message
  */
-void Error::setErrorMessage(const QString &error) {
+void Message::setErrorMessage(const QString &error) {
   this->errorMessage->setText(error);
   this->update();
 }
@@ -36,7 +36,7 @@ void Error::setErrorMessage(const QString &error) {
 /**
  * @brief get the error message
  */
-QString Error::getErrorMessage() const {
+QString Message::getErrorMessage() const {
   return this->errorMessage->text();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

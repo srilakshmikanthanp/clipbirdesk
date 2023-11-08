@@ -8,48 +8,40 @@
 // Qt header
 #include <QDialog>
 #include <QLabel>
-#include <QStyleHints>
+#include <QLineEdit>
+#include <QPushButton>
 #include <QVBoxLayout>
+#include <QStyleHints>
 
 // project header
-#include "ui/gui/modals/modal/modal.hpp"
+#include "constants/constants.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class Error : public Modal {
+class Joining : public QDialog {
  private:  // disable copy and move for this class
 
-  Q_DISABLE_COPY_MOVE(Error)
+  Q_DISABLE_COPY_MOVE(Joining)
 
  private:  // just for Qt
 
   Q_OBJECT
 
- private:  // Member variable
+ signals:   // Signals
 
-  QLabel *errorMessage = new QLabel(this);
+  void onConnect(const QString &ipv4, const QString &port);
 
  public:
 
  /**
-  * @brief Construct a new Modal object
+  * @brief Construct a new Abstract object
   *
   * @param parent
   */
-  explicit Error(QWidget * parent = nullptr);
+  explicit Joining(QWidget * parent = nullptr);
 
   /**
    * @brief Destroy the Status object
    */
-  virtual ~Error() = default;
-
-  /**
-   * @brief set the error message
-   */
-  void setErrorMessage(const QString &);
-
-  /**
-   * @brief get the error message
-   */
-  QString getErrorMessage() const;
+  virtual ~Joining() = default;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

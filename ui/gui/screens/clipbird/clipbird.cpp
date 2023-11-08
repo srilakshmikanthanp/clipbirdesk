@@ -242,7 +242,7 @@ void Clipbird::handleConnectionError(QString error) {
   auto message = QString("Connection Error\nError Message: %1").arg(error);
 
   // Dialog Instance
-  auto dialog = new modals::Error(this);
+  auto dialog = new modals::Message(this);
 
   // icon for the dialog
   auto icon = QIcon(constants::getAppLogo().c_str());
@@ -302,7 +302,7 @@ void Clipbird::onQrCodeClicked() {
   qDebug() << "QR Code Info: " << QString(info);
 
   // create a dialog
-  auto dialog = new modals::Group();
+  static auto dialog = new modals::Group();
 
   // set the icon
   dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
@@ -310,8 +310,11 @@ void Clipbird::onQrCodeClicked() {
   // set the title
   dialog->setWindowTitle(constants::getAppName().c_str());
 
-  // set delete on close
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  // set Fixed Size
+  dialog->setFixedSize(dialog->sizeHint());
+
+  // always on top
+  dialog->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   // set the info
   dialog->setQrCode(QString(info));
@@ -320,7 +323,7 @@ void Clipbird::onQrCodeClicked() {
   dialog->setPort(QString::number(server.port));
 
   // show the dialog
-  dialog->show();
+  if (!dialog->isVisible()) dialog->show();
 
   // set as not resizable
   dialog->setFixedSize(dialog->sizeHint());
@@ -359,19 +362,28 @@ void Clipbird::onConnectClicked() {
   };
 
   // get the ip and port from user
-  auto dialog = new modals::Connect();
+  static auto dialog = new modals::Joining();
 
-  // show the dialog
-  dialog->show();
+  // set the icon
+  dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+
+  // set the title
+  dialog->setWindowTitle(constants::getAppName().c_str());
+
+  // always on top
+  dialog->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   // set as not resizable
-  dialog->setFixedSize(dialog->size());
+  dialog->setFixedSize(dialog->sizeHint());
 
   // close on tab change
   QObject::connect(tab, &QTabWidget::currentChanged, dialog, &QDialog::close);
 
+  // show the dialog
+  if (!dialog->isVisible()) dialog->show();
+
   // connect the dialog to window clicked signal
-  connect(dialog, &modals::Connect::onConnect, [=](auto ipv4, auto port) {
+  connect(dialog, &modals::Joining::onConnect, [=](auto ipv4, auto port) {
     // validate the ip and port
     if (!validator(ipv4.toShort(), port.toShort())) {
       return;
@@ -392,12 +404,25 @@ void Clipbird::onConnectClicked() {
  */
 void Clipbird::onAboutClicked() {
   // create a dialog
-  static auto dialog = new modals::AboutUs(this);
+  static auto dialog = new modals::AboutUs();
 
   // set the icon
-  if (!dialog->isVisible()) {
-    dialog->show();
-  }
+  dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+
+  // set the title
+  dialog->setWindowTitle(constants::getAppName().c_str());
+
+  // always on top
+  dialog->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+  // show the dialog
+  if (!dialog->isVisible()) dialog->show();
+
+  // set as not resizable
+  dialog->setFixedSize(dialog->sizeHint());
+
+  // close on tab change
+  QObject::connect(tab, &QTabWidget::currentChanged, dialog, &QDialog::close);
 }
 
 /**

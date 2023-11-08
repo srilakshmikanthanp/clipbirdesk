@@ -9,11 +9,8 @@
 #include <QDialog>
 #include <QStyleHints>
 
-// project header
-#include "ui/gui/modals/modal/modal.hpp"
-
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class History : public Modal {
+class History : public QDialog {
  private:  // disable copy and move for this class
 
   Q_DISABLE_COPY_MOVE(History)
@@ -25,7 +22,7 @@ class History : public Modal {
  public:
 
  /**
-  * @brief Construct a new Modal object
+  * @brief Construct a new Abstract object
   *
   * @param parent
   */

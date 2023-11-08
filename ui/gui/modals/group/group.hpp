@@ -14,10 +14,9 @@
 
 // project header
 #include "ui/gui/components/qrcode/qrcode.hpp"
-#include "ui/gui/modals/modal/modal.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class Group : public Modal {
+class Group : public QDialog {
  private:  // disable copy and move for this class
 
   Q_DISABLE_COPY_MOVE(Group)
@@ -41,7 +40,7 @@ class Group : public Modal {
  public:
 
  /**
-  * @brief Construct a new Modal object
+  * @brief Construct a new Abstract object
   *
   * @param parent
   */

@@ -7,11 +7,11 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
 /**
- * @brief Construct a new Modal object
+ * @brief Construct a new Abstract object
  *
  * @param parent
  */
-AboutUs::AboutUs(QWidget* parent) : Modal(parent) {
+AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
   // Click Handlers
   auto donateClick = [=]() {
     QDesktopServices::openUrl(QUrl(constants::getAppDonatePage().c_str()));

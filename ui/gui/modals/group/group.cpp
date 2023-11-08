@@ -19,11 +19,11 @@ void Group::setUpQrCodeColor(Qt::ColorScheme scheme) {
 }
 
 /**
- * @brief Construct a new Modal object
+ * @brief Construct a new Abstract object
  *
  * @param parent
  */
-Group::Group(QWidget *parent) : Modal(parent) {
+Group::Group(QWidget *parent) : QDialog(parent) {
   // create layout
   auto root = new QVBoxLayout(this);
 

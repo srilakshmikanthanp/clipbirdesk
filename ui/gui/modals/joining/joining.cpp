@@ -3,15 +3,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "connect.hpp"
+#include "joining.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
 /**
- * @brief Construct a new Modal object
+ * @brief Construct a new Abstract object
  *
  * @param parent
  */
-Connect::Connect(QWidget * parent) : Modal(parent) {
+Joining::Joining(QWidget * parent) : QDialog(parent) {
   // create root layout
   auto root = new QVBoxLayout(this);
 
@@ -25,7 +25,7 @@ Connect::Connect(QWidget * parent) : Modal(parent) {
   auto port = new QLineEdit(this);
 
   // create the button
-  auto button = new QPushButton("Connect");
+  auto button = new QPushButton("Join");
 
   // set the placeholder
   ipv4->setPlaceholderText("IPv4");
