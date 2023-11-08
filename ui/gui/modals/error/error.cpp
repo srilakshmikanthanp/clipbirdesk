@@ -28,8 +28,8 @@ Error::Error(QWidget *parent) : Modal(parent) {
 /**
  * @brief set the error message
  */
-void Error::setErrorMessage(const QString &) {
-  this->errorMessage->setText(this->getErrorMessage());
+void Error::setErrorMessage(const QString &error) {
+  this->errorMessage->setText(error);
   this->update();
 }
 
