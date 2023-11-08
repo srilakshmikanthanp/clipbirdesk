@@ -8,7 +8,7 @@
 #include <QScreen>
 #include <QVBoxLayout>
 
-#include "ui/gui/content/content.hpp"
+#include "ui/gui/screens/clipbird/clipbird.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 class Window : public QMainWindow {
@@ -43,12 +43,12 @@ class Window : public QMainWindow {
   /**
    * @brief Set Content
    */
-  void setContent(ui::gui::Content* content);
+  void setContent(ui::gui::Clipbird* content);
 
   /**
    * @brief get Content
    */
-  ui::gui::Content* getContent() const;
+  ui::gui::Clipbird* getContent() const;
 
  protected:  // protected functions
 

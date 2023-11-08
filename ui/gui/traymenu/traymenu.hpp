@@ -9,7 +9,10 @@
 #include <QMenu>
 #include <QSystemTrayIcon>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
+// local headers
+#include "constants/constants.hpp"
+
+namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 class TrayMenu : public QMenu {
  private:  // Disable copy constructor and copy assignment operator
 
@@ -24,11 +27,10 @@ class TrayMenu : public QMenu {
   QAction connect   =   QAction("Join to Group");
   QAction qrCode    =   QAction("Group QrCode");
   QAction reset     =   QAction("Reset Devices");
-  QAction openApp   =   QAction("ClipBird");
+  QAction openApp   =   QAction(QString::fromStdString(constants::getAppName()));
   QAction send      =   QAction("Send");
   QAction history   =   QAction("History");
   QAction about     =   QAction("About");
-  QAction issue     =   QAction("Report Issue");
   QAction exitApp   =   QAction("Exit");
 
  signals:  // signals
@@ -51,9 +53,6 @@ class TrayMenu : public QMenu {
 
  signals:  // signals
   void OnAboutClicked();
-
- signals:  // signals
-  void OnIssueClicked();
 
  signals:  // signals
   void OnExitClicked();
@@ -85,11 +84,6 @@ class TrayMenu : public QMenu {
    * @brief set About Enabled or Disabled
    */
   void setAboutEnabled(bool);
-
-  /**
-   * @brief set Issue Enabled or Disabled
-   */
-  void setIssueEnabled(bool);
 
   /**
    * @brief set Reset Enabled or Disabled
@@ -130,11 +124,6 @@ class TrayMenu : public QMenu {
    * @brief Is About Enabled
    */
   bool isAboutEnabled() const;
-
-  /**
-   * @brief Is Issue Enabled
-   */
-  bool isIssueEnabled() const;
 
   /**
    * @brief Is Reset Enabled

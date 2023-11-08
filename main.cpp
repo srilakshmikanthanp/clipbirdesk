@@ -20,7 +20,7 @@
 // Project Headers
 #include "constants/constants.hpp"
 #include "controller/clipbird/clipbird.hpp"
-#include "ui/gui/content/content.hpp"
+#include "ui/gui/screens/clipbird/clipbird.hpp"
 #include "ui/gui/window/window.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
@@ -139,7 +139,7 @@ class ClipbirdApplication : public SingleApplication {
  private:  //  Member Variables and Objects
 
   controller::ClipBird *controller;
-  ui::gui::Content *content;
+  ui::gui::Clipbird *content;
   ui::gui::Window *window;
   QSystemTrayIcon *trayIcon;
 
@@ -165,7 +165,7 @@ class ClipbirdApplication : public SingleApplication {
   void initialize() {
     // create the objects of the class
     controller = new controller::ClipBird(this->getSslConfiguration());
-    content    = new ui::gui::Content(controller);
+    content    = new ui::gui::Clipbird(controller);
     window     = new ui::gui::Window();
     trayIcon   = new QSystemTrayIcon(this);
 
@@ -207,7 +207,7 @@ class ClipbirdApplication : public SingleApplication {
     window->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
 
     // using some classes
-    using ui::gui::Content;
+    using ui::gui::Clipbird;
 
     // tray icon click from content
     const auto signal_tic = &QSystemTrayIcon::activated;
@@ -216,7 +216,7 @@ class ClipbirdApplication : public SingleApplication {
 
     // set the signal for instance Started
     const auto signal_is = &SingleApplication::instanceStarted;
-    const auto slot_is   = &Content::show;
+    const auto slot_is   = &Clipbird::show;
     QObject::connect(this, signal_is, window, slot_is);
 
     // detect the system theme

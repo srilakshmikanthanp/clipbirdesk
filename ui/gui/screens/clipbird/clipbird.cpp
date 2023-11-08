@@ -3,15 +3,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "content.hpp"
+#include "clipbird.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
-//------------------------------ slots for Content -------------------------//
+//------------------------------ slots for Clipbird -------------------------//
 
 /**
  * @brief handle the host action from the window
  */
-void Content::handleHostAction(Tabs t, components::Host::Value h) {
+void Clipbird::handleHostAction(Tabs t, components::Host::Value h) {
   if (t == Tabs::Server && std::get<1>(h) == Action::Disconnect) {
     controller->disconnectClient(std::get<0>(h));
   }
@@ -28,10 +28,10 @@ void Content::handleHostAction(Tabs t, components::Host::Value h) {
 /**
  * @brief On Tab Changed for Client
  */
-void Content::handleTabChangeForClient(Tabs tab) {
+void Clipbird::handleTabChangeForClient(Tabs tab) {
   if (tab != Tabs::Client) return;  // if not client tab return
 
-  // initialize the client Content
+  // initialize the client Clipbird
   this->setStatus("Join to a Group", Status::Disconnected);
 
   // reset the device list
@@ -48,13 +48,13 @@ void Content::handleTabChangeForClient(Tabs tab) {
 /**
  * @brief On Tab Changed for Server
  */
-void Content::handleTabChangeForServer(Tabs tab) {
+void Clipbird::handleTabChangeForServer(Tabs tab) {
   if (tab != Tabs::Server) return;  // if not server tab return
 
   // Device mDns name
   auto name = QString::fromStdString(constants::getMDnsServiceName());
 
-  // initialize the server Content
+  // initialize the server Clipbird
   this->setStatus(name, Status::Inactive);
 
   // reset the device list
@@ -73,7 +73,7 @@ void Content::handleTabChangeForServer(Tabs tab) {
 /**
  * @brief Handle the Client List Item Clicked
  */
-void Content::handleClientListChange(QList<types::device::Device> clients) {
+void Clipbird::handleClientListChange(QList<types::device::Device> clients) {
   // Create a list of tuple with Action
   QList<components::Host::Value> clients_m;
 
@@ -89,7 +89,7 @@ void Content::handleClientListChange(QList<types::device::Device> clients) {
 /**
  * @brief Handle the Server State Change
  */
-void Content::handleServerStateChange(bool isStarted) {
+void Clipbird::handleServerStateChange(bool isStarted) {
   // infer the status from the server state
   auto groupName  = QString::fromStdString(constants::getMDnsServiceName());
   auto status_m   = isStarted ? Status::Active : Status::Inactive;
@@ -120,7 +120,7 @@ void Content::handleServerStateChange(bool isStarted) {
  *
  * @param client
  */
-void Content::handleAuthRequest(const types::device::Device& client) {
+void Clipbird::handleAuthRequest(const types::device::Device& client) {
   // get the message to show
   // clang-format off
   auto message = QString(
@@ -175,7 +175,7 @@ void Content::handleAuthRequest(const types::device::Device& client) {
 /**
  * @brief Handle the Server List Item Clicked
  */
-void Content::handleServerListChange(QList<types::device::Device> servers) {
+void Clipbird::handleServerListChange(QList<types::device::Device> servers) {
   // Create a list of tuple with Action
   QList<components::Host::Value> servers_m;
 
@@ -202,7 +202,7 @@ void Content::handleServerListChange(QList<types::device::Device> servers) {
 /**
  * @brief Handle the server status change
  */
-void Content::handleServerStatusChanged(bool isConnected) {
+void Clipbird::handleServerStatusChanged(bool isConnected) {
   // infer the status from the server state
   auto groupName = isConnected ? controller->getConnectedServer().name : QString("Join to a Group");
   auto servers   = controller->getServerList();
@@ -237,19 +237,12 @@ void Content::handleServerStatusChanged(bool isConnected) {
 /**
  * @brief handle onConnectionError
  */
-void Content::handleConnectionError(QString error) {
+void Clipbird::handleConnectionError(QString error) {
   // Just Show the error info to user via Dialog
-  // clang-format off
-  auto message = QString(
-    "Connection Error\n"
-    "Error Message: %1"
-  ).arg(
-    error
-  );
-  // clang-format on
+  auto message = QString("Connection Error\nError Message: %1").arg(error);
 
   // Dialog Instance
-  auto dialog = new QMessageBox();
+  auto dialog = new modals::Error(this);
 
   // icon for the dialog
   auto icon = QIcon(constants::getAppLogo().c_str());
@@ -261,7 +254,7 @@ void Content::handleConnectionError(QString error) {
   dialog->setWindowTitle(constants::getAppName().c_str());
 
   // set the message
-  dialog->setText(message);
+  dialog->setErrorMessage(message);
 
   // set delete on close
   dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -275,7 +268,7 @@ void Content::handleConnectionError(QString error) {
 /**
  * @brief On Qr Code Clicked
  */
-void Content::onQrCodeClicked() {
+void Clipbird::onQrCodeClicked() {
   // generate the qr code with all inteface ip and port in format
   auto interfaces = QNetworkInterface::allInterfaces();
 
@@ -309,41 +302,7 @@ void Content::onQrCodeClicked() {
   qDebug() << "QR Code Info: " << QString(info);
 
   // create a dialog
-  auto dialog = new QDialog();
-
-  // create layout
-  auto root = new QVBoxLayout();
-
-  // create label
-  auto qrcode = new components::QrCode(dialog);
-
-  // create label
-  auto port = new QLabel(dialog);
-
-  // set the size
-  qrcode->setFixedSize(200, 200);
-
-  // set the text
-  qrcode->setText(QString(info));
-
-  // set the text
-  port->setText(QString::number(server.port));
-
-  // set center alignment
-  port->setAlignment(Qt::AlignCenter);
-
-  // set the style sheet
-  port->setStyleSheet("QLabel { color : gray; }");
-
-  // add the ip and port input to layout
-  root->addWidget(qrcode);
-  root->addWidget(port);
-
-  // size policy
-  root->setSizeConstraint(QLayout::SetFixedSize);
-
-  // center alignment of qrcode
-  root->setAlignment(qrcode, Qt::AlignCenter);
+  auto dialog = new modals::QrCode();
 
   // set the icon
   dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
@@ -351,11 +310,14 @@ void Content::onQrCodeClicked() {
   // set the title
   dialog->setWindowTitle(constants::getAppName().c_str());
 
-  // set the root layout to dialog
-  dialog->setLayout(root);
-
   // set delete on close
   dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+  // set the info
+  dialog->setQrCode(QString(info));
+
+  // set port
+  dialog->setPort(QString::number(server.port));
 
   // show the dialog
   dialog->show();
@@ -363,31 +325,14 @@ void Content::onQrCodeClicked() {
   // set as not resizable
   dialog->setFixedSize(dialog->sizeHint());
 
-  // initial theme
-  if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
-    qrcode->setColor(Qt::white);
-  } else {
-    qrcode->setColor(Qt::black);
-  }
-
   // close on tab change
   QObject::connect(tab, &QTabWidget::currentChanged, dialog, &QDialog::close);
-
-  // detect the system theme
-  const auto signal = &QStyleHints::colorSchemeChanged;
-  QObject::connect(QGuiApplication::styleHints(), signal, [=](auto scheme) {
-    if (scheme == Qt::ColorScheme::Dark) {
-      qrcode->setColor(Qt::white);
-    } else {
-      qrcode->setColor(Qt::black);
-    }
-  });
 }
 
 /**
  * @brief On Connect Clicked
  */
-void Content::onConnectClicked() {
+void Clipbird::onConnectClicked() {
   // On HostName successfully resolved
   const auto slot_hr = [=](const auto dialog, quint16 port, const auto& host) {
     // if host name is not resolved
@@ -414,7 +359,7 @@ void Content::onConnectClicked() {
   };
 
   // get the ip and port from user
-  auto dialog = new QDialog();
+  auto dialog = new modals::Modal();
 
   // create root layout
   auto root = new QVBoxLayout(dialog);
@@ -488,21 +433,14 @@ void Content::onConnectClicked() {
 /**
  * @brief On About Clicked
  */
-void Content::onAboutClicked() {
+void Clipbird::onAboutClicked() {
   QDesktopServices::openUrl(QUrl(constants::getAppHomePage().c_str()));
-}
-
-/**
- * @brief On Issue Clicked
- */
-void Content::onIssueClicked() {
-  QDesktopServices::openUrl(QUrl(constants::getAppIssuePage().c_str()));
 }
 
 /**
  * @brief On Reset Clicked
  */
-void Content::onResetClicked() {
+void Clipbird::onResetClicked() {
   controller->clearServerCertificates();
   controller->clearClientCertificates();
 }
@@ -510,32 +448,32 @@ void Content::onResetClicked() {
 /**
  * @brief On Open App Clicked
  */
-void Content::onOpenAppClicked() {
+void Clipbird::onOpenAppClicked() {
   this->parentWidget()->show();
 }
 
 /**
  * @brief On Send Clicked
  */
-void Content::onSendClicked() {
+void Clipbird::onSendClicked() {
   this->controller->syncClipboard(controller->getClipboard());
 }
 
 /**
  * @brief On Received Clicked
  */
-void Content::onReceivedClicked() {
+void Clipbird::onReceivedClicked() {
   // TODO: implement
 }
 
 /**
- * @brief Construct a new Content object
+ * @brief Construct a new Clipbird object
  * with parent as QWidget
  *
  * @param c controller
  * @param p parent
  */
-Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
+Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   // set no taskbar icon & no window Frame & always on top
   setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
@@ -608,103 +546,98 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   // clang-format on
 
   // set the signal for menus QrCode click
-  const auto signal_qc = &ui::gui::content::TrayMenu::OnQrCodeClicked;
-  const auto slot_qc   = &Content::onQrCodeClicked;
+  const auto signal_qc = &ui::gui::TrayMenu::OnQrCodeClicked;
+  const auto slot_qc   = &Clipbird::onQrCodeClicked;
   QObject::connect(trayMenu, signal_qc, this, slot_qc);
 
   // set the signal for menus Connect click
-  const auto signal_cc = &ui::gui::content::TrayMenu::OnConnectClicked;
-  const auto slot_cc   = &Content::onConnectClicked;
+  const auto signal_cc = &ui::gui::TrayMenu::OnConnectClicked;
+  const auto slot_cc   = &Clipbird::onConnectClicked;
   QObject::connect(trayMenu, signal_cc, this, slot_cc);
 
   // set the signal for menus About click
-  const auto signal_ac = &ui::gui::content::TrayMenu::OnAboutClicked;
-  const auto slot_ac   = &Content::onAboutClicked;
+  const auto signal_ac = &ui::gui::TrayMenu::OnAboutClicked;
+  const auto slot_ac   = &Clipbird::onAboutClicked;
   QObject::connect(trayMenu, signal_ac, this, slot_ac);
 
-  // set the signal for menus Issue click
-  const auto signal_ic = &ui::gui::content::TrayMenu::OnIssueClicked;
-  const auto slot_ic   = &Content::onIssueClicked;
-  QObject::connect(trayMenu, signal_ic, this, slot_ic);
-
   // set the signal for menus Open App click
-  const auto signal_oc = &ui::gui::content::TrayMenu::OnOpenAppClicked;
-  const auto slot_oc   = &Content::onOpenAppClicked;
+  const auto signal_oc = &ui::gui::TrayMenu::OnOpenAppClicked;
+  const auto slot_oc   = &Clipbird::onOpenAppClicked;
   QObject::connect(trayMenu, signal_oc, this, slot_oc);
 
   // set the signal for menus Send click
-  const auto signal_sc = &ui::gui::content::TrayMenu::OnSendClicked;
-  const auto slot_sc   = &Content::onSendClicked;
+  const auto signal_sc = &ui::gui::TrayMenu::OnSendClicked;
+  const auto slot_sc   = &Clipbird::onSendClicked;
   QObject::connect(trayMenu, signal_sc, this, slot_sc);
 
   // send the signal for menus Received click
-  const auto signal_rcv = &ui::gui::content::TrayMenu::OnHistoryClicked;
-  const auto slot_rcv   = &Content::onReceivedClicked;
+  const auto signal_rcv = &ui::gui::TrayMenu::OnHistoryClicked;
+  const auto slot_rcv   = &Clipbird::onReceivedClicked;
   QObject::connect(trayMenu, signal_rcv, this, slot_rcv);
 
   // set the signal for menus Reset click
-  const auto signal_rc = &ui::gui::content::TrayMenu::OnResetClicked;
-  const auto slot_rc   = &Content::onResetClicked;
+  const auto signal_rc = &ui::gui::TrayMenu::OnResetClicked;
+  const auto slot_rc   = &Clipbird::onResetClicked;
   QObject::connect(trayMenu, signal_rc, this, slot_rc);
 
   // set the signal for menus Quit click
-  const auto signal_ec = &ui::gui::content::TrayMenu::OnExitClicked;
+  const auto signal_ec = &ui::gui::TrayMenu::OnExitClicked;
   const auto slot_ec   = [] { QApplication::quit(); };
   QObject::connect(trayMenu, signal_ec, this, slot_ec);
 
   // connect server list signal
-  const auto signal_so = &content::HostList::onAction;
+  const auto signal_so = &components::HostList::onAction;
   const auto slot_so   = serverListSlot;
   connect(serverList, signal_so, slot_so);
 
   // connect client list signal
-  const auto signal_co = &content::HostList::onAction;
+  const auto signal_co = &components::HostList::onAction;
   const auto slot_co   = clientListSlot;
   connect(clientList, signal_co, slot_co);
 
   // Connect the signal and slot for client list change
   const auto signal_cl = &ClipBird::OnClientListChanged;
-  const auto slot_cl   = &Content::handleClientListChange;
+  const auto slot_cl   = &Clipbird::handleClientListChange;
   connect(controller, signal_cl, this, slot_cl);
 
   // Connect the signal and slot for server list change
   const auto signal_sl = &ClipBird::OnServerListChanged;
-  const auto slot_sl   = &Content::handleServerListChange;
+  const auto slot_sl   = &Clipbird::handleServerListChange;
   connect(controller, signal_sl, this, slot_sl);
 
   // Connect the signal and slot for server status change
   const auto signal_st = &ClipBird::OnServerStateChanged;
-  const auto slot_st   = &Content::handleServerStateChange;
+  const auto slot_st   = &Clipbird::handleServerStateChange;
   connect(controller, signal_st, this, slot_st);
 
   // connect signal and slot for OnAuthRequest
   const auto signal_or = &ClipBird::OnAuthRequest;
-  const auto slot_or = &Content::handleAuthRequest;
+  const auto slot_or = &Clipbird::handleAuthRequest;
   connect(controller, signal_or, this, slot_or);
 
   // Connect the signal and slot for server status change
   const auto signal_ss = &ClipBird::OnServerStatusChanged;
-  const auto slot_ss   = &Content::handleServerStatusChanged;
+  const auto slot_ss   = &Clipbird::handleServerStatusChanged;
   connect(controller, signal_ss, this, slot_ss);
 
   // Connect the signal and slot for host action
-  const auto signal_ha = &Content::onHostAction;
-  const auto slot_ha   = &Content::handleHostAction;
+  const auto signal_ha = &Clipbird::onHostAction;
+  const auto slot_ha   = &Clipbird::handleHostAction;
   connect(this, signal_ha, this, slot_ha);
 
   // Connect the signal and slot for tab change(client)
-  const auto signal_tc = &Content::onTabChanged;
-  const auto slot_tc   = &Content::handleTabChangeForClient;
+  const auto signal_tc = &Clipbird::onTabChanged;
+  const auto slot_tc   = &Clipbird::handleTabChangeForClient;
   connect(this, signal_tc, this, slot_tc);
 
   // Connect the signal and slot for tab change(server)
-  const auto signal_ts = &Content::onTabChanged;
-  const auto slot_ts   = &Content::handleTabChangeForServer;
+  const auto signal_ts = &Clipbird::onTabChanged;
+  const auto slot_ts   = &Clipbird::handleTabChangeForServer;
   connect(this, signal_ts, this, slot_ts);
 
   // Connect the signal and slot for OnConnectionError
   const auto signal_ce = &ClipBird::OnConnectionError;
-  const auto slot_ce   = &Content::handleConnectionError;
+  const auto slot_ce   = &Clipbird::handleConnectionError;
   connect(controller, signal_ce, this, slot_ce);
 
   // if host is lastly server
@@ -718,35 +651,35 @@ Content::Content(Content::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
 /**
  * @brief Set the Status object
  */
-void Content::setStatus(const QString& key, components::Status::Value val) {
+void Clipbird::setStatus(const QString& key, components::Status::Value val) {
   this->status->set(key, val);
 }
 
 /**
  * @brief Get the Host Status object
  */
-QPair<QString, components::Status::Value> Content::getStatus() {
+QPair<QString, components::Status::Value> Clipbird::getStatus() {
   return this->status->get();
 }
 
 /**
  * @brief Set tab as client
  */
-void Content::setTabAsClient() {
+void Clipbird::setTabAsClient() {
   this->tab->setCurrentIndex(1);
 }
 
 /**
  * @brief Set tab as server
  */
-void Content::setTabAsServer() {
+void Clipbird::setTabAsServer() {
   this->tab->setCurrentIndex(0);
 }
 
 /**
  * @brief Set the QSystemTrayIcon
  */
-void Content::setTrayIcon(QSystemTrayIcon* trayIcon) {
+void Clipbird::setTrayIcon(QSystemTrayIcon* trayIcon) {
   this->trayIcon = trayIcon;
 
   // set the icon to tray
@@ -765,7 +698,7 @@ void Content::setTrayIcon(QSystemTrayIcon* trayIcon) {
 /**
  * @brief Get System Tray Icon
  */
-QSystemTrayIcon* Content::getTrayIcon() {
+QSystemTrayIcon* Clipbird::getTrayIcon() {
   return this->trayIcon;
 }
 
@@ -774,35 +707,35 @@ QSystemTrayIcon* Content::getTrayIcon() {
 /**
  * @brief Set the Server List object
  */
-void Content::setClientList(const QList<components::Host::Value>& hosts) {
+void Clipbird::setClientList(const QList<components::Host::Value>& hosts) {
   clientList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List object
  */
-QList<components::Host::Value> Content::getClientList() {
+QList<components::Host::Value> Clipbird::getClientList() {
   return clientList->getHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
-void Content::addClient(components::Host::Value host) {
+void Clipbird::addClient(components::Host::Value host) {
   clientList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
-void Content::removeClient(components::Host::Value host) {
+void Clipbird::removeClient(components::Host::Value host) {
   clientList->removeHost(host);
 }
 
 /**
  * @brief Remove all servers from the list
  */
-void Content::removeAllClient() {
+void Clipbird::removeAllClient() {
   clientList->removeHosts();
 }
 
@@ -811,35 +744,35 @@ void Content::removeAllClient() {
 /**
  * @brief Set the Server List object
  */
-void Content::setServerList(const QList<components::Host::Value>& hosts) {
+void Clipbird::setServerList(const QList<components::Host::Value>& hosts) {
   serverList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List from the tab
  */
-QList<components::Host::Value> Content::getServerList() {
+QList<components::Host::Value> Clipbird::getServerList() {
   return serverList->getHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
-void Content::addServer(components::Host::Value host) {
+void Clipbird::addServer(components::Host::Value host) {
   serverList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
-void Content::removeServer(components::Host::Value host) {
+void Clipbird::removeServer(components::Host::Value host) {
   serverList->removeHost(host);
 }
 
 /**
  * @brief Remove all servers from the list
  */
-void Content::removeAllServers() {
+void Clipbird::removeAllServers() {
   serverList->removeHosts();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

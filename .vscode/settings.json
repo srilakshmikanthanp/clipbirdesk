@@ -162,6 +162,7 @@
     "singleapplication": "cpp",
     "ta_test_priv.h": "c",
     "qbytearray": "cpp",
-    "qpainter": "cpp"
+    "qpainter": "cpp",
+    "qdialog": "cpp"
   },
 }

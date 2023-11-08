@@ -39,24 +39,28 @@
 // project headers
 #include "controller/clipbird/clipbird.hpp"
 #include "types/device/device.hpp"
-#include "ui/gui/components/host/host.hpp"
 #include "ui/gui/components/qrcode/qrcode.hpp"
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/components/hostlist/hostlist.hpp"
 #include "ui/gui/traymenu/traymenu.hpp"
+#include "ui/gui/modals/aboutus/aboutus.hpp"
+#include "ui/gui/modals/connect/connect.hpp"
+#include "ui/gui/modals/error/error.hpp"
+#include "ui/gui/modals/modal/modal.hpp"
+#include "ui/gui/modals/qrcode/qrcode.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
-class Content : public QFrame {
+class Clipbird : public QFrame {
  private:  // Member variable (Tray)
 
-  ui::gui::content::TrayMenu *trayMenu = new ui::gui::content::TrayMenu(this);  // Tray Menu
-  QSystemTrayIcon *trayIcon = nullptr;  // Tray Icon
   ui::gui::components::Status *status = new ui::gui::components::Status(this);  // Status
+  QSystemTrayIcon *trayIcon = nullptr;  // Tray Icon
+  ui::gui::TrayMenu *trayMenu = new ui::gui::TrayMenu(this);  // Tray Menu
 
  private:  // Member variable (Tabs)
 
-  content::HostList* clientList = new content::HostList();  // Server Tab
-  content::HostList* serverList = new content::HostList();  // Client Tab
+  components::HostList* clientList = new components::HostList();  // Server Tab
+  components::HostList* serverList = new components::HostList();  // Client Tab
 
  private:  // Member variable (Layout)
 
@@ -73,7 +77,7 @@ class Content : public QFrame {
 
  private:  // Disable copy and move
 
-  Q_DISABLE_COPY_MOVE(Content)
+  Q_DISABLE_COPY_MOVE(Clipbird)
 
  public:  // enum for this class
 
@@ -107,7 +111,7 @@ class Content : public QFrame {
 
  private:  // private slots
 
-  //------------------------------ slots for Content -------------------------//
+  //------------------------------ slots for Clipbird -------------------------//
 
   /**
    * @brief handle the host action from the window
@@ -191,11 +195,6 @@ class Content : public QFrame {
   void onReceivedClicked();
 
   /**
-   * @brief On Issue Clicked
-   */
-  void onIssueClicked();
-
-  /**
    * @brief On Reset Clicked
    */
   void onResetClicked();
@@ -203,10 +202,10 @@ class Content : public QFrame {
  public:
 
   /**
-   * @brief Construct a new Content object
+   * @brief Construct a new Clipbird object
    * with parent as QWidget
    */
-  explicit Content(ClipBird* controller, QWidget* parent = nullptr);
+  explicit Clipbird(ClipBird* controller, QWidget* parent = nullptr);
 
   /**
    * @brief Set the Status object

@@ -120,11 +120,6 @@ qt_standard_project_setup()
 qt_add_resources(RESOURCES
   ${PROJECT_SOURCE_DIR}/assets/resources.qrc)
 
-# Add windows.rc to project
-if (WIN32)
-  set (RESOURCES ${RESOURCES} ${PROJECT_SOURCE_DIR}/assets/windows.rc)
-endif()
-
 # Add executable
 qt_add_executable(clipbird
   ${main_cpp} ${RESOURCES})
@@ -143,12 +138,6 @@ target_include_directories(clipbird
   PUBLIC ${PROJECT_SOURCE_DIR}
   PUBLIC ${PROJECT_BINARY_DIR})
 
-# include in win or mac
-if (WIN32 OR APPLE)
-  target_include_directories(clipbird
-    PUBLIC ${BONJOUR_INCLUDE_DIR})
-endif()
-
 # Link libraries
 target_link_libraries(clipbird
   PRIVATE SingleApplication::SingleApplication
@@ -158,12 +147,6 @@ target_link_libraries(clipbird
   PRIVATE OpenSSL::Crypto
   PRIVATE qrencode)
 
-# link bonjour if windows or Mac
-if(WIN32 OR APPLE)
-  target_link_libraries(clipbird
-    PRIVATE ${BONJOUR_LIBRARIES})
-endif()
-
 # set target properties
 set_target_properties(clipbird PROPERTIES
   WIN32_EXECUTABLE TRUE
@@ -172,12 +155,18 @@ set_target_properties(clipbird PROPERTIES
 
 # Add Platform specific definitions for apple
 if(APPLE)
+  target_include_directories(clipbird PUBLIC ${BONJOUR_INCLUDE_DIR})
+  target_link_libraries(clipbird PRIVATE ${BONJOUR_LIBRARIES})
   add_definitions(-D__APPLE__)
 endif()
 
 # Add Platform specific definitions for win
 if(WIN32)
+  target_include_directories(clipbird PUBLIC ${BONJOUR_INCLUDE_DIR})
+  target_link_libraries(clipbird PRIVATE Dwmapi.lib)
+  target_link_libraries(clipbird PRIVATE ${BONJOUR_LIBRARIES})
   add_definitions(-D_WIN32)
+  set (RESOURCES ${RESOURCES} ${PROJECT_SOURCE_DIR}/assets/windows.rc)
 endif()
 
 # Add Platform specific definitions for linux

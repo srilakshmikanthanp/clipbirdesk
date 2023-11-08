@@ -5,7 +5,7 @@
 
 #include "traymenu.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 /**
  * @brief Construct a new Sys Tray object
  *
@@ -16,7 +16,6 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   QObject::connect(&qrCode, &QAction::triggered, this, &TrayMenu::OnQrCodeClicked);
   QObject::connect(&connect, &QAction::triggered, this, &TrayMenu::OnConnectClicked);
   QObject::connect(&about, &QAction::triggered, this, &TrayMenu::OnAboutClicked);
-  QObject::connect(&issue, &QAction::triggered, this, &TrayMenu::OnIssueClicked);
   QObject::connect(&reset, &QAction::triggered, this, &TrayMenu::OnResetClicked);
   QObject::connect(&exitApp, &QAction::triggered, this, &TrayMenu::OnExitClicked);
   QObject::connect(&openApp, &QAction::triggered, this, &TrayMenu::OnOpenAppClicked);
@@ -33,7 +32,6 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   this->addAction(&history);
   this->addSeparator();
   this->addAction(&about);
-  this->addAction(&issue);
   this->addSeparator();
   this->addAction(&exitApp);
 }
@@ -57,13 +55,6 @@ void TrayMenu::setQrCodeEnabled(bool isenabled) {
  */
 void TrayMenu::setAboutEnabled(bool isenabled) {
   about.setEnabled(isenabled);
-}
-
-/**
- * @brief set Issue Enabled or Disabled
- */
-void TrayMenu::setIssueEnabled(bool isenabled) {
-  issue.setEnabled(isenabled);
 }
 
 /**
@@ -120,13 +111,6 @@ bool TrayMenu::isQrCodeEnabled() const {
  */
 bool TrayMenu::isAboutEnabled() const {
   return about.isEnabled();
-}
-
-/**
- * @brief Is Issue Enabled
- */
-bool TrayMenu::isIssueEnabled() const {
-  return issue.isEnabled();
 }
 
 /**

@@ -9,11 +9,80 @@
 #include <QStackedLayout>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QHostAddress>
+#include <QHostInfo>
+#include <QLabel>
+#include <QPainter>
+#include <QPushButton>
+#include <QStyle>
+#include <QStyleOption>
 
-// Project headers
-#include "ui/gui/components/host/host.hpp"
+// C++ Headers
+#include <tuple>
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::content {
+// local headers
+#include "types/device/device.hpp"
+
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
+class Host : public QWidget {
+ private:  // constant values for text
+
+  const QString connect = "Connect", disconnect = "Disconnect";
+
+ public:  // enum for action
+
+  enum class Action { Connect, Disconnect };
+
+ public:  // typedefs
+
+  using Value = std::tuple<types::device::Device, Action>;
+
+ signals:  // Signals
+  void onAction(std::tuple<types::device::Device, Action>);
+
+ private:  // Member variable
+
+  types::device::Device device;
+  Action action;
+
+ private:  // Member variable
+
+  QPushButton *actBtn  = new QPushButton(this);
+  QLabel *hostName = new QLabel(this);
+
+ private:  // just for Qt meta object
+
+  Q_OBJECT
+
+ public:  // public Member functions
+
+  /**
+   * @brief Construct a new HostView object
+   * with parent as QWidget
+   * @param parent parent object
+   */
+  explicit Host(QWidget *parent = nullptr);
+
+  /**
+   * @brief Set the Host
+   */
+  void setHost(Value host);
+
+  /**
+   * @brief Get the Host
+   */
+  Value getHost() const;
+
+  /**
+   * @brief Override paint for custom style
+   */
+  void paintEvent(QPaintEvent *event) override;
+
+ private:  // disable copy and move
+
+  Q_DISABLE_COPY_MOVE(Host)
+};
+
 class HostList : public QWidget {
  signals:  // Signals
   void onAction(components::Host::Value host);

@@ -20,15 +20,15 @@ Window::Window(QWidget* parent) : QMainWindow(parent) {
 /**
  * @brief Set Content
  */
-void Window::setContent(ui::gui::Content* content) {
+void Window::setContent(ui::gui::Clipbird* content) {
   this->setCentralWidget(content);
 }
 
 /**
  * @brief get Content
  */
-ui::gui::Content* Window::getContent() const {
-  return dynamic_cast<ui::gui::Content*>(this->centralWidget());
+ui::gui::Clipbird* Window::getContent() const {
+  return dynamic_cast<ui::gui::Clipbird*>(this->centralWidget());
 }
 
 /**
