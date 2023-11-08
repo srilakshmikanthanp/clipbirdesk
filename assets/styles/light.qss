@@ -25,8 +25,8 @@ QLabel {
 }
 
 QPushButton {
-  background-color: #167dff; /* Windows 11 accent color */
-  color: #f9f9f9; /* Light text on the button */
+  background-color: #ededed; /* Windows 11 accent color */
+  color: #000000; /* Light text on the button */
   border: none;
   border-radius: 5px;
   padding: 6px;
@@ -79,7 +79,7 @@ QScrollBar:vertical {
 }
 
 QScrollBar::handle:vertical {
-  background: #959595; /* Windows 11 scrollbar handle color */
+  background: #ededed; /* Windows 11 scrollbar handle color */
   border-radius: 5px;
 }
 
