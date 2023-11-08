@@ -22,6 +22,12 @@ set(APPLICATION_ISSUEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk/iss
 # Set the APPLICATION_HOMEPAGE
 set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
 
+# Set the DONATE_URL
+set(DONATE_URL "https://github.com/srilakshmikanthanp/clipbirdesk")
+
+# Set the Version
+set(VERSION ${PROJECT_VERSION})
+
 # Set the logo.png path variable
 set(APPLICATION_LOGO_PATH ":/images/logo.png")
 

@@ -302,7 +302,7 @@ void Clipbird::onQrCodeClicked() {
   qDebug() << "QR Code Info: " << QString(info);
 
   // create a dialog
-  auto dialog = new modals::QrCode();
+  auto dialog = new modals::Group();
 
   // set the icon
   dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
@@ -359,46 +359,7 @@ void Clipbird::onConnectClicked() {
   };
 
   // get the ip and port from user
-  auto dialog = new modals::Modal();
-
-  // create root layout
-  auto root = new QVBoxLayout(dialog);
-
-  // create label
-  auto label = new QLabel("Enter the IP and Port of the server", dialog);
-
-  // create the ip and port input
-  auto ipv4 = new QLineEdit(dialog);
-
-  // create the ip and port input
-  auto port = new QLineEdit(dialog);
-
-  // create the button
-  auto button = new QPushButton("Connect");
-
-  // set the placeholder
-  ipv4->setPlaceholderText("IPv4");
-
-  // set the placeholder
-  port->setPlaceholderText("Port");
-
-  // add the ip and port input to layout
-  root->addWidget(label);
-  root->addWidget(ipv4);
-  root->addWidget(port);
-  root->addWidget(button);
-
-  // set the icon
-  dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
-
-  // set the title
-  dialog->setWindowTitle(constants::getAppName().c_str());
-
-  // set the root layout to dialog
-  dialog->setLayout(root);
-
-  // set delete on close
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
+  auto dialog = new modals::Connect();
 
   // show the dialog
   dialog->show();
@@ -410,23 +371,19 @@ void Clipbird::onConnectClicked() {
   QObject::connect(tab, &QTabWidget::currentChanged, dialog, &QDialog::close);
 
   // connect the dialog to window clicked signal
-  connect(button, &QPushButton::clicked, [=] {
-    // get the ip and port
-    auto port_s = port->text().toShort();
-    auto ipv4_s = ipv4->text();
-
+  connect(dialog, &modals::Connect::onConnect, [=](auto ipv4, auto port) {
     // validate the ip and port
-    if (!validator(ipv4_s, port_s)) {
+    if (!validator(ipv4.toShort(), port.toShort())) {
       return;
     }
 
     // bind the port
     auto slot = std::bind(
-      slot_hr, dialog, port_s, std::placeholders::_1
+      slot_hr, dialog, port.toShort(), std::placeholders::_1
     );
 
     // resolve the host name
-    QHostInfo::lookupHost(ipv4_s, this, slot);
+    QHostInfo::lookupHost(ipv4, this, slot);
   });
 }
 
@@ -434,7 +391,13 @@ void Clipbird::onConnectClicked() {
  * @brief On About Clicked
  */
 void Clipbird::onAboutClicked() {
-  QDesktopServices::openUrl(QUrl(constants::getAppHomePage().c_str()));
+  // create a dialog
+  static auto dialog = new modals::AboutUs(this);
+
+  // set the icon
+  if (!dialog->isVisible()) {
+    dialog->show();
+  }
 }
 
 /**

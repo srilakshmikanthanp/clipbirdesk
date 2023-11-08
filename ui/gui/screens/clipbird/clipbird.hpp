@@ -47,7 +47,7 @@
 #include "ui/gui/modals/connect/connect.hpp"
 #include "ui/gui/modals/error/error.hpp"
 #include "ui/gui/modals/modal/modal.hpp"
-#include "ui/gui/modals/qrcode/qrcode.hpp"
+#include "ui/gui/modals/group/group.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 class Clipbird : public QFrame {

@@ -17,10 +17,10 @@
 #include "ui/gui/modals/modal/modal.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class QrCode : public Modal {
+class Group : public Modal {
  private:  // disable copy and move for this class
 
-  Q_DISABLE_COPY_MOVE(QrCode)
+  Q_DISABLE_COPY_MOVE(Group)
 
  private:  // just for Qt
 
@@ -34,6 +34,10 @@ class QrCode : public Modal {
   // create label
   QLabel *port = new QLabel(this);
 
+ private:  // private member functions
+
+  void setUpQrCodeColor(Qt::ColorScheme);
+
  public:
 
  /**
@@ -41,12 +45,12 @@ class QrCode : public Modal {
   *
   * @param parent
   */
-  explicit QrCode(QWidget * parent = nullptr);
+  explicit Group(QWidget * parent = nullptr);
 
   /**
    * @brief Destroy the Status object
    */
-  virtual ~QrCode() = default;
+  virtual ~Group() = default;
 
   /**
    * @brief set the qr code

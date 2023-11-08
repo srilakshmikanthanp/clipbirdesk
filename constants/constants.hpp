@@ -37,6 +37,12 @@ std::string getAppMinorVersion();
 std::string getAppPatchVersion();
 
 /**
+ * @brief Get the Application Version
+ * @return std::string
+ */
+std::string getAppVersion();
+
+/**
  * @brief Get the Application Name
  * @return std::string
  */
@@ -84,6 +90,12 @@ std::string getAppHomePage();
  * @return std::string
  */
 std::string getAppIssuePage();
+
+/**
+ * @brief Get the App Donate Page
+ * @return std::string
+ */
+std::string getAppDonatePage();
 
 /**
  * @brief Get the App Window Ratio

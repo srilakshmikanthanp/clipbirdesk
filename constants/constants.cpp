@@ -12,24 +12,8 @@ namespace srilakshmikanthanp::clipbirdesk::constants {
  * @brief Get the Application Version
  * @return std::string
  */
-std::string getAppMajorVersion() {
-  return std::string(CLIPBIRDESK_VERSION_MAJOR);
-}
-
-/**
- * @brief Get the Application Version
- * @return std::string
- */
-std::string getAppMinorVersion() {
-  return std::string(CLIPBIRDESK_VERSION_MINOR);
-}
-
-/**
- * @brief Get the Application Version
- * @return std::string
- */
-std::string getAppPatchVersion() {
-  return std::string(CLIPBIRDESK_VERSION_PATCH);
+std::string getAppVersion() {
+  return std::string(CLIPBIRDESK_VERSION);
 }
 
 /**
@@ -103,6 +87,14 @@ std::string getAppHomePage() {
  */
 std::string getAppIssuePage() {
   return std::string(CLIPBIRDESK_ISSUEPAGE);
+}
+
+/**
+ * @brief Get the App Donate Page
+ * @return std::string
+ */
+std::string getAppDonatePage() {
+  return std::string(CLIPBIRDESK_DONATE);
 }
 
 /**

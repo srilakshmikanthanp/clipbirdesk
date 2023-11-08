@@ -6,10 +6,15 @@
 // https://opensource.org/licenses/MIT
 
 // Qt header
+#include <QDesktopServices>
 #include <QDialog>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
 #include <QStyleHints>
 
 // project header
+#include "constants/constants.hpp"
 #include "ui/gui/modals/modal/modal.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {

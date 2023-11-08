@@ -8,7 +8,7 @@
 /*********************** Common to All ************************/
 
 QFrame, QWidget {
-  background: #242424; /* Dark background color */
+  background: #272727; /* Dark background color */
   color: #E0E0E0; /* Light text color */
   font-family: Segoe UI, sans-serif; /* Windows 11 font */
   margin: 2px 0px 2px 0px;
@@ -16,7 +16,7 @@ QFrame, QWidget {
 }
 
 QFrame {
-  background: #242424;
+  background: #272727;
   border-radius: 8px;
 }
 
@@ -34,7 +34,7 @@ QPushButton:hover {
 }
 
 QTabWidget::pane {
-  background-color: #242424;
+  background-color: #272727;
   border: none;
   margin: 0px;
   padding: 0px;
@@ -45,12 +45,12 @@ QTabWidget::tab-bar {
 }
 
 QTabBar::tab {
-  border-bottom: 3px solid #242424;
+  border-bottom: 3px solid #272727;
   padding: 6px;
   color: gray;
   margin: 2px;
   font-weight: 650;
-  background-color: #242424;
+  background-color: #272727;
 }
 
 QTabBar::tab:selected {
@@ -68,7 +68,7 @@ QScrollArea {
 }
 
 QScrollBar:vertical {
-  background: #242424;
+  background: #272727;
   border: none;
   width: 10px;
   margin: 0px;
@@ -95,7 +95,7 @@ QScrollBar::sub-page:vertical {
 }
 
 QMenu {
-  background-color: #242424;
+  background-color: #272727;
   border: none;
   border-radius: 5px;
   padding: 6px;
@@ -104,7 +104,7 @@ QMenu {
 }
 
 QMenu::item {
-  background-color: #242424;
+  background-color: #272727;
   color: #E0E0E0;
   border: none;
   border-radius: 5px;
@@ -122,7 +122,7 @@ QMenu::item:disabled {
 }
 
 QLineEdit {
-  background-color: #242424;
+  background-color: #272727;
   color: #E0E0E0;
   border: 1px solid #808080;
   border-radius: 5px;

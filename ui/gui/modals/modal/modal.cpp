@@ -15,16 +15,19 @@ void Modal::setUpTitleBar(Qt::ColorScheme scheme) {
 // Gonna set up title bar of window using native methods :)
 #ifdef _WIN32
   // check the color scheme
-  BOOL isDark = scheme == Qt::ColorScheme::Dark;
+  bool isDark = scheme == Qt::ColorScheme::Dark;
   auto winID  = this->winId();
   auto hwnd   = reinterpret_cast<HWND>(winID);
+
+  // policy
+  auto policy = isDark ? DWMNCRP_ENABLED : DWMNCRP_DISABLED;
 
   // set the title bar
   auto result = DwmSetWindowAttribute(
     hwnd,
     DWMWA_USE_IMMERSIVE_DARK_MODE,
-    &isDark,
-    sizeof(isDark)
+    &policy,
+    sizeof(policy)
   );
 
   // is success

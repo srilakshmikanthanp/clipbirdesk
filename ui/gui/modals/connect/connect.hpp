@@ -7,9 +7,14 @@
 
 // Qt header
 #include <QDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QVBoxLayout>
 #include <QStyleHints>
 
 // project header
+#include "constants/constants.hpp"
 #include "ui/gui/modals/modal/modal.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
@@ -21,6 +26,10 @@ class Connect : public Modal {
  private:  // just for Qt
 
   Q_OBJECT
+
+ signals:   // Signals
+
+  void onConnect(const QString &ipv4, const QString &port);
 
  public:
 

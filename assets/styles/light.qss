@@ -8,7 +8,7 @@
 /*********************** Common to All ************************/
 
 QFrame, QWidget {
-  background: #FFFFFF; /* Light background color */
+  background: #f9f9f9; /* Light background color */
   color: #000000; /* Dark text color */
   font-family: Segoe UI, sans-serif; /* Windows 11 font */
   margin: 2px 0px 2px 0px;
@@ -16,7 +16,7 @@ QFrame, QWidget {
 }
 
 QFrame {
-  background: #FFFFFF;
+  background: #f9f9f9;
   border-radius: 8px;
 }
 
@@ -26,7 +26,7 @@ QLabel {
 
 QPushButton {
   background-color: #167dff; /* Windows 11 accent color */
-  color: #FFFFFF; /* Light text on the button */
+  color: #f9f9f9; /* Light text on the button */
   border: none;
   border-radius: 5px;
   padding: 6px;
@@ -34,11 +34,11 @@ QPushButton {
 
 QPushButton:hover {
   background-color: #167dff; /* Slightly darker accent color on hover */
-  color: #FFFFFF;
+  color: #f9f9f9;
 }
 
 QTabWidget::pane {
-  background: #FFFFFF;
+  background: #f9f9f9;
   border: none;
   margin: 0px;
   padding: 0px;
@@ -49,12 +49,12 @@ QTabWidget::tab-bar {
 }
 
 QTabBar::tab {
-  border-bottom: 3px solid #FFFFFF;
+  border-bottom: 3px solid #f9f9f9;
   padding: 6px;
   color: gray;
   margin: 2px;
   font-weight: 650;
-  background: #FFFFFF;
+  background: #f9f9f9;
 }
 
 QTabBar::tab:selected {
@@ -72,7 +72,7 @@ QScrollArea {
 }
 
 QScrollBar:vertical {
-  background: #FFFFFF;
+  background: #f9f9f9;
   border: none;
   width: 10px;
   margin: 0px;
@@ -99,7 +99,7 @@ QScrollBar::sub-page:vertical {
 }
 
 QMenu {
-  background-color: #FFFFFF;;
+  background-color: #f9f9f9;;
   border: none;
   border-radius: 5px;
   padding: 6px;
@@ -108,7 +108,7 @@ QMenu {
 }
 
 QMenu::item {
-  background-color: #FFFFFF;;
+  background-color: #f9f9f9;;
   color: #000000;
   border: none;
   border-radius: 5px;
@@ -118,7 +118,7 @@ QMenu::item {
 
 QMenu::item:selected {
   background-color: #167dff;
-  color: #FFFFFF;
+  color: #f9f9f9;
 }
 
 QMenu::item:disabled {
@@ -126,7 +126,7 @@ QMenu::item:disabled {
 }
 
 QLineEdit {
-  background-color: #FFFFFF;;
+  background-color: #f9f9f9;;
   color: #000000;
   border: 1px solid gray;
   border-radius: 5px;

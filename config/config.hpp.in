@@ -6,9 +6,7 @@
 // https://opensource.org/licenses/MIT
 
 // Application Version
-#define CLIPBIRDESK_VERSION_MAJOR  "@clipbirdesk_VERSION_MAJOR@"
-#define CLIPBIRDESK_VERSION_MINOR  "@clipbirdesk_VERSION_MINOR@"
-#define CLIPBIRDESK_VERSION_PATCH  "@clipbirdesk_VERSION_PATCH@"
+#define CLIPBIRDESK_VERSION        "@VERSION@"
 
 // Application Name
 #define CLIPBIRDESK_NAME           "@CMAKE_PROJECT_NAME@"
@@ -27,6 +25,9 @@
 
 // Application Issue page
 #define CLIPBIRDESK_ISSUEPAGE      "@APPLICATION_ISSUEPAGE@"
+
+// Application Donate page
+#define CLIPBIRDESK_DONATE         "@DONATE_URL@"
 
 // Application Organization name
 #define CLIPBIRDESK_ORG_NAME       "@APPLICATION_ORGANIZATION_NAME@"

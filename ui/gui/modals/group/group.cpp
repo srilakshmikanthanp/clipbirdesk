@@ -3,17 +3,29 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "qrcode.hpp"
+#include "group.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
+/**
+ * @brief Set up the qr code color
+ *
+ */
+void Group::setUpQrCodeColor(Qt::ColorScheme scheme) {
+  if (scheme == Qt::ColorScheme::Dark) {
+    qrcode->setColor(Qt::white);
+  } else {
+    qrcode->setColor(Qt::black);
+  }
+}
+
 /**
  * @brief Construct a new Modal object
  *
  * @param parent
  */
-QrCode::QrCode(QWidget *parent) : Modal(parent) {
+Group::Group(QWidget *parent) : Modal(parent) {
   // create layout
-  auto root = new QVBoxLayout();
+  auto root = new QVBoxLayout(this);
 
   // set the size
   qrcode->setFixedSize(200, 200);
@@ -35,27 +47,19 @@ QrCode::QrCode(QWidget *parent) : Modal(parent) {
   this->setLayout(root);
 
   // initial theme
-  if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
-    qrcode->setColor(Qt::white);
-  } else {
-    qrcode->setColor(Qt::black);
-  }
+  setUpQrCodeColor(QGuiApplication::styleHints()->colorScheme());
 
   // detect the system theme
+  const auto styleHints = QGuiApplication::styleHints();
   const auto signal = &QStyleHints::colorSchemeChanged;
-  QObject::connect(QGuiApplication::styleHints(), signal, [=](auto scheme) {
-    if (scheme == Qt::ColorScheme::Dark) {
-      qrcode->setColor(Qt::white);
-    } else {
-      qrcode->setColor(Qt::black);
-    }
-  });
+  const auto slot = &Group::setUpQrCodeColor;
+  QObject::connect(styleHints, signal, this, slot);
 }
 
 /**
  * @brief set the qr code
  */
-void QrCode::setQrCode(const QString &qrcode) {
+void Group::setQrCode(const QString &qrcode) {
   this->qrcode->setText(qrcode);
   this->update();
 }
@@ -63,14 +67,14 @@ void QrCode::setQrCode(const QString &qrcode) {
 /**
  * @brief get the qr code
  */
-QString QrCode::getQrCode() const {
+QString Group::getQrCode() const {
   return this->qrcode->getText();
 }
 
 /**
  * @brief set the port
  */
-void QrCode::setPort(const QString &port) {
+void Group::setPort(const QString &port) {
   this->port->setText(port);
   this->update();
 }
@@ -78,7 +82,7 @@ void QrCode::setPort(const QString &port) {
 /**
  * @brief get the port
  */
-QString QrCode::getPort() const {
+QString Group::getPort() const {
   return this->port->text();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals
