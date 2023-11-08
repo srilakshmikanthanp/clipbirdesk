@@ -44,7 +44,7 @@
 #include "ui/gui/components/hostlist/hostlist.hpp"
 #include "ui/gui/traymenu/traymenu.hpp"
 #include "ui/gui/modals/aboutus/aboutus.hpp"
-#include "ui/gui/modals/joining/joining.hpp"
+#include "ui/gui/modals/joiner/joiner.hpp"
 #include "ui/gui/modals/message/message.hpp"
 #include "ui/gui/modals/group/group.hpp"
 

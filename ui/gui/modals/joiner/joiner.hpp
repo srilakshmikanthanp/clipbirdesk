@@ -17,10 +17,10 @@
 #include "constants/constants.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class Joining : public QDialog {
+class Joiner : public QDialog {
  private:  // disable copy and move for this class
 
-  Q_DISABLE_COPY_MOVE(Joining)
+  Q_DISABLE_COPY_MOVE(Joiner)
 
  private:  // just for Qt
 
@@ -37,11 +37,11 @@ class Joining : public QDialog {
   *
   * @param parent
   */
-  explicit Joining(QWidget * parent = nullptr);
+  explicit Joiner(QWidget * parent = nullptr);
 
   /**
    * @brief Destroy the Status object
    */
-  virtual ~Joining() = default;
+  virtual ~Joiner() = default;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

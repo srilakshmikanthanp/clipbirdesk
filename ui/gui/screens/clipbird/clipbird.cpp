@@ -362,7 +362,7 @@ void Clipbird::onConnectClicked() {
   };
 
   // get the ip and port from user
-  static auto dialog = new modals::Joining();
+  static auto dialog = new modals::Joiner();
 
   // set the icon
   dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
@@ -383,7 +383,7 @@ void Clipbird::onConnectClicked() {
   if (!dialog->isVisible()) dialog->show();
 
   // connect the dialog to window clicked signal
-  connect(dialog, &modals::Joining::onConnect, [=](auto ipv4, auto port) {
+  connect(dialog, &modals::Joiner::onConnect, [=](auto ipv4, auto port) {
     // validate the ip and port
     if (!validator(ipv4.toShort(), port.toShort())) {
       return;
