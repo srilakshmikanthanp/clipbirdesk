@@ -7,6 +7,27 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 /**
+ * @brief Construct a new Clip Tile object
+ *
+ * @param parent
+ */
+ClipTile::ClipTile(QWidget *parent) : QWidget(parent) {
+  // TODO
+}
+
+/**
+ * @brief set the clip
+ */
+void ClipTile::setClip(const QVector<QPair<QString, QByteArray>> &) {}
+
+/**
+ * @brief get the clip
+ */
+const QVector<QPair<QString, QByteArray>> &ClipTile::getClip() const {
+  return clip;
+}
+
+/**
  * @brief Construct a new Clip Hist object
  *
  * @param parent

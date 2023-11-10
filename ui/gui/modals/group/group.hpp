@@ -13,7 +13,7 @@
 #include <QVBoxLayout>
 
 // project header
-#include "ui/gui/components/qrcode/qrcode.hpp"
+#include "utility/functions/qrcode/qrcode.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
 class Group : public QDialog {
@@ -28,14 +28,17 @@ class Group : public QDialog {
  private:  // private member variable
 
   // create label
-  components::QrCode *qrcode = new components::QrCode(this);
+  QLabel *port = new QLabel(this);
 
   // create label
-  QLabel *port = new QLabel(this);
+  QString text;
+
+  // Image of the qrcode
+  QLabel *qrcode = new QLabel();
 
  private:  // private member functions
 
-  void setUpQrCodeColor(Qt::ColorScheme);
+  void setUpQrCode(Qt::ColorScheme);
 
  public:
 

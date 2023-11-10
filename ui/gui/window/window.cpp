@@ -9,7 +9,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 /**
  * @brief Construct a new Gui Main object
  */
-Window::Window(QWidget* parent) : QMainWindow(parent) {
+Window::Window(QWidget* parent) : QWidget(parent) {
   // set mainWindow attributes
   this->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
@@ -21,14 +21,57 @@ Window::Window(QWidget* parent) : QMainWindow(parent) {
  * @brief Set Content
  */
 void Window::setContent(ui::gui::Clipbird* content) {
-  this->setCentralWidget(content);
+ // create a layout for vertical
+  auto layout = new QVBoxLayout(this);
+
+  // content margin
+  layout->setContentsMargins(5, 5, 5, 5);
+
+  // add the widget to the layout
+  layout->addWidget((this->content = content));
+
+  // warp layout with a widget
+  auto wrapper = new QWidget(this);
+
+  // set as Rounded Corner
+  wrapper->setStyleSheet("QWidget { border-radius: 10px; }");
+
+  // shadow effect
+  auto shadow = new QGraphicsDropShadowEffect(this);
+
+  // set the blur radius
+  shadow->setBlurRadius(10);
+
+  // set the color
+  shadow->setColor(QColor(0, 0, 0, 160));
+
+  // set the offset
+  shadow->setOffset(0, 0);
+
+  // set the shadow effect
+  wrapper->setGraphicsEffect(shadow);
+
+  // set the layout to the wrapper
+  wrapper->setLayout(layout);
+
+  // create layout for the main window
+  auto main = new QVBoxLayout(this);
+
+  // add the wrapper to the main layout
+  main->addWidget(wrapper);
+
+  // content margin
+  main->setContentsMargins(5, 5, 5, 5);
+
+  // set the main layout to the window
+  this->setLayout(main);
 }
 
 /**
  * @brief get Content
  */
 ui::gui::Clipbird* Window::getContent() const {
-  return dynamic_cast<ui::gui::Clipbird*>(this->centralWidget());
+  return this->content;
 }
 
 /**

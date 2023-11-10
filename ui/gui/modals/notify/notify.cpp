@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "message.hpp"
+#include "notify.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
 /**
@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
  *
  * @param parent
  */
-Message::Message(QWidget *parent) : QDialog(parent) {
+Notify::Notify(QWidget *parent) : QDialog(parent) {
   // Set the errorMessage label to center
   this->errorMessage->setAlignment(Qt::AlignCenter);
 
@@ -28,7 +28,7 @@ Message::Message(QWidget *parent) : QDialog(parent) {
 /**
  * @brief set the error message
  */
-void Message::setErrorMessage(const QString &error) {
+void Notify::setMessage(const QString &error) {
   this->errorMessage->setText(error);
   this->update();
 }
@@ -36,7 +36,7 @@ void Message::setErrorMessage(const QString &error) {
 /**
  * @brief get the error message
  */
-QString Message::getErrorMessage() const {
+QString Notify::getMessage() const {
   return this->errorMessage->text();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

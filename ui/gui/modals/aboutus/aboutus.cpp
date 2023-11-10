@@ -25,12 +25,6 @@ AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
     QDesktopServices::openUrl(QUrl(constants::getAppIssuePage().c_str()));
   };
 
-  // Images and Icons
-  auto logoIco   = new QIcon(":/images/logo.png");
-  auto webIco    = new QIcon(":/images/web.png");
-  auto bugIco    = new QIcon(":/images/bug.png");
-  auto donateIco = new QIcon(":/images/dollar.png");
-
   // widgets
   auto logo      = new QLabel(this);
   auto version   = new QLabel(this);
@@ -38,16 +32,22 @@ AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
   auto bug       = new QPushButton(this);
   auto donate    = new QPushButton(this);
 
+  // Images and Icons
+  auto logoIco   = QIcon(":/images/logo.png");
+  auto webIco    = QIcon(":/images/web.png");
+  auto bugIco    = QIcon(":/images/bug.png");
+  auto donateIco = QIcon(":/images/dollar.png");
+
   // set logo of the app
-  logo->setPixmap(logoIco->pixmap(QSize(128, 128)));
+  logo->setPixmap(logoIco.pixmap(QSize(128, 128)));
 
   // set version
   version->setText("Version: " + QString::fromStdString(constants::getAppVersion()));
 
   // set icons
-  web->setIcon(*webIco);
-  bug->setIcon(*bugIco);
-  donate->setIcon(*donateIco);
+  web->setIcon(webIco);
+  bug->setIcon(bugIco);
+  donate->setIcon(donateIco);
 
   // set text
   web->setText("Website");
@@ -73,26 +73,23 @@ AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
   layoutVer->addLayout(layoutHor);
 
   // center align the labels
-  logo->setAlignment(Qt::AlignCenter);
   version->setAlignment(Qt::AlignCenter);
+  logo->setAlignment(Qt::AlignCenter);
 
   // Alignments
   layoutVer->setAlignment(Qt::AlignCenter);
   layoutHor->setAlignment(Qt::AlignCenter);
 
-  // set layout
-  setLayout(layoutVer);
-
-  // set Fixed size
-  setFixedSize(this->sizeHint());
+  // set the layout
+  this->setLayout(layoutVer);
 
   // Click Handler for web
   connect(web, &QPushButton::clicked, webClick);
 
-  // Click Handler for bug
-  connect(bug, &QPushButton::clicked, bugClick);
-
   // Click Handler for donate
   connect(donate, &QPushButton::clicked, donateClick);
+
+  // Click Handler for bug
+  connect(bug, &QPushButton::clicked, bugClick);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

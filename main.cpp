@@ -65,6 +65,11 @@ class ClipbirdApplication : public SingleApplication {
       throw std::runtime_error("Can't Create QSslConfiguration");
     }
 
+    // if the certificate expired
+    if (cert.expiryDate() < QDateTime::currentDateTime()) {
+      return getNewSslConfiguration();
+    }
+
     // set peer verify
     sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
 
@@ -179,20 +184,6 @@ class ClipbirdApplication : public SingleApplication {
 
     // set not to quit on last content closed
     qApp->setQuitOnLastWindowClosed(false);
-
-    // set padding as 20px
-    window->setContentsMargins(20, 20, 5, 5);
-
-    // BackDrop Shadow
-    auto shadow = new QGraphicsDropShadowEffect();
-
-    // set the shadow Properties
-    shadow->setBlurRadius(10);
-    shadow->setOffset(5, 5);
-    shadow->setColor(QColor(0, 0, 0, 100));
-
-    // set the shadow to content
-    content->setGraphicsEffect(shadow);
 
     // set the QSystemTrayIcon
     content->setTrayIcon(trayIcon);

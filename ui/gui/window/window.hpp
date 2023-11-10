@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 #include <QGuiApplication>
+#include <QGraphicsDropShadowEffect>
 #include <QMainWindow>
 #include <QScreen>
 #include <QVBoxLayout>
@@ -11,19 +12,15 @@
 #include "ui/gui/screens/clipbird/clipbird.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
-class Window : public QMainWindow {
+class Window : public QWidget {
  private:  // Member variable
 
+  ui::gui::Clipbird* content = nullptr;
   QSize ratio = QSize(3, 3);
 
  private:  // Disable copy, move and assignment
 
   Q_DISABLE_COPY_MOVE(Window);
-
- private:  // make setCentral Widget and centralWidget private
-
-  using QMainWindow::setCentralWidget;
-  using QMainWindow::centralWidget;
 
  public:  // Constructor and Destructor
 

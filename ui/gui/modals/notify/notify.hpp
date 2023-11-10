@@ -12,10 +12,10 @@
 #include <QVBoxLayout>
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class Message : public QDialog {
+class Notify : public QDialog {
  private:  // disable copy and move for this class
 
-  Q_DISABLE_COPY_MOVE(Message)
+  Q_DISABLE_COPY_MOVE(Notify)
 
  private:  // just for Qt
 
@@ -32,21 +32,21 @@ class Message : public QDialog {
   *
   * @param parent
   */
-  explicit Message(QWidget * parent = nullptr);
+  explicit Notify(QWidget * parent = nullptr);
 
   /**
    * @brief Destroy the Status object
    */
-  virtual ~Message() = default;
+  virtual ~Notify() = default;
 
   /**
    * @brief set the error message
    */
-  void setErrorMessage(const QString &);
+  void setMessage(const QString &);
 
   /**
    * @brief get the error message
    */
-  QString getErrorMessage() const;
+  QString getMessage() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

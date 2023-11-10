@@ -45,11 +45,8 @@ Joiner::Joiner(QWidget * parent) : QDialog(parent) {
   // set the title
   this->setWindowTitle(constants::getAppName().c_str());
 
-  // set the root layout to dialog
+  // set layout
   this->setLayout(root);
-
-  // set delete on close
-  this->setAttribute(Qt::WA_DeleteOnClose);
 
   // connect the slot
   connect(button, &QPushButton::clicked, this, [this, ipv4, port]() {

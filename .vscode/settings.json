@@ -166,6 +166,7 @@
     "qdialog": "cpp",
     "qvboxlayout": "cpp",
     "qlineedit": "cpp",
-    "qdesktopservices": "cpp"
+    "qdesktopservices": "cpp",
+    "qstring": "cpp"
   },
 }

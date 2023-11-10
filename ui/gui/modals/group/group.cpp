@@ -10,12 +10,16 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
  * @brief Set up the qr code color
  *
  */
-void Group::setUpQrCodeColor(Qt::ColorScheme scheme) {
+void Group::setUpQrCode(Qt::ColorScheme scheme) {
+  using utility::functions::getQrCode;
+
   if (scheme == Qt::ColorScheme::Dark) {
-    qrcode->setColor(Qt::white);
+    this->qrcode->setPixmap(QPixmap::fromImage(getQrCode(text, Qt::white)));
   } else {
-    qrcode->setColor(Qt::black);
+    this->qrcode->setPixmap(QPixmap::fromImage(getQrCode(text, Qt::black)));
   }
+
+  this->update();
 }
 
 /**
@@ -25,34 +29,27 @@ void Group::setUpQrCodeColor(Qt::ColorScheme scheme) {
  */
 Group::Group(QWidget *parent) : QDialog(parent) {
   // create layout
-  auto root = new QVBoxLayout(this);
-
-  // set the size
-  qrcode->setFixedSize(200, 200);
+  auto root = new QVBoxLayout();
 
   // set center alignment
+  qrcode->setAlignment(Qt::AlignCenter);
   port->setAlignment(Qt::AlignCenter);
 
   // add the ip and port input to layout
   root->addWidget(qrcode);
   root->addWidget(port);
 
-  // size policy
-  root->setSizeConstraint(QLayout::SetFixedSize);
-
   // center alignment of qrcode
   root->setAlignment(qrcode, Qt::AlignCenter);
+  root->setAlignment(port, Qt::AlignCenter);
 
-  // set the layout
+  // set layout
   this->setLayout(root);
-
-  // initial theme
-  setUpQrCodeColor(QGuiApplication::styleHints()->colorScheme());
 
   // detect the system theme
   const auto styleHints = QGuiApplication::styleHints();
   const auto signal = &QStyleHints::colorSchemeChanged;
-  const auto slot = &Group::setUpQrCodeColor;
+  const auto slot = &Group::setUpQrCode;
   QObject::connect(styleHints, signal, this, slot);
 }
 
@@ -60,7 +57,9 @@ Group::Group(QWidget *parent) : QDialog(parent) {
  * @brief set the qr code
  */
 void Group::setQrCode(const QString &qrcode) {
-  this->qrcode->setText(qrcode);
+  auto styleHints = QGuiApplication::styleHints();
+  this->text = qrcode;
+  this->setUpQrCode(styleHints->colorScheme());
   this->update();
 }
 
@@ -68,7 +67,7 @@ void Group::setQrCode(const QString &qrcode) {
  * @brief get the qr code
  */
 QString Group::getQrCode() const {
-  return this->qrcode->getText();
+  return this->text;
 }
 
 /**

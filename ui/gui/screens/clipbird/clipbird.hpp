@@ -39,13 +39,12 @@
 // project headers
 #include "controller/clipbird/clipbird.hpp"
 #include "types/device/device.hpp"
-#include "ui/gui/components/qrcode/qrcode.hpp"
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/components/hostlist/hostlist.hpp"
 #include "ui/gui/traymenu/traymenu.hpp"
 #include "ui/gui/modals/aboutus/aboutus.hpp"
 #include "ui/gui/modals/joiner/joiner.hpp"
-#include "ui/gui/modals/message/message.hpp"
+#include "ui/gui/modals/notify/notify.hpp"
 #include "ui/gui/modals/group/group.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
