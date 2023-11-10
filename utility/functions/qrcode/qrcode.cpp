@@ -39,10 +39,10 @@ QImage getQrCode(const QString& text, QColor color, QSize size) {
   auto sx = size.width() / width;
 
   // create a image
-  QImage image(QSize(width * sx, width * sy), QImage::Format_RGB32);
+  QImage image(QSize(width * sx, width * sy), QImage::Format_ARGB32);
 
   // transparent background
-  image.fill(Qt::transparent);
+  image.fill(QColor(0,0,0,0));
 
   // create a painter
   QPainter painter(&image);
