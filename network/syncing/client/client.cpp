@@ -463,6 +463,11 @@ void Client::onServiceAdded(types::device::Device server) {
     throw std::runtime_error("SSL Config Config is not set");
   }
 
+  // if already found
+  if (std::find(m_servers.begin(), m_servers.end(), server) != m_servers.end()) {
+    return;
+  }
+
   // emit server found
   emit OnServerFound(server);
 
