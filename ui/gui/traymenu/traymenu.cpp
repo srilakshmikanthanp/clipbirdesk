@@ -147,4 +147,20 @@ bool TrayMenu::isSendEnabled() const {
 bool TrayMenu::isHistoryEnabled() const {
   return history.isEnabled();
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::content
+
+/**
+ * @brief Override paint event
+ */
+void TrayMenu::paintEvent(QPaintEvent* event) {
+  QPainter painter(this);
+  painter.setRenderHint(QPainter::Antialiasing);
+
+  QPainterPath path;
+  QRectF rect = QRectF(this->rect()).adjusted(2.0, 2.0, -2.0, -2.0);
+  path.addRoundedRect(rect, 7, 7);
+  QRegion region = QRegion(path.toFillPolygon().toPolygon());
+  this->setMask(region);
+
+  QMenu::paintEvent(event);
+}
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

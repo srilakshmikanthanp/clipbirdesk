@@ -7,6 +7,8 @@
 
 // Qt headers
 #include <QMenu>
+#include <QPainter>
+#include <QPainterPath>
 #include <QSystemTrayIcon>
 
 // local headers
@@ -149,5 +151,12 @@ class TrayMenu : public QMenu {
    * @brief Is Received Enabled
    */
   bool isHistoryEnabled() const;
+
+ protected:
+
+  /**
+   * @brief Override paint event
+   */
+  void paintEvent(QPaintEvent* event) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

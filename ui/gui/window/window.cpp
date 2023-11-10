@@ -34,7 +34,7 @@ void Window::setContent(ui::gui::Clipbird* content) {
   auto wrapper = new QWidget(this);
 
   // set as Rounded Corner
-  wrapper->setStyleSheet("QWidget { border-radius: 10px; }");
+  wrapper->setStyleSheet("border-radius: 10px;");
 
   // shadow effect
   auto shadow = new QGraphicsDropShadowEffect(this);
@@ -61,7 +61,7 @@ void Window::setContent(ui::gui::Clipbird* content) {
   main->addWidget(wrapper);
 
   // content margin
-  main->setContentsMargins(5, 5, 5, 5);
+  main->setContentsMargins(10, 10, 10, 10);
 
   // set the main layout to the window
   this->setLayout(main);
