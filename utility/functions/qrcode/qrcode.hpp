@@ -21,5 +21,5 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions {
  * @param color color of the qrcode
  * @param size size of the qrcode
  */
-QImage getQrCode(const QString& text, QColor color, QSize size = QSize(200, 200));
+QImage getQrCode(const QString& text, QColor color, QSize size = QSize(300, 300));
 }

@@ -230,6 +230,11 @@ void Clipbird::handleServerStatusChanged(bool isConnected) {
     servers_m.append({s, getAction(s)});
   }
 
+  // if the server is not in the list
+  if (isConnected && !servers.contains(controller->getConnectedServer())) {
+    servers_m.append({controller->getConnectedServer(), Action::Disconnect});
+  }
+
   // set the server list to the window
   this->setServerList(servers_m);
 }
@@ -295,6 +300,17 @@ void Clipbird::onQrCodeClicked() {
 
   // add all the ip address
   for (auto addr : addrs) {
+    // if not localhost or ipv6 skip
+    if (addr.isLoopback() || addr.protocol() == QAbstractSocket::IPv6Protocol) {
+      continue;
+    }
+
+    // if localhost skip
+    if (addr.toString().startsWith("127.")) {
+      continue;
+    }
+
+    // add the ip to array
     ips.append(addr.toString());
   }
 
