@@ -33,7 +33,7 @@ class ClipTile : public QWidget {
 
  private:  // Member variable
 
-  QLabel *                            item;
+  QLabel * item = new QLabel(this);
 
  signals:  // signals
 

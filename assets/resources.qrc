@@ -23,6 +23,12 @@
     <file>images/dollar.png</file>
   </qresource>
   <qresource>
+    <file>images/copy.png</file>
+  </qresource>
+  <qresource>
+    <file>images/delete.png</file>
+  </qresource>
+  <qresource>
     <file>styles/light.qss</file>
   </qresource>
   <qresource>

@@ -254,7 +254,7 @@ void Clipbird::handleConnectionError(QString error) {
   auto message = QString("Connection Error\nError Message: %1").arg(error);
 
   // Dialog Instance
-  auto dialog = new modals::Notify(this);
+  auto dialog = new QMessageBox();
 
   // icon for the dialog
   auto icon = QIcon(constants::getAppLogo().c_str());
@@ -266,7 +266,7 @@ void Clipbird::handleConnectionError(QString error) {
   dialog->setWindowTitle(constants::getAppName().c_str());
 
   // set the message
-  dialog->setMessage(message);
+  dialog->setText(message);
 
   // set delete on close
   dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -281,11 +281,8 @@ void Clipbird::handleConnectionError(QString error) {
  * @brief On Qr Code Clicked
  */
 void Clipbird::onQrCodeClicked() {
-  // create a dialog
-  static auto dialog = new modals::Group();
-
   // if already visible return
-  if (dialog->isVisible()) return;
+  if (group.isVisible()) return;
 
   // generate the qr code with all inteface ip and port in format
   auto interfaces = QNetworkInterface::allInterfaces();
@@ -305,21 +302,21 @@ void Clipbird::onQrCodeClicked() {
   // add ips
   QJsonArray ips;
 
-  // add all the ip address
-  for (auto addr : addrs) {
+  // using algorithms
+  std::for_each(addrs.begin(), addrs.end(), [&](auto& addr) {
     // if not localhost or ipv6 skip
     if (addr.isLoopback() || addr.protocol() == QAbstractSocket::IPv6Protocol) {
-      continue;
+      return;
     }
 
     // if localhost skip
     if (addr.toString().startsWith("127.")) {
-      continue;
+      return;
     }
 
     // add the ip to array
     ips.append(addr.toString());
-  }
+  });
 
   // add the ips to json
   json.insert("ips", ips);
@@ -331,28 +328,28 @@ void Clipbird::onQrCodeClicked() {
   qDebug() << "QR Code Info: " << QString(info);
 
   // set the icon
-  dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+  group.setWindowIcon(QIcon(constants::getAppLogo().c_str()));
 
   // set the title
-  dialog->setWindowTitle(constants::getAppName().c_str());
+  group.setWindowTitle(constants::getAppName().c_str());
 
   // set Fixed Size
-  dialog->setFixedSize(dialog->sizeHint());
+  group.setFixedSize(group.sizeHint());
 
   // set the info
-  dialog->setQrCode(QString(info));
+  group.setQrCode(QString(info));
 
   // set port
-  dialog->setPort(QString::number(server.port));
+  group.setPort(QString::number(server.port));
 
   // show the dialog
-  dialog->show();
+  group.show();
 
   // set as not resizable
-  dialog->setFixedSize(dialog->sizeHint());
+  group.setFixedSize(group.sizeHint());
 
   // close on tab change
-  QObject::connect(tab, &QTabWidget::currentChanged, dialog, &QDialog::close);
+  QObject::connect(tab, &QTabWidget::currentChanged, &group, &QDialog::close);
 }
 
 /**
@@ -384,29 +381,26 @@ void Clipbird::onConnectClicked() {
     }
   };
 
-  // get the ip and port from user
-  static auto dialog = new modals::Joiner();
-
   // if already visible return
-  if (dialog->isVisible()) return;
+  if (joiner.isVisible()) return;
 
   // set the icon
-  dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+  joiner.setWindowIcon(QIcon(constants::getAppLogo().c_str()));
 
   // set the title
-  dialog->setWindowTitle(constants::getAppName().c_str());
+  joiner.setWindowTitle(constants::getAppName().c_str());
 
   // set as not resizable
-  dialog->setFixedSize(dialog->sizeHint());
+  joiner.setFixedSize(joiner.sizeHint());
 
   // close on tab change
-  QObject::connect(tab, &QTabWidget::currentChanged, dialog, &QDialog::close);
+  QObject::connect(tab, &QTabWidget::currentChanged, &joiner, &QDialog::close);
 
   // show the dialog
-  if (!dialog->isVisible()) dialog->show();
+  if (!joiner.isVisible()) joiner.show();
 
   // connect the dialog to window clicked signal
-  connect(dialog, &modals::Joiner::onConnect, [=](auto ipv4, auto port) {
+  connect(&joiner, &modals::Joiner::onConnect, [=](auto ipv4, auto port) {
     // validate the ip and port
     if (!validator(ipv4.toShort(), port.toShort())) {
       return;
@@ -414,7 +408,7 @@ void Clipbird::onConnectClicked() {
 
     // bind the port
     auto slot = std::bind(
-      slot_hr, dialog, port.toShort(), std::placeholders::_1
+      slot_hr, &joiner, port.toShort(), std::placeholders::_1
     );
 
     // resolve the host name
@@ -426,23 +420,20 @@ void Clipbird::onConnectClicked() {
  * @brief On About Clicked
  */
 void Clipbird::onAboutClicked() {
-  // create a dialog
-  static auto dialog = new modals::AboutUs();
-
   // if already visible return
-  if (dialog->isVisible()) return;
+  if (aboutUs.isVisible()) return;
 
   // set the icon
-  dialog->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+  aboutUs.setWindowIcon(QIcon(constants::getAppLogo().c_str()));
 
   // set the title
-  dialog->setWindowTitle(constants::getAppName().c_str());
+  aboutUs.setWindowTitle(constants::getAppName().c_str());
 
   // show the dialog
-  dialog->show();
+  aboutUs.show();
 
   // close on tab change
-  QObject::connect(tab, &QTabWidget::currentChanged, dialog, &QDialog::close);
+  QObject::connect(tab, &QTabWidget::currentChanged, &aboutUs, &QDialog::close);
 }
 
 /**
@@ -471,7 +462,38 @@ void Clipbird::onSendClicked() {
  * @brief On Received Clicked
  */
 void Clipbird::onReceivedClicked() {
-  // TODO: implement
+  // if already visible return
+  if (history.isVisible()) return;
+
+  // set the icon
+  history.setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+
+  // set the title
+  history.setWindowTitle(constants::getAppName().c_str());
+
+  // set history
+  history.setHistory(controller->getHistory());
+
+  // set size
+  history.setFixedSize(QSize(340, 380));
+
+  // connect signal for Clipboard Copy
+  const auto signal_cc = &modals::History::onClipSelected;
+  const auto slot_cc   = [=](auto i) { controller->setClipboard(history.getHistory().at(i)); };
+  connect(&history, signal_cc, slot_cc);
+
+  // connect signal for history change
+  const auto signal_hc = &ClipBird::OnHistoryChanged;
+  const auto slot_hc   = &modals::History::setHistory;
+  connect(controller, signal_hc, &history, slot_hc);
+
+  // connect signal for history delete
+  const auto signal_hd = &modals::History::onClipDelete;
+  const auto slot_hd   = &ClipBird::deleteHistoryAt;
+  connect(&history, signal_hd, controller, slot_hd);
+
+  // show the dialog
+  history.show();
 }
 
 /**

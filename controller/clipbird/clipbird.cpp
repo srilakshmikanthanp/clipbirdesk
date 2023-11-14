@@ -539,6 +539,22 @@ bool ClipBird::isLastlyHostIsServer() const {
 }
 
 /**
+ * @brief delete the history at the given index
+ */
+void ClipBird::deleteHistoryAt(int index) {
+  // if the index is out of range then throw error
+  if (index < 0 || index >= m_history.size()) {
+    throw std::runtime_error("Index out of range");
+  }
+
+  // remove the history at the given index
+  m_history.remove(index);
+
+  // emit the signal
+  emit OnHistoryChanged(m_history);
+}
+
+/**
  * @brief Get the History of the clipboard
  */
 QVector<QVector<QPair<QString, QByteArray>>> ClipBird::getHistory() const {

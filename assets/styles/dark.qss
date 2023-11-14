@@ -67,6 +67,19 @@ QScrollArea {
   border: none;
 }
 
+QScrollBar::handle:horizontal,
+QScrollBar::handle:vertical {
+  background: #959595; /* Windows 11 scrollbar handle color */
+  border-radius: 5px;
+}
+
+QScrollBar:horizontal {
+  background: #272727;
+  border: none;
+  height: 10px;
+  margin: 0px;
+}
+
 QScrollBar:vertical {
   background: #272727;
   border: none;
@@ -74,24 +87,21 @@ QScrollBar:vertical {
   margin: 0px;
 }
 
-QScrollBar::handle:vertical {
-  background: #959595; /* Windows 11 scrollbar handle color */
-  border-radius: 5px;
-}
-
-QScrollBar::add-line:vertical {
-  height: 0px;
-}
-
-QScrollBar::sub-line:vertical {
-  height: 0px;
-}
-
+QScrollBar::up-arrow:horizontal,
+QScrollBar::down-arrow:horizontal,
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal,
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal,
 QScrollBar::up-arrow:vertical,
 QScrollBar::down-arrow:vertical,
 QScrollBar::add-page:vertical,
-QScrollBar::sub-page:vertical {
+QScrollBar::sub-page:vertical,
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
   background: none;
+  height: 0px;
+  width: 0px;
 }
 
 QMenu {

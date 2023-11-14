@@ -261,6 +261,11 @@ class ClipBird : public QObject {
   bool isLastlyHostIsServer() const;
 
   /**
+   * @brief delete the history at the given index
+   */
+  void deleteHistoryAt(int index);
+
+  /**
    * @brief Get the History of the clipboard
    */
   QVector<QVector<QPair<QString, QByteArray>>> getHistory() const;

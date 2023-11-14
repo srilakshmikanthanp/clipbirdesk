@@ -43,6 +43,7 @@
 #include "ui/gui/components/hostlist/hostlist.hpp"
 #include "ui/gui/traymenu/traymenu.hpp"
 #include "ui/gui/modals/aboutus/aboutus.hpp"
+#include "ui/gui/modals/history/history.hpp"
 #include "ui/gui/modals/joiner/joiner.hpp"
 #include "ui/gui/modals/notify/notify.hpp"
 #include "ui/gui/modals/group/group.hpp"
@@ -59,6 +60,13 @@ class Clipbird : public QFrame {
 
   components::HostList* clientList = new components::HostList();  // Server Tab
   components::HostList* serverList = new components::HostList();  // Client Tab
+
+ private:  // Member variable (Modals)
+
+  modals::AboutUs aboutUs = modals::AboutUs();
+  modals::Group group = modals::Group();
+  modals::History history = modals::History();
+  modals::Joiner joiner = modals::Joiner();
 
  private:  // Member variable (Layout)
 
