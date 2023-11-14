@@ -208,6 +208,13 @@ void Clipbird::handleServerStatusChanged(bool isConnected) {
   auto servers   = controller->getServerList();
   auto status_m  = isConnected ? Status::Connected : Status::Disconnected;
 
+  // server compare
+  const auto serverCompare = [=](const auto& device) -> bool {
+    if (!controller->isConnectedToServer()) false;
+    auto server = controller->getConnectedServer();
+    return server.ip == std::get<0>(device).ip && server.port == std::get<0>(device).port;
+  };
+
   // get the action for the server
   const auto getAction = [=](const auto& s) {
     if (!controller->isConnectedToServer()) return Action::Connect;
@@ -231,7 +238,7 @@ void Clipbird::handleServerStatusChanged(bool isConnected) {
   }
 
   // if the server is not in the list
-  if (isConnected && !servers.contains(controller->getConnectedServer())) {
+  if (isConnected && !std::any_of(servers_m.begin(), servers_m.end(), serverCompare)) {
     servers_m.append({controller->getConnectedServer(), Action::Disconnect});
   }
 

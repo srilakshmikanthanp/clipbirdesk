@@ -43,6 +43,12 @@ std::string getAppPatchVersion();
 std::string getAppVersion();
 
 /**
+ * @brief App Max History Size
+ * @return int
+ */
+int getAppMaxHistorySize();
+
+/**
  * @brief Get the Application Name
  * @return std::string
  */

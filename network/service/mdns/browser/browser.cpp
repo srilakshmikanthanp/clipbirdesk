@@ -21,9 +21,6 @@ void Browser::onHostResolved(bool isAdded, quint16 port, QString srvName, const 
     return;
   }
 
-  // remove the .local from srv name
-  srvName.replace(".local.", "");
-
   // get the ip address
   auto ip = info.addresses().first();
 
@@ -62,6 +59,9 @@ void Browser::browseCallback(
     return;
   }
 
+  // create context with service name and this
+  auto contextObj = new std::pair(new std::string(serviceName), browserObj);
+
   // infer callback type from flag
   auto callback = flags & kDNSServiceFlagsAdd ? (
     addedCallback                                    // Service Added
@@ -78,7 +78,7 @@ void Browser::browseCallback(
       regtype,                                       // regtype
       domain,                                        // domain
       callback,                                      // callback
-      browserObj                                     // context
+      contextObj                                     // context
   );
 
   // check for error
@@ -123,7 +123,15 @@ void Browser::addedCallback(
     void* context                                    // context
 ) {
   // convert context to Register object
-  auto browserObj = static_cast<Browser*>(context);
+  auto contextObj = static_cast<std::pair<std::string*, Browser*>*>(context);
+  auto browserObj = contextObj->second;
+  auto serviceName = QString::fromStdString(*contextObj->first);
+
+  // free the service name
+  delete contextObj->first;
+
+  // free the context
+  delete contextObj;
 
   // Avoid warning of unused variables
   Q_UNUSED(interfaceIndex);
@@ -146,7 +154,7 @@ void Browser::addedCallback(
     browserObj,                                      // this
     true,                                            // Removed
     ntohs(port),                                     // port
-    QString::fromUtf8(hosttarget),                   // srvName
+    serviceName,                                     // srvName
     std::placeholders::_1                            // QHostInfo
   );
 
@@ -170,7 +178,15 @@ void Browser::removeCallback(
     void* context                                    // context
 ) {
   // convert context to Register object
-  auto browserObj = static_cast<Browser*>(context);
+  auto contextObj = static_cast<std::pair<std::string*, Browser*>*>(context);
+  auto browserObj = contextObj->second;
+  auto serviceName = QString::fromStdString(*contextObj->first);
+
+  // free the service name
+  delete contextObj->first;
+
+  // free the context
+  delete contextObj;
 
   // Avoid warning of unused variables
   Q_UNUSED(interfaceIndex);

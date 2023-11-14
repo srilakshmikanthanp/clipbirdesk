@@ -70,6 +70,10 @@ class ClipBird : public QObject {
   /// @brief On Sync Request  (From Server)
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> data);
 
+  signals:  // signals for this class
+  /// @brief On History Changed
+  void OnHistoryChanged(QVector<QVector<QPair<QString, QByteArray>>>);
+
  private:  // typedefs for this class
 
   using Server = network::syncing::Server;
@@ -84,6 +88,7 @@ class ClipBird : public QObject {
   std::variant<Server, Client> m_host;
   QSslConfiguration m_sslConfig;
   clipboard::Clipboard m_clipboard;
+  QVector<QVector<QPair<QString, QByteArray>>> m_history;
 
  private:  // private slots
 
@@ -95,6 +100,9 @@ class ClipBird : public QObject {
 
   /// @brief Handle the Server Found (From client)
   void handleServerFound(types::device::Device server);
+
+  /// @brief Handle the sync request (From server)
+  void handleSyncRequest(QVector<QPair<QString, QByteArray>> data);
 
  private: // private functions
 
@@ -251,5 +259,10 @@ class ClipBird : public QObject {
    * @brief IS the Host is Lastly Server
    */
   bool isLastlyHostIsServer() const;
+
+  /**
+   * @brief Get the History of the clipboard
+   */
+  QVector<QVector<QPair<QString, QByteArray>>> getHistory() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::controller

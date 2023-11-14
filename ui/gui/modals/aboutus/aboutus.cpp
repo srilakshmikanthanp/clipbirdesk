@@ -26,11 +26,11 @@ AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
   };
 
   // widgets
+  auto donate    = new QPushButton(this);
+  auto web       = new QPushButton(this);
   auto logo      = new QLabel(this);
   auto version   = new QLabel(this);
-  auto web       = new QPushButton(this);
   auto bug       = new QPushButton(this);
-  auto donate    = new QPushButton(this);
 
   // Images and Icons
   auto logoIco   = QIcon(":/images/logo.png");
@@ -46,12 +46,12 @@ AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
 
   // set icons
   web->setIcon(webIco);
-  bug->setIcon(bugIco);
   donate->setIcon(donateIco);
+  bug->setIcon(bugIco);
 
   // set text
-  web->setText("Website");
   bug->setText("Report Bug");
+  web->setText("Website");
   donate->setText("Donate");
 
   // Vertical Layout

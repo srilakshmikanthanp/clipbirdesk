@@ -17,6 +17,14 @@ std::string getAppVersion() {
 }
 
 /**
+ * @brief App Max History Size
+ * @return int
+ */
+int getAppMaxHistorySize() {
+  return 10;
+}
+
+/**
  * @brief Get the Application Name
  * @return std::string
  */

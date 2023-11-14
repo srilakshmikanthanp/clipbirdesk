@@ -87,6 +87,22 @@ void ClipBird::handleServerFound(types::device::Device server) {
 }
 
 /**
+ * @brief @brief Handle the sync request (From server)
+ */
+void ClipBird::handleSyncRequest(QVector<QPair<QString, QByteArray>> data) {
+  // remove last
+  if (this->m_history.size() + 1 > constants::getAppMaxHistorySize()) {
+    this->m_history.pop_back();
+  }
+
+  // add to front
+  this->m_history.push_front(data);
+
+  // emit the signal
+  emit OnHistoryChanged(m_history);
+}
+
+/**
  * @brief Set the SSL Configuration object
  */
 void ClipBird::setSslConfiguration(QSslConfiguration config) {
@@ -151,9 +167,11 @@ void ClipBird::setCurrentHostAsServer() {
   connect(server, signal_sa, this, slot_sa);
 
   // Connect the onSyncRequest signal to the clipboard
-  const auto signal_sr = &Server::OnSyncRequest;
-  const auto slot_sr   = &clipboard::Clipboard::set;
-  const auto slot_hsr  = &ClipBird::OnSyncRequest;
+  const auto signal_sr  = &Server::OnSyncRequest;
+  const auto slot_sr    = &clipboard::Clipboard::set;
+  const auto slot_hsr   = &ClipBird::handleSyncRequest;
+  const auto signal_hsr = &ClipBird::OnSyncRequest;
+  connect(server, signal_sr, this, signal_hsr);
   connect(server, signal_sr, this, slot_hsr);
   connect(server, signal_sr, &m_clipboard, slot_sr);
 
@@ -217,9 +235,11 @@ void ClipBird::setCurrentHostAsClient() {
   connect(client, signal_sc, this, slot_hc);
 
   // Connect the onSyncRequest signal to the clipboard
-  const auto signal_rq = &Client::OnSyncRequest;
-  const auto slot_rq   = &clipboard::Clipboard::set;
-  const auto slot_hrq  = &ClipBird::OnSyncRequest;
+  const auto signal_rq  = &Client::OnSyncRequest;
+  const auto slot_hrq   = &ClipBird::handleSyncRequest;
+  const auto slot_rq    = &clipboard::Clipboard::set;
+  const auto signal_hrq = &ClipBird::OnSyncRequest;
+  connect(client, signal_rq, this, signal_hrq);
   connect(client, signal_rq, this, slot_hrq);
   connect(client, signal_rq, &m_clipboard, slot_rq);
 
@@ -516,5 +536,12 @@ void ClipBird::setClipboard(const QVector<QPair<QString, QByteArray>> &data) {
  */
 bool ClipBird::isLastlyHostIsServer() const {
   return storage::Storage::instance().getHostIsServer();
+}
+
+/**
+ * @brief Get the History of the clipboard
+ */
+QVector<QVector<QPair<QString, QByteArray>>> ClipBird::getHistory() const {
+  return m_history;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::controller
