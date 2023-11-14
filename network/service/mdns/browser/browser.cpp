@@ -21,6 +21,23 @@ void Browser::onHostResolved(bool isAdded, quint16 port, QString srvName, const 
     return;
   }
 
+  // remove the service type from service name
+  srvName.remove("." + QString::fromStdString(constants::getMDnsServiceType() + ".local."));
+
+  // Replace the \xxx ascii code to char
+  QRegularExpression regex("\\\\([0-9]{3})");
+
+  // replace the ascii code to char
+  auto match = regex.match(srvName);
+
+  // check for all matches
+  for (auto nth = 0; nth < match.capturedTexts().size(); ++nth) {
+    auto asciiCode = match.captured(nth).replace("\\", "").toInt();
+    auto cap       = match.captured(nth);
+    auto replace   = QString(static_cast<QChar>(asciiCode));
+    srvName.replace(cap, replace);
+  }
+
   // get the ip address
   auto ip = info.addresses().first();
 
@@ -78,7 +95,7 @@ void Browser::browseCallback(
       regtype,                                       // regtype
       domain,                                        // domain
       callback,                                      // callback
-      contextObj                                     // context
+      browserObj                                     // context
   );
 
   // check for error
@@ -123,21 +140,15 @@ void Browser::addedCallback(
     void* context                                    // context
 ) {
   // convert context to Register object
-  auto contextObj = static_cast<std::pair<std::string*, Browser*>*>(context);
-  auto browserObj = contextObj->second;
-  auto serviceName = QString::fromStdString(*contextObj->first);
-
-  // free the service name
-  delete contextObj->first;
-
-  // free the context
-  delete contextObj;
+  auto browserObj = static_cast<Browser*>(context);
 
   // Avoid warning of unused variables
   Q_UNUSED(interfaceIndex);
-  Q_UNUSED(fullname);
   Q_UNUSED(txtLen);
   Q_UNUSED(txtRecord);
+
+  // service name
+  auto serviceName = QString::fromUtf8(fullname);
 
   // check for Error
   if (errorCode != kDNSServiceErr_NoError) {
@@ -178,21 +189,15 @@ void Browser::removeCallback(
     void* context                                    // context
 ) {
   // convert context to Register object
-  auto contextObj = static_cast<std::pair<std::string*, Browser*>*>(context);
-  auto browserObj = contextObj->second;
-  auto serviceName = QString::fromStdString(*contextObj->first);
-
-  // free the service name
-  delete contextObj->first;
-
-  // free the context
-  delete contextObj;
+  auto browserObj = static_cast<Browser*>(context);
 
   // Avoid warning of unused variables
   Q_UNUSED(interfaceIndex);
-  Q_UNUSED(fullname);
   Q_UNUSED(txtLen);
   Q_UNUSED(txtRecord);
+
+  // service name
+  auto serviceName = QString::fromUtf8(fullname);
 
   // check for Error
   if (errorCode != kDNSServiceErr_NoError) {
@@ -209,7 +214,7 @@ void Browser::removeCallback(
     browserObj,                                      // this
     false,                                           // Removed
     ntohs(port),                                     // port
-    QString::fromUtf8(hosttarget),                   // srvName
+    serviceName,                                     // srvName
     std::placeholders::_1                            // QHostInfo
   );
 

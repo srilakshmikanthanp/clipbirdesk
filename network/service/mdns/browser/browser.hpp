@@ -15,6 +15,7 @@
 #include <QHostAddress>
 #include <QHostInfo>
 #include <QObject>
+#include <QRegularExpression>
 #include <QSocketNotifier>
 #include <QTimer>
 #include <QUdpSocket>
