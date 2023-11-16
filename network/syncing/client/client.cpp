@@ -133,9 +133,12 @@ void Client::processSyncingPacket(const packets::SyncingPacket& packet) {
   QVector<QPair<QString, QByteArray>> items;
 
   // Get the items from the packet
-  for (auto item : packet.getItems()) {
-    items.append({item.getMimeType().toStdString().c_str(), item.getPayload()});
+  for (auto i : packet.getItems()) {
+    if (i.getPayloadLength()) items.append({i.getMimeType().toStdString().c_str(), i.getPayload()});;
   }
+
+  // is empty list
+  if (items.isEmpty()) return;
 
   // emit the signal
   emit OnSyncRequest(items);
