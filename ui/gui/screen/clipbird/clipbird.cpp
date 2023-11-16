@@ -448,7 +448,7 @@ void Clipbird::onResetClicked() {
  * @brief On Open App Clicked
  */
 void Clipbird::onOpenAppClicked() {
-  this->parentWidget()->show();
+  this->window()->show();
 }
 
 /**

@@ -80,14 +80,14 @@ QScrollBar::handle:vertical {
 QScrollBar:horizontal {
   background: #f9f9f9;
   border: none;
-  height: 10px;
+  height: 5px;
   margin: 0px;
 }
 
 QScrollBar:vertical {
   background: #f9f9f9;
   border: none;
-  width: 10px;
+  width: 5px;
   margin: 0px;
 }
 
@@ -155,4 +155,22 @@ QLineEdit {
 
 #Device > * {
   font-weight: 550;
+}
+
+#ClipTile {
+  background: #ededed;
+  color: white;
+  border-radius: 10px;
+  max-width: 300;
+  min-width: 300;
+}
+
+#ClipTile > QPushButton {
+  background: none;
+}
+
+#ClipTile > QLabel {
+  background: #ededed;
+  max-height: 80px;
+  min-height: 80px;
 }

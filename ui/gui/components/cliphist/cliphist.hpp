@@ -32,6 +32,11 @@ class ClipTile : public QWidget {
   const QString MIME_TYPE_PNG   = "image/png";
   const QString MIME_TYPE_HTML  = "text/html";
 
+ private:  // Member variable
+
+  // create a label
+  QLabel *item = new QLabel(this);
+
  signals:  // signals
 
   // called when the clip is deleted
@@ -47,12 +52,22 @@ class ClipTile : public QWidget {
    *
    * @param parent
    */
-  ClipTile(const QVector<QPair<QString, QByteArray>> &clip, QWidget *parent = nullptr);
+  ClipTile(QWidget *parent = nullptr);
 
   /**
    * @brief Destroy the Clip Tile object
    */
   ~ClipTile() = default;
+
+  /**
+   * @brief set the clip
+   */
+  void setClip(const QVector<QPair<QString, QByteArray>> &clip);
+
+  /**
+   * @brief Clear the clip
+   */
+  void clearClip();
 
  protected:  // protected member function
 
@@ -69,11 +84,12 @@ class ClipHist : public QWidget {
 
   Q_OBJECT
 
- private:  // just for Qt
+ private:  // Member variable
 
   QStackedLayout* stackLayout = new QStackedLayout(this);
   QWidget* verticalWidget     = new QWidget(this);
   QVBoxLayout* verticalLayout = new QVBoxLayout(verticalWidget);
+  QList<ClipTile*> list   = QList<ClipTile*>();
 
  signals:  // signals
 

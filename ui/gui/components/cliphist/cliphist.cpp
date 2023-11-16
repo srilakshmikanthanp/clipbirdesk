@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
  *
  * @param parent
  */
-ClipTile::ClipTile(const QVector<QPair<QString, QByteArray>> &clip, QWidget *parent): QWidget(parent) {
+ClipTile::ClipTile(QWidget *parent): QWidget(parent) {
   // vertical layout for adding Label and buttons
   auto layout = new QVBoxLayout();
 
@@ -20,9 +20,6 @@ ClipTile::ClipTile(const QVector<QPair<QString, QByteArray>> &clip, QWidget *par
 
   // no spacing between label and buttons
   layout->setSpacing(0);
-
-  // create a label
-  auto item = new QLineEdit(this);
 
   // set properties
   item->setAlignment(Qt::AlignLeft);
@@ -57,17 +54,19 @@ ClipTile::ClipTile(const QVector<QPair<QString, QByteArray>> &clip, QWidget *par
 
   // add main layout to widget
   this->setLayout(layout);
+}
 
-  // fixed width
-  this->setFixedWidth(300);
-
+/**
+ * @brief set the clip
+ */
+void ClipTile::setClip(const QVector<QPair<QString, QByteArray>> &clip) {
   // infer the data
   for (const auto &[mime, data] : clip) {
     // has Image png
     if (mime == MIME_TYPE_PNG) {
-      // auto icon   = QIcon(QPixmap::fromImage(QImage::fromData(data)));
-      // item->setPixmap(icon.pixmap(QSize(512, 512)));
-      // break;
+      auto icon = QPixmap::fromImage(QImage::fromData(data));
+      item->setPixmap(icon.scaled(100, 100, Qt::KeepAspectRatio));
+      break;
     }
 
     // has Text
@@ -76,6 +75,13 @@ ClipTile::ClipTile(const QVector<QPair<QString, QByteArray>> &clip, QWidget *par
       break;
     }
   }
+}
+
+/**
+ * @brief Clear the clip
+ */
+void ClipTile::clearClip() {
+  item->clear();
 }
 
 /**
@@ -120,35 +126,53 @@ ClipHist::ClipHist(QWidget *parent) : QWidget(parent) {
 
   // set object name
   this->setObjectName("ClipHist");
+
+  // create all items
+  for (auto i = 0L; i < constants::getAppMaxHistorySize(); ++i) {
+    this->list.append(new ClipTile());
+  }
 }
 
 /**
  * @brief Set the History
  */
 void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &history) {
-  // clear the layout without Repaint
+  // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
     verticalLayout->removeItem(item);
-    delete item->widget();
     delete item;
+  }
+
+  // set parent as null
+  for (auto item: this->list) {
+    item->disconnect();
+    item->setParent(nullptr);
+    item->clearClip();
   }
 
   // set the history
   for (auto idx = 0L; idx < history.size(); idx++) {
-    // create a new host view
-    ClipTile *tile  = new ClipTile(history.at(idx));
+    // get the tile from the list
+    ClipTile *tile  = (ClipTile*) this->list.at(idx);
 
-    // connect the host view signal to this signal
+    // remove all the previous connections
+    tile->disconnect();
+
+    // connect the copy signal to this signal
     auto signal_d = &components::ClipTile::onClipDelete;
     auto slot_d   = [=]() { emit onClipDelete(idx); };
     QObject::connect(tile, signal_d, slot_d);
 
+    // connect the select signal to this signal
     auto signal_c = &components::ClipTile::onClipCopy;
     auto slot_c   = [=]() { emit onClipSelected(idx); };
     QObject::connect(tile, signal_c, slot_c);
 
-    // add the host view to the layout
+    // set the clip
+    tile->setClip(history.at(idx));
+
+    // add the item to the layout
     verticalLayout->addWidget(tile);
   }
 
@@ -164,7 +188,6 @@ void ClipHist::clearHistory() {
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
     verticalLayout->removeItem(item);
-    delete item->widget();
     delete item;
   }
 

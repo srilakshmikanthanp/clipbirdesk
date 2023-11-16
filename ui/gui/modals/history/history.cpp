@@ -32,6 +32,16 @@ History::History(QWidget * parent) : QDialog(parent) {
 
   // set layout to widget
   this->setLayout(vBox);
+
+  // connect the signals
+  auto signal_s = &components::ClipHist::onClipSelected;
+  auto slot_s  = &History::onClipSelected;
+  QObject::connect(this->clipHist, signal_s, this, slot_s);
+
+  // connect the signals
+  auto signal_d = &components::ClipHist::onClipDelete;
+  auto slot_d  = &History::onClipDelete;
+  QObject::connect(this->clipHist, signal_d, this, slot_d);
 }
 
 /**

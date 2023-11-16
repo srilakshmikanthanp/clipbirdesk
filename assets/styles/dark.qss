@@ -157,6 +157,8 @@ QLineEdit {
   background: #2d2d2d;
   color: white;
   border-radius: 10px;
+  max-width: 305;
+  min-width: 305;
 }
 
 #ClipTile > QPushButton {
@@ -165,6 +167,6 @@ QLineEdit {
 
 #ClipTile > QLabel {
   background: #2d2d2d;
-  max-height: 100px;
-  min-height: 100px;
+  max-height: 80px;
+  min-height: 80px;
 }
