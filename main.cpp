@@ -24,6 +24,7 @@
 #include "ui/gui/window/window.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
+#include "ui/gui/utilities/functions/functions.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk {
 /**
@@ -226,6 +227,27 @@ class ClipbirdApplication : public SingleApplication {
     delete window;
   }
 };
+
+/**
+ * @brief Custom event filter for the application that
+ * captures window shown event and if the window is decorated
+ * apply some attributes to the window
+ */
+class ClipbirdEventFilter : public QObject {
+  virtual bool eventFilter(QObject * o, QEvent * e) {
+    if (e->type() == QEvent::WindowActivate) {
+      handleWindowShownEvent(dynamic_cast<QWidget *>(o));
+    }
+
+    return QObject::eventFilter(o, e);
+  }
+
+  void handleWindowShownEvent(QWidget *window) {
+    if (!(window->windowFlags() & Qt::FramelessWindowHint)) {
+      ui::gui::utilities::setPlatformAttributes(window);
+    }
+  }
+};
 }  // namespace srilakshmikanthanp::clipbirdesk
 
 /**
@@ -244,9 +266,13 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
+  using srilakshmikanthanp::clipbirdesk::ClipbirdEventFilter;
 
   // create the application
   ClipbirdApplication app(argc, argv);
+
+  // install event filter
+  app.installEventFilter(new ClipbirdEventFilter());
 
   // Home Directory of the application
   auto path = QString::fromStdString(getAppHome());

@@ -5,7 +5,14 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+#include <QStyleHints>
+#include <QGuiApplication>
+#include <QStyleHints>
 #include <QWidget>
+
+#ifdef _WIN32
+#include <dwmapi.h>
+#endif
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::utilities{
 /**

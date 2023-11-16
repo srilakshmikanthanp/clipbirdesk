@@ -168,6 +168,8 @@
     "qlineedit": "cpp",
     "qdesktopservices": "cpp",
     "qstring": "cpp",
-    "qscrollarea": "cpp"
+    "qscrollarea": "cpp",
+    "qstylehints": "cpp",
+    "qguiapplication": "cpp"
   },
 }
