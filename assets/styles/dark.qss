@@ -70,20 +70,20 @@ QScrollArea {
 QScrollBar::handle:horizontal,
 QScrollBar::handle:vertical {
   background: #959595; /* Windows 11 scrollbar handle color */
-  border-radius: 5px;
+  border-radius: 15px;
 }
 
 QScrollBar:horizontal {
   background: #272727;
   border: none;
-  height: 10px;
+  height: 5px;
   margin: 0px;
 }
 
 QScrollBar:vertical {
   background: #272727;
   border: none;
-  width: 10px;
+  width: 5px;
   margin: 0px;
 }
 
@@ -151,4 +151,20 @@ QLineEdit {
 
 #Device > * {
   font-weight: 550;
+}
+
+#ClipTile {
+  background: #2d2d2d;
+  color: white;
+  border-radius: 10px;
+}
+
+#ClipTile > QPushButton {
+  background: none;
+}
+
+#ClipTile > QLabel {
+  background: #2d2d2d;
+  max-height: 100px;
+  min-height: 100px;
 }

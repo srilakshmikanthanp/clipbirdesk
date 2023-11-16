@@ -1,3 +1,5 @@
+#pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -9,7 +11,7 @@
 #include <QScreen>
 #include <QVBoxLayout>
 
-#include "ui/gui/screens/clipbird/clipbird.hpp"
+#include "ui/gui/screen/clipbird/clipbird.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 class Window : public QWidget {

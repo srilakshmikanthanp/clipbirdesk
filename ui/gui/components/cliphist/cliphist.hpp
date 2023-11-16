@@ -7,6 +7,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPainter>
 #include <QStyle>
 #include <QPushButton>
@@ -31,10 +32,6 @@ class ClipTile : public QWidget {
   const QString MIME_TYPE_PNG   = "image/png";
   const QString MIME_TYPE_HTML  = "text/html";
 
- private:  // Member variable
-
-  QLabel * item = new QLabel(this);
-
  signals:  // signals
 
   // called when the clip is deleted
@@ -56,6 +53,11 @@ class ClipTile : public QWidget {
    * @brief Destroy the Clip Tile object
    */
   ~ClipTile() = default;
+
+ protected:  // protected member function
+
+  // paint event
+  void paintEvent(QPaintEvent *) override;
 };
 
 class ClipHist : public QWidget {
@@ -72,11 +74,6 @@ class ClipHist : public QWidget {
   QStackedLayout* stackLayout = new QStackedLayout(this);
   QWidget* verticalWidget     = new QWidget(this);
   QVBoxLayout* verticalLayout = new QVBoxLayout(verticalWidget);
-
- private:  // Member variable
-
-  QList<QVector<QPair<QString, QByteArray>>> history;
-  qsizetype bucket = 30;
 
  signals:  // signals
 
@@ -111,11 +108,6 @@ class ClipHist : public QWidget {
    * @brief Clear the History
    */
   void clearHistory();
-
-  /**
-   * @brief Get the History
-   */
-  const QList<QVector<QPair<QString, QByteArray>>> &getHistory() const;
 
  protected:  // protected member function
 

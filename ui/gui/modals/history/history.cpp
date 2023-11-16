@@ -18,9 +18,6 @@ History::History(QWidget * parent) : QDialog(parent) {
   // set the widget as Resizable
   historyArea->setWidgetResizable(true);
 
-  // set policy for scroll area
-  historyArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-
   // set the widget to scroll area
   historyArea->setWidget(this->clipHist);
 
@@ -28,7 +25,7 @@ History::History(QWidget * parent) : QDialog(parent) {
   historyArea->setAlignment(Qt::AlignCenter);
 
   // create layout VBox
-  auto vBox = new QVBoxLayout(this);
+  auto vBox = new QVBoxLayout();
 
   // add scroll area to layout
   vBox->addWidget(historyArea);
@@ -49,12 +46,5 @@ void History::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist)
  */
 void History::clearHistory() {
   this->clipHist->clearHistory();
-}
-
-/**
- * @brief Get the History
- */
-const QList<QVector<QPair<QString, QByteArray>>> &History::getHistory() const {
-  return this->clipHist->getHistory();
 }
 }

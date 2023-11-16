@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "joiner.hpp"
+#include "connect.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
 /**
@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
  *
  * @param parent
  */
-Joiner::Joiner(QWidget * parent) : QDialog(parent) {
+Connect::Connect(QWidget * parent) : QDialog(parent) {
   // create root layout
   auto root = new QVBoxLayout(this);
 

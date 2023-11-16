@@ -20,7 +20,7 @@
 // Project Headers
 #include "constants/constants.hpp"
 #include "controller/clipbird/clipbird.hpp"
-#include "ui/gui/screens/clipbird/clipbird.hpp"
+#include "ui/gui/screen/clipbird/clipbird.hpp"
 #include "ui/gui/window/window.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"

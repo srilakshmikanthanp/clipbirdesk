@@ -44,8 +44,7 @@
 #include "ui/gui/traymenu/traymenu.hpp"
 #include "ui/gui/modals/aboutus/aboutus.hpp"
 #include "ui/gui/modals/history/history.hpp"
-#include "ui/gui/modals/joiner/joiner.hpp"
-#include "ui/gui/modals/notify/notify.hpp"
+#include "ui/gui/modals/connect/connect.hpp"
 #include "ui/gui/modals/group/group.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
@@ -66,7 +65,7 @@ class Clipbird : public QFrame {
   modals::AboutUs aboutUs = modals::AboutUs();
   modals::Group group = modals::Group();
   modals::History history = modals::History();
-  modals::Joiner joiner = modals::Joiner();
+  modals::Connect joiner = modals::Connect();
 
  private:  // Member variable (Layout)
 

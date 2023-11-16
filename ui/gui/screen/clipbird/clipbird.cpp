@@ -400,7 +400,7 @@ void Clipbird::onConnectClicked() {
   if (!joiner.isVisible()) joiner.show();
 
   // connect the dialog to window clicked signal
-  connect(&joiner, &modals::Joiner::onConnect, [=](auto ipv4, auto port) {
+  connect(&joiner, &modals::Connect::onConnect, [=](auto ipv4, auto port) {
     // validate the ip and port
     if (!validator(ipv4.toShort(), port.toShort())) {
       return;
@@ -475,11 +475,11 @@ void Clipbird::onReceivedClicked() {
   history.setHistory(controller->getHistory());
 
   // set size
-  history.setFixedSize(QSize(340, 380));
+  history.setFixedSize(QSize(350, 380));
 
   // connect signal for Clipboard Copy
   const auto signal_cc = &modals::History::onClipSelected;
-  const auto slot_cc   = [=](auto i) { controller->setClipboard(history.getHistory().at(i)); };
+  const auto slot_cc   = [=](auto i) { controller->setClipboard(controller->getHistory().at(i)); };
   connect(&history, signal_cc, slot_cc);
 
   // connect signal for history change

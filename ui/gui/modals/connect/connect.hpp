@@ -8,22 +8,27 @@
 // Qt header
 #include <QDialog>
 #include <QLabel>
-#include <QStyleHints>
+#include <QLineEdit>
+#include <QPushButton>
 #include <QVBoxLayout>
+#include <QStyleHints>
+
+// project header
+#include "constants/constants.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class Notify : public QDialog {
+class Connect : public QDialog {
  private:  // disable copy and move for this class
 
-  Q_DISABLE_COPY_MOVE(Notify)
+  Q_DISABLE_COPY_MOVE(Connect)
 
  private:  // just for Qt
 
   Q_OBJECT
 
- private:  // Member variable
+ signals:   // Signals
 
-  QLabel *errorMessage = new QLabel(this);
+  void onConnect(const QString &ipv4, const QString &port);
 
  public:
 
@@ -32,21 +37,11 @@ class Notify : public QDialog {
   *
   * @param parent
   */
-  explicit Notify(QWidget * parent = nullptr);
+  explicit Connect(QWidget * parent = nullptr);
 
   /**
    * @brief Destroy the Status object
    */
-  virtual ~Notify() = default;
-
-  /**
-   * @brief set the error message
-   */
-  void setMessage(const QString &);
-
-  /**
-   * @brief get the error message
-   */
-  QString getMessage() const;
+  virtual ~Connect() = default;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

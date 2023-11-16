@@ -7,6 +7,7 @@
 
 // Qt header
 #include <QDialog>
+#include <QScrollBar>
 #include <QScrollArea>
 #include <QStyleHints>
 #include <QVBoxLayout>
@@ -59,10 +60,5 @@ class History : public QDialog {
    * @brief Clear the History
    */
   void clearHistory();
-
-  /**
-   * @brief Get the History
-   */
-  const QList<QVector<QPair<QString, QByteArray>>> &getHistory() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

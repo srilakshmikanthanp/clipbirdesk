@@ -16,31 +16,32 @@ ClipTile::ClipTile(const QVector<QPair<QString, QByteArray>> &clip, QWidget *par
   auto layout = new QVBoxLayout();
 
   // set the style
-  this->setStyleSheet(R"(
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    color: white;
-    background: #2d2d2d;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-  )");
+  this->setObjectName("ClipTile");
 
   // no spacing between label and buttons
   layout->setSpacing(0);
 
+  // create a label
+  auto item = new QLineEdit(this);
+
   // set properties
   item->setAlignment(Qt::AlignLeft);
-  item->setMargin(10);
-  item->setWordWrap(true);
-  item->setFixedHeight(95);
 
   // delete button for clip
   auto del = new QPushButton();
   auto cpy = new QPushButton();
 
+  // Connect Signals
+  QObject::connect(del, &QPushButton::clicked, [this]() { emit onClipDelete(); });
+  QObject::connect(cpy, &QPushButton::clicked, [this]() { emit onClipCopy(); });
+
   // set icons
   del->setIcon(QIcon(":/images/delete.png"));
   cpy->setIcon(QIcon(":/images/copy.png"));
+
+  // pointer
+  del->setCursor(Qt::PointingHandCursor);
+  cpy->setCursor(Qt::PointingHandCursor);
 
   // hBox to put copy and delete buttons
   auto hBox = new QHBoxLayout();
@@ -57,24 +58,16 @@ ClipTile::ClipTile(const QVector<QPair<QString, QByteArray>> &clip, QWidget *par
   // add main layout to widget
   this->setLayout(layout);
 
-  // set fixed size for tail
-  this->setFixedSize(360, 150);
+  // fixed width
+  this->setFixedWidth(300);
 
   // infer the data
   for (const auto &[mime, data] : clip) {
     // has Image png
     if (mime == MIME_TYPE_PNG) {
-      auto pixmap = QPixmap::fromImage(QImage::fromData(data));
-      auto icon   = QIcon();
-      icon.addPixmap(pixmap);
-      item->setPixmap(icon.pixmap(QSize(512, 512)));
-      break;
-    }
-
-    // has HTML
-    if (mime == MIME_TYPE_HTML) {
-      item->setText(QString::fromUtf8(data));
-      break;
+      // auto icon   = QIcon(QPixmap::fromImage(QImage::fromData(data)));
+      // item->setPixmap(icon.pixmap(QSize(512, 512)));
+      // break;
     }
 
     // has Text
@@ -83,6 +76,16 @@ ClipTile::ClipTile(const QVector<QPair<QString, QByteArray>> &clip, QWidget *par
       break;
     }
   }
+}
+
+/**
+ * @brief Paint event
+ */
+void ClipTile::paintEvent(QPaintEvent *event) {
+  QStyleOption opt;
+  opt.initFrom(this);
+  QPainter p(this);
+  style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
 /**
@@ -95,7 +98,7 @@ ClipHist::ClipHist(QWidget *parent) : QWidget(parent) {
   verticalLayout->setAlignment(Qt::AlignTop);
 
   // create a label
-  QLabel *label = new QLabel("No Hosts");
+  QLabel *label = new QLabel("Nothing so far");
 
   // set alignment as center
   label->setAlignment(Qt::AlignCenter);
@@ -114,17 +117,22 @@ ClipHist::ClipHist(QWidget *parent) : QWidget(parent) {
 
   // set the layout
   this->setLayout(this->stackLayout);
+
+  // set object name
+  this->setObjectName("ClipHist");
 }
 
 /**
  * @brief Set the History
  */
 void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &history) {
-  // set the history
-  this->history = history;
-
-  // clear the layout
-  this->clearHistory();
+  // clear the layout without Repaint
+  QLayoutItem* item;
+  while ((item = verticalLayout->takeAt(0)) != nullptr) {
+    verticalLayout->removeItem(item);
+    delete item->widget();
+    delete item;
+  }
 
   // set the history
   for (auto idx = 0L; idx < history.size(); idx++) {
@@ -144,9 +152,6 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
     verticalLayout->addWidget(tile);
   }
 
-  // Redraw the widget
-  this->repaint();
-
   // update
   this->update();
 }
@@ -163,21 +168,8 @@ void ClipHist::clearHistory() {
     delete item;
   }
 
-  // clear the history
-  this->history.clear();
-
-  // Redraw the widget
-  this->repaint();
-
   // update
   this->update();
-}
-
-/**
- * @brief Get the History
- */
-const QList<QVector<QPair<QString, QByteArray>>> &ClipHist::getHistory() const {
-  return history;
 }
 
 /**
@@ -191,7 +183,10 @@ void ClipHist::paintEvent(QPaintEvent *event) {
     this->stackLayout->setCurrentIndex(1);
   }
 
-  // call the base class
-  QWidget::paintEvent(event);
+  // For Style sheet
+  QStyleOption opt;
+  opt.initFrom(this);
+  QPainter p(this);
+  style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components
