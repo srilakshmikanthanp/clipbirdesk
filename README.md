@@ -89,7 +89,7 @@ To Install Clipbird on your system, you can either download the installer from t
 
 ### Installing Clipbird on an Android Platform
 
-Follow thw instructions on the [clipbirdroid](https://github.com/srilakshmikanthanp/clipbirdroid) repository to install Clipbird on your Android system.
+Follow the instructions on the [clipbirdroid](https://github.com/srilakshmikanthanp/clipbirdroid) repository to install Clipbird on your Android system.
 
 ### Installing Clipbird on a Windows Platform
 
@@ -97,11 +97,11 @@ In the following steps, we will see how to install clipbird in the Windows platf
 
 #### Installing Bonjour
 
-Just go to [bonjour](https://developer.apple.com/bonjour/) and downlod the bonjour SDK for windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
+Just go to [bonjour](https://developer.apple.com/bonjour/) and download the Bonjour SDK for Windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
 
 #### Installing Clipbird
 
-Just go to Github Release and choose the suitable version for your system and download it. Then install it in your system.
+Just go to Github Release choose the suitable version for your system and download it. Then install it in your system.
 
 ### Building Clipbird on a Windows Platform
 
@@ -124,11 +124,11 @@ choco install openssl
 
 #### Installing Qt6
 
-Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for windows, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
+Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for Windows, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
 
 #### Installing Bonjour
 
-Just go to [bonjour](https://developer.apple.com/bonjour/) and downlod the bonjour SDK for windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
+Just go to [bonjour](https://developer.apple.com/bonjour/) and download the Bonjour SDK for Windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
 
 #### Environment Variables
 
