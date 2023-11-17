@@ -14,7 +14,7 @@
 #include "ui/gui/screen/clipbird/clipbird.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
-class Window : public QWidget {
+class Container : public QWidget {
  private:  // Member variable
 
   ui::gui::Clipbird* content = nullptr;
@@ -22,7 +22,7 @@ class Window : public QWidget {
 
  private:  // Disable copy, move and assignment
 
-  Q_DISABLE_COPY_MOVE(Window);
+  Q_DISABLE_COPY_MOVE(Container);
 
  public:  // Constructor and Destructor
 
@@ -31,13 +31,13 @@ class Window : public QWidget {
    *
    * @param parent parent widget
    */
-  explicit Window(QWidget* parent = nullptr);
+  explicit Container(QWidget* parent = nullptr);
 
   /**
    * @brief Destroy the Gui Main object
    *
    */
-  ~Window() noexcept = default;
+  ~Container() noexcept = default;
 
   /**
    * @brief Set Content
@@ -65,5 +65,5 @@ class Window : public QWidget {
    * @brief On Show Event
    */
   void showEvent(QShowEvent* event) override;
-};  // class Window
+};  // class Container
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

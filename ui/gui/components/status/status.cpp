@@ -13,6 +13,14 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
  */
 Status::Status(QWidget* parent) : QLabel(parent) {
   this->setObjectName("Status");
+  this->setUpLanguage();
+}
+
+/**
+ * @brief Function used to set up all text in the label, etc..
+ */
+void Status::setUpLanguage() {
+  // Nothing to do
 }
 
 /**
@@ -53,5 +61,16 @@ void Status::set(const QString& text, Value val) {
  */
 QPair<QString, Status::Value> Status::get() const {
   return {this->text(), this->value};
+}
+
+/**
+ * @brief change event
+ */
+void Status::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) {
+    this->setUpLanguage();
+  }
+
+  QWidget::changeEvent(event);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

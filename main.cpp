@@ -21,7 +21,7 @@
 #include "constants/constants.hpp"
 #include "controller/clipbird/clipbird.hpp"
 #include "ui/gui/screen/clipbird/clipbird.hpp"
-#include "ui/gui/window/window.hpp"
+#include "ui/gui/container/container.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
@@ -146,7 +146,7 @@ class ClipbirdApplication : public SingleApplication {
 
   controller::ClipBird *controller;
   ui::gui::Clipbird *content;
-  ui::gui::Window *window;
+  ui::gui::Container *window;
   QSystemTrayIcon *trayIcon;
 
  private:  // Disable Copy, Move and Assignment
@@ -172,7 +172,7 @@ class ClipbirdApplication : public SingleApplication {
     // create the objects of the class
     controller = new controller::ClipBird(this->getSslConfiguration());
     content    = new ui::gui::Clipbird(controller);
-    window     = new ui::gui::Window();
+    window     = new ui::gui::Container();
     trayIcon   = new QSystemTrayIcon(this);
 
     // set the signal handler for all os

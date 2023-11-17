@@ -46,6 +46,8 @@ Group::Group(QWidget *parent) : QDialog(parent) {
   // set layout
   this->setLayout(root);
 
+  this->setUpLanguage();
+
   // detect the system theme
   const auto styleHints = QGuiApplication::styleHints();
   const auto signal = &QStyleHints::colorSchemeChanged;
@@ -83,5 +85,23 @@ void Group::setPort(const QString &port) {
  */
 QString Group::getPort() const {
   return this->port->text();
+}
+
+/**
+ * @brief Function used to set up all text in the label, etc..
+ */
+void Group::setUpLanguage() {
+  // Nothing to do
+}
+
+/**
+ * @brief change event
+ */
+void Group::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) {
+    this->setUpLanguage();
+  }
+
+  QWidget::changeEvent(event);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

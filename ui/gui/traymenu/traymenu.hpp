@@ -6,6 +6,7 @@
 // https://opensource.org/licenses/MIT
 
 // Qt headers
+#include <QEvent>
 #include <QMenu>
 #include <QPainter>
 #include <QPainterPath>
@@ -24,16 +25,23 @@ class TrayMenu : public QMenu {
 
   Q_OBJECT
 
+ private:  // Member Functions
+
+  /**
+   * @brief Function used to set up all text in the label, etc..
+   */
+  void setUpLanguage();
+
  private:  // Actions
 
-  QAction connect   =   QAction("Join to Group");
-  QAction qrCode    =   QAction("Group QrCode");
-  QAction reset     =   QAction("Reset Devices");
-  QAction openApp   =   QAction(QString::fromStdString(constants::getAppName()));
-  QAction send      =   QAction("Send");
-  QAction history   =   QAction("History");
-  QAction about     =   QAction("About");
-  QAction exitApp   =   QAction("Exit");
+  QAction connect   =   QAction();
+  QAction qrCode    =   QAction();
+  QAction reset     =   QAction();
+  QAction openApp   =   QAction();
+  QAction send      =   QAction();
+  QAction history   =   QAction();
+  QAction about     =   QAction();
+  QAction exitApp   =   QAction();
 
  signals:  // signals
   void OnConnectClicked();
@@ -158,5 +166,10 @@ class TrayMenu : public QMenu {
    * @brief Override paint event
    */
   void paintEvent(QPaintEvent* event) override;
+
+  /**
+   * @brief Override change event
+   */
+  void changeEvent(QEvent *) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

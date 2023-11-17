@@ -40,6 +40,13 @@ Host::Host(QWidget *parent) : QWidget(parent) {
 }
 
 /**
+ * @brief Function used to set up all text in the label, etc..
+ */
+void Host::setUpLanguage() {
+  // Nothing to do
+}
+
+/**
  * @brief Set the Device
  */
 void Host::setHost(Host::Value host) {
@@ -77,13 +84,21 @@ void Host::paintEvent(QPaintEvent *event) {
   style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
+/**
+ * @brief change event
+ */
+void Host::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) {
+    this->setUpLanguage();
+  }
+
+  QWidget::changeEvent(event);
+}
+
 // Host List
 HostList::HostList(QWidget* parent) : QWidget(parent) {
   // set alignment from start and center
   verticalLayout->setAlignment(Qt::AlignTop);
-
-  // create a label
-  QLabel *label = new QLabel("No Hosts");
 
   // set alignment as center
   label->setAlignment(Qt::AlignCenter);
@@ -102,6 +117,16 @@ HostList::HostList(QWidget* parent) : QWidget(parent) {
 
   // set the layout
   this->setLayout(this->stackLayout);
+
+  // set up initial Translation
+  this->setUpLanguage();
+}
+
+/**
+ * @brief Function used to set up all text in the label, etc..
+ */
+void HostList::setUpLanguage() {
+  this->label->setText(QObject::tr("Nothing so far"));
 }
 
 /**
@@ -214,4 +239,16 @@ void HostList::paintEvent(QPaintEvent *event) {
   // call the base class
   QWidget::paintEvent(event);
 }
+
+/**
+ * @brief change event
+ */
+void HostList::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) {
+    this->setUpLanguage();
+  }
+
+  QWidget::changeEvent(event);
+}
+
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window

@@ -3,13 +3,13 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "window.hpp"
+#include "container.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 /**
  * @brief Construct a new Gui Main object
  */
-Window::Window(QWidget* parent) : QWidget(parent) {
+Container::Container(QWidget* parent) : QWidget(parent) {
   // set mainWindow attributes
   this->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
@@ -20,7 +20,7 @@ Window::Window(QWidget* parent) : QWidget(parent) {
 /**
  * @brief Set Content
  */
-void Window::setContent(ui::gui::Clipbird* content) {
+void Container::setContent(ui::gui::Clipbird* content) {
  // create a layout for vertical
   auto layout = new QVBoxLayout(this);
 
@@ -70,14 +70,14 @@ void Window::setContent(ui::gui::Clipbird* content) {
 /**
  * @brief get Content
  */
-ui::gui::Clipbird* Window::getContent() const {
+ui::gui::Clipbird* Container::getContent() const {
   return this->content;
 }
 
 /**
  * @brief Override the setVisiblity
  */
-void Window::setVisible(bool visible) {
+void Container::setVisible(bool visible) {
   // if visible is false return
   if (!visible) return QWidget::setVisible(visible);
 
@@ -108,7 +108,7 @@ void Window::setVisible(bool visible) {
  *
  * @param event
  */
-bool Window::event(QEvent* event) {
+bool Container::event(QEvent* event) {
   // if event is window deactivation
   if (event->type() == QEvent::WindowDeactivate) {
     this->hide();
@@ -121,7 +121,7 @@ bool Window::event(QEvent* event) {
 /**
  * @brief On Show Event
  */
-void Window::showEvent(QShowEvent* event) {
+void Container::showEvent(QShowEvent* event) {
   QWidget::showEvent(event);
   QWidget::setFocus();
   QWidget::activateWindow();

@@ -5,6 +5,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+#include <QEvent>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -34,6 +35,10 @@ class ClipTile : public QWidget {
 
  private:  // Member variable
 
+  QVector<QPair<QString, QByteArray>> clip;
+
+ private:  // Member variable
+
   // create a label
   QLabel *item = new QLabel(this);
 
@@ -44,6 +49,13 @@ class ClipTile : public QWidget {
 
   // called when the clip is copied
   void onClipCopy();
+
+ private:  // Member Functions
+
+  /**
+   * @brief Function used to set up all text in the label, etc..
+   */
+  void setUpLanguage();
 
  public:  // Constructor and Destructor
 
@@ -69,10 +81,23 @@ class ClipTile : public QWidget {
    */
   void clearClip();
 
+  /**
+   * @brief Has Clip
+   */
+  bool hasClip();
+
+  /**
+   * @brief get the Clip
+   */
+  QVector<QPair<QString, QByteArray>> getClip();
+
  protected:  // protected member function
 
   // paint event
   void paintEvent(QPaintEvent *) override;
+
+  // change event
+  void changeEvent(QEvent *) override;
 };
 
 class ClipHist : public QWidget {
@@ -91,6 +116,10 @@ class ClipHist : public QWidget {
   QVBoxLayout* verticalLayout = new QVBoxLayout(verticalWidget);
   QList<ClipTile*> list   = QList<ClipTile*>();
 
+ private:  // Member variable (With Text Info)
+
+  QLabel *label = new QLabel(this);
+
  signals:  // signals
 
   // called when the clip is copied
@@ -98,6 +127,13 @@ class ClipHist : public QWidget {
 
   // called when the clip is deleted
   void onClipDelete(int index);
+
+ private:  // Member Functions
+
+  /**
+   * @brief Function used to set up all text in the label, etc..
+   */
+  void setUpLanguage();
 
  public:  // Constructor and Destructor
 
@@ -111,7 +147,7 @@ class ClipHist : public QWidget {
   /**
    * @brief Destroy the Clip Hist object
    */
-  ~ClipHist() = default;
+  ~ClipHist();
 
  public:  // public member function
 
@@ -125,9 +161,17 @@ class ClipHist : public QWidget {
    */
   void clearHistory();
 
+  /**
+   * @brief get the History
+   */
+  QList<QVector<QPair<QString, QByteArray>>> getHistory();
+
  protected:  // protected member function
 
   // paint event
   void paintEvent(QPaintEvent *) override;
+
+  // change event
+  void changeEvent(QEvent *) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::components

@@ -108,11 +108,11 @@ class Clipbird : public QFrame {
 
  private:  // constant for keys (Server)
 
-  static constexpr const char* const s_tabTitle     = "Create Group";
+  static constexpr const char* const s_tabTitle = "Create Group";
 
  private:  // constant for keys (Client)
 
-  static inline QString c_tabTitle = "Join Group";
+  static constexpr const char* const c_tabTitle = "Join Group";
 
  private:  // private slots
 
@@ -203,6 +203,13 @@ class Clipbird : public QFrame {
    * @brief On Reset Clicked
    */
   void onResetClicked();
+
+  //----------------------------- slots for Event ----------------------------//
+
+  /**
+   * @brief Function used to set up all text in the label, etc..
+   */
+  void setUpLanguage();
 
  public:
 
@@ -295,5 +302,12 @@ class Clipbird : public QFrame {
    * @brief Remove all servers from the list
    */
   void removeAllServers();
+
+ protected:  // Member Functions
+
+  /**
+   * @brief Override change event
+   */
+  void changeEvent(QEvent *) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

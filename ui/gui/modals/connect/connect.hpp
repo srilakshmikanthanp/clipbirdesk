@@ -7,6 +7,7 @@
 
 // Qt header
 #include <QDialog>
+#include <QEvent>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -30,6 +31,13 @@ class Connect : public QDialog {
 
   void onConnect(const QString &ipv4, const QString &port);
 
+ private:  // Member Functions
+
+  /**
+   * @brief Function used to set up all text in the label, etc..
+   */
+  void setUpLanguage();
+
  public:
 
  /**
@@ -43,5 +51,12 @@ class Connect : public QDialog {
    * @brief Destroy the Status object
    */
   virtual ~Connect() = default;
+
+ protected:  // Member Functions
+
+  /**
+   * @brief Override change event
+   */
+  void changeEvent(QEvent *) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

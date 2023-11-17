@@ -7,6 +7,7 @@
 
 // Qt header
 #include <QDesktopServices>
+#include <QEvent>
 #include <QDialog>
 #include <QLabel>
 #include <QPushButton>
@@ -26,6 +27,22 @@ class AboutUs : public QDialog {
 
   Q_OBJECT
 
+ private:  // Member variable (With Text Info)
+
+  // widgets
+  QPushButton *donate = new QPushButton(this);
+  QPushButton *web    = new QPushButton(this);
+  QLabel *logo        = new QLabel(this);
+  QLabel *version     = new QLabel(this);
+  QPushButton *bug    = new QPushButton(this);
+
+ private:  // Member Functions
+
+  /**
+   * @brief Function used to set up all text in the label, etc..
+   */
+  void setUpLanguage();
+
  public:
 
  /**
@@ -39,5 +56,12 @@ class AboutUs : public QDialog {
    * @brief Destroy the Status object
    */
   virtual ~AboutUs() = default;
+
+ protected:  // Member Functions
+
+  /**
+   * @brief Override change event
+   */
+  void changeEvent(QEvent *) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

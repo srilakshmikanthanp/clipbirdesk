@@ -34,6 +34,23 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   this->addAction(&about);
   this->addSeparator();
   this->addAction(&exitApp);
+
+  // set up the initial language
+  this->setUpLanguage();
+}
+
+/**
+ * @brief Function used to set up all text in the label, etc..
+ */
+void TrayMenu::setUpLanguage() {
+  connect.setText(QObject::tr("Join to Group"));
+  qrCode.setText(QObject::tr("Group QrCode"));
+  reset.setText(QObject::tr("Reset Devices"));
+  openApp.setText(QObject::tr("Open"));
+  send.setText(QObject::tr("Send"));
+  history.setText(QObject::tr("History"));
+  about.setText(QObject::tr("About"));
+  exitApp.setText(QObject::tr("Exit"));
 }
 
 /**
@@ -146,6 +163,17 @@ bool TrayMenu::isSendEnabled() const {
  */
 bool TrayMenu::isHistoryEnabled() const {
   return history.isEnabled();
+}
+
+/**
+ * @brief change event
+ */
+void TrayMenu::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) {
+    this->setUpLanguage();
+  }
+
+  QWidget::changeEvent(event);
 }
 
 /**

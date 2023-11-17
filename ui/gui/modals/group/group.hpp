@@ -38,7 +38,16 @@ class Group : public QDialog {
 
  private:  // private member functions
 
+  /**
+   * @brief Set the Up Qr Code object
+   *
+   */
   void setUpQrCode(Qt::ColorScheme);
+
+  /**
+   * @brief Function used to set up all text in the label, etc..
+   */
+  void setUpLanguage();
 
  public:
 
@@ -73,5 +82,12 @@ class Group : public QDialog {
    * @brief get the port
    */
   QString getPort() const;
+
+ protected:  // Member Functions
+
+  /**
+   * @brief Override change event
+   */
+  void changeEvent(QEvent *) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals

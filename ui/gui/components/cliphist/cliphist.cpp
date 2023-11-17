@@ -54,6 +54,16 @@ ClipTile::ClipTile(QWidget *parent): QWidget(parent) {
 
   // add main layout to widget
   this->setLayout(layout);
+
+  // set up linguist
+  this->setUpLanguage();
+}
+
+/**
+ * @brief Function used to set up all text in the label, etc..
+ */
+void ClipTile::setUpLanguage() {
+  // No thing to Do
 }
 
 /**
@@ -75,6 +85,8 @@ void ClipTile::setClip(const QVector<QPair<QString, QByteArray>> &clip) {
       break;
     }
   }
+
+  this->clip = clip;
 }
 
 /**
@@ -82,6 +94,20 @@ void ClipTile::setClip(const QVector<QPair<QString, QByteArray>> &clip) {
  */
 void ClipTile::clearClip() {
   item->clear();
+}
+
+/**
+ * @brief Has Clip
+ */
+bool ClipTile::hasClip() {
+  return !this->clip.isEmpty();
+}
+
+/**
+ * @brief Clear the clip
+ */
+QVector<QPair<QString, QByteArray>> ClipTile::getClip() {
+  return this->clip;
 }
 
 /**
@@ -95,6 +121,17 @@ void ClipTile::paintEvent(QPaintEvent *event) {
 }
 
 /**
+ * @brief change event
+ */
+void ClipTile::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) {
+    this->setUpLanguage();
+  }
+
+  QWidget::changeEvent(event);
+}
+
+/**
  * @brief Construct a new Clip Hist object
  *
  * @param parent
@@ -102,9 +139,6 @@ void ClipTile::paintEvent(QPaintEvent *event) {
 ClipHist::ClipHist(QWidget *parent) : QWidget(parent) {
   // set alignment from start and center
   verticalLayout->setAlignment(Qt::AlignTop);
-
-  // create a label
-  QLabel *label = new QLabel("Nothing so far");
 
   // set alignment as center
   label->setAlignment(Qt::AlignCenter);
@@ -127,10 +161,20 @@ ClipHist::ClipHist(QWidget *parent) : QWidget(parent) {
   // set object name
   this->setObjectName("ClipHist");
 
+  // set up initial language
+  this->setUpLanguage();
+
   // create all items
   for (auto i = 0L; i < constants::getAppMaxHistorySize(); ++i) {
     this->list.append(new ClipTile());
   }
+}
+
+/**
+ * @brief Function used to set up all text in the label, etc..
+ */
+void ClipHist::setUpLanguage() {
+  this->label->setText(QObject::tr("Nothing so far"));
 }
 
 /**
@@ -193,6 +237,46 @@ void ClipHist::clearHistory() {
 
   // update
   this->update();
+}
+
+/**
+ * @brief get the History
+ */
+QList<QVector<QPair<QString, QByteArray>>> ClipHist::getHistory() {
+  QList<QVector<QPair<QString, QByteArray>>> history;
+
+  for (auto tile: this->list) {
+    if (tile->hasClip()) {
+      history.append(tile->getClip());
+    } else {
+      break;
+    }
+  }
+
+  return history;
+}
+
+/**
+ * @brief Destroy the Clip Hist object
+ */
+ClipHist::~ClipHist() {
+  for (auto item: this->list) {
+    item->disconnect();
+    item->setParent(nullptr);
+    item->clearClip();
+    item->deleteLater();
+  }
+}
+
+/**
+ * @brief change event
+ */
+void ClipHist::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) {
+    this->setUpLanguage();
+  }
+
+  QWidget::changeEvent(event);
 }
 
 /**

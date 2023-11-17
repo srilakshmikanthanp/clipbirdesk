@@ -7,6 +7,7 @@
 
 // Qt headers
 #include <QStackedLayout>
+#include <QEvent>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QHostAddress>
@@ -54,6 +55,13 @@ class Host : public QWidget {
 
   Q_OBJECT
 
+ private:  // Member Functions
+
+  /**
+   * @brief Function used to set up all text in the label, etc..
+   */
+  void setUpLanguage();
+
  public:  // public Member functions
 
   /**
@@ -73,10 +81,17 @@ class Host : public QWidget {
    */
   Value getHost() const;
 
+ protected:
+
   /**
    * @brief Override paint for custom style
    */
   void paintEvent(QPaintEvent *event) override;
+
+  /**
+   * @brief Override change event
+   */
+  void changeEvent(QEvent *) override;
 
  private:  // disable copy and move
 
@@ -104,6 +119,17 @@ class HostList : public QWidget {
   QStackedLayout* stackLayout = new QStackedLayout(this);
   QWidget* verticalWidget     = new QWidget(this);
   QVBoxLayout* verticalLayout = new QVBoxLayout(verticalWidget);
+
+ private:  // Member variable (With Text Info)
+
+  QLabel *label = new QLabel(this);
+
+ private:  // Member Functions
+
+  /**
+   * @brief Function used to set up all text in the label, etc..
+   */
+  void setUpLanguage();
 
  public:  // Member Functions
 
@@ -140,5 +166,10 @@ class HostList : public QWidget {
    * @brief Override teh show event
    */
   void paintEvent(QPaintEvent* event) override;
+
+  /**
+   * @brief Override change event
+   */
+  void changeEvent(QEvent *) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window

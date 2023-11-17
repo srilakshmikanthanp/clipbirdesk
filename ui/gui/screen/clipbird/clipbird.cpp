@@ -142,7 +142,7 @@ void Clipbird::handleAuthRequest(const types::device::Device& client) {
   dialog->setWindowIcon(icon);
 
   // set the title
-  dialog->setWindowTitle("Clipbird");
+  dialog->setWindowTitle(constants::getAppName().c_str());
 
   // set the message
   dialog->setText(message);
@@ -251,28 +251,16 @@ void Clipbird::handleServerStatusChanged(bool isConnected) {
  */
 void Clipbird::handleConnectionError(QString error) {
   // Just Show the error info to user via Dialog
-  auto message = QString("Connection Error\nError Message: %1").arg(error);
+  auto message = QString("Connection Error: %1").arg(error);
 
-  // Dialog Instance
-  auto dialog = new QMessageBox();
+  // Title of the Notification
+  auto title = constants::getAppName().c_str();
 
   // icon for the dialog
   auto icon = QIcon(constants::getAppLogo().c_str());
 
-  // set the icon
-  dialog->setWindowIcon(icon);
-
-  // set the title
-  dialog->setWindowTitle(constants::getAppName().c_str());
-
-  // set the message
-  dialog->setText(message);
-
-  // set delete on close
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
-
-  // show the dialog
-  dialog->show();
+  // show notification
+  trayIcon->showMessage(title, message, icon);
 }
 
 //----------------------------- slots for Tray ----------------------------//
@@ -497,6 +485,14 @@ void Clipbird::onReceivedClicked() {
 }
 
 /**
+ * @brief Function used to set up all text in the label, etc..
+ */
+void Clipbird::setUpLanguage() {
+  this->tab->setTabText(0, QObject::tr(this->s_tabTitle));
+  this->tab->setTabText(1, QObject::tr(this->c_tabTitle));
+}
+
+/**
  * @brief Construct a new Clipbird object
  * with parent as QWidget
  *
@@ -547,10 +543,10 @@ Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QFrame(p), controller(c)
   clientArea->setAlignment(Qt::AlignCenter);
 
   // add server list to tab
-  tab->addTab(clientArea, s_tabTitle);
+  tab->addTab(clientArea, QObject::tr(s_tabTitle));
 
   // add client list to tab
-  tab->addTab(serverArea, c_tabTitle);
+  tab->addTab(serverArea, QObject::tr(c_tabTitle));
 
   // add tab to  layout
   root->addWidget(tab);
@@ -804,5 +800,16 @@ void Clipbird::removeServer(components::Host::Value host) {
  */
 void Clipbird::removeAllServers() {
   serverList->removeHosts();
+}
+
+/**
+ * @brief change event
+ */
+void Clipbird::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) {
+    this->setUpLanguage();
+  }
+
+  QWidget::changeEvent(event);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

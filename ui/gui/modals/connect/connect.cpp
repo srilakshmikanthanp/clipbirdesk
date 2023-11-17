@@ -16,7 +16,7 @@ Connect::Connect(QWidget * parent) : QDialog(parent) {
   auto root = new QVBoxLayout(this);
 
   // create label
-  auto label = new QLabel("Enter the IP and Port of the server", this);
+  auto label = new QLabel(QObject::tr("Enter the IP and Port of the server"), this);
 
   // create the ip and port input
   auto ipv4 = new QLineEdit(this);
@@ -25,13 +25,13 @@ Connect::Connect(QWidget * parent) : QDialog(parent) {
   auto port = new QLineEdit(this);
 
   // create the button
-  auto button = new QPushButton("Join");
+  auto button = new QPushButton(QObject::tr("Join"));
 
   // set the placeholder
-  ipv4->setPlaceholderText("IPv4");
+  ipv4->setPlaceholderText(QObject::tr("IPv4"));
 
   // set the placeholder
-  port->setPlaceholderText("Port");
+  port->setPlaceholderText(QObject::tr("Port"));
 
   // add the ip and port input to layout
   root->addWidget(label);
@@ -52,5 +52,26 @@ Connect::Connect(QWidget * parent) : QDialog(parent) {
   connect(button, &QPushButton::clicked, this, [this, ipv4, port]() {
     emit onConnect(ipv4->text(), port->text());
   });
+
+  // set up language
+  this->setUpLanguage();
+}
+
+/**
+ * @brief Function used to set up all text in the label, etc..
+ */
+void Connect::setUpLanguage() {
+  // Nothing to do
+}
+
+/**
+ * @brief change event
+ */
+void Connect::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) {
+    this->setUpLanguage();
+  }
+
+  QWidget::changeEvent(event);
 }
 }

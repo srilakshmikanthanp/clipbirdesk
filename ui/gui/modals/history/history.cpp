@@ -33,6 +33,9 @@ History::History(QWidget * parent) : QDialog(parent) {
   // set layout to widget
   this->setLayout(vBox);
 
+  // set up language
+  this->setUpLanguage();
+
   // connect the signals
   auto signal_s = &components::ClipHist::onClipSelected;
   auto slot_s  = &History::onClipSelected;
@@ -56,5 +59,30 @@ void History::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist)
  */
 void History::clearHistory() {
   this->clipHist->clearHistory();
+}
+
+/**
+ * @brief get the history
+ */
+QList<QVector<QPair<QString, QByteArray>>> History::getHistory() const {
+  return this->clipHist->getHistory();
+}
+
+/**
+ * @brief Function used to set up all text in the label, etc..
+ */
+void History::setUpLanguage() {
+  // Nothing to do
+}
+
+/**
+ * @brief change event
+ */
+void History::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) {
+    this->setUpLanguage();
+  }
+
+  QWidget::changeEvent(event);
 }
 }

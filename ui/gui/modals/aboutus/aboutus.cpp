@@ -25,13 +25,6 @@ AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
     QDesktopServices::openUrl(QUrl(constants::getAppIssuePage().c_str()));
   };
 
-  // widgets
-  auto donate    = new QPushButton(this);
-  auto web       = new QPushButton(this);
-  auto logo      = new QLabel(this);
-  auto version   = new QLabel(this);
-  auto bug       = new QPushButton(this);
-
   // Images and Icons
   auto logoIco   = QIcon(":/images/logo.png");
   auto webIco    = QIcon(":/images/web.png");
@@ -41,18 +34,10 @@ AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
   // set logo of the app
   logo->setPixmap(logoIco.pixmap(QSize(128, 128)));
 
-  // set version
-  version->setText("Version: " + QString::fromStdString(constants::getAppVersion()));
-
   // set icons
   web->setIcon(webIco);
   donate->setIcon(donateIco);
   bug->setIcon(bugIco);
-
-  // set text
-  bug->setText("Report Bug");
-  web->setText("Website");
-  donate->setText("Donate");
 
   // Vertical Layout
   auto layoutVer = new QVBoxLayout(this);
@@ -83,6 +68,9 @@ AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
   // set the layout
   this->setLayout(layoutVer);
 
+  // set up initial language
+  this->setUpLanguage();
+
   // Click Handler for web
   connect(web, &QPushButton::clicked, webClick);
 
@@ -91,5 +79,32 @@ AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
 
   // Click Handler for bug
   connect(bug, &QPushButton::clicked, bugClick);
+}
+
+/**
+ * @brief Function used to set up all text in the label, etc..
+ */
+void AboutUs::setUpLanguage() {
+  // get the app version
+  auto v = QString::fromStdString(constants::getAppVersion());
+
+  // set version
+  version->setText(QObject::tr("Version: ") + v);
+
+  // set text
+  bug->setText(QObject::tr("Report Bug"));
+  web->setText(QObject::tr("Website"));
+  donate->setText(QObject::tr("Donate"));
+}
+
+/**
+ * @brief change event
+ */
+void AboutUs::changeEvent(QEvent *event) {
+  if (event->type() == QEvent::LanguageChange) {
+    this->setUpLanguage();
+  }
+
+  QWidget::changeEvent(event);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals
