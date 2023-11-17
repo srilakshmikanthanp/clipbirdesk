@@ -112,7 +112,7 @@ class Clipbird : public QFrame {
 
  private:  // constant for keys (Client)
 
-  static constexpr const char* const c_tabTitle     = "Join Group";
+  static inline QString c_tabTitle = "Join Group";
 
  private:  // private slots
 
