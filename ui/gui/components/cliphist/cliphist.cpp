@@ -181,18 +181,19 @@ void ClipHist::setUpLanguage() {
  * @brief Set the History
  */
 void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &history) {
+  // set parent as null
+  for (auto item: this->list) {
+    item->disconnect();
+    item->hide();
+    item->setParent(nullptr);
+    item->clearClip();
+  }
+
   // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
     verticalLayout->removeItem(item);
     delete item;
-  }
-
-  // set parent as null
-  for (auto item: this->list) {
-    item->disconnect();
-    item->setParent(nullptr);
-    item->clearClip();
   }
 
   // set the history
