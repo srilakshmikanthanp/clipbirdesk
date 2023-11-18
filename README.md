@@ -128,7 +128,7 @@ Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installe
 
 #### Installing Bonjour
 
-Just go to [bonjour](https://developer.apple.com/bonjour/) and download the Bonjour SDK for Windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
+Just go to [Bonjour](https://developer.apple.com/bonjour/) and download the Bonjour SDK for Windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
 
 #### Environment Variables
 

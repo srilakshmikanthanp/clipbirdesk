@@ -123,8 +123,8 @@ void Clipbird::handleServerStateChange(bool isStarted) {
 void Clipbird::handleAuthRequest(const types::device::Device& client) {
   // get the message to show
   // clang-format off
-  auto message = QString(
-    "A New client Attempting to connect\n"
+  auto message = QObject::tr(
+    "A New Host Wants to Join Group\n"
     "Host: %1\n"
     "Accept the connection?"
   ).arg(
@@ -158,6 +158,9 @@ void Clipbird::handleAuthRequest(const types::device::Device& client) {
 
   // show the dialog
   dialog->show();
+
+  // set fixed size
+  dialog->setFixedSize(dialog->sizeHint());
 
   // connect the dialog to window AuthSuccess signal
   const auto signal_s = &QMessageBox::accepted;
@@ -290,21 +293,26 @@ void Clipbird::onQrCodeClicked() {
   // add ips
   QJsonArray ips;
 
-  // using algorithms
-  std::for_each(addrs.begin(), addrs.end(), [&](auto& addr) {
-    // if not localhost or ipv6 skip
-    if (addr.isLoopback() || addr.protocol() == QAbstractSocket::IPv6Protocol) {
-      return;
+  // using for loop
+  for (auto addr: addrs) {
+    // if not ipv4 then skip
+    if (addr.protocol() == QAbstractSocket::IPv6Protocol) {
+      continue;
+    }
+
+    // if not localhost
+    if (addr.isLoopback()) {
+      continue;
     }
 
     // if localhost skip
     if (addr.toString().startsWith("127.")) {
-      return;
+      continue;
     }
 
     // add the ip to array
     ips.append(addr.toString());
-  });
+  }
 
   // add the ips to json
   json.insert("ips", ips);
