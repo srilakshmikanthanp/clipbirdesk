@@ -126,6 +126,11 @@ qt_standard_project_setup()
 qt_add_resources(RESOURCES
   ${PROJECT_SOURCE_DIR}/assets/resources.qrc)
 
+# if windows
+if(WIN32)
+  set (RESOURCES ${RESOURCES} ${PROJECT_SOURCE_DIR}/assets/windows.rc)
+endif()
+
 # Add executable
 qt_add_executable(clipbird
   ${main_cpp} ${RESOURCES})
@@ -172,7 +177,6 @@ if(WIN32)
   target_link_libraries(clipbird PRIVATE Dwmapi.lib)
   target_link_libraries(clipbird PRIVATE ${BONJOUR_LIBRARIES})
   add_definitions(-D_WIN32)
-  set (RESOURCES ${RESOURCES} ${PROJECT_SOURCE_DIR}/assets/windows.rc)
 endif()
 
 # Add Platform specific definitions for linux

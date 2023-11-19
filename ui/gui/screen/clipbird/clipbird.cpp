@@ -136,7 +136,7 @@ void Clipbird::handleAuthRequest(const types::device::Device& client) {
   auto dialog = new QMessageBox();
 
   // icon for the dialog
-  auto icon = QIcon(constants::getAppLogo().c_str());
+  auto icon = QIcon(QString::fromStdString(constants::getAppLogo()));
 
   // set the icon
   dialog->setWindowIcon(icon);
@@ -260,7 +260,7 @@ void Clipbird::handleConnectionError(QString error) {
   auto title = constants::getAppName().c_str();
 
   // icon for the dialog
-  auto icon = QIcon(constants::getAppLogo().c_str());
+  auto icon = QIcon(QString::fromStdString(constants::getAppLogo()));
 
   // show notification
   trayIcon->showMessage(title, message, icon);
@@ -324,7 +324,7 @@ void Clipbird::onQrCodeClicked() {
   qDebug() << "QR Code Info: " << QString(info);
 
   // set the icon
-  group.setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+  group.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
 
   // set the title
   group.setWindowTitle(constants::getAppName().c_str());
@@ -381,7 +381,7 @@ void Clipbird::onConnectClicked() {
   if (joiner.isVisible()) return;
 
   // set the icon
-  joiner.setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+  joiner.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
 
   // set the title
   joiner.setWindowTitle(constants::getAppName().c_str());
@@ -420,7 +420,7 @@ void Clipbird::onAboutClicked() {
   if (aboutUs.isVisible()) return;
 
   // set the icon
-  aboutUs.setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+  aboutUs.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
 
   // set the title
   aboutUs.setWindowTitle(constants::getAppName().c_str());
@@ -462,7 +462,7 @@ void Clipbird::onReceivedClicked() {
   if (history.isVisible()) return;
 
   // set the icon
-  history.setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+  history.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
 
   // set the title
   history.setWindowTitle(constants::getAppName().c_str());

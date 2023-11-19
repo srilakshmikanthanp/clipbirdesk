@@ -33,9 +33,13 @@ Remove-Item -Recurse -Force $ClipbirDir/* -Exclude .gitignore
 Write-Host "Copying $env:OPENSSL_ROOT_DIR /bin/*.dll to $ClipbirDir" -ForegroundColor Green
 Copy-Item "$env:OPENSSL_ROOT_DIR/bin/*.dll" $ClipbirDir
 
+# create assets directory in the package directory
+Write-Host "Creating assets directory in $ClipbirDir" -ForegroundColor Green
+New-Item -ItemType Directory -Force -Path $ClipbirDir/assets/images
+
 # copy the Logo to the package directory
 Write-Host "Copying ./assets/images/* to $ClipbirDir" -ForegroundColor Green
-Copy-Item ./assets/images/* $ClipbirDir
+Copy-Item ./assets/images/* $ClipbirDir/assets/images
 
 # Create the package as BuildType (to lower) version
 Write-Host "Creating the package as Release version" -ForegroundColor Green
