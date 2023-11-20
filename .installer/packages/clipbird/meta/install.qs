@@ -29,7 +29,7 @@ Component.prototype.createOperations = function () {
       "@TargetDir@/clipbird.exe",
       appData + "/Microsoft/Windows/Start Menu/Programs/Startup/ClipBird.lnk",
       "workingDirectory=@TargetDir@",
-      "iconPath=@TargetDir@/assets/logo.png",
+      "iconPath=@TargetDir@/assets/images/logo.png",
       "IconId=0",
       "description=ClipBird"
     );
@@ -61,7 +61,7 @@ Component.prototype.createOperations = function () {
       "@TargetDir@/clipbird.exe",
       "@StartMenuDir@/ClipBird.lnk",
       "workingDirectory=@TargetDir@",
-      "iconPath=@TargetDir@/assets/logo.ico",
+      "iconPath=@TargetDir@/assets/images/logo.ico",
       "IconId=0",
       "description=ClipBird"
     );
