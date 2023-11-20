@@ -199,9 +199,9 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 
 ## Screenshots
 
-|![clipbird](.photos/clipbird_light.png) | ![history](.photos/history_light.png)|
-|--------------------------------- | ----------------------------------         |
-|![clipbird](.photos/clipbird_dark.png) | ![history](.photos/history_dark.png)  |
+|![clipbird](.images/clipbird_light.png) | ![history](.images/history_light.png) |
+|--------------------------------------- | --------------------------------------|
+|![clipbird](.images/clipbird_dark.png)  | ![history](.images/history_dark.png)  |
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
