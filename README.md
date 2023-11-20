@@ -63,6 +63,7 @@
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
     <li><a href="#contributors">Contributors</a></li>
+    <li><a href="#screenshots">Screenshots</a></li>
   </ol>
 </details>
 
@@ -195,6 +196,12 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 * [Dharun RK](https://github.com/rkdharun)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Screenshots
+
+![clipbird](.photos/Clipbird.png) | ![history](.photos/History.png)
+--------------------------------- | ----------------------------------
+
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
