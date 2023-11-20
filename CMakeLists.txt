@@ -28,17 +28,17 @@ set(DONATE_URL "https://github.com/srilakshmikanthanp/clipbirdesk")
 # Set the Version
 set(VERSION ${PROJECT_VERSION})
 
+# set organization name
+set(APPLICATION_ORGANIZATION_NAME "srilakshmikanthanp")
+
 # Set the logo.png path variable
-set(APPLICATION_LOGO_PATH ":/images/logo.png")
+set(APPLICATION_LOGO_PATH ":/images/logo.ico")
 
 # set the main.qss path variable (Light)
 set(APPLICATION_LIGHT_QSS_PATH ":/styles/light.qss")
 
 # set the main.qss path variable (Dark)
 set(APPLICATION_DARK_QSS_PATH ":/styles/dark.qss")
-
-# set organization name
-set(APPLICATION_ORGANIZATION_NAME "srilakshmikanthanp")
 
 # Set the BBONJOUR_DIR from env
 set(BONJOUR_SDK_HOME $ENV{BONJOUR_SDK_HOME})

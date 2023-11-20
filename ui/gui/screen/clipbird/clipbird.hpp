@@ -108,11 +108,11 @@ class Clipbird : public QFrame {
 
  private:  // constant for keys (Server)
 
-  static constexpr const char* const s_tabTitle = "Create Group";
+  QString s_tabTitle = QObject::tr("Create Group");
 
  private:  // constant for keys (Client)
 
-  static constexpr const char* const c_tabTitle = "Join Group";
+  QString c_tabTitle = QObject::tr("Join Group");
 
  private:  // private slots
 

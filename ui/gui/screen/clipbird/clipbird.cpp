@@ -32,7 +32,7 @@ void Clipbird::handleTabChangeForClient(Tabs tab) {
   if (tab != Tabs::Client) return;  // if not client tab return
 
   // initialize the client Clipbird
-  this->setStatus("Join to a Group", Status::Disconnected);
+  this->setStatus(QObject::tr("Join to a Group"), Status::Disconnected);
 
   // reset the device list
   this->removeAllClient();
@@ -254,7 +254,7 @@ void Clipbird::handleServerStatusChanged(bool isConnected) {
  */
 void Clipbird::handleConnectionError(QString error) {
   // Just Show the error info to user via Dialog
-  auto message = QString("Connection Error: %1").arg(error);
+  auto message = QObject::tr("Connection Error: %1").arg(error);
 
   // Title of the Notification
   auto title = constants::getAppName().c_str();
@@ -324,7 +324,7 @@ void Clipbird::onQrCodeClicked() {
   qDebug() << "QR Code Info: " << QString(info);
 
   // set the icon
-  group.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
+  group.setWindowIcon(QIcon(constants::getAppLogo().c_str()));
 
   // set the title
   group.setWindowTitle(constants::getAppName().c_str());
@@ -496,8 +496,8 @@ void Clipbird::onReceivedClicked() {
  * @brief Function used to set up all text in the label, etc..
  */
 void Clipbird::setUpLanguage() {
-  this->tab->setTabText(0, QObject::tr(this->s_tabTitle));
-  this->tab->setTabText(1, QObject::tr(this->c_tabTitle));
+  this->tab->setTabText(0, s_tabTitle);
+  this->tab->setTabText(1, c_tabTitle);
 }
 
 /**
@@ -551,10 +551,10 @@ Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QFrame(p), controller(c)
   clientArea->setAlignment(Qt::AlignCenter);
 
   // add server list to tab
-  tab->addTab(clientArea, QObject::tr(s_tabTitle));
+  tab->addTab(clientArea, this->s_tabTitle);
 
   // add client list to tab
-  tab->addTab(serverArea, QObject::tr(c_tabTitle));
+  tab->addTab(serverArea, this->c_tabTitle);
 
   // add tab to  layout
   root->addWidget(tab);

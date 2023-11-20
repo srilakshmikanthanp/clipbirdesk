@@ -10,6 +10,7 @@
   <qresource>
     <file>images/logo.png</file>
     <file>images/logo.svg</file>
+    <file>images/logo.ico</file>
     <file>images/web.png</file>
     <file>images/bug.png</file>
     <file>images/dollar.png</file>

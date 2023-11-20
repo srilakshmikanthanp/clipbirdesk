@@ -184,7 +184,6 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
   // set parent as null
   for (auto item: this->list) {
     item->disconnect();
-    item->hide();
     item->setParent(nullptr);
     item->clearClip();
   }
