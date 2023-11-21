@@ -140,7 +140,7 @@ void Server::processPingPacket(const packets::PingPacket &packet) {
   using packets::PingPacket;
 
   // if it is pong then ignore
-  if (packet.getPingType() == PingPacket::PingType::Pong) {
+  if (packet.getPingType() == types::enums::PingType::Pong) {
     qInfo() << (LOG("Pong Received")); return;
   }
 
@@ -150,7 +150,7 @@ void Server::processPingPacket(const packets::PingPacket &packet) {
   // create the PingPacket
   auto pingPacket = utility::functions::createPacket(PingPacketParams{
     PingPacket::PacketType::PingPong,
-    PingPacket::PingType::Pong
+    types::enums::PingType::Pong
   });
 
   // send the packet to the client

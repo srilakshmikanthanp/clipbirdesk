@@ -37,11 +37,6 @@ class PingPacket {
     PingPong = 0x03
   };
 
-  /// @brief Allowed Ping Types
-  enum PingType : quint32 {
-    Ping = 0x01, Pong = 0x02
-  };
-
  public:
 
   /**
