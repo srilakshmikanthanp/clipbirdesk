@@ -502,7 +502,7 @@ void ClipBird::disconnectFromServer(const types::device::Device &host) {
  * @brief Sync the clipboard data with the Group
  */
 void ClipBird::syncClipboard(const QVector<QPair<QString, QByteArray>> &data) {
-  if(std::get<Client>(m_host).getConnectedServer().has_value()) {
+  if(std::holds_alternative<Server>(m_host)) {
     std::get<Client>(m_host).syncItems(data);
   }
 

@@ -345,7 +345,7 @@ QSslConfiguration Client::getSslConfiguration() const {
 void Client::syncItems(QVector<QPair<QString, QByteArray>> items) {
   // check if the socket is connected else throw error
   if (!m_ssl_socket->isOpen()) {
-    throw std::runtime_error("Socket is not connected");
+    return;
   }
 
   // using createPacket to create the packet
