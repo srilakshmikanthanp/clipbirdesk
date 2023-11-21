@@ -64,7 +64,7 @@ class Client : public service::mdnsBrowser {
 
  signals:  // signals for this class
  /// @brief on InvalidPacket
-  void OnInvalidPacket(QString error);
+  void OnInvalidPacket(int code, QString error);
 
  private:  // just for Qt
 

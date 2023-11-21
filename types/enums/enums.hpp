@@ -28,7 +28,7 @@ enum AuthStatus : quint32 {
 
 /// @brief Allowed Ping Types
 enum PingType : quint32 {
-  Ping = 0x01,
-  Pong = 0x02
+  Ping = 0x00,
+  Pong = 0x01
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::types::enums

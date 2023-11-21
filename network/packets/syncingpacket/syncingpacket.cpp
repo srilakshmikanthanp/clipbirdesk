@@ -306,6 +306,16 @@ SyncingPacket SyncingPacket::fromBytes(const QByteArray &array) {
   stream >> packet.packetType;
   stream >> packet.itemCount;
 
+  // if the stream is not good
+  if (stream.status() != QDataStream::Ok) {
+    throw MalformedPacket(ErrorCode::CodingError, "SyncingPacket");
+  }
+
+  // check the packet type
+  if (packet.packetType != PacketType::SyncPacket) {
+    throw types::except::NotThisPacket("Not SyncingPacket");
+  }
+
   // Read the Payloads
   for (quint32 i = 0; i < packet.itemCount; i++) {
     packet.items.push_back(SyncingItem::fromStream(stream));

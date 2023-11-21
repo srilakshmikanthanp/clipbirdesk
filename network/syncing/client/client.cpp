@@ -119,7 +119,7 @@ void Client::processAuthentication(const packets::Authentication& packet) {
  * @param packet Invalid packet
  */
 void Client::processInvalidPacket(const packets::InvalidRequest& packet) {
-  emit OnInvalidPacket(QString("Error %1: %2").arg(packet.getErrorCode()).arg(packet.getErrorMessage()));
+  emit OnInvalidPacket(packet.getErrorCode() , packet.getErrorMessage());
 }
 
 /**
