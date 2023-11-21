@@ -48,7 +48,7 @@ quint32 PingPacket::getPacketType() const noexcept {
  * @param type
  */
 void PingPacket::setPingType(quint32 type) {
-  if (type != PingType::Ping && type != PingType::Pong) {
+  if (type != types::enums::Ping && type != types::enums::Pong) {
     throw std::invalid_argument("Invalid Type");
   }
 
@@ -93,6 +93,8 @@ QByteArray PingPacket::toBytes() const {
  * @brief From Bytes
  */
 PingPacket PingPacket::fromBytes(const QByteArray &array) {
+  // allowed ping type
+  auto allowedPingType = QList<quint32>{ types::enums::Ping, types::enums::Pong };
   auto stream = QDataStream(array);
 
   using types::except::MalformedPacket;
@@ -114,7 +116,8 @@ PingPacket PingPacket::fromBytes(const QByteArray &array) {
     throw types::except::NotThisPacket("Not PingPacket");
   }
 
-  if (packet.pingType != PingType::Ping && packet.pingType != PingType::Pong) {
+  // check for valid ping type
+  if (!allowedPingType.contains(packet.pingType)) {
     throw std::invalid_argument("Invalid Ping Type");
   }
 

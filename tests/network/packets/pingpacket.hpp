@@ -24,6 +24,9 @@ TEST(PingPacket, TestingPingPacket) {
   // using the AuthenticationPacket
   using srilakshmikanthanp::clipbirdesk::network::packets::PingPacket;
 
+    // using the ErrorCode
+  using srilakshmikanthanp::clipbirdesk::types::enums::PingType;
+
   // using functions namespace
   using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
 
@@ -32,7 +35,7 @@ TEST(PingPacket, TestingPingPacket) {
 
   // constant values
   const auto packetType = PingPacket::PacketType::PingPong;
-  const auto pingType  = PingPacket::PingType::Ping;
+  const auto pingType  = PingType::Ping;
 
   // create packet
   packet_send = createPacket(params::PingPacketParams{packetType, pingType});
