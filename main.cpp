@@ -38,7 +38,7 @@ class ClipbirdApplication : public SingleApplication {
    * @brief Get the certificate from App Home
    */
   QSslConfiguration getOldSslConfiguration() {
-    auto two_months = std::chrono::microseconds(constants::getAppCertExpiryInterval());
+    auto two_months = std::chrono::milliseconds(constants::getAppCertExpiryInterval());
     auto &storage = storage::Storage::instance();
 
     // read the certificate and key
