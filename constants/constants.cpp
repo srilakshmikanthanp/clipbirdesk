@@ -135,7 +135,7 @@ std::string getAppOrgName() {
 /**
  * @brief Used to get the certificate expiry time should not be less than 2 months
  */
-long getAppCertExpiryBeforeTime() {
-  return 60L * 60L * 24L * 60L * 1000L;
+long long getAppCertExpiryInterval() {
+  return 60LL * 60LL * 24LL * 60LL * 1000LL;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::config
