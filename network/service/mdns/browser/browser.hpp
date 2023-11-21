@@ -45,6 +45,10 @@ class Browser : public QObject {
   QSocketNotifier* m_res_notify    = nullptr;  ///< Socket notifier
   DNSServiceRef m_res_ref          = nullptr;  ///< Service ref
 
+ private:  // private variables
+
+  std::map<QString, std::pair<QHostAddress, quint16>> serviceMap;
+
  private:  // Just for Qt
 
   Q_OBJECT
@@ -61,7 +65,7 @@ class Browser : public QObject {
    * @param isAdded
    * @param const QHostInfo& info
    */
-  void onHostResolved(bool isAdded, quint16 port, QString srvName, const QHostInfo& info);
+  void onHostResolved(quint16 port, QString srvName, const QHostInfo& info);
 
   /**
    * @brief Callback function for DNSServiceBrowse function
@@ -98,18 +102,7 @@ class Browser : public QObject {
    * @brief Callback function for DNSServiceResolve function
    * that service Removed
    */
-  static void removeCallback(
-      DNSServiceRef serviceRef,        // DNSServiceRef
-      DNSServiceFlags flags,           // DNSServiceFlags
-      uint32_t interfaceIndex,         // InterfaceIndex
-      DNSServiceErrorType errorCode,   // DNSServiceErrorType
-      const char* fullname,            // fullname
-      const char* hosttarget,          // hosttarget
-      uint16_t port,                   // port
-      uint16_t txtLen,                 // txtLen
-      const unsigned char* txtRecord,  // txtRecord
-      void* context                    // context
-  );
+  void removeCallback(QString serviceName);
 
  public:
 

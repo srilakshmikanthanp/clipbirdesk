@@ -14,7 +14,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
  * @param isAdded
  * @param const QHostInfo& info
  */
-void Browser::onHostResolved(bool isAdded, quint16 port, QString srvName, const QHostInfo& info) {
+void Browser::onHostResolved(quint16 port, QString srvName, const QHostInfo& info) {
   // check for error
   if (info.error() != QHostInfo::NoError || info.addresses().isEmpty()) {
     qWarning() << LOG("Unable to resolve service");
@@ -41,8 +41,11 @@ void Browser::onHostResolved(bool isAdded, quint16 port, QString srvName, const 
   // get the ip address
   auto ip = info.addresses().first();
 
+  // add to map
+  this->serviceMap[srvName] = {ip, port};
+
   // emit the signal
-  isAdded ? emit onServiceAdded({ip, port, srvName}) : emit onServiceRemoved({ip, port, srvName});
+  emit onServiceAdded({ip, port, srvName});
 }
 
 /**
@@ -79,12 +82,10 @@ void Browser::browseCallback(
   // create context with service name and this
   auto contextObj = new std::pair(new std::string(serviceName), browserObj);
 
-  // infer callback type from flag
-  auto callback = flags & kDNSServiceFlagsAdd ? (
-    addedCallback                                    // Service Added
-  ) : (
-    removeCallback                                   // Service Removed
-  );
+  // if removed
+  if (!(flags & kDNSServiceFlagsAdd)) {
+    return browserObj->removeCallback(QString(serviceName));
+  }
 
   // resolve the service
   auto errorType = DNSServiceResolve(
@@ -94,7 +95,7 @@ void Browser::browseCallback(
       serviceName,                                   // serviceName
       regtype,                                       // regtype
       domain,                                        // domain
-      callback,                                      // callback
+      addedCallback,                                 // callback
       browserObj                                     // context
   );
 
@@ -163,7 +164,6 @@ void Browser::addedCallback(
   auto callback = std::bind(
     &onHostResolved,                                 // Function
     browserObj,                                      // this
-    true,                                            // Removed
     ntohs(port),                                     // port
     serviceName,                                     // srvName
     std::placeholders::_1                            // QHostInfo
@@ -176,50 +176,21 @@ void Browser::addedCallback(
 /**
  * @brief Callback function for DNSServiceResolve function
  */
-void Browser::removeCallback(
-    DNSServiceRef serviceRef,                        // DNSServiceRef
-    DNSServiceFlags flags,                           // DNSServiceFlags
-    uint32_t interfaceIndex,                         // InterfaceIndex
-    DNSServiceErrorType errorCode,                   // DNSServiceErrorType
-    const char* fullname,                            // fullname
-    const char* hosttarget,                          // hosttarget
-    uint16_t port,                                   // port
-    uint16_t txtLen,                                 // txtLen
-    const unsigned char* txtRecord,                  // txtRecord
-    void* context                                    // context
-) {
-  // convert context to Register object
-  auto browserObj = static_cast<Browser*>(context);
+void Browser::removeCallback(QString serviceName) {
+  // remove the service name from service map
+  auto service = this->serviceMap.find(serviceName);
+  auto device = types::device::Device();
 
-  // Avoid warning of unused variables
-  Q_UNUSED(interfaceIndex);
-  Q_UNUSED(txtLen);
-  Q_UNUSED(txtRecord);
+  // get the QHostAddress
+  device.port = service->second.second;
+  device.name = serviceName;
+  device.ip = service->second.first;
 
-  // service name
-  auto serviceName = QString::fromUtf8(fullname);
+  // emit the signal
+  emit onServiceRemoved(device);
 
-  // check for Error
-  if (errorCode != kDNSServiceErr_NoError) {
-    qWarning() << LOG("DNSServiceResolve failed");
-    return;
-  }
-
-  // service name
-  auto hostname   = QString::fromUtf8(hosttarget);
-
-  // bind the iAdded and port
-  auto callback = std::bind(
-    &onHostResolved,                                 // Function
-    browserObj,                                      // this
-    false,                                           // Removed
-    ntohs(port),                                     // port
-    serviceName,                                     // srvName
-    std::placeholders::_1                            // QHostInfo
-  );
-
-  // Resolve the ip address from hostname
-  QHostInfo::lookupHost(hostname, callback);
+  // remove the service from map
+  this->serviceMap.erase(service);
 }
 
 /**
