@@ -20,6 +20,7 @@
 #include <QNetworkReply>
 
 // standard headers
+#include <optional>
 #include <tuple>
 #include <utility>
 
@@ -216,14 +217,9 @@ class Client : public service::mdnsBrowser {
   void connectToServer(types::device::Device client);
 
   /**
-   * @brief IS connected to the server
-   */
-  bool isConnected() const;
-
-  /**
    * @brief Get the Connection Host and Port object
    */
-  types::device::Device getConnectedServer() const;
+  std::optional<types::device::Device> getConnectedServer() const;
 
   /**
    * @brief Disconnect from the server

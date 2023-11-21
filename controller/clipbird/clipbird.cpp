@@ -50,6 +50,10 @@ void ClipBird::handleServerStatusChanged(bool status) {
   auto *client = &std::get<Client>(m_host);
   auto slot_n  = &Client::syncItems;
   auto &store  = storage::Storage::instance();
+  auto server = client->getConnectedServer();
+
+  // is not value
+  if (!server.has_value()) return;
 
   // if the client is connected then connect the signals
   if (!status) {
@@ -57,7 +61,7 @@ void ClipBird::handleServerStatusChanged(bool status) {
   } else {
     connect(&m_clipboard, signal, client, slot_n);
     auto cert = client->getConnectedServerCertificate();
-    auto name = client->getConnectedServer().name;
+    auto name = server->name;
     store.setServerCert(name, cert.toPem());
     this->m_sslConfig.addCaCertificate(cert);
     client->setSslConfiguration(this->m_sslConfig);
@@ -73,8 +77,11 @@ void ClipBird::handleServerFound(types::device::Device server) {
     throw std::runtime_error("Host is not client");
   }
 
+  // get the connected server
+  auto connectedServer = std::get<Client>(m_host).getConnectedServer();
+
   // if already connected then return
-  if (std::get<Client>(m_host).isConnected()) return;
+  if (connectedServer.has_value()) return;
 
   // get the client and store the server
   auto *client = &std::get<Client>(m_host);
@@ -454,22 +461,11 @@ void ClipBird::connectToServer(const types::device::Device &host) {
 }
 
 /**
- * @brief Is Client Connected
- */
-bool ClipBird::isConnectedToServer() {
-  if (std::holds_alternative<Client>(m_host)) {
-    return std::get<Client>(m_host).isConnected();
-  } else {
-    throw std::runtime_error("Host is not client");
-  }
-}
-
-/**
  * @brief get the connected server address and port
  *
  * @return types::device::Device address and port
  */
-types::device::Device ClipBird::getConnectedServer() const {
+std::optional<types::device::Device> ClipBird::getConnectedServer() const {
   if (std::holds_alternative<Client>(m_host)) {
     return std::get<Client>(m_host).getConnectedServer();
   } else {
@@ -488,7 +484,7 @@ void ClipBird::disconnectFromServer(const types::device::Device &host) {
 
   // find the server with the given host and ip
   const auto match = [&](auto i) -> auto{
-    return (i.ip == host.ip) && (i.port == host.port);
+    return (i->ip == host.ip) && (i->port == host.port);
   };
 
   // get the connected server
@@ -506,10 +502,12 @@ void ClipBird::disconnectFromServer(const types::device::Device &host) {
  * @brief Sync the clipboard data with the Group
  */
 void ClipBird::syncClipboard(const QVector<QPair<QString, QByteArray>> &data) {
+  if(std::get<Client>(m_host).getConnectedServer().has_value()) {
+    std::get<Client>(m_host).syncItems(data);
+  }
+
   if (std::holds_alternative<Server>(m_host)) {
     std::get<Server>(m_host).syncItems(data);
-  } else if(std::get<Client>(m_host).isConnected()) {
-    std::get<Client>(m_host).syncItems(data);
   }
 }
 

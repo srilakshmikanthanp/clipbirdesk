@@ -343,7 +343,7 @@ void Client::connectToServer(types::device::Device server) {
   m_ssl_socket->setSslConfiguration(m_ssl_config);
 
   // check if the socket is connected
-  if (this->isConnected()) {
+  if (this->m_ssl_socket->state() == QAbstractSocket::ConnectedState) {
     this->m_ssl_socket->abort();
   }
 
@@ -381,7 +381,7 @@ void Client::connectToServerSecured(types::device::Device server) {
   m_ssl_socket->setSslConfiguration(m_ssl_config);
 
   // check if the socket is connected
-  if (this->isConnected()) {
+  if (this->m_ssl_socket->state() == QAbstractSocket::ConnectedState) {
     this->m_ssl_socket->abort();
   }
 
@@ -407,20 +407,13 @@ void Client::connectToServerSecured(types::device::Device server) {
 }
 
 /**
- * @brief IS connected to the server
- */
-bool Client::isConnected() const {
-  return m_ssl_socket->state() == QAbstractSocket::ConnectedState;
-}
-
-/**
  * @brief Get the Connection Host and Port object
  * @return QPair<QHostAddress, quint16>
  */
-types::device::Device Client::getConnectedServer() const {
+std::optional<types::device::Device> Client::getConnectedServer() const {
   // check if the socket is connected else throw error
   if (this->m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
-    throw std::runtime_error("Socket is not connected");
+    return std::optional<types::device::Device>();
   }
 
   // peer server details
@@ -430,7 +423,7 @@ types::device::Device Client::getConnectedServer() const {
   auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
   // return the host address and port number
-  return { addr, port, name };
+  return std::optional<types::device::Device>({addr, port, name});
 }
 
 /**
@@ -445,7 +438,7 @@ void Client::disconnectFromServer() {
  */
 QSslCertificate Client::getConnectedServerCertificate() const{
   // if not connected throw error
-  if (!this->isConnected()) {
+  if (this->m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
     throw std::runtime_error("Socket is not connected");
   }
 

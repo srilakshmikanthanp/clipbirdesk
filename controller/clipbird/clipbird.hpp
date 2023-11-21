@@ -213,16 +213,11 @@ class ClipBird : public QObject {
   void connectToServer(const types::device::Device &host);
 
   /**
-   * @brief Is Client Connected
-   */
-  bool isConnectedToServer();
-
-  /**
    * @brief get the connected server address and port
    *
    * @return types::device::Device address and port
    */
-  types::device::Device getConnectedServer() const;
+  std::optional<types::device::Device> getConnectedServer() const;
 
   /**
    * @brief Disconnect from the server
