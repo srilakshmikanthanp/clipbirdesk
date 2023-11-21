@@ -32,29 +32,18 @@ namespace srilakshmikanthanp::clipbirdesk {
  * for ClipBird Application
  */
 class ClipbirdApplication : public SingleApplication {
- private:  // Member Variables and Objects
-
-  // file path to store the certificate and key
-  std::string certPath = (std::filesystem::path(constants::getAppHome()) / "cert.pem").string();
-  std::string keyPath  = (std::filesystem::path(constants::getAppHome()) / "key.pem").string();
-
  private:  // Member Functions
 
   /**
    * @brief Get the certificate from App Home
    */
   QSslConfiguration getOldSslConfiguration() {
-    // QFile to read the certificate and key
-    QFile certFile(certPath.c_str()), pkeyFile(keyPath.c_str());
-
-    // open the certificate and key
-    if(!certFile.open(QIODevice::ReadOnly) || !pkeyFile.open(QIODevice::ReadOnly)) {
-      throw std::runtime_error("Can't Create Certificate");
-    }
+    auto two_months = std::chrono::microseconds(constants::getAppCertExpiryBeforeTime());
+    auto &storage = storage::Storage::instance();
 
     // read the certificate and key
-    QSslCertificate cert = QSslCertificate(certFile.readAll(), QSsl::Pem);
-    QSslKey key = QSslKey(pkeyFile.readAll(), QSsl::Rsa);
+    QSslCertificate cert = QSslCertificate(storage.getHostCert(), QSsl::Pem);
+    QSslKey key = QSslKey(storage.getHostKey(), QSsl::Rsa);
     QSslConfiguration sslConfig;
 
     // set the certificate and key
@@ -66,8 +55,8 @@ class ClipbirdApplication : public SingleApplication {
       throw std::runtime_error("Can't Create QSslConfiguration");
     }
 
-    // if the certificate expired
-    if (cert.expiryDate() < QDateTime::currentDateTime()) {
+    // if the certificate is going to expiry
+    if (cert.expiryDate() - QDateTime::currentDateTime() < two_months) {
       return getNewSslConfiguration();
     }
 
@@ -82,20 +71,13 @@ class ClipbirdApplication : public SingleApplication {
    * @brief Get the certificate by creating new one
    */
   QSslConfiguration getNewSslConfiguration() {
-    // QFile to read the certificate and key
-    QFile certFile(certPath.c_str()), pkeyFile(keyPath.c_str());
-
-    // open the certificate and key
-    if(!certFile.open(QIODevice::WriteOnly) || !pkeyFile.open(QIODevice::WriteOnly)) {
-      throw std::runtime_error("Can't Create Certificate");
-    }
-
     // generate the certificate and key
     auto sslConfig = utility::functions::getQSslConfiguration();
 
     // write the certificate and key
-    certFile.write(sslConfig.localCertificate().toPem());
-    pkeyFile.write(sslConfig.privateKey().toPem());
+    auto &storage = storage::Storage::instance();
+    storage.setHostCert(sslConfig.localCertificate().toPem());
+    storage.setHostKey(sslConfig.privateKey().toPem());
 
     // return the configuration
     return sslConfig;
@@ -106,7 +88,9 @@ class ClipbirdApplication : public SingleApplication {
    * or generate new one and store it
    */
   QSslConfiguration getSslConfiguration() {
-    if (!std::filesystem::exists(certPath) || !std::filesystem::exists(keyPath)) {
+    auto &storage = storage::Storage::instance();
+
+    if (!storage.hasHostCert() || !storage.hasHostKey()) {
       return getNewSslConfiguration();
     } else {
       return getOldSslConfiguration();

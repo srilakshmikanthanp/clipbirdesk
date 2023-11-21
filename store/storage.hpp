@@ -21,6 +21,8 @@ class Storage : public QObject {
 
  private: // keys
   const char* hostStateKey = "hostState";
+  const char* hostCertKey  = "hostCert";
+  const char* hostKeyKey   = "hostKey";
 
  private:  // qt
 
@@ -113,6 +115,36 @@ class Storage : public QObject {
    * @brief Get the current state of the server or client
    */
   bool getHostIsServer();
+
+  /**
+   * @brief set the Host certificate
+   */
+  void setHostCert(const QByteArray &cert);
+
+  /**
+   * @brief has Host cert
+   */
+  bool hasHostCert();
+
+  /**
+   * @brief Get the Host certificate
+   */
+  QByteArray getHostCert();
+
+  /**
+   * @brief set the Host Key
+   */
+  void setHostKey(const QByteArray &key);
+
+  /**
+   * @brief has Host Key
+   */
+  bool hasHostKey();
+
+  /**
+   * @brief Get the Host Key
+   */
+  QByteArray getHostKey();
 
   /**
    * @brief Instance of the storage

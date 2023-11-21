@@ -181,6 +181,74 @@ void Storage::clearAllServerCert() {
 }
 
 /**
+ * @brief set the Host certificate
+ */
+void Storage::setHostCert(const QByteArray &cert) {
+  settings->beginGroup(generalGroup);
+  settings->setValue(hostCertKey, cert);
+  settings->endGroup();
+}
+
+/**
+ * @brief has Host cert
+ */
+bool Storage::hasHostCert() {
+  settings->beginGroup(generalGroup);
+  auto cert = settings->value(hostCertKey);
+  settings->endGroup();
+  return !cert.isNull();
+}
+
+/**
+ * @brief Get the Host certificate
+ */
+QByteArray Storage::getHostCert() {
+  settings->beginGroup(generalGroup);
+  auto cert = settings->value(hostCertKey);
+  settings->endGroup();
+
+  if (cert.isNull()) {
+    throw std::invalid_argument("name not found");
+  }
+
+  return cert.toByteArray();
+}
+
+/**
+ * @brief set the Host Key
+ */
+void Storage::setHostKey(const QByteArray &key) {
+  settings->beginGroup(generalGroup);
+  settings->setValue(hostKeyKey, key);
+  settings->endGroup();
+}
+
+/**
+ * @brief has Host Key
+ */
+bool Storage::hasHostKey() {
+  settings->beginGroup(generalGroup);
+  auto key = settings->value(hostKeyKey);
+  settings->endGroup();
+  return !key.isNull();
+}
+
+/**
+ * @brief Get the Host Key
+ */
+QByteArray Storage::getHostKey() {
+  settings->beginGroup(generalGroup);
+  auto key = settings->value(hostKeyKey);
+  settings->endGroup();
+
+  if (key.isNull()) {
+    throw std::invalid_argument("name not found");
+  }
+
+  return key.toByteArray();
+}
+
+/**
  * @brief Get the current state of the server or client
  *
  * @return true  if server

@@ -129,4 +129,9 @@ std::string getMDnsServiceType();
  * @return std::string
  */
 std::string getAppOrgName();
+
+/**
+ * @brief Used to get the certificate expiry time should not be less than 2 months
+ */
+long getAppCertExpiryBeforeTime();
 }  // namespace srilakshmikanthanp::clipbirdesk::config
