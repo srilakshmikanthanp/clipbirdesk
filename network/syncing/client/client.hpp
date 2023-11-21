@@ -62,6 +62,10 @@ class Client : public service::mdnsBrowser {
   /// @brief On Sync Request
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
 
+ signals:  // signals for this class
+ /// @brief on InvalidPacket
+  void OnInvalidPacket(QString error);
+
  private:  // just for Qt
 
   /// @brief Qt meta object
@@ -141,6 +145,13 @@ class Client : public service::mdnsBrowser {
    * @param packet Invalid packet
    */
   void processInvalidPacket(const packets::InvalidRequest& packet);
+
+  /**
+   * @brief Precess the PingPacket from the client
+   *
+   * @param packet PingPacket
+   */
+  void processPingPacket(const packets::PingPacket &packet);
 
   /**
    * @brief Process the packet that has been received

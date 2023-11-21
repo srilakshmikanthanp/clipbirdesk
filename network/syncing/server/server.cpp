@@ -128,6 +128,36 @@ void Server::processDisconnection() {
 }
 
 /**
+ * @brief Precess the PingPacket from the client
+ *
+ * @param packet PingPacket
+ */
+void Server::processPingPacket(const packets::PingPacket &packet) {
+  // get the Sender of the packet
+  auto client = qobject_cast<QSslSocket *>(sender());
+
+  // using Ping Packet
+  using packets::PingPacket;
+
+  // if it is pong then ignore
+  if (packet.getPingType() == PingPacket::PingType::Pong) {
+    qInfo() << (LOG("Pong Received")); return;
+  }
+
+  // using PingPacket Params
+  using utility::functions::params::PingPacketParams;
+
+  // create the PingPacket
+  auto pingPacket = utility::functions::createPacket(PingPacketParams{
+    PingPacket::PacketType::PingPong,
+    PingPacket::PingType::Pong
+  });
+
+  // send the packet to the client
+  this->sendPacket(client, pingPacket);
+}
+
+/**
  * @brief Process the SyncingPacket from the client
  *
  * @param packet SyncingPacket
@@ -216,6 +246,24 @@ void Server::processReadyRead() {
   // Deserialize the data to SyncingPacket
   try {
     this->processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
+    return;
+  } catch (const types::except::MalformedPacket &e) {
+    const auto type = packets::InvalidRequest::PacketType::RequestFailed;
+    this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
+    return;
+  } catch (const types::except::NotThisPacket &e) {
+    qWarning() << (LOG(e.what()));
+  } catch (const std::exception &e) {
+    qWarning() << (LOG(e.what()));
+    return;
+  } catch (...) {
+    qWarning() << (LOG("Unknown Error"));
+    return;
+  }
+
+  // Deserialize the data to SyncingPacket
+  try {
+    this->processPingPacket(fromQByteArray<packets::PingPacket>(data));
     return;
   } catch (const types::except::MalformedPacket &e) {
     const auto type = packets::InvalidRequest::PacketType::RequestFailed;
@@ -451,8 +499,11 @@ void Server::authSuccess(types::device::Device device) {
   // Notify the listeners that the client list is changed
   emit OnClientListChanged(getConnectedClientsList());
 
+  // using AuthenticationParams
+  using utility::functions::params::AuthenticationParams;
+
   // create the Authentication packet
-  auto packet = utility::functions::createPacket({
+  auto packet = utility::functions::createPacket(AuthenticationParams{
     packets::Authentication::PacketType::AuthStatus,
     types::enums::AuthStatus::AuthOkay,
   });
@@ -483,8 +534,11 @@ void Server::authFailed(types::device::Device device) {
   // Remove the client from the unauthenticated list
   m_unauthenticatedClients.erase(itr);
 
+  // using AuthenticationParams
+  using utility::functions::params::AuthenticationParams;
+
   // create the Authentication packet
-  auto packet = utility::functions::createPacket({
+  auto packet = utility::functions::createPacket(AuthenticationParams{
     packets::Authentication::PacketType::AuthStatus,
     types::enums::AuthStatus::AuthFail,
   });

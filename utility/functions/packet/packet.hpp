@@ -16,25 +16,26 @@
 // Local header files
 #include "network/packets/authentication/authentication.hpp"
 #include "network/packets/invalidrequest/invalidrequest.hpp"
+#include "network/packets/pingpacket/pingpacket.hpp"
 #include "network/packets/syncingpacket/syncingpacket.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::utility::functions::internals {
+namespace srilakshmikanthanp::clipbirdesk::utility::functions::params {
 /**
  * @brief parameters for Authentication
  */
 struct AuthenticationParams {
-  quint8 packetType;
-  quint8 authStatus;
+  quint32 packetType;
+  quint32 authStatus;
 };
 
 /**
  * @brief Parameters for the ErrorMessage
  */
 struct InvalidPacketParams {
-  quint8 packetType;
-  quint8 errorCode;
+  quint32 packetType;
+  quint32 errorCode;
   const QString& errorMessage;
 };
 
@@ -50,10 +51,18 @@ struct SyncingItemParams {
  * @brief parameters for the SyncingPacket
  */
 struct SyncingPacketParams {
-  quint8 packetType;
+  quint32 packetType;
   QVector<QPair<QString, QByteArray>> items;
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::utility::functions::internals
+
+/**
+ * @brief PingPacket parameters
+ */
+struct PingPacketParams {
+  quint32 packetType;
+  quint32 pingType;
+};
+}  // namespace srilakshmikanthanp::clipbirdesk::utility::functions::params
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions {
 /**
@@ -64,7 +73,7 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions {
  *
  * @return Authentication
  */
-network::packets::Authentication createPacket(internals::AuthenticationParams params);
+network::packets::Authentication createPacket(params::AuthenticationParams params);
 
 /**
  * @brief Create the ErrorMessage
@@ -75,7 +84,7 @@ network::packets::Authentication createPacket(internals::AuthenticationParams pa
  *
  * @return ErrorMessage
  */
-network::packets::InvalidRequest createPacket(internals::InvalidPacketParams params);
+network::packets::InvalidRequest createPacket(params::InvalidPacketParams params);
 
 /**
  * @brief Create the SyncingItem
@@ -85,7 +94,7 @@ network::packets::InvalidRequest createPacket(internals::InvalidPacketParams par
  *
  * @return SyncingItem
  */
-network::packets::SyncingItem createPacket(internals::SyncingItemParams params);
+network::packets::SyncingItem createPacket(params::SyncingItemParams params);
 
 /**
  * @brief Create the SyncingPacket
@@ -95,5 +104,15 @@ network::packets::SyncingItem createPacket(internals::SyncingItemParams params);
  *
  * @return SyncingPacket
  */
-network::packets::SyncingPacket createPacket(internals::SyncingPacketParams params);
+network::packets::SyncingPacket createPacket(params::SyncingPacketParams params);
+
+/**
+ * @brief Create the PingPacket
+ *
+ * @param packetType
+ * @param pingType
+ *
+ * @return PingPacket
+ */
+network::packets::PingPacket createPacket(params::PingPacketParams params);
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

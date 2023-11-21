@@ -37,7 +37,7 @@ TEST(AuthenticationTest, TestingAuthentication) {
   const auto packetType = Authentication::PacketType::AuthStatus;
 
   // setting the packet type
-  packet_send = createPacket({ packetType, AuthStatus::AuthOkay });
+  packet_send = createPacket(params::AuthenticationParams{ packetType, AuthStatus::AuthOkay });
 
   // load the packet from network byte order
   packet_recv = fromQByteArray<Authentication>(toQByteArray(packet_send));

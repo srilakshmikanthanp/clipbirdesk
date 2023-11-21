@@ -119,7 +119,34 @@ void Client::processAuthentication(const packets::Authentication& packet) {
  * @param packet Invalid packet
  */
 void Client::processInvalidPacket(const packets::InvalidRequest& packet) {
-  qWarning() << (LOG(packet.getErrorMessage().toStdString()));
+  emit OnInvalidPacket(QString("Error %1: %2").arg(packet.getErrorCode()).arg(packet.getErrorMessage()));
+}
+
+/**
+ * @brief Precess the PingPacket from the client
+ *
+ * @param packet PingPacket
+ */
+void Client::processPingPacket(const packets::PingPacket &packet) {
+  // using PingPacket Params
+  using utility::functions::params::PingPacketParams;
+
+  // using Ping Packet
+  using packets::PingPacket;
+
+  // if it is pong then ignore
+  if (packet.getPingType() == PingPacket::PingType::Pong) {
+    qInfo() << (LOG("Pong Received")); return;
+  }
+
+  // create the PingPacket
+  auto pingPacket = utility::functions::createPacket(PingPacketParams{
+    PingPacket::PacketType::PingPong,
+    PingPacket::PingType::Pong
+  });
+
+  // send the packet to the client
+  this->sendPacket(pingPacket);
 }
 
 /**
@@ -216,6 +243,23 @@ void Client::processReadyRead() {
   // try to parse the packet
   try {
     processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
+    return;
+  } catch (const types::except::MalformedPacket& e) {
+    qWarning() << (LOG(e.what()));
+    return;
+  } catch (const types::except::NotThisPacket& e) {
+    qWarning() << (LOG(e.what()));
+  } catch (const std::exception& e) {
+    qWarning() << (LOG(e.what()));
+    return;
+  } catch (...) {
+    qWarning() << (LOG("Unknown Error"));
+    return;
+  }
+
+  // try to parse the packet
+  try {
+    processPingPacket(fromQByteArray<packets::PingPacket>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
     qWarning() << (LOG(e.what()));

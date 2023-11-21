@@ -132,6 +132,13 @@ class Server : public service::mdnsRegister {
   void processDisconnection();
 
   /**
+   * @brief Precess the PingPacket from the client
+   *
+   * @param packet PingPacket
+   */
+  void processPingPacket(const packets::PingPacket &packet);
+
+  /**
    * @brief Process the SyncingPacket from the client
    *
    * @param packet SyncingPacket

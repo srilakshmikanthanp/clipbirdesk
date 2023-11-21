@@ -14,7 +14,7 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions {
  *
  * @return Authentication
  */
-network::packets::Authentication createPacket(internals::AuthenticationParams params) {
+network::packets::Authentication createPacket(params::AuthenticationParams params) {
   // create the packet
   network::packets::Authentication packet;
 
@@ -40,7 +40,7 @@ network::packets::Authentication createPacket(internals::AuthenticationParams pa
  *
  * @return ErrorMessage
  */
-network::packets::InvalidRequest createPacket(internals::InvalidPacketParams params) {
+network::packets::InvalidRequest createPacket(params::InvalidPacketParams params) {
   // create the packet
   network::packets::InvalidRequest packet;
 
@@ -68,7 +68,7 @@ network::packets::InvalidRequest createPacket(internals::InvalidPacketParams par
  *
  * @return SyncingItem
  */
-network::packets::SyncingItem createPacket(internals::SyncingItemParams params) {
+network::packets::SyncingItem createPacket(params::SyncingItemParams params) {
   // create the SyncingItem
   network::packets::SyncingItem syncItem;
 
@@ -96,7 +96,7 @@ network::packets::SyncingItem createPacket(internals::SyncingItemParams params) 
  *
  * @return SyncingPacket
  */
-network::packets::SyncingPacket createPacket(internals::SyncingPacketParams params) {
+network::packets::SyncingPacket createPacket(params::SyncingPacketParams params) {
   // create the packet
   network::packets::SyncingPacket packet;
 
@@ -119,6 +119,31 @@ network::packets::SyncingPacket createPacket(internals::SyncingPacketParams para
 
   // set the items
   packet.setItems(items);
+
+  // set the packet length
+  packet.setPacketLength(packet.size());
+
+  // return the packet
+  return packet;
+}
+
+/**
+ * @brief Create the PingPacket
+ *
+ * @param packetType
+ * @param pingType
+ *
+ * @return PingPacket
+ */
+network::packets::PingPacket createPacket(params::PingPacketParams params) {
+  // create the packet
+  network::packets::PingPacket packet;
+
+  // set the packet type
+  packet.setPacketType(params.packetType);
+
+  // set the ping type
+  packet.setPingType(params.pingType);
 
   // set the packet length
   packet.setPacketLength(packet.size());

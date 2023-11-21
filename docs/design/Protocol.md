@@ -130,6 +130,29 @@ The **SyncingPacket** is used to transfer clipboard data between the client and 
 | Payload         | varies|       |
 | ...             | ...   | ...   |
 
+### PingPacket
+
+The **PingPacket** is used to check the connection between the client and the server. This packet contains the following fields:
+
+#### Header
+
+- **Packet Length**: This field specifies the length of the packet, for PingPacket it is length of ping message.
+- **Packet Type**: This field specifies the type of packet, which is set to 0x03 for the PingPacket.
+
+#### Body
+
+- **PingType**: This field specifies the type of ping message. it can be one of the following values.
+  - 0x00: Ping (Request)
+  - 0x01: Pong (Response)
+
+#### Structure
+
+| Field           | Bytes | value |
+|-----------------|-------| ----- |
+| Packet Length   | 4     |       |
+| Packet Type     | 4     | 0x03  |
+| PingType        | 4     |       |
+
 #### Possible MimeTypes
 
 | Mime Type           | Description |
