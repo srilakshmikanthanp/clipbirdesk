@@ -56,15 +56,25 @@ void ClipBird::handleServerStatusChanged(bool status) {
   if (!server.has_value()) return;
 
   // if the client is connected then connect the signals
-  if (!status) {
-    disconnect(&m_clipboard, signal, client, slot_n);
-  } else {
+  if (status) {
     connect(&m_clipboard, signal, client, slot_n);
     auto cert = client->getConnectedServerCertificate();
     auto name = server->name;
     store.setServerCert(name, cert.toPem());
     this->m_sslConfig.addCaCertificate(cert);
     client->setSslConfiguration(this->m_sslConfig);
+    return;
+
+  }
+
+  // Disconnect the Signal
+  disconnect(&m_clipboard, signal, client, slot_n);
+
+  // Get all server
+  for (auto s : client->getServerList()) {
+    if (store.hasServerCert(s.name)) {
+      return client->connectToServerSecured(s);
+    }
   }
 }
 
