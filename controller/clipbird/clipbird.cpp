@@ -50,18 +50,16 @@ void ClipBird::handleServerStatusChanged(bool status, types::device::Device host
   auto *client = &std::get<Client>(m_host);
   auto slot_n  = &Client::syncItems;
   auto &store  = storage::Storage::instance();
-  auto server = client->getConnectedServer();
 
   // if the client is connected then connect the signals
-  if (status && server.has_value()) {
+  if (status) {
     connect(&m_clipboard, signal, client, slot_n);
     auto cert = client->getConnectedServerCertificate();
-    auto name = server->name;
+    auto name = host.name;
     store.setServerCert(name, cert.toPem());
     this->m_sslConfig.addCaCertificate(cert);
     client->setSslConfiguration(this->m_sslConfig);
     return;
-
   }
 
   // Disconnect the Signal
