@@ -52,11 +52,8 @@ void ClipBird::handleServerStatusChanged(bool status) {
   auto &store  = storage::Storage::instance();
   auto server = client->getConnectedServer();
 
-  // is not value
-  if (!server.has_value()) return;
-
   // if the client is connected then connect the signals
-  if (status) {
+  if (status && server.has_value()) {
     connect(&m_clipboard, signal, client, slot_n);
     auto cert = client->getConnectedServerCertificate();
     auto name = server->name;
