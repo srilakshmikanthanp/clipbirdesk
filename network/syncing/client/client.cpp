@@ -108,7 +108,7 @@ void Client::processSslErrorsSecured(const QList<QSslError>& errors) {
  */
 void Client::processAuthentication(const packets::Authentication& packet) {
   if (packet.getAuthStatus() == types::enums::AuthStatus::AuthOkay) {
-    emit OnServerStatusChanged(true);
+    emit OnServerStatusChanged(true, this->getConnectedServer().value());
   }
 }
 
@@ -169,6 +169,13 @@ void Client::processSyncingPacket(const packets::SyncingPacket& packet) {
 
   // emit the signal
   emit OnSyncRequest(items);
+}
+
+/**
+ * @brief Process Disconnection
+ */
+void Client::processDisconnection() {
+  emit OnServerStatusChanged(false, this->getConnectedServer().value());
 }
 
 /**
@@ -318,7 +325,7 @@ Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
   // disconnected signal to emit the signal for
   // server state changed
   const auto signal_d = &QSslSocket::disconnected;
-  const auto slot_d   = [=] {emit OnServerStatusChanged(false); };
+  const auto slot_d   = &Client::processDisconnection;
   connect(m_ssl_socket, signal_d, this, slot_d);
 }
 

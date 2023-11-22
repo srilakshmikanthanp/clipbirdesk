@@ -44,7 +44,7 @@ class ClipBird : public QObject {
 
  signals:  // signals for this class
   /// @brief On Server state changed (From Client)
-  void OnServerStatusChanged(bool isConnected);
+  void OnServerStatusChanged(bool isConnected, types::device::Device);
 
   //----------------------- server Signals ------------------------//
 
@@ -96,7 +96,7 @@ class ClipBird : public QObject {
   void handleClientStateChanged(types::device::Device client, bool connected);
 
   /// @brief Handle On Server Disconnect (From client)
-  void handleServerStatusChanged(bool status);
+  void handleServerStatusChanged(bool status, types::device::Device host);
 
   /// @brief Handle the Server Found (From client)
   void handleServerFound(types::device::Device server);

@@ -52,7 +52,7 @@ class Client : public service::mdnsBrowser {
 
  signals:  // signals for this class
   /// @brief On Server state changed
-  void OnServerStatusChanged(bool isConnected);
+  void OnServerStatusChanged(bool isConnected, types::device::Device server);
 
  signals:  // signals for this class
   /// @brief On Connection Error
@@ -145,6 +145,11 @@ class Client : public service::mdnsBrowser {
    * @param packet Invalid packet
    */
   void processInvalidPacket(const packets::InvalidRequest& packet);
+
+  /**
+   * @brief Process Disconnection
+   */
+  void processDisconnection();
 
   /**
    * @brief Precess the PingPacket from the client

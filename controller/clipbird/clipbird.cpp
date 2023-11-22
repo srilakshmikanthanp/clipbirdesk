@@ -39,7 +39,7 @@ void ClipBird::handleClientStateChanged(types::device::Device client, bool conne
  *
  * @param isConnected is connected to the server
  */
-void ClipBird::handleServerStatusChanged(bool status) {
+void ClipBird::handleServerStatusChanged(bool status, types::device::Device host) {
   // if the host is not client then throw error
   if (!std::holds_alternative<Client>(m_host)) {
     throw std::runtime_error("Host is not client");
@@ -69,7 +69,7 @@ void ClipBird::handleServerStatusChanged(bool status) {
 
   // Get all server
   for (auto s : client->getServerList()) {
-    if (store.hasServerCert(s.name)) {
+    if (host != s && store.hasServerCert(s.name)) {
       return client->connectToServerSecured(s);
     }
   }
