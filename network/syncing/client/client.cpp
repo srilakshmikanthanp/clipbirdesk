@@ -108,7 +108,12 @@ void Client::processSslErrorsSecured(const QList<QSslError>& errors) {
  */
 void Client::processAuthentication(const packets::Authentication& packet) {
   if (packet.getAuthStatus() == types::enums::AuthStatus::AuthOkay) {
-    emit OnServerStatusChanged(true, this->getConnectedServer().value());
+    auto addr = m_ssl_socket->peerAddress();
+    auto port = m_ssl_socket->peerPort();
+    auto cert = m_ssl_socket->peerCertificate();
+    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+    auto host = types::device::Device({addr, port, name});
+    emit OnServerStatusChanged(true, host);
   }
 }
 
@@ -175,7 +180,15 @@ void Client::processSyncingPacket(const packets::SyncingPacket& packet) {
  * @brief Process Disconnection
  */
 void Client::processDisconnection() {
-  emit OnServerStatusChanged(false, this->getConnectedServer().value());
+  // get the peer server details
+  auto addr = m_ssl_socket->peerAddress();
+  auto port = m_ssl_socket->peerPort();
+  auto cert = m_ssl_socket->peerCertificate();
+  auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+  auto host = types::device::Device({addr, port, name});
+
+  // emit the signal
+  emit OnServerStatusChanged(false, host);
 }
 
 /**
