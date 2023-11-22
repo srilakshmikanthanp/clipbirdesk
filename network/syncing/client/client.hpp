@@ -102,21 +102,20 @@ class Client : public service::mdnsBrowser {
     // create the QDataStream
     QDataStream stream(m_ssl_socket);
 
-    // start the transaction
-    stream.startTransaction();
-
     // write the data to the stream
     auto wrote = 0;
 
     // write the packet length
     while (wrote < data.size()) {
       auto bytes = stream.writeRawData(data.data() + wrote, data.size() - wrote);
+      if (bytes == -1) break;
       wrote = wrote + bytes;
-      if (bytes == -1) { stream.abortTransaction(); break; }
     }
 
-    // commit the transaction
-    stream.commitTransaction();
+    // check for error
+    if (wrote != data.size()) {
+      qErrnoWarning("Error while writing to the socket");
+    }
   }
 
   void processSslErrorsSecured(const QList<QSslError>& errors);

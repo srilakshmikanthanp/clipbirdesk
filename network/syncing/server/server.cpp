@@ -155,6 +155,9 @@ void Server::processPingPacket(const packets::PingPacket &packet) {
 
   // send the packet to the client
   this->sendPacket(client, pingPacket);
+
+  // flush the socket
+  client->flush();
 }
 
 /**

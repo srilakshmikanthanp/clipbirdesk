@@ -150,8 +150,11 @@ void Client::processPingPacket(const packets::PingPacket &packet) {
     types::enums::PingType::Pong
   });
 
-  // send the packet to the client
+  // send packet to the server
   this->sendPacket(pingPacket);
+
+  // flush the socket
+  this->m_ssl_socket->flush();
 }
 
 /**
