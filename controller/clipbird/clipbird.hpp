@@ -104,6 +104,9 @@ class ClipBird : public QObject {
   /// @brief Handle the sync request (From server)
   void handleSyncRequest(QVector<QPair<QString, QByteArray>> data);
 
+  /// @brief Handle the Auth Request (From Server)
+  void handleAuthRequest(types::device::Device host);
+
  private: // private functions
 
   /**

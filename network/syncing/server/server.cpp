@@ -444,7 +444,27 @@ void Server::stopServer() {
 }
 
 /**
- * @brief Get the Dei=vice Certificate
+ * @brief Get the Device Certificate
+ */
+QSslCertificate Server::getUnauthedClientCert(types::device::Device device) const {
+  // matcher lambda function to find the client
+  const auto matcher = [&device](QSslSocket *c) {
+    return (c->peerAddress() == device.ip) && (c->peerPort() == device.port);
+  };
+
+  // find the client from the list of clients
+  for (auto c : this->m_unauthenticatedClients) {
+    if (matcher(c)) {
+      return c->peerCertificate();
+    }
+  }
+
+  // if not found
+  throw std::runtime_error("Client not found");
+}
+
+/**
+ * @brief Get the Device Certificate
  */
 QSslCertificate Server::getClientCert(types::device::Device device) const {
   // matcher lambda function to find the client

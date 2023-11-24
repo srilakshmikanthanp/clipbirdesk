@@ -99,7 +99,7 @@ void ClipBird::handleServerFound(types::device::Device server) {
 }
 
 /**
- * @brief @brief Handle the sync request (From server)
+ * @brief Handle the sync request (From server)
  */
 void ClipBird::handleSyncRequest(QVector<QPair<QString, QByteArray>> data) {
   // remove last
@@ -112,6 +112,37 @@ void ClipBird::handleSyncRequest(QVector<QPair<QString, QByteArray>> data) {
 
   // emit the signal
   emit OnHistoryChanged(m_history);
+}
+
+/**
+ * @brief Handle the Auth Request (From Server)
+ */
+void ClipBird::handleAuthRequest(types::device::Device host) {
+  // if the host is not server then throw error
+  if (!std::holds_alternative<Server>(m_host)) {
+    throw std::runtime_error("Host is not server");
+  }
+
+  // get the certificate from the server
+  auto cert = std::get<Server>(m_host).getUnauthedClientCert(host);
+
+  // get the store instance
+  auto &store = storage::Storage::instance();
+
+  // is store not has the certificate
+  if (!store.hasClientCert(host.name)) {
+    return emit OnAuthRequest(host);
+  }
+
+  // get the certificate from the store
+  auto c = store.getClientCert(host.name);
+
+  // if the certificate is not same then emit the signal
+  if (c != cert.toPem()) {
+    return emit OnAuthRequest(host);
+  } else {
+    return this->authSuccess(host);
+  }
 }
 
 /**
@@ -175,7 +206,7 @@ void ClipBird::setCurrentHostAsServer() {
   // connect OnAuthRequest to clipbird OnAuthRequest
   // Connect the onSyncRequest signal to the clipboard
   const auto signal_sa = &Server::OnAuthRequest;
-  const auto slot_sa   = &ClipBird::OnAuthRequest;
+  const auto slot_sa   = &ClipBird::handleAuthRequest;
   connect(server, signal_sa, this, slot_sa);
 
   // Connect the onSyncRequest signal to the clipboard

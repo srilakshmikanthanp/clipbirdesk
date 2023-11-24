@@ -224,7 +224,12 @@ class Server : public service::mdnsRegister {
   void stopServer();
 
   /**
-   * @brief Get the Dei=vice Certificate
+   * @brief Get the Device Certificate
+   */
+  QSslCertificate getUnauthedClientCert(types::device::Device device) const;
+
+  /**
+   * @brief Get the Device Certificate
    */
   QSslCertificate getClientCert(types::device::Device device) const;
 
