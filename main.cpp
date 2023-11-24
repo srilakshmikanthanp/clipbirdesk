@@ -89,12 +89,20 @@ class ClipbirdApplication : public SingleApplication {
    */
   QSslConfiguration getSslConfiguration() {
     auto &storage = storage::Storage::instance();
+    QSslConfiguration config;
 
     if (!storage.hasHostCert() || !storage.hasHostKey()) {
-      return getNewSslConfiguration();
+      config = getNewSslConfiguration();
     } else {
-      return getOldSslConfiguration();
+      config = getOldSslConfiguration();
     }
+
+    // log the certificate and key
+    qInfo("Certificate: " + config.localCertificate().toPem());
+    qInfo("Key: " + config.privateKey().toPem());
+
+    // return the configuration
+    return config;
   }
 
   /**
