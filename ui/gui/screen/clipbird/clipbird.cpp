@@ -162,6 +162,9 @@ void Clipbird::handleAuthRequest(const types::device::Device& client) {
   // set fixed size
   dialog->setFixedSize(dialog->sizeHint());
 
+  // center the window
+  dialog->move(QGuiApplication::primaryScreen()->geometry().center() - dialog->rect().center());
+
   // connect the dialog to window AuthSuccess signal
   const auto signal_s = &QMessageBox::accepted;
   const auto slot_s   = [=] { controller->authSuccess(client); };
@@ -352,6 +355,9 @@ void Clipbird::onQrCodeClicked() {
   // set as not resizable
   group.setFixedSize(group.sizeHint());
 
+  // center the window
+  group.move(QGuiApplication::primaryScreen()->geometry().center() - group.rect().center());
+
   // close on tab change
   QObject::connect(tab, &QTabWidget::currentChanged, &group, &QDialog::close);
 }
@@ -401,7 +407,10 @@ void Clipbird::onConnectClicked() {
   QObject::connect(tab, &QTabWidget::currentChanged, &joiner, &QDialog::close);
 
   // show the dialog
-  if (!joiner.isVisible()) joiner.show();
+  joiner.show();
+
+  // center the window
+  joiner.move(QGuiApplication::primaryScreen()->geometry().center() - joiner.rect().center());
 
   // connect the dialog to window clicked signal
   connect(&joiner, &modals::Connect::onConnect, [=](auto ipv4, auto port) {
@@ -435,6 +444,9 @@ void Clipbird::onAboutClicked() {
 
   // show the dialog
   aboutUs.show();
+
+  // center the window
+  aboutUs.move(QGuiApplication::primaryScreen()->geometry().center() - aboutUs.rect().center());
 
   // close on tab change
   QObject::connect(tab, &QTabWidget::currentChanged, &aboutUs, &QDialog::close);
@@ -498,6 +510,9 @@ void Clipbird::onReceivedClicked() {
 
   // show the dialog
   history.show();
+
+  // center the window
+  history.move(QGuiApplication::primaryScreen()->geometry().center() - history.rect().center());
 }
 
 /**
