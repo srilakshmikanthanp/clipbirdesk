@@ -218,7 +218,7 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
   }
 
   // update
-  this->update();
+  this->repaint();
 }
 
 /**

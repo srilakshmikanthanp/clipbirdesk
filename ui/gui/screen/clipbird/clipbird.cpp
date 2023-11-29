@@ -121,19 +121,8 @@ void Clipbird::handleServerStateChange(bool isStarted) {
  * @param client
  */
 void Clipbird::handleAuthRequest(const types::device::Device& client) {
-  // get the message to show
-  // clang-format off
-  auto message = QObject::tr(
-    "A New Host Wants to Join Group\n"
-    "Host: %1\n"
-    "Accept the connection?"
-  ).arg(
-    client.name
-  );
-  // clang-format on
-
   // get the user input
-  auto dialog = new QMessageBox();
+  auto dialog = new modals::Request();
 
   // icon for the dialog
   auto icon = QIcon(QString::fromStdString(constants::getAppLogo()));
@@ -145,34 +134,22 @@ void Clipbird::handleAuthRequest(const types::device::Device& client) {
   dialog->setWindowTitle(constants::getAppName().c_str());
 
   // set the message
-  dialog->setText(message);
+  dialog->setHost(client.name);
 
   // set delete on close
   dialog->setAttribute(Qt::WA_DeleteOnClose);
 
-  // set the buttons
-  dialog->setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-
-  // set the default button
-  dialog->setDefaultButton(QMessageBox::No);
-
   // show the dialog
   dialog->show();
 
-  // set fixed size
-  dialog->setFixedSize(dialog->sizeHint());
-
-  // center the window
-  dialog->move(QGuiApplication::primaryScreen()->geometry().center() - dialog->rect().center());
-
   // connect the dialog to window AuthSuccess signal
-  const auto signal_s = &QMessageBox::accepted;
-  const auto slot_s   = [=] { controller->authSuccess(client); };
+  const auto signal_s = &modals::Request::onAccept;
+  const auto slot_s   = [=] { controller->authSuccess(client); dialog->close(); };
   connect(dialog, signal_s, slot_s);
 
   // connect the dialog to window AuthFail signal
-  const auto signal_f = &QMessageBox::rejected;
-  const auto slot_f   = [=] { controller->authFailed(client); };
+  const auto signal_f = &modals::Request::onReject;
+  const auto slot_f   = [=] { controller->authFailed(client); dialog->close(); };
   connect(dialog, signal_f, slot_f);
 }
 
@@ -284,7 +261,7 @@ void Clipbird::handleConnectionError(QString error) {
  */
 void Clipbird::onQrCodeClicked() {
   // if already visible return
-  if (group.isVisible()) return;
+  if (group.isVisible()) { return group.raise(); }
 
   // generate the qr code with all inteface ip and port in format
   auto interfaces = QNetworkInterface::allInterfaces();
@@ -356,7 +333,7 @@ void Clipbird::onQrCodeClicked() {
   group.setFixedSize(group.sizeHint());
 
   // center the window
-  group.move(QGuiApplication::primaryScreen()->geometry().center() - group.rect().center());
+  group.move(QGuiApplication::primaryScreen()->availableGeometry().center() - group.rect().center());
 
   // close on tab change
   QObject::connect(tab, &QTabWidget::currentChanged, &group, &QDialog::close);
@@ -392,7 +369,7 @@ void Clipbird::onConnectClicked() {
   };
 
   // if already visible return
-  if (joiner.isVisible()) return;
+  if (joiner.isVisible()) { return joiner.raise(); }
 
   // set the icon
   joiner.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
@@ -410,7 +387,7 @@ void Clipbird::onConnectClicked() {
   joiner.show();
 
   // center the window
-  joiner.move(QGuiApplication::primaryScreen()->geometry().center() - joiner.rect().center());
+  joiner.move(QGuiApplication::primaryScreen()->availableGeometry().center() - joiner.rect().center());
 
   // connect the dialog to window clicked signal
   connect(&joiner, &modals::Connect::onConnect, [=](auto ipv4, auto port) {
@@ -434,7 +411,7 @@ void Clipbird::onConnectClicked() {
  */
 void Clipbird::onAboutClicked() {
   // if already visible return
-  if (aboutUs.isVisible()) return;
+  if (aboutUs.isVisible()) { return aboutUs.raise(); }
 
   // set the icon
   aboutUs.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
@@ -446,7 +423,7 @@ void Clipbird::onAboutClicked() {
   aboutUs.show();
 
   // center the window
-  aboutUs.move(QGuiApplication::primaryScreen()->geometry().center() - aboutUs.rect().center());
+  aboutUs.move(QGuiApplication::primaryScreen()->availableGeometry().center() - aboutUs.rect().center());
 
   // close on tab change
   QObject::connect(tab, &QTabWidget::currentChanged, &aboutUs, &QDialog::close);
@@ -479,7 +456,7 @@ void Clipbird::onSendClicked() {
  */
 void Clipbird::onReceivedClicked() {
   // if already visible return
-  if (history.isVisible()) return;
+  if (history.isVisible()) { return history.raise(); }
 
   // set the icon
   history.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
@@ -510,9 +487,6 @@ void Clipbird::onReceivedClicked() {
 
   // show the dialog
   history.show();
-
-  // center the window
-  history.move(QGuiApplication::primaryScreen()->geometry().center() - history.rect().center());
 }
 
 /**

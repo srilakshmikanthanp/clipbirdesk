@@ -7,23 +7,20 @@
 
 // Qt header
 #include <QDialog>
+#include <QLabel>
 #include <QPainterPath>
 #include <QPainter>
 #include <QScreen>
 #include <QGuiApplication>
-#include <QScrollBar>
-#include <QScrollArea>
+#include <QPushButton>
 #include <QStyleHints>
 #include <QVBoxLayout>
 
-// Local headers
-#include "ui/gui/components/cliphist/cliphist.hpp"
-
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class History : public QDialog {
+class Request : public QDialog {
  private:  // disable copy and move for this class
 
-  Q_DISABLE_COPY_MOVE(History)
+  Q_DISABLE_COPY_MOVE(Request)
 
  private:  // just for Qt
 
@@ -31,15 +28,18 @@ class History : public QDialog {
 
  private:
 
-  components::ClipHist *clipHist = new components::ClipHist(this);
+  QLabel *prompt      = new QLabel(this);
+  QLabel *host        = new QLabel(this);
+  QPushButton *accept = new QPushButton(this);
+  QPushButton *reject = new QPushButton(this);
 
  signals:  // signals
-
   // called when the clip is copied
-  void onClipSelected(int index);
+  void onAccept();
 
+ signals:  // signals
   // called when the clip is deleted
-  void onClipDelete(int index);
+  void onReject();
 
  private:  // Member Functions
 
@@ -50,43 +50,40 @@ class History : public QDialog {
 
  public:
 
- /**
-  * @brief Construct a new Abstract object
-  *
-  * @param parent
-  */
-  explicit History(QWidget * parent = nullptr);
+  /**
+   * @brief Construct a new Abstract object
+   *
+   * @param parent
+   */
+  explicit Request(QWidget * parent = nullptr);
 
   /**
    * @brief Destroy the Status object
    */
-  virtual ~History() = default;
-
-    /**
-   * @brief Set the History
-   */
-  void setHistory(const QList<QVector<QPair<QString, QByteArray>>> &);
+  virtual ~Request() = default;
 
   /**
-   * @brief Clear the History
+   * @brief Set the Host Text object
+   *
+   * @param text
    */
-  void clearHistory();
+  void setHost(const QString &text);
 
   /**
-   * @brief get the History
+   * @brief get the Host Text object
+   *
+   * @return QString
    */
-  QList<QVector<QPair<QString, QByteArray>>> getHistory() const;
+  QString getHost() const;
 
   /**
    * @brief override set visible
    */
   void setVisible(bool visible) override;
 
- protected:  // Member Functions
-
   /**
-   * @brief Override change event
+   * @brief Override paint event
    */
-  void changeEvent(QEvent *) override;
+  void paintEvent(QPaintEvent* event) override;
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals
+}

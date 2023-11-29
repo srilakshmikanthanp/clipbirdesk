@@ -243,6 +243,23 @@ class ClipbirdEventFilter : public QObject {
 }  // namespace srilakshmikanthanp::clipbirdesk
 
 /**
+ * @brief Global Error Handler that helps to log
+ */
+void globalErrorHandler() {
+  // log the error message
+  try {
+    std::rethrow_exception(std::current_exception());
+  } catch (const std::exception &e) {
+    qCritical() << e.what();
+  } catch (...) {
+    qCritical() << "Unknown Exception";
+  }
+
+  // abort the application
+  std::abort();
+}
+
+/**
  * @brief main function that starts the application
  * by ensuring that only one instance of the
  * application is running
@@ -297,6 +314,9 @@ auto main(int argc, char **argv) -> int {
   // Set the log file as std::cout
   Logger::setLogStream(&logstream);
 #endif
+
+  // Set the global error handler
+  std::set_terminate(globalErrorHandler);
 
   // Set the custom message handler
   qInstallMessageHandler(Logger::handler);

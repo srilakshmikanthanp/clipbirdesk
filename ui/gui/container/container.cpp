@@ -40,10 +40,10 @@ void Container::setContent(ui::gui::Clipbird* content) {
   auto shadow = new QGraphicsDropShadowEffect(this);
 
   // set the blur radius
-  shadow->setBlurRadius(10);
+  shadow->setBlurRadius(50);
 
   // set the color
-  shadow->setColor(QColor(0, 0, 0, 160));
+  shadow->setColor(QColor(0, 0, 0, 30));
 
   // set the offset
   shadow->setOffset(0, 0);
@@ -61,7 +61,7 @@ void Container::setContent(ui::gui::Clipbird* content) {
   main->addWidget(wrapper);
 
   // content margin
-  main->setContentsMargins(10, 10, 10, 10);
+  main->setContentsMargins(5, 5, 2, 2);
 
   // set the main layout to the window
   this->setLayout(main);

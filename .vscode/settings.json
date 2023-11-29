@@ -170,6 +170,7 @@
     "qstring": "cpp",
     "qscrollarea": "cpp",
     "qstylehints": "cpp",
-    "qguiapplication": "cpp"
+    "qguiapplication": "cpp",
+    "qscrollbar": "cpp"
   },
 }

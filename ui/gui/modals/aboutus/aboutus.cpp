@@ -39,6 +39,11 @@ AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
   donate->setIcon(donateIco);
   bug->setIcon(bugIco);
 
+  // pointer
+  web->setCursor(Qt::PointingHandCursor);
+  donate->setCursor(Qt::PointingHandCursor);
+  bug->setCursor(Qt::PointingHandCursor);
+
   // Vertical Layout
   auto layoutVer = new QVBoxLayout(this);
 

@@ -311,19 +311,16 @@ void ClipBird::clearServerCertificates() {
   // Ca Certificates
   QList<QSslCertificate> caCerts;
 
-  // clear all ca Server certs from m_sslconfig
-  this->m_sslConfig.setCaCertificates(caCerts);
-
   // set all ca Client certs from store
   for (auto certByte : store.getAllClientCert()) {
     caCerts.append(QSslCertificate(certByte, QSsl::Pem));
   }
 
-  // set the ca certificates
-  this->m_sslConfig.setCaCertificates(caCerts);
-
   // clear all ca Server certs from store
   store.clearAllServerCert();
+
+  // set the ca certificates
+  this->m_sslConfig.setCaCertificates(caCerts);
 
   // if the host is server then set the ssl configuration
   if (std::holds_alternative<Server>(m_host)) {
@@ -346,9 +343,6 @@ void ClipBird::clearClientCertificates() {
   // Ca Certificates
   QList<QSslCertificate> caCerts;
 
-  // clear all ca Server certs from m_sslconfig
-  this->m_sslConfig.setCaCertificates(caCerts);
-
   // set all ca Client certs from store
   for (auto certByte : store.getAllServerCert()) {
     caCerts.append(QSslCertificate(certByte, QSsl::Pem));
@@ -358,7 +352,7 @@ void ClipBird::clearClientCertificates() {
   this->m_sslConfig.setCaCertificates(caCerts);
 
   // clear all ca Server certs from store
-  store.clearAllServerCert();
+  store.clearAllClientCert();
 
   // if the host is server then set the ssl configuration
   if (std::holds_alternative<Server>(m_host)) {

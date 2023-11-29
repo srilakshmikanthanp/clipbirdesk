@@ -24,6 +24,11 @@ History::History(QWidget * parent) : QDialog(parent) {
   // Align center the List
   historyArea->setAlignment(Qt::AlignCenter);
 
+  // always set scroll bar at top
+  const auto signal = &QScrollBar::rangeChanged;
+  const auto slot   = [historyArea]() { historyArea->verticalScrollBar()->setValue(0); };
+  QObject::connect(historyArea->verticalScrollBar(), signal, this, slot);
+
   // create layout VBox
   auto vBox = new QVBoxLayout();
 
@@ -74,6 +79,36 @@ QList<QVector<QPair<QString, QByteArray>>> History::getHistory() const {
 void History::setUpLanguage() {
   // Nothing to do
 }
+
+/**
+ * @brief override set visible
+ */
+void History::setVisible(bool visible) {
+  // call base class setVisible
+  QWidget::setVisible(visible);
+
+  // if not visible
+  if (!visible) return;
+
+  // get the screen size
+  auto screen = QGuiApplication::primaryScreen()->availableGeometry();
+
+  // get the widget size
+  auto size = this->size();
+
+  // create a new geometry
+  QRect geometry;
+
+  // set the geometry to right bottom with margin 20
+  geometry.setHeight(size.height());
+  geometry.setY(screen.height() - size.height() - 5);
+  geometry.setX(screen.width() - size.width() - 5);
+  geometry.setWidth(size.width());
+
+  // set the geometry
+  this->setGeometry(geometry);
+}
+
 
 /**
  * @brief change event
