@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 // Qt Headers
+#include <QAbstractNativeEventFilter>
 #include <QApplication>
 #include <QHostInfo>
 #include <QFile>
@@ -218,6 +219,13 @@ class ClipbirdApplication : public SingleApplication {
     delete content;
     delete window;
   }
+
+  /**
+   * @brief get the controller
+   */
+  controller::ClipBird *getController() const {
+    return controller;
+  }
 };
 
 /**
@@ -239,6 +247,78 @@ class ClipbirdEventFilter : public QObject {
       ui::gui::utilities::setPlatformAttributes(window);
     }
   }
+};
+
+/**
+ * @brief Custom event filter for the application that
+ * captures Native event and if the device is going to sleep
+ * or wake up disconnect
+ */
+class ClipbirdNativeEventFilter : public QAbstractNativeEventFilter {
+ private:
+  bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override {
+    constexpr const char *WIN_MSG = "windows_generic_MSG";
+
+    if (eventType == WIN_MSG) {
+      handleWindowsGenericMessage(static_cast<MSG *>(message));
+    }
+
+    return false;
+  }
+
+  void handleWindowsGenericMessage(MSG * msg) {
+    if (msg->message == WM_POWERBROADCAST) {
+      switch (msg->wParam)
+      {
+      case PBT_APMRESUMESUSPEND:
+        this->handleWakeUpEvent();
+        break;
+
+      case PBT_APMSUSPEND:
+        this->handleSleepEvent();
+        break;
+      }
+    }
+  }
+
+  void handleSleepEvent() {
+    switch(controller->getHostType()) {
+    case types::enums::HostType::CLIENT:
+      controller->disposeClient();
+      break;
+
+    case types::enums::HostType::SERVER:
+      controller->disposeServer();
+      break;
+    }
+  }
+
+  void handleWakeUpEvent() {
+    switch (controller->getHostType()) {
+    case types::enums::HostType::CLIENT:
+      controller->setCurrentHostAsClient();
+      break;
+    case types::enums::HostType::SERVER:
+      controller->setCurrentHostAsServer();
+      break;
+    }
+  }
+
+ private:
+
+  controller::ClipBird *controller;
+
+ public:
+
+  /**
+   * @brief Destroy the Clipbird Native Event Filter object
+   */
+  virtual ~ClipbirdNativeEventFilter() = default;
+
+  /**
+   * @brief Construct a new Clipbird Native Event Filter object
+   */
+  ClipbirdNativeEventFilter(controller::ClipBird *controller): controller(controller) {}
 };
 }  // namespace srilakshmikanthanp::clipbirdesk
 
@@ -276,6 +356,7 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
   using srilakshmikanthanp::clipbirdesk::ClipbirdEventFilter;
+  using srilakshmikanthanp::clipbirdesk::ClipbirdNativeEventFilter;
 
   // create the application
   ClipbirdApplication app(argc, argv);
@@ -323,6 +404,15 @@ auto main(int argc, char **argv) -> int {
 
   // Initialize the application
   app.initialize();
+
+  // controller of the application
+  auto controller = app.getController();
+
+  // native event filter
+  auto filter = new ClipbirdNativeEventFilter(controller);
+
+  // install native event filter
+  app.installNativeEventFilter(filter);
 
   // start application and return status code
   return app.exec();

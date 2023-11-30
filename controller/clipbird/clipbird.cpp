@@ -440,6 +440,21 @@ types::device::Device ClipBird::getServerInfo() const {
 }
 
 /**
+ * @brief Dispose Server
+ */
+void ClipBird::disposeServer() {
+  if (!std::holds_alternative<Server>(m_host)) {
+    throw std::runtime_error("Host is not server");
+  }
+
+  // get the server
+  auto *server = &std::get<Server>(m_host);
+
+  // disconnect all clients
+  server->disconnectAllClients();
+}
+
+/**
  * @brief The function that is called when the client is authenticated
  *
  * @param client the client that is currently processed
@@ -532,6 +547,21 @@ void ClipBird::disconnectFromServer(const types::device::Device &host) {
   } else {
     throw std::runtime_error("Server not found");
   }
+}
+
+/**
+ * @brief Dispose Client
+ */
+void ClipBird::disposeClient() {
+  if (!std::holds_alternative<Client>(m_host)) {
+    throw std::runtime_error("Host is not client");
+  }
+
+  // get the client
+  auto *client = &std::get<Client>(m_host);
+
+  // disconnect from the server
+  client->disconnectFromServer();
 }
 
 /**

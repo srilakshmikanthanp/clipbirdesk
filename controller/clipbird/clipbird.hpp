@@ -187,6 +187,11 @@ class ClipBird : public QObject {
   types::device::Device getServerInfo() const;
 
   /**
+   * @brief Dispose Server
+   */
+  void disposeServer();
+
+  /**
    * @brief The function that is called when the client is authenticated
    *
    * @param client the client that is currently processed
@@ -218,6 +223,11 @@ class ClipBird : public QObject {
    * @param port Port number
    */
   void connectToServer(const types::device::Device &host);
+
+  /**
+   * @brief Dispose Client
+   */
+  void disposeClient();
 
   /**
    * @brief get the connected server address and port
