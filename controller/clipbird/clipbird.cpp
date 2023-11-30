@@ -241,6 +241,9 @@ void ClipBird::setCurrentHostAsServer() {
 
   // Start the server to listen and accept the client
   server->startServer();
+
+  // emit the signal for host change
+  emit OnHostTypeChanged(types::enums::HostType::SERVER);
 }
 
 /**
@@ -299,6 +302,9 @@ void ClipBird::setCurrentHostAsClient() {
 
   // Start the Discovery
   client->startBrowsing();
+
+  // emit the signal for host change
+  emit OnHostTypeChanged(types::enums::HostType::CLIENT);
 }
 
 /**
@@ -587,5 +593,20 @@ void ClipBird::deleteHistoryAt(int index) {
  */
 QVector<QVector<QPair<QString, QByteArray>>> ClipBird::getHistory() const {
   return m_history;
+}
+
+/**
+ * @brief Get the Host Type
+ */
+types::enums::HostType ClipBird::getHostType() const {
+  if (std::holds_alternative<Client>(m_host)) {
+    return types::enums::HostType::CLIENT;
+  }
+
+  if (std::holds_alternative<Server>(m_host)) {
+    return types::enums::HostType::SERVER;
+  }
+
+  return types::enums::HostType::NONE;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::controller

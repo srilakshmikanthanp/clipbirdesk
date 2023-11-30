@@ -31,4 +31,11 @@ enum PingType : quint32 {
   Ping = 0x00,
   Pong = 0x01
 };
+
+/// @brief Host Type
+enum HostType: quint32 {
+  SERVER = 0x00,
+  CLIENT = 0x01,
+  NONE   = 0x03
+};
 }  // namespace srilakshmikanthanp::clipbirdesk::types::enums

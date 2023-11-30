@@ -74,6 +74,10 @@ class ClipBird : public QObject {
   /// @brief On History Changed
   void OnHistoryChanged(QVector<QVector<QPair<QString, QByteArray>>>);
 
+  signals:  // signals for this class
+  /// @brief On Host Type Changed
+  void OnHostTypeChanged(types::enums::HostType);
+
  private:  // typedefs for this class
 
   using Server = network::syncing::Server;
@@ -267,5 +271,10 @@ class ClipBird : public QObject {
    * @brief Get the History of the clipboard
    */
   QVector<QVector<QPair<QString, QByteArray>>> getHistory() const;
+
+  /**
+   * @brief Get the Host Type
+   */
+  types::enums::HostType getHostType() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::controller
