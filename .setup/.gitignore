@@ -1,4 +1,4 @@
-# Ignore All but not .gitignore
+# ignore all file except .gitignore
 *
 
 # Not ignore .gitignore

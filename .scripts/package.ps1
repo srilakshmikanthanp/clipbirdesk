@@ -23,50 +23,32 @@ Write-Host "Building clipbird with Release configuration" -ForegroundColor Green
 cmake -G "Visual Studio 17 2022" -B ./build && cmake --build ./build --config Release
 
 # clipbird package data directory
-$ClipbirDir = "./.installer/packages/clipbird/data"
+$ClipbirDir = "./.setup"
 
 # clean the package directory items except .gitignore
 Write-Host "Cleaning the package directory $ClipbirDir" -ForegroundColor Green
 Remove-Item -Recurse -Force $ClipbirDir/* -Exclude .gitignore
 
-# Copy All openssl dlls to the package directory
-Write-Host "Copying $env:OPENSSL_ROOT_DIR /bin/*.dll to $ClipbirDir" -ForegroundColor Green
-Copy-Item "$env:OPENSSL_ROOT_DIR/bin/*.dll" $ClipbirDir
-
 # create assets directory in the package directory
 Write-Host "Creating assets directory in $ClipbirDir" -ForegroundColor Green
 New-Item -ItemType Directory -Force -Path $ClipbirDir/assets/images
 
-# copy the Logo to the package directory
-Write-Host "Copying ./assets/images/* to $ClipbirDir" -ForegroundColor Green
+# copy the Image files to the package directory
+Write-Host "Copying ./assets/images/* to $ClipbirDir/assets/images" -ForegroundColor Green
 Copy-Item ./assets/images/* $ClipbirDir/assets/images
 
-# Create the package as BuildType (to lower) version
+# copy the bonjour installer to the package directory from env
+Write-Host "Copying $env:BONJOUR_SDK_HOME/Installer/Bonjour64.msi to $ClipbirDir" -ForegroundColor Green
+Copy-Item "$env:BONJOUR_SDK_HOME/Installer/Bonjour64.msi" $ClipbirDir
+
+# Copy All openssl dlls to the package directory
+Write-Host "Copying $env:OPENSSL_ROOT_DIR /bin/*.dll to $ClipbirDir" -ForegroundColor Green
+Copy-Item "$env:OPENSSL_ROOT_DIR/bin/*.dll" $ClipbirDir
+
+# Copy All Qt dlls to the package directory
 Write-Host "Creating the package as Release version" -ForegroundColor Green
 windeployqt ./build/Release/clipbird.exe --dir $ClipbirDir --release
 
 # copy the clipbird.exe to the package directory
 Write-Host "Copying ./build/Release/clipbird.exe to $ClipbirDir" -ForegroundColor Green
 Copy-Item ./build/Release/clipbird.exe $ClipbirDir
-
-#------------------ qt installer framework -----------------------#
-
-# Config file for qt installer framework
-$ConfigFile = "./.installer/configuration/config.xml"
-
-# package directory for qt installer framework
-$PackageDir = "./.installer/packages"
-
-# destination directory for qt installer framework
-$Destination = "./build/installer"
-
-# make sure that the destination directory exists
-New-Item -ItemType Directory -Force -Path $Destination
-
-# Clean the destination directory
-Write-Host "Cleaning the $Destination file" -ForegroundColor Green
-Remove-Item -Recurse -Force $Destination/*
-
-# create binary package with qt installer framework
-Write-Host "Creating binary package... " -ForegroundColor Green
-binarycreator -c "$ConfigFile" -p "$PackageDir"  "$Destination/clipbird.exe"
