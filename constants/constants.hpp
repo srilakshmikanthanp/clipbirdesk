@@ -134,4 +134,14 @@ std::string getAppOrgName();
  * @brief Used to get the certificate expiry time should not be less than 2 months
  */
 long long getAppCertExpiryInterval();
+
+/**
+ *  @brief Used to get the max read idle time
+ */
+long long getAppMaxReadIdleTime();
+
+/**
+ * @brief Used to get the max write idle time
+ */
+long long getAppMaxWriteIdleTime();
 }  // namespace srilakshmikanthanp::clipbirdesk::config

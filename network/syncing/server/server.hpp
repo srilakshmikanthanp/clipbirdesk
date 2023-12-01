@@ -66,6 +66,15 @@ class Server : public service::mdnsRegister {
   /// @brief SSL server
   QSslServer* m_server = new QSslServer(this);
 
+  /// @brief Timer to send ping packet
+  QTimer* m_pingTimer = new QTimer(this);
+
+  /// @brief Timer to check for timeout
+  QTimer* m_pongTimer = new QTimer(this);
+
+  /// @brief property to hold read time
+  const char* READ_TIME = "READ_TIME";
+
  private:  // some typedefs
 
   using MalformedPacket = types::except::MalformedPacket;
@@ -149,6 +158,16 @@ class Server : public service::mdnsRegister {
    * read from the client
    */
   void processReadyRead();
+
+  /**
+   * @brief function to process the timeout
+   */
+  void processPingTimeout();
+
+  /**
+   * @brief function to process the timeout
+   */
+  void processPongTimeout();
 
  public:  // constructors and destructors
 

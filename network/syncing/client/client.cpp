@@ -107,14 +107,23 @@ void Client::processSslErrorsSecured(const QList<QSslError>& errors) {
  * @param packet Authentication
  */
 void Client::processAuthentication(const packets::Authentication& packet) {
-  if (packet.getAuthStatus() == types::enums::AuthStatus::AuthOkay) {
-    auto addr = m_ssl_socket->peerAddress();
-    auto port = m_ssl_socket->peerPort();
-    auto cert = m_ssl_socket->peerCertificate();
-    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
-    auto host = types::device::Device({addr, port, name});
-    emit OnServerStatusChanged(true, host);
+  if (packet.getAuthStatus() != types::enums::AuthStatus::AuthOkay) {
+    return;
   }
+
+  // get the details of the server
+  auto addr = m_ssl_socket->peerAddress();
+  auto port = m_ssl_socket->peerPort();
+  auto cert = m_ssl_socket->peerCertificate();
+  auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
+  auto host = types::device::Device({addr, port, name});
+
+  // emit the signal
+  emit OnServerStatusChanged(true, host);
+
+  // start the timer
+  this->m_pingTimer->start(constants::getAppMaxWriteIdleTime());
+  this->m_pongTimer->start(constants::getAppMaxReadIdleTime());
 }
 
 /**
@@ -192,6 +201,12 @@ void Client::processDisconnection() {
 
   // emit the signal
   emit OnServerStatusChanged(false, host);
+
+  // stop the timer
+  this->m_pingTimer->stop();
+
+  // stop the timer
+  this->m_pongTimer->stop();
 }
 
 /**
@@ -201,6 +216,9 @@ void Client::processDisconnection() {
 void Client::processReadyRead() {
   // using fromQByteArray to parse the packet
   using utility::functions::fromQByteArray;
+
+  // set the last read time property
+  m_ssl_socket->setProperty(READ_TIME, QDateTime::currentDateTime());
 
   // get the first four bytes of the packet
   QDataStream get(m_ssl_socket);
@@ -319,6 +337,42 @@ void Client::processReadyRead() {
 }
 
 /**
+ * @brief function to process the timeout
+ */
+void Client::processPingTimeout() {
+  // using PingPacket Params
+  using utility::functions::params::PingPacketParams;
+
+  // using Ping Packet
+  using packets::PingPacket;
+
+  // create packet
+  using utility::functions::createPacket;
+
+  // create the PingPacket
+  auto pingPacket = createPacket(PingPacketParams{
+    PingPacket::PacketType::PingPong,
+    types::enums::PingType::Ping
+  });
+
+  // send the packet to all the clients
+  this->sendPacket(pingPacket);
+}
+
+/**
+ * @brief function to process the timeout
+ */
+void Client::processPongTimeout() {
+  auto lastRead = m_ssl_socket->property(READ_TIME).toDateTime();
+  auto now      = QDateTime::currentDateTime();
+  auto diff     = lastRead.msecsTo(now);
+
+  if (diff > constants::getAppMaxReadIdleTime()) {
+    m_ssl_socket->disconnectFromHost();
+  }
+}
+
+/**
  * @brief Construct a new Syncing Client object
  * and connect the signals and slots and start
  * the timer and Service discovery
@@ -343,6 +397,18 @@ Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
   const auto signal_d = &QSslSocket::disconnected;
   const auto slot_d   = &Client::processDisconnection;
   connect(m_ssl_socket, signal_d, this, slot_d);
+
+  // Connect the socket to the callback function that
+  // process the timeout
+  const auto signal_w = &QTimer::timeout;
+  const auto slot_w   = &Client::processPingTimeout;
+  QObject::connect(m_pingTimer, signal_w, this, slot_w);
+
+  // Connect the socket to the callback function that
+  // process the timeout
+  const auto signal_tr = &QTimer::timeout;
+  const auto slot_tr   = &Client::processPingTimeout;
+  QObject::connect(m_pongTimer, signal_tr, this, slot_tr);
 }
 
 /**

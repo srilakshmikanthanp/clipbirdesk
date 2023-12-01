@@ -195,6 +195,9 @@ void Server::processReadyRead() {
   // Get the client that was ready to read
   auto client = qobject_cast<QSslSocket *>(sender());
 
+  // set the last read time property
+  client->setProperty(READ_TIME, QDateTime::currentDateTime());
+
   // if not authenticated then return
   if (!m_clients.contains(client)) return;
 
@@ -290,6 +293,44 @@ void Server::processReadyRead() {
 }
 
 /**
+ * @brief function to process the timeout
+ */
+void Server::processPingTimeout() {
+  // using PingPacket Params
+  using utility::functions::params::PingPacketParams;
+
+  // using Ping Packet
+  using packets::PingPacket;
+
+  // create packet
+  using utility::functions::createPacket;
+
+  // create the PingPacket
+  auto pingPacket = createPacket(PingPacketParams{
+    PingPacket::PacketType::PingPong,
+    types::enums::PingType::Ping
+  });
+
+  // send the packet to all the clients
+  this->sendPacket(pingPacket);
+}
+
+/**
+ * @brief function to process the timeout
+ */
+void Server::processPongTimeout() {
+  for (auto client : m_clients) {
+    auto lastRead = client->property(READ_TIME).toDateTime();
+    auto now      = QDateTime::currentDateTime();
+    auto diff     = lastRead.msecsTo(now);
+
+    if (diff > constants::getAppMaxReadIdleTime()) {
+      client->disconnectFromHost();
+    }
+  }
+}
+
+/**
  * @brief Construct a new Syncing Server object and
  * bind to any available port and any available
  * IP address
@@ -315,6 +356,18 @@ Server::Server(QObject *parent) : service::mdnsRegister(parent) {
   const auto signal_e = &QSslServer::sslErrors;
   const auto slot_e   = &Server::processSslErrors;
   QObject::connect(m_server, signal_e, this, slot_e);
+
+  // Connect the socket to the callback function that
+  // process the timeout
+  const auto signal_w = &QTimer::timeout;
+  const auto slot_w   = &Server::processPingTimeout;
+  QObject::connect(m_pingTimer, signal_w, this, slot_w);
+
+  // Connect the socket to the callback function that
+  // process the timeout
+  const auto signal_r = &QTimer::timeout;
+  const auto slot_r   = &Server::processPingTimeout;
+  QObject::connect(m_pongTimer, signal_r, this, slot_r);
 }
 
 /**
@@ -424,6 +477,12 @@ void Server::startServer() {
 
   // start the discovery server
   this->registerServiceAsync();
+
+  // start the ping timer
+  m_pingTimer->start(constants::getAppMaxWriteIdleTime());
+
+  // start the pong timer
+  m_pongTimer->start(constants::getAppMaxReadIdleTime());
 }
 
 /**
@@ -441,6 +500,12 @@ void Server::stopServer() {
 
   // Notify the listeners
   emit OnServerStateChanged(false);
+
+  // stop the ping timer
+  m_pingTimer->stop();
+
+  // stop the pong timer
+  m_pongTimer->stop();
 }
 
 /**

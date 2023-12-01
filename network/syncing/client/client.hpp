@@ -87,6 +87,15 @@ class Client : public service::mdnsBrowser {
   /// @brief List of Found servers
   QList<types::device::Device> m_servers;
 
+  /// @brief Timer to send ping packet
+  QTimer* m_pingTimer = new QTimer(this);
+
+  /// @brief Timer to check for timeout
+  QTimer* m_pongTimer = new QTimer(this);
+
+  /// @brief property to hold read time
+  const char* READ_TIME = "READ_TIME";
+
  private:  // private functions
 
   /**
@@ -170,6 +179,16 @@ class Client : public service::mdnsBrowser {
    * from the server
    */
   void processReadyRead();
+
+  /**
+   * @brief function to process the timeout
+   */
+  void processPingTimeout();
+
+  /**
+   * @brief function to process the timeout
+   */
+  void processPongTimeout();
 
  public:
 

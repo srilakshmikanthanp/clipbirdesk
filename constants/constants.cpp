@@ -138,4 +138,18 @@ std::string getAppOrgName() {
 long long getAppCertExpiryInterval() {
   return 60LL * 60LL * 24LL * 60LL * 1000LL;
 }
+
+/**
+ *  @brief Used to get the max read idle time
+ */
+long long getAppMaxReadIdleTime() {
+  return 60 * 1000;
+}
+
+/**
+ * @brief Used to get the max write idle time
+ */
+long long getAppMaxWriteIdleTime() {
+  return 10 * 1000;
+}
 }  // namespace srilakshmikanthanp::clipbirdesk::config
