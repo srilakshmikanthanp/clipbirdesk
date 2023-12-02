@@ -294,13 +294,10 @@ class ClipbirdNativeEventFilter : public QAbstractNativeEventFilter {
   }
 
   void handleWakeUpEvent() {
-    switch (controller->getHostType()) {
-    case types::enums::HostType::CLIENT:
-      controller->setCurrentHostAsClient();
-      break;
-    case types::enums::HostType::SERVER:
+    if (controller->isLastlyHostIsServer()) {
       controller->setCurrentHostAsServer();
-      break;
+    } else {
+      controller->setCurrentHostAsClient();
     }
   }
 
@@ -326,7 +323,6 @@ class ClipbirdNativeEventFilter : public QAbstractNativeEventFilter {
  * @brief Global Error Handler that helps to log
  */
 void globalErrorHandler() {
-  // log the error message
   try {
     std::rethrow_exception(std::current_exception());
   } catch (const std::exception &e) {
@@ -335,7 +331,6 @@ void globalErrorHandler() {
     qCritical() << "Unknown Exception";
   }
 
-  // abort the application
   std::abort();
 }
 
