@@ -198,7 +198,7 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# Bonjour Integration
+## Bonjour Integration
 
 <img align="left" width="100" height="100" src=".images/bonjour.svg">
 
