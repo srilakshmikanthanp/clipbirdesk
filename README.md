@@ -202,7 +202,10 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 
 <img align="left" width="100" height="100" src=".images/bonjour.svg">
 
-This project utilizes Bonjour technology by Apple for Advertising and Discovery of the devices that has Clipbird installed in the local network. Bonjour, also known as zero-configuration networking, enables automatic discovery of devices and services on a local network using industry standard IP protocols. Bonjour makes it easy to discover, publish, and resolve network services with a sophisticated, easy-to-use programming interface that is accessible from Cocoa, Ruby, Python, and other languages.
+This project utilizes Bonjour technology by Apple for Advertising and Discovery of the devices that has Clipbird installed in the local network. Bonjour, also known as zero-configuration networking, enables automatic discovery of devices and services on a local network using industry standard IP protocols. Bonjour makes it easy to discover, publish, and resolve network services with a sophisticated, easy-to-use programming interface that is accessible from Cocoa, Ruby, Python, and other 
+languages.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Screenshots
 
@@ -210,6 +213,7 @@ This project utilizes Bonjour technology by Apple for Advertising and Discovery 
 |--------------------------------------- | --------------------------------------|
 |![clipbird](.images/clipbird_dark.png)  | ![history](.images/history_dark.png)  |
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
