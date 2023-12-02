@@ -197,6 +197,13 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+# Bonjour Integration
+
+![Bonjour Logo](.images/bonjour.png)
+
+This project utilizes Bonjour technology by Apple for Advertising and Discovery of the devices that has Clipbird installed in the local network.
+Bonjour, also known as zero-configuration networking, enables automatic discovery of devices and services on a local network using industry standard IP protocols. Bonjour makes it easy to discover, publish, and resolve network services with a sophisticated, easy-to-use programming interface that is accessible from Cocoa, Ruby, Python, and other languages.
+
 ## Screenshots
 
 |![clipbird](.images/clipbird_light.png) | ![history](.images/history_light.png) |
