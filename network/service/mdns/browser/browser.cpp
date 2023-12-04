@@ -182,9 +182,9 @@ void Browser::removeCallback(QString serviceName) {
   auto device = types::device::Device();
 
   // get the QHostAddress
-  device.port = service->second.second;
+  device.port = service->second;
   device.name = serviceName;
-  device.ip = service->second.first;
+  device.ip = service->first;
 
   // emit the signal
   emit onServiceRemoved(device);

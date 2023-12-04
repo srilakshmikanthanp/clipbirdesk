@@ -47,7 +47,7 @@ class Browser : public QObject {
 
  private:  // private variables
 
-  std::map<QString, std::pair<QHostAddress, quint16>> serviceMap;
+  QMap<QString, QPair<QHostAddress, quint16>> serviceMap;
 
  private:  // Just for Qt
 
