@@ -30,6 +30,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QtConcurrent>
 
 // standard headers
 #include <algorithm>

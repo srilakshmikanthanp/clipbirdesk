@@ -448,7 +448,12 @@ void Clipbird::onOpenAppClicked() {
  * @brief On Send Clicked
  */
 void Clipbird::onSendClicked() {
-  this->controller->syncClipboard(controller->getClipboard());
+  QtConcurrent::run([this]() {
+    auto content = controller->getClipboard();
+    QTimer::singleShot(0, controller, [=]() {
+      this->controller->syncClipboard(content);
+    });
+  });
 }
 
 /**

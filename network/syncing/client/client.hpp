@@ -6,6 +6,7 @@
 // https://opensource.org/licenses/MIT
 
 // Qt headers
+#include <QApplication>
 #include <QByteArray>
 #include <QSslCertificate>
 #include <QDateTime>
@@ -108,15 +109,12 @@ class Client : public service::mdnsBrowser {
     // Convert the packet to QByteArray
     const auto data = utility::functions::toQByteArray(pack);
 
-    // create the QDataStream
-    QDataStream stream(m_ssl_socket);
-
     // write the data to the stream
-    auto wrote = 0;
+    qint32 wrote = 0L;
 
     // write the packet length
     while (wrote < data.size()) {
-      auto bytes = stream.writeRawData(data.data() + wrote, data.size() - wrote);
+      auto bytes = m_ssl_socket->write(data.data() + wrote, data.size() - wrote);
       if (bytes == -1) break;
       wrote = wrote + bytes;
     }

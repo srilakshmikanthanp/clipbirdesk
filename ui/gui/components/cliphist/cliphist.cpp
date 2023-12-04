@@ -72,16 +72,20 @@ void ClipTile::setUpLanguage() {
 void ClipTile::setClip(const QVector<QPair<QString, QByteArray>> &clip) {
   // infer the data
   for (const auto &[mime, data] : clip) {
-    // has Image png
-    if (mime == MIME_TYPE_PNG) {
+    // has Image png ans size is less than 1mb
+    if (mime == MIME_TYPE_PNG && data.size() > IMG_SIZE) {
+      auto icon = QPixmap::fromImage(QImage(":/images/photo.png"));
+      item->setPixmap(icon.scaled(100, 100, Qt::KeepAspectRatio));
+      break;
+    } else if (mime == MIME_TYPE_PNG) {
       auto icon = QPixmap::fromImage(QImage::fromData(data));
       item->setPixmap(icon.scaled(100, 100, Qt::KeepAspectRatio));
       break;
     }
 
-    // has Text
+    // has Text trim the text to 100 characters
     if (mime == MIME_TYPE_TEXT) {
-      item->setText(QString::fromUtf8(data));
+      item->setText(QString::fromUtf8(data).left(TXT_SIZE));
       break;
     }
   }
@@ -184,11 +188,11 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
   // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
-    verticalLayout->removeItem(item);
     auto tile = (ClipTile*) item->widget();
     tile->disconnect();
     tile->clearClip();
     tile->setParent(nullptr);
+    verticalLayout->removeItem(item);
     delete item;
   }
 

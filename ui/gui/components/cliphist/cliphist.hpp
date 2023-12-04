@@ -33,6 +33,9 @@ class ClipTile : public QWidget {
   const QString MIME_TYPE_PNG   = "image/png";
   const QString MIME_TYPE_HTML  = "text/html";
 
+  const int IMG_SIZE = 1024 * 1024;
+  const int TXT_SIZE = 200;
+
  private:  // Member variable
 
   QVector<QPair<QString, QByteArray>> clip;

@@ -13,7 +13,7 @@ namespace srilakshmikanthanp::clipbirdesk::clipboard {
  */
 void Clipboard::onClipboardChangeImpl() {
   if (!this->m_clipboard->ownsClipboard()) {
-    emit OnClipboardChange(this->get());
+    QtConcurrent::run([this]() { emit OnClipboardChange(this->get()); });
   }
 }
 

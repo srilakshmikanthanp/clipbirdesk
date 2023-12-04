@@ -20,6 +20,7 @@
 #include <QString>
 #include <QUrl>
 #include <QVector>
+#include <QtConcurrent>
 
 // project header
 #include "types/except/except.hpp"

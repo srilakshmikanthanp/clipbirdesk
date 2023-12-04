@@ -5,6 +5,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+#include <QApplication>
 #include <QByteArray>
 #include <QList>
 #include <QObject>
@@ -92,15 +93,12 @@ class Server : public service::mdnsRegister {
     // Convert the packet to QByteArray
     const auto data = utility::functions::toQByteArray(pack);
 
-    // create the QDataStream
-    QDataStream stream(client);
-
     // write the data to the stream
-    auto wrote = 0L;
+    qint32 wrote = 0L;
 
     // write the packet length
     while (wrote < data.size()) {
-      auto bytes = stream.writeRawData(data.data() + wrote, data.size() - wrote);
+      auto bytes = client->write(data.data() + wrote, data.size() - wrote);
       if (bytes == -1) break;
       wrote = wrote + bytes;
     }

@@ -107,6 +107,7 @@ configure_file(
 
 # Find Qt packages
 find_package(Qt6 REQUIRED COMPONENTS
+  Concurrent
   Widgets
   Network
   Sql)
@@ -154,6 +155,7 @@ target_link_libraries(clipbird
   PRIVATE SingleApplication::SingleApplication
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
+  PRIVATE Qt6::Concurrent
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto
   PRIVATE qrencode)

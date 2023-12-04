@@ -227,21 +227,26 @@ void Server::processReadyRead() {
   put << packetLength;
 
   // infer the read size
-  quint32 toRead = packetLength - data.size();
+  qint32 toRead = packetLength - data.size();
 
   // resize the data
   data.resize(packetLength);
 
   // read the data from the socket
-  while (toRead > 0) {
-    auto start = data.data() + data.size() - toRead;
-    auto bytes = get.readRawData(start, toRead);
+  auto start = data.data() + data.size() - toRead;
+  auto bytes = get.readRawData(start, toRead);
 
-    if (bytes == -1) {
-      return get.rollbackTransaction();
-    }
+  // check for error
+  if (bytes == -1) {
+    return get.rollbackTransaction();
+  }
 
-    toRead -= bytes;
+  // update the toRead
+  toRead -= bytes;
+
+  // if toRead is not zero then return
+  if (toRead) {
+    return get.rollbackTransaction();
   }
 
   // commit the transaction
