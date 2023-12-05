@@ -134,6 +134,16 @@ class ClipHist : public QWidget {
  private:  // Member Functions
 
   /**
+   * @brief on clipDelete Impl
+   */
+  void onClipDeleteImpl(int idx);
+
+  /**
+   * @brief on clipCopy Impl
+   */
+  void onClipCopyImpl(int idx);
+
+  /**
    * @brief Function used to set up all text in the label, etc..
    */
   void setUpLanguage();

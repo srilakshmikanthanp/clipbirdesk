@@ -182,6 +182,20 @@ void ClipHist::setUpLanguage() {
 }
 
 /**
+ * @brief on clipDelete Impl
+ */
+void ClipHist::onClipDeleteImpl(int idx) {
+  QMetaObject::invokeMethod(this, "onClipDelete", Qt::DirectConnection, Q_ARG(int, idx));
+}
+
+/**
+ * @brief on clipCopy Impl
+ */
+void ClipHist::onClipCopyImpl(int idx) {
+  emit onClipSelected(idx);
+}
+
+/**
  * @brief Set the History
  */
 void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &history) {
@@ -202,12 +216,12 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
 
     // connect the copy signal to this signal
     auto signal_d = &components::ClipTile::onClipDelete;
-    auto slot_d   = [=]() { emit onClipDelete(idx); };
+    auto slot_d   = [=]() { this->onClipDeleteImpl(idx); };
     QObject::connect(tile, signal_d, slot_d);
 
     // connect the select signal to this signal
     auto signal_c = &components::ClipTile::onClipCopy;
-    auto slot_c   = [=]() { emit onClipSelected(idx); };
+    auto slot_c   = [=]() { this->onClipCopyImpl(idx); };
     QObject::connect(tile, signal_c, slot_c);
 
     // set the clip
