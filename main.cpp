@@ -155,13 +155,6 @@ class ClipbirdApplication : public SingleApplication {
    * @param argv argument vector
    */
   ClipbirdApplication(int &argc, char **argv) : SingleApplication(argc, argv) {
-    // Nothing to do here
-  }
-
-  /**
-   * @brief Initialize the Application
-   */
-  void initialize() {
     // create the objects of the class
     controller = new controller::ClipBird(this->getSslConfiguration());
     content    = new ui::gui::Clipbird(controller);
@@ -177,7 +170,7 @@ class ClipbirdApplication : public SingleApplication {
     setQssFile(QGuiApplication::styleHints()->colorScheme());
 
     // set ToolTip
-    trayIcon->setToolTip(constants::getAppName().c_str());
+    trayIcon->setToolTip(QString::fromStdString(constants::getAppName()));
 
     // set not to quit on last content closed
     qApp->setQuitOnLastWindowClosed(false);
@@ -359,6 +352,9 @@ auto main(int argc, char **argv) -> int {
   // create the application
   ClipbirdApplication app(argc, argv);
 
+  // controller
+  auto controller = app.getController();
+
   // install event filter
   app.installEventFilter(new ClipbirdEventFilter());
 
@@ -399,12 +395,6 @@ auto main(int argc, char **argv) -> int {
 
   // Set the custom message handler
   qInstallMessageHandler(Logger::handler);
-
-  // Initialize the application
-  app.initialize();
-
-  // controller of the application
-  auto controller = app.getController();
 
   // native event filter
   auto filter = new ClipbirdNativeEventFilter(controller);

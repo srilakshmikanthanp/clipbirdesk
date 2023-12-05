@@ -169,7 +169,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information. However, please note that it uses the Qt framework, which is licensed under the LGPL v3 and GPL v3 licenses.
+Distributed under the MIT License. See `LICENSE` for more information. However, please note that it uses the Qt framework, which is licensed under the LGPL v3 and GPL v3 licenses.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
