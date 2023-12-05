@@ -75,7 +75,7 @@ void ClipTile::setClip(const QVector<QPair<QString, QByteArray>> &clip) {
     // has Image png ans size is less than 1mb
     if (mime == MIME_TYPE_PNG && data.size() > IMG_SIZE) {
       auto icon = QPixmap::fromImage(QImage(":/images/photo.png"));
-      item->setPixmap(icon.scaled(100, 100, Qt::KeepAspectRatio));
+      item->setPixmap(icon.scaled(30, 30, Qt::KeepAspectRatio));
       break;
     } else if (mime == MIME_TYPE_PNG) {
       auto icon = QPixmap::fromImage(QImage::fromData(data));

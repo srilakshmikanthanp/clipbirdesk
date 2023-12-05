@@ -229,6 +229,11 @@ void Server::processReadyRead() {
   // infer the read size
   qint32 toRead = packetLength - data.size();
 
+  // check has enough bytes
+  if (client->bytesAvailable() < toRead) {
+    return get.rollbackTransaction();
+  }
+
   // resize the data
   data.resize(packetLength);
 

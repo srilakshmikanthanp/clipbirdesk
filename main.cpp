@@ -176,6 +176,9 @@ class ClipbirdApplication : public SingleApplication {
     // set initial theme
     setQssFile(QGuiApplication::styleHints()->colorScheme());
 
+    // set ToolTip
+    trayIcon->setToolTip(constants::getAppName().c_str());
+
     // set not to quit on last content closed
     qApp->setQuitOnLastWindowClosed(false);
 

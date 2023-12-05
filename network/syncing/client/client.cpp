@@ -244,6 +244,11 @@ void Client::processReadyRead() {
   // infer the read size
   auto toRead = packetLength - data.length();
 
+  // check has enough bytes
+  if (m_ssl_socket->bytesAvailable() < toRead) {
+    return get.rollbackTransaction();
+  }
+
   // resize the data
   data.resize(packetLength);
 
