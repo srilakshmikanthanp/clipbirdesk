@@ -23,9 +23,9 @@
 #include "controller/clipbird/clipbird.hpp"
 #include "ui/gui/screen/clipbird/clipbird.hpp"
 #include "ui/gui/container/container.hpp"
+#include "ui/gui/utilities/functions/functions.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
-#include "ui/gui/utilities/functions/functions.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk {
 /**

@@ -85,7 +85,7 @@ void Clipboard::clear() {
  */
 void Clipboard::set(const QVector<QPair<QString, QByteArray>> data) {
   // create the mime data object
-  auto mimeData = new QMimeData();
+  QMimeData *mimeData = new QMimeData();
 
   // set the data
   for (const auto& [mime, data] : data) {

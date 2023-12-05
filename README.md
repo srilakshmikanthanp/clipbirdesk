@@ -62,8 +62,8 @@
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
-    <li><a href="#contributors">Contributors</a></li>
     <li><a href="#bonjour-integration">Bonjour Integration</a></li>
+    <li><a href="#contributors">Contributors</a></li>
     <li><a href="#screenshots">Screenshots</a></li>
   </ol>
 </details>
@@ -190,20 +190,20 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 * [C++](https://isocpp.org/)
 * [Bonjour](https://developer.apple.com/bonjour/)
 
+## Bonjour Integration
+
+<img align="right" width="100" height="100" src=".images/bonjour.svg" alt="Bonjour">
+
+This project utilizes Bonjour technology by Apple for Advertising and Discovery of the devices that has Clipbird installed in the local network. Bonjour, also known as zero-configuration networking, enables automatic discovery of devices and services on a local network using industry standard IP protocols. Bonjour makes it easy to discover, publish, and resolve network services with a sophisticated, easy-to-use programming interface that is accessible from Cocoa, Ruby, Python, and other 
+languages.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <!-- Contributors -->
 ## Contributors
 
 * [Suryanarayanan](https://github.com/suryanarayanandv)
 * [Dharun RK](https://github.com/rkdharun)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-## Bonjour Integration
-
-<img align="left" width="100" height="100" src=".images/bonjour.svg">
-
-This project utilizes Bonjour technology by Apple for Advertising and Discovery of the devices that has Clipbird installed in the local network. Bonjour, also known as zero-configuration networking, enables automatic discovery of devices and services on a local network using industry standard IP protocols. Bonjour makes it easy to discover, publish, and resolve network services with a sophisticated, easy-to-use programming interface that is accessible from Cocoa, Ruby, Python, and other 
-languages.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
