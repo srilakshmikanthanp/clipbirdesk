@@ -192,7 +192,7 @@ void ClipHist::onClipDeleteImpl(int idx) {
  * @brief on clipCopy Impl
  */
 void ClipHist::onClipCopyImpl(int idx) {
-  emit onClipSelected(idx);
+  QMetaObject::invokeMethod(this, "onClipSelected", Qt::DirectConnection, Q_ARG(int, idx));
 }
 
 /**
