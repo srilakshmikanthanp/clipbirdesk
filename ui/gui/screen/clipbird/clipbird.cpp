@@ -178,6 +178,11 @@ void Clipbird::handleServerListChange(QList<types::device::Device> servers) {
     servers_m.append({s, getAction(s)});
   }
 
+  // show the connected server always on top
+  std::sort(servers_m.begin(), servers_m.end(), [=](const auto& a, const auto& b) {
+    return std::get<2>(a) == Action::Disconnect;
+  });
+
   // set the server list to the window
   this->setServerList(servers_m);
 }
@@ -232,6 +237,11 @@ void Clipbird::handleServerStatusChanged(bool isConnected) {
   })) {
     servers_m.append({server.value(), Action::Disconnect});
   }
+
+  // show the connected server always on top
+  std::sort(servers_m.begin(), servers_m.end(), [=](const auto& a, const auto& b) {
+    return std::get<2>(a) == Action::Disconnect;
+  });
 
   // set the server list to the window
   this->setServerList(servers_m);
