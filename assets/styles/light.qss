@@ -147,7 +147,7 @@ QLineEdit {
 /***************** Object Names *****************/
 
 QFrame#Clipbird {
-  border: 1px solid rgba(211, 211, 211, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.110);
   border-radius: 10px;
 }
 
