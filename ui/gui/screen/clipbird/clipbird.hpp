@@ -10,6 +10,7 @@
 #include <QDesktopServices>
 #include <QFocusEvent>
 #include <QFormLayout>
+#include <QGraphicsDropShadowEffect>
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHostAddress>
@@ -27,6 +28,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QFrame>
+#include <QStyleOption>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -311,5 +313,10 @@ class Clipbird : public QFrame {
    * @brief Override change event
    */
   void changeEvent(QEvent *) override;
+
+  /**
+  * @brief paint event
+  */
+  void paintEvent(QPaintEvent *event) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

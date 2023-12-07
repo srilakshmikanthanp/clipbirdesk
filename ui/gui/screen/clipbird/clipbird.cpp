@@ -458,12 +458,12 @@ void Clipbird::onOpenAppClicked() {
  * @brief On Send Clicked
  */
 void Clipbird::onSendClicked() {
-  QtConcurrent::run([this]() {
+  Q_UNUSED(QtConcurrent::run([this]() {
     auto content = controller->getClipboard();
     QTimer::singleShot(0, controller, [=]() {
       this->controller->syncClipboard(content);
     });
-  });
+  }));
 }
 
 /**
@@ -522,6 +522,24 @@ void Clipbird::setUpLanguage() {
 Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   // set no taskbar icon & no window Frame & always on top
   setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+
+  // set object name
+  this->setObjectName("Clipbird");
+
+  // shadow effect
+  auto shadow = new QGraphicsDropShadowEffect(this);
+
+  // set the blur radius
+  shadow->setBlurRadius(50);
+
+  // set the color
+  shadow->setColor(QColor(0, 0, 0, 30));
+
+  // set the offset
+  shadow->setOffset(0, 0);
+
+  // set the shadow effect
+  this->setGraphicsEffect(shadow);
 
   // create the  layout
   QVBoxLayout* root = new QVBoxLayout();
@@ -831,5 +849,18 @@ void Clipbird::changeEvent(QEvent *event) {
   }
 
   QWidget::changeEvent(event);
+}
+
+/**
+ * @brief paint event
+ */
+void Clipbird::paintEvent(QPaintEvent *event) {
+  // For style Sheet take effect
+  QStyleOption opt;
+  opt.initFrom(this);
+  QPainter p(this);
+  style()->drawPrimitive(
+    QStyle::PE_Widget, &opt, &p, this
+  );
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui

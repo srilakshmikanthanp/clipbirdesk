@@ -21,44 +21,11 @@ Container::Container(QWidget* parent) : QWidget(parent) {
  * @brief Set Content
  */
 void Container::setContent(ui::gui::Clipbird* content) {
- // create a layout for vertical
-  auto layout = new QVBoxLayout(this);
-
-  // content margin
-  layout->setContentsMargins(5, 5, 5, 5);
-
-  // add the widget to the layout
-  layout->addWidget((this->content = content));
-
-  // warp layout with a widget
-  auto wrapper = new QWidget(this);
-
-  // set as Rounded Corner
-  wrapper->setStyleSheet("border-radius: 10px;");
-
-  // shadow effect
-  auto shadow = new QGraphicsDropShadowEffect(this);
-
-  // set the blur radius
-  shadow->setBlurRadius(50);
-
-  // set the color
-  shadow->setColor(QColor(0, 0, 0, 30));
-
-  // set the offset
-  shadow->setOffset(0, 0);
-
-  // set the shadow effect
-  wrapper->setGraphicsEffect(shadow);
-
-  // set the layout to the wrapper
-  wrapper->setLayout(layout);
-
   // create layout for the main window
   auto main = new QVBoxLayout(this);
 
   // add the wrapper to the main layout
-  main->addWidget(wrapper);
+  main->addWidget(this->content = content);
 
   // content margin
   main->setContentsMargins(5, 5, 2, 2);
