@@ -274,11 +274,6 @@ void Client::processReadyRead() {
     return;
   }
 
-  // commit the transaction
-  if (!get.commitTransaction()) {
-    return;
-  }
-
   // try to parse the packet
   try {
     processAuthentication(fromQByteArray<packets::Authentication>(data));
