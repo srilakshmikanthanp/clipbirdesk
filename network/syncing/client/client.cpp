@@ -417,7 +417,7 @@ Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
   // Connect the socket to the callback function that
   // process the timeout
   const auto signal_tr = &QTimer::timeout;
-  const auto slot_tr   = &Client::processPingTimeout;
+  const auto slot_tr   = &Client::processPongTimeout;
   QObject::connect(m_pongTimer, signal_tr, this, slot_tr);
 }
 

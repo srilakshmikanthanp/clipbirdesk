@@ -376,7 +376,7 @@ Server::Server(QObject *parent) : service::mdnsRegister(parent) {
   // Connect the socket to the callback function that
   // process the timeout
   const auto signal_r = &QTimer::timeout;
-  const auto slot_r   = &Server::processPingTimeout;
+  const auto slot_r   = &Server::processPongTimeout;
   QObject::connect(m_pongTimer, signal_r, this, slot_r);
 }
 
