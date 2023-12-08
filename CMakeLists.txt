@@ -23,7 +23,7 @@ set(APPLICATION_ISSUEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk/iss
 set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
 
 # Set the DONATE_URL
-set(DONATE_URL "https://github.com/srilakshmikanthanp/clipbirdesk")
+set(DONATE_URL "https://srilakshmikanthanp.github.io/donate")
 
 # Set the Version
 set(VERSION ${PROJECT_VERSION})
