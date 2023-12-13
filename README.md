@@ -95,14 +95,6 @@ Follow the instructions on the [clipbirdroid](https://github.com/srilakshmikanth
 
 ### Installing Clipbird on a Windows Platform
 
-In the following steps, we will see how to install clipbird in the Windows platform.
-
-#### Installing Bonjour
-
-Just go to [bonjour](https://developer.apple.com/bonjour/) and download the Bonjour SDK for Windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
-
-#### Installing Clipbird
-
 Just go to Github Release choose the suitable version for your system and download it. Then install it in your system.
 
 ### Building Clipbird on a Windows Platform
@@ -194,8 +186,7 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 
 <img align="right" width="100" height="100" src=".images/bonjour.svg" alt="Bonjour">
 
-This project utilizes Bonjour technology by Apple for Advertising and Discovery of the devices that has Clipbird installed in the local network. Bonjour, also known as zero-configuration networking, enables automatic discovery of devices and services on a local network using industry standard IP protocols. Bonjour makes it easy to discover, publish, and resolve network services with a sophisticated, easy-to-use programming interface that is accessible from Cocoa, Ruby, Python, and other 
-languages.
+This project utilizes Bonjour technology by Apple for Advertising and Discovery of the devices that has Clipbird installed in the local network. Bonjour, also known as zero-configuration networking, enables automatic discovery of devices and services on a local network using industry standard IP protocols. Bonjour makes it easy to discover, publish, and resolve network services with a sophisticated, easy-to-use programming interface that is accessible from Cocoa, Ruby, Python, and other languages.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
