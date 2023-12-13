@@ -29,6 +29,14 @@ $ClipbirDir = "./.setup"
 Write-Host "Cleaning the package directory $ClipbirDir" -ForegroundColor Green
 Remove-Item -Recurse -Force $ClipbirDir/* -Exclude .gitignore
 
+# create conf directory in the package directory
+Write-Host "Creating conf directory in $ClipbirDir" -ForegroundColor Green
+New-Item -ItemType Directory -Force -Path $ClipbirDir/conf
+
+# copy the conf folder to the package directory
+Write-Host "Copying ./conf/* to $ClipbirDir" -ForegroundColor Green
+Copy-Item ./conf/* $ClipbirDir/conf
+
 # create assets directory in the package directory
 Write-Host "Creating assets directory in $ClipbirDir" -ForegroundColor Green
 New-Item -ItemType Directory -Force -Path $ClipbirDir/assets/images

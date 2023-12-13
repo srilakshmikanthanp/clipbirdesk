@@ -1,11 +1,11 @@
 # CMakeLists.txt for clipbird
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
-# read version from file
+# read version from ini file
 file(READ "${CMAKE_CURRENT_LIST_DIR}/conf/VERSION" VERSION)
 
 # Read UUID from file
-file(READ "${CMAKE_CURRENT_LIST_DIR}/conf/UUID" UUID)
+file(READ "${CMAKE_CURRENT_LIST_DIR}/conf/APPUUID" UUID)
 
 # set project name and version
 project(clipbird VERSION ${VERSION} LANGUAGES CXX)

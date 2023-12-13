@@ -3,15 +3,15 @@
 ; constants used in the script
 #define ClipbirdPublisher "srilakshmikanthanp"
 #define ClipbirdName "clipbird"
-#define ClipbirdVersion GetValue("conf/VERSION")
-#define ClipbirdUUId GetValue("conf/UUID")
+#define ClipbirdVersion "{code:GetValue}\'VERSION'"
+#define ClipbirdUUID "{code:GetValue}\'APPUUID'"
 #define ClipbirdURL "https://github.com/srilakshmikanthanp/clipbirdesk"
 #define ClipbirdExeName "clipbird.exe"
 
 [Setup]
 AppPublisher={#ClipbirdPublisher}
 AppVerName={#ClipbirdName} {#ClipbirdVersion}
-AppId={#ClipbirdUUId}
+AppId={#ClipbirdUUID}
 AppVersion={#ClipbirdVersion}
 AppName={#ClipbirdName}
 AppPublisherURL={#ClipbirdURL}
@@ -27,6 +27,7 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 UninstallDisplayIcon={app}\{#ClipbirdExeName}
+UsePreviousLanguage=no
 
 [Registry]
 ; To start app on windows startup
@@ -81,19 +82,16 @@ Filename    : "{app}\{#ClipbirdExeName}";                                    \
 Description : "{cm:LaunchProgram,{#StringChange(ClipbirdName, '&', '&&')}}"; \
 Flags       : nowait postinstall skipifsilent
 
-; function used read UUID from file
+
+; function used read Version from file
 [Code]
-function GetValue(FileName: String): String;
+function GetValue(Key: string): string;
 var
-  F: TextFile;
-  S: String;
+  FilePath: string;
+  Value: AnsiString;
 begin
-  Result := '';
-  if not FileExists(FileName) then
-    Exit;
-  AssignFile(F, FileName);
-  Reset(F);
-  Readln(F, S);
-  CloseFile(F);
-  Result := S;
+  FilePath  := ExpandConstant('{src}\conf\') + Key;
+  LoadStringFromFile(FilePath, Value);
+  Result := Value;
+  if Result = '' then RaiseException('Cannot find Key');
 end;
