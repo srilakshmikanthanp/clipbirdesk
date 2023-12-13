@@ -107,11 +107,6 @@ FetchContent_MakeAvailable(WinToast)
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
 
-# Add network/service/avahi if the os is linux
-if(NOT WIN32 AND NOT APPLE)
-  list(FILTER main_cpp EXCLUDE REGEX "network/service/dnsd")
-endif()
-
 # remove tests folder from list
 list(FILTER main_cpp EXCLUDE REGEX "tests/")
 
