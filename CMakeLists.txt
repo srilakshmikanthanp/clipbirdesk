@@ -1,8 +1,14 @@
 # CMakeLists.txt for clipbird
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
+# read version from file
+file(READ "${CMAKE_CURRENT_LIST_DIR}/conf/VERSION" VERSION)
+
+# Read UUID from file
+file(READ "${CMAKE_CURRENT_LIST_DIR}/conf/UUID" UUID)
+
 # set project name and version
-project(clipbird VERSION 1.2.0 LANGUAGES CXX)
+project(clipbird VERSION ${VERSION} LANGUAGES CXX)
 
 # set c++ standard 17
 set(CMAKE_CXX_STANDARD 17)
@@ -27,6 +33,9 @@ set(DONATE_URL "https://srilakshmikanthanp.github.io/donate")
 
 # Set the Version
 set(VERSION ${PROJECT_VERSION})
+
+# Set the UUID
+set(UUID ${UUID})
 
 # set organization name
 set(APPLICATION_ORGANIZATION_NAME "srilakshmikanthanp")
@@ -85,6 +94,15 @@ set(WITH_TOOLS OFF CACHE BOOL "" FORCE)
 
 # Make Available qzxing
 FetchContent_MakeAvailable(libqrencode)
+
+# Fetch https://github.com/mohabouje/WinToast.git
+FetchContent_Declare(WinToast
+  GIT_REPOSITORY https://github.com/mohabouje/WinToast.git
+  GIT_TAG        v1.3.0
+)
+
+# Make Available WinToast
+FetchContent_MakeAvailable(WinToast)
 
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
@@ -158,7 +176,8 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Concurrent
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto
-  PRIVATE qrencode)
+  PRIVATE qrencode
+  PRIVATE WinToast)
 
 # set target properties
 set_target_properties(clipbird PROPERTIES
@@ -177,6 +196,7 @@ endif()
 if(WIN32)
   target_include_directories(clipbird PUBLIC ${BONJOUR_INCLUDE_DIR})
   target_link_libraries(clipbird PRIVATE Dwmapi.lib)
+  target_link_libraries(clipbird PRIVATE runtimeobject.lib)
   target_link_libraries(clipbird PRIVATE ${BONJOUR_LIBRARIES})
   add_definitions(-D_WIN32)
 endif()

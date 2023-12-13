@@ -27,6 +27,21 @@ void Container::setContent(ui::gui::Clipbird* content) {
   // add the wrapper to the main layout
   main->addWidget(this->content = content);
 
+  // shadow effect
+  auto shadow = new QGraphicsDropShadowEffect(this);
+
+  // set the blur radius
+  shadow->setBlurRadius(50);
+
+  // set the color
+  shadow->setColor(QColor(0, 0, 0, 30));
+
+  // set the offset
+  shadow->setOffset(0, 0);
+
+  // set the shadow effect
+  content->setGraphicsEffect(shadow);
+
   // content margin
   main->setContentsMargins(5, 5, 2, 2);
 

@@ -14,15 +14,15 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
 AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
   // Click Handlers
   auto donateClick = [=]() {
-    QDesktopServices::openUrl(QUrl(constants::getAppDonatePage().c_str()));
+    QDesktopServices::openUrl(QUrl(constants::getAppDonatePage()));
   };
 
   auto webClick = [=]() {
-    QDesktopServices::openUrl(QUrl(constants::getAppHomePage().c_str()));
+    QDesktopServices::openUrl(QUrl(constants::getAppHomePage()));
   };
 
   auto bugClick = [=]() {
-    QDesktopServices::openUrl(QUrl(constants::getAppIssuePage().c_str()));
+    QDesktopServices::openUrl(QUrl(constants::getAppIssuePage()));
   };
 
   // Images and Icons

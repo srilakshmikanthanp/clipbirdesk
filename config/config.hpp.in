@@ -8,6 +8,9 @@
 // Application Version
 #define CLIPBIRDESK_VERSION        "@VERSION@"
 
+// Application UUID
+#define CLIPBIRDESK_UUID           "@UUID@"
+
 // Application Name
 #define CLIPBIRDESK_NAME           "@CMAKE_PROJECT_NAME@"
 

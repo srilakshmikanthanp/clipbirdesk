@@ -108,12 +108,12 @@ std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey) {
   }
 
   // set the organization name
-  if(!X509_NAME_add_entry_by_txt(name, "O", MBSTRING_ASC, (const unsigned char *)org.c_str(), -1, -1, 0)) {
+  if(!X509_NAME_add_entry_by_txt(name, "O", MBSTRING_ASC, (const unsigned char *)org, -1, -1, 0)) {
     throw std::runtime_error("Can't Set Subject Name");
   }
 
   // set the unit name
-  if(!X509_NAME_add_entry_by_txt(name, "OU", MBSTRING_ASC, (const unsigned char *)unit.c_str(), -1, -1, 0)) {
+  if(!X509_NAME_add_entry_by_txt(name, "OU", MBSTRING_ASC, (const unsigned char *)unit, -1, -1, 0)) {
     throw std::runtime_error("Can't Set Subject Name");
   }
 

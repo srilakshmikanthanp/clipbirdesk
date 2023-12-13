@@ -1,15 +1,17 @@
 ; This Script used to build installer for clipbird application using inno setup
 
+; constants used in the script
 #define ClipbirdPublisher "srilakshmikanthanp"
 #define ClipbirdName "clipbird"
-#define ClipbirdVersion "1.2.0"
+#define ClipbirdVersion GetValue("conf/VERSION")
+#define ClipbirdUUId GetValue("conf/UUID")
 #define ClipbirdURL "https://github.com/srilakshmikanthanp/clipbirdesk"
 #define ClipbirdExeName "clipbird.exe"
 
 [Setup]
 AppPublisher={#ClipbirdPublisher}
 AppVerName={#ClipbirdName} {#ClipbirdVersion}
-AppId={{3A8D9FCA-9F95-4947-8AB0-3E364ED765E1}
+AppId={#ClipbirdUUId}
 AppVersion={#ClipbirdVersion}
 AppName={#ClipbirdName}
 AppPublisherURL={#ClipbirdURL}
@@ -78,3 +80,20 @@ StatusMsg   : "Installing VC++ Redistributables..."
 Filename    : "{app}\{#ClipbirdExeName}";                                    \
 Description : "{cm:LaunchProgram,{#StringChange(ClipbirdName, '&', '&&')}}"; \
 Flags       : nowait postinstall skipifsilent
+
+; function used read UUID from file
+[Code]
+function GetValue(FileName: String): String;
+var
+  F: TextFile;
+  S: String;
+begin
+  Result := '';
+  if not FileExists(FileName) then
+    Exit;
+  AssignFile(F, FileName);
+  Reset(F);
+  Readln(F, S);
+  CloseFile(F);
+  Result := S;
+end;

@@ -4,14 +4,16 @@
 // https://opensource.org/licenses/MIT
 
 // Qt Headers
+#include <wintoastlib.h>
+
 #include <QAbstractNativeEventFilter>
 #include <QApplication>
-#include <QHostInfo>
 #include <QFile>
+#include <QGraphicsDropShadowEffect>
+#include <QHostInfo>
+#include <QMessageBox>
 #include <QNetworkProxy>
 #include <QStyleHints>
-#include <QGraphicsDropShadowEffect>
-#include <QMessageBox>
 #include <QSystemTrayIcon>
 #include <SingleApplication>
 
@@ -21,8 +23,8 @@
 // Project Headers
 #include "constants/constants.hpp"
 #include "controller/clipbird/clipbird.hpp"
-#include "ui/gui/screen/clipbird/clipbird.hpp"
 #include "ui/gui/container/container.hpp"
+#include "ui/gui/screen/clipbird/clipbird.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
@@ -39,12 +41,12 @@ class ClipbirdApplication : public SingleApplication {
    * @brief Get the certificate from App Home
    */
   QSslConfiguration getOldSslConfiguration() {
-    auto two_months = std::chrono::milliseconds(constants::getAppCertExpiryInterval());
-    auto &storage = storage::Storage::instance();
+    auto two_months      = std::chrono::milliseconds(constants::getAppCertExpiryInterval());
+    auto &storage        = storage::Storage::instance();
 
     // read the certificate and key
     QSslCertificate cert = QSslCertificate(storage.getHostCert(), QSsl::Pem);
-    QSslKey key = QSslKey(storage.getHostKey(), QSsl::Rsa);
+    QSslKey key          = QSslKey(storage.getHostKey(), QSsl::Rsa);
     QSslConfiguration sslConfig;
 
     // set the certificate and key
@@ -76,7 +78,7 @@ class ClipbirdApplication : public SingleApplication {
     auto sslConfig = utility::functions::getQSslConfiguration();
 
     // write the certificate and key
-    auto &storage = storage::Storage::instance();
+    auto &storage  = storage::Storage::instance();
     storage.setHostCert(sslConfig.localCertificate().toPem());
     storage.setHostKey(sslConfig.privateKey().toPem());
 
@@ -120,7 +122,7 @@ class ClipbirdApplication : public SingleApplication {
    */
   void setQssFile(Qt::ColorScheme scheme) {
     // detect system theme is dark or light
-    bool isDark = scheme == Qt::ColorScheme::Dark;
+    bool isDark     = scheme == Qt::ColorScheme::Dark;
 
     // qss
     std::string qss = isDark ? constants::getAppQSSDark() : constants::getAppQSSLight();
@@ -146,7 +148,7 @@ class ClipbirdApplication : public SingleApplication {
 
   Q_DISABLE_COPY_MOVE(ClipbirdApplication);
 
- public:   // Constructors and Destructors
+ public:  // Constructors and Destructors
 
   /**
    * @brief Construct a new Clipbird Application object
@@ -185,7 +187,7 @@ class ClipbirdApplication : public SingleApplication {
     window->setContent(content);
 
     // set the icon to content
-    window->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+    window->setWindowIcon(QIcon(constants::getAppLogo()));
 
     // using some classes
     using ui::gui::Clipbird;
@@ -230,7 +232,7 @@ class ClipbirdApplication : public SingleApplication {
  * apply some attributes to the window
  */
 class ClipbirdEventFilter : public QObject {
-  virtual bool eventFilter(QObject * o, QEvent * e) {
+  virtual bool eventFilter(QObject *o, QEvent *e) {
     if (e->type() == QEvent::WindowActivate) {
       handleWindowShownEvent(dynamic_cast<QWidget *>(o));
     }
@@ -252,6 +254,7 @@ class ClipbirdEventFilter : public QObject {
  */
 class ClipbirdNativeEventFilter : public QAbstractNativeEventFilter {
  private:
+
   bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override {
     constexpr const char *WIN_MSG = "windows_generic_MSG";
 
@@ -262,10 +265,9 @@ class ClipbirdNativeEventFilter : public QAbstractNativeEventFilter {
     return false;
   }
 
-  void handleWindowsGenericMessage(MSG * msg) {
+  void handleWindowsGenericMessage(MSG *msg) {
     if (msg->message == WM_POWERBROADCAST) {
-      switch (msg->wParam)
-      {
+      switch (msg->wParam) {
       case PBT_APMRESUMESUSPEND:
         this->handleWakeUpEvent();
         break;
@@ -278,7 +280,7 @@ class ClipbirdNativeEventFilter : public QAbstractNativeEventFilter {
   }
 
   void handleSleepEvent() {
-    switch(controller->getHostType()) {
+    switch (controller->getHostType()) {
     case types::enums::HostType::CLIENT:
       controller->disposeClient();
       break;
@@ -311,7 +313,7 @@ class ClipbirdNativeEventFilter : public QAbstractNativeEventFilter {
   /**
    * @brief Construct a new Clipbird Native Event Filter object
    */
-  ClipbirdNativeEventFilter(controller::ClipBird *controller): controller(controller) {}
+  ClipbirdNativeEventFilter(controller::ClipBird *controller) : controller(controller) {}
 };
 }  // namespace srilakshmikanthanp::clipbirdesk
 
@@ -343,17 +345,41 @@ void globalErrorHandler() {
 auto main(int argc, char **argv) -> int {
   // using ClipbirdApplication class from namespace
   using srilakshmikanthanp::clipbirdesk::ClipbirdApplication;
-  using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
-  using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
-  using srilakshmikanthanp::clipbirdesk::logging::Logger;
   using srilakshmikanthanp::clipbirdesk::ClipbirdEventFilter;
   using srilakshmikanthanp::clipbirdesk::ClipbirdNativeEventFilter;
+  using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
+  using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
+  using srilakshmikanthanp::clipbirdesk::constants::getAppName;
+  using srilakshmikanthanp::clipbirdesk::constants::getAppOrgName;
+  using srilakshmikanthanp::clipbirdesk::constants::getAppVersion;
+  using srilakshmikanthanp::clipbirdesk::logging::Logger;
+
+  // std::string to std::wstring
+  const auto W = [](std::string str) -> std::wstring {
+    return std::wstring(str.begin(), str.end());
+  };
+
+  // create AUMI
+  auto appAumi = WinToastLib::WinToast::configureAUMI(
+    W(getAppOrgName()), W(getAppName()), W(std::string()), W(getAppVersion())
+  );
+
+  // is compatible
+  if (!WinToastLib::WinToast::isCompatible()) {
+    return EXIT_FAILURE;
+  }
+
+  // set up wintoast lib
+  WinToastLib::WinToast::instance()->setAppName(W(getAppName()));
+  WinToastLib::WinToast::instance()->setAppUserModelId(appAumi);
+
+  // initialize
+  if (!WinToastLib::WinToast::instance()->initialize()) {
+    return EXIT_FAILURE;
+  }
 
   // create the application
   ClipbirdApplication app(argc, argv);
-
-  // controller
-  auto controller = app.getController();
 
   // install event filter
   app.installEventFilter(new ClipbirdEventFilter());
@@ -396,8 +422,11 @@ auto main(int argc, char **argv) -> int {
   // Set the custom message handler
   qInstallMessageHandler(Logger::handler);
 
+  // controller
+  auto controller = app.getController();
+
   // native event filter
-  auto filter = new ClipbirdNativeEventFilter(controller);
+  auto filter     = new ClipbirdNativeEventFilter(controller);
 
   // install native event filter
   app.installNativeEventFilter(filter);

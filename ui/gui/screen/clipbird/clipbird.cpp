@@ -122,35 +122,22 @@ void Clipbird::handleServerStateChange(bool isStarted) {
  */
 void Clipbird::handleAuthRequest(const types::device::Device& client) {
   // get the user input
-  auto dialog = new modals::Request();
-
-  // icon for the dialog
-  auto icon = QIcon(QString::fromStdString(constants::getAppLogo()));
-
-  // set the icon
-  dialog->setWindowIcon(icon);
-
-  // set the title
-  dialog->setWindowTitle(constants::getAppName().c_str());
-
-  // set the message
-  dialog->setHost(client.name);
-
-  // set delete on close
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
-
-  // show the dialog
-  dialog->show();
+  auto toast = new notification::JoinRequest(this);
 
   // connect the dialog to window AuthSuccess signal
-  const auto signal_s = &modals::Request::onAccept;
-  const auto slot_s   = [=] { controller->authSuccess(client); dialog->close(); };
-  connect(dialog, signal_s, slot_s);
+  const auto signal_s = &notification::JoinRequest::onAccept;
+  const auto slot_s   = [=] { controller->authSuccess(client); };
+  connect(toast, signal_s, slot_s);
+  connect(toast, signal_s, toast, &QObject::deleteLater);
 
   // connect the dialog to window AuthFail signal
-  const auto signal_f = &modals::Request::onReject;
-  const auto slot_f   = [=] { controller->authFailed(client); dialog->close(); };
-  connect(dialog, signal_f, slot_f);
+  const auto signal_f = &notification::JoinRequest::onReject;
+  const auto slot_f   = [=] { controller->authFailed(client); };
+  connect(toast, signal_f, slot_f);
+  connect(toast, signal_f, toast, &QObject::deleteLater);
+
+  // shoe the notification
+  toast->show(client);
 }
 
 //----------------------------- slots for Client --------------------------//
@@ -255,7 +242,7 @@ void Clipbird::handleConnectionError(QString error) {
   auto message = QObject::tr("Connection Error: %1").arg(error);
 
   // Title of the Notification
-  auto title = constants::getAppName().c_str();
+  auto title = constants::getAppName();
 
   // icon for the dialog
   auto icon = QIcon(QString::fromStdString(constants::getAppLogo()));
@@ -322,10 +309,10 @@ void Clipbird::onQrCodeClicked() {
   qDebug() << "QR Code Info: " << QString(info);
 
   // set the icon
-  group.setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+  group.setWindowIcon(QIcon(constants::getAppLogo()));
 
   // set the title
-  group.setWindowTitle(constants::getAppName().c_str());
+  group.setWindowTitle(constants::getAppName());
 
   // set Fixed Size
   group.setFixedSize(group.sizeHint());
@@ -385,7 +372,7 @@ void Clipbird::onConnectClicked() {
   joiner.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
 
   // set the title
-  joiner.setWindowTitle(constants::getAppName().c_str());
+  joiner.setWindowTitle(constants::getAppName());
 
   // set as not resizable
   joiner.setFixedSize(joiner.sizeHint());
@@ -427,7 +414,7 @@ void Clipbird::onAboutClicked() {
   aboutUs.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
 
   // set the title
-  aboutUs.setWindowTitle(constants::getAppName().c_str());
+  aboutUs.setWindowTitle(constants::getAppName());
 
   // show the dialog
   aboutUs.show();
@@ -477,7 +464,7 @@ void Clipbird::onReceivedClicked() {
   history.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
 
   // set the title
-  history.setWindowTitle(constants::getAppName().c_str());
+  history.setWindowTitle(constants::getAppName());
 
   // set history
   history.setHistory(controller->getHistory());
@@ -525,21 +512,6 @@ Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QFrame(p), controller(c)
 
   // set object name
   this->setObjectName("Clipbird");
-
-  // shadow effect
-  auto shadow = new QGraphicsDropShadowEffect(this);
-
-  // set the blur radius
-  shadow->setBlurRadius(50);
-
-  // set the color
-  shadow->setColor(QColor(0, 0, 0, 30));
-
-  // set the offset
-  shadow->setOffset(0, 0);
-
-  // set the shadow effect
-  this->setGraphicsEffect(shadow);
 
   // create the  layout
   QVBoxLayout* root = new QVBoxLayout();
@@ -747,13 +719,13 @@ void Clipbird::setTrayIcon(QSystemTrayIcon* trayIcon) {
   this->trayIcon = trayIcon;
 
   // set the icon to tray
-  trayIcon->setIcon(QIcon(constants::getAppLogo().c_str()));
+  trayIcon->setIcon(QIcon(constants::getAppLogo()));
 
   // set the tray menu
   trayIcon->setContextMenu(trayMenu);
 
   // set tooltip
-  trayIcon->setToolTip(constants::getAppName().c_str());
+  trayIcon->setToolTip(constants::getAppName());
 
   // show tray icon
   trayIcon->show();

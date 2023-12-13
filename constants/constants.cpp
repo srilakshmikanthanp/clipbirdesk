@@ -10,10 +10,17 @@
 namespace srilakshmikanthanp::clipbirdesk::constants {
 /**
  * @brief Get the Application Version
- * @return std::string
+ * @return const char*
  */
-std::string getAppVersion() {
-  return std::string(CLIPBIRDESK_VERSION);
+const char* getAppVersion() {
+  return CLIPBIRDESK_VERSION;
+}
+
+/**
+ * @brief Get the App UUID
+ */
+const char* getAppUUID() {
+  return CLIPBIRDESK_UUID;
 }
 
 /**
@@ -26,42 +33,42 @@ int getAppMaxHistorySize() {
 
 /**
  * @brief Get the Application Name
- * @return std::string
+ * @return const char*
  */
-std::string getAppName() {
-  return std::string(CLIPBIRDESK_NAME);
+const char* getAppName() {
+  return CLIPBIRDESK_NAME;
 }
 
 /**
  * @brief Get logo path
- * @return std::string
+ * @return const char*
  */
-std::string getAppLogo() {
-  return std::string(CLIPBIRDESK_LOGO);
+const char* getAppLogo() {
+  return CLIPBIRDESK_LOGO;
 }
 
 /**
  * @brief Get the Application QSS File
- * @return std::string
+ * @return const char*
  */
-std::string getAppQSSLight() {
-  return std::string(APPLICATION_LIGHT_QSS_PATH);
+const char* getAppQSSLight() {
+  return APPLICATION_LIGHT_QSS_PATH;
 }
 
 /**
  * @brief Get the Application QSS File
- * @return std::string
+ * @return const char*
  */
-std::string getAppQSSDark() {
-  return std::string(APPLICATION_DARK_QSS_PATH);
+const char* getAppQSSDark() {
+  return APPLICATION_DARK_QSS_PATH;
 }
 
 /**
  * @brief Get App Home Directory
- * @return std::string
+ * @return const char*
  */
 std::string getAppHome() {
-  return (std::filesystem::path(QDir::homePath().toStdString()) / ("." + getAppName())).string();
+  return (std::filesystem::path(QDir::homePath().toStdString()) / (std::string(".") + getAppName())).string();
 }
 
 /**
@@ -82,33 +89,33 @@ QSize getAppWindowSize() {
 /**
  * @brief Get the App Home Page
  *
- * @return std::string
+ * @return const char*
  */
-std::string getAppHomePage() {
-  return std::string(CLIPBIRDESK_HOMEPAGE);
+const char* getAppHomePage() {
+  return CLIPBIRDESK_HOMEPAGE;
 }
 
 /**
  * @brief Get the App Issue Page
  *
- * @return std::string
+ * @return const char*
  */
-std::string getAppIssuePage() {
-  return std::string(CLIPBIRDESK_ISSUEPAGE);
+const char* getAppIssuePage() {
+  return CLIPBIRDESK_ISSUEPAGE;
 }
 
 /**
  * @brief Get the App Donate Page
- * @return std::string
+ * @return const char*
  */
-std::string getAppDonatePage() {
-  return std::string(CLIPBIRDESK_DONATE);
+const char* getAppDonatePage() {
+  return CLIPBIRDESK_DONATE;
 }
 
 /**
  * @brief Get the MDns Service Name
  *
- * @return std::string
+ * @return const char*
  */
 std::string getMDnsServiceName() {
   return QSysInfo::machineHostName().toStdString();
@@ -117,19 +124,19 @@ std::string getMDnsServiceName() {
 /**
  * @brief Get the MDns Service Type
  *
- * @return std::string
+ * @return const char*
  */
-std::string getMDnsServiceType() {
-  return std::string("_clipbird._tcp");
+const char* getMDnsServiceType() {
+  return "_clipbird._tcp";
 }
 
 /**
  * @brief Get the Organization Name
  *
- * @return std::string
+ * @return const char*
  */
-std::string getAppOrgName() {
-  return std::string(CLIPBIRDESK_ORG_NAME);
+const char* getAppOrgName() {
+  return CLIPBIRDESK_ORG_NAME;
 }
 
 /**

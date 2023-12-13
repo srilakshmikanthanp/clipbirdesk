@@ -22,7 +22,7 @@ void Browser::onHostResolved(quint16 port, QString srvName, const QHostInfo& inf
   }
 
   // remove the service type from service name
-  srvName.remove("." + QString::fromStdString(constants::getMDnsServiceType() + ".local."));
+  srvName.remove("." + QString::fromStdString(constants::getMDnsServiceType() + std::string(".local.")));
 
   // Replace the \xxx ascii code to char
   QRegularExpression regex("\\\\([0-9]{3})");
@@ -214,7 +214,7 @@ void Browser::startBrowsing() {
       &this->m_browse_ref,                           // DNSServiceRef
       0,                                             // DNSServiceFlags
       kDNSServiceInterfaceIndexAny,                  // InterfaceIndex
-      constants::getMDnsServiceType().c_str(),       // regtype
+      constants::getMDnsServiceType(),               // regtype
       NULL,                                          // domain
       browseCallback,                                // callback
       this                                           // context

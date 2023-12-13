@@ -20,27 +20,14 @@
 namespace srilakshmikanthanp::clipbirdesk::constants {
 /**
  * @brief Get the Application Version
- * @return std::string
+ * @return const char*
  */
-std::string getAppMajorVersion();
+const char* getAppVersion();
 
 /**
- * @brief Get the Application Version
- * @return std::string
+ * @brief Get the App UUID
  */
-std::string getAppMinorVersion();
-
-/**
- * @brief Get the Application Version
- * @return std::string
- */
-std::string getAppPatchVersion();
-
-/**
- * @brief Get the Application Version
- * @return std::string
- */
-std::string getAppVersion();
+const char* getAppUUID();
 
 /**
  * @brief App Max History Size
@@ -50,31 +37,31 @@ int getAppMaxHistorySize();
 
 /**
  * @brief Get the Application Name
- * @return std::string
+ * @return const char*
  */
-std::string getAppName();
+const char* getAppName();
 
 /**
  * @brief Get logo path
- * @return std::string
+ * @return const char*
  */
-std::string getAppLogo();
+const char* getAppLogo();
 
 /**
  * @brief Get the Application QSS File
- * @return std::string
+ * @return const char*
  */
-std::string getAppQSSLight();
+const char* getAppQSSLight();
 
 /**
  * @brief Get the Application QSS File
- * @return std::string
+ * @return const char*
  */
-std::string getAppQSSDark();
+const char* getAppQSSDark();
 
 /**
  * @brief Get App Home Directory
- * @return std::string
+ * @return const char*
  */
 std::string getAppHome();
 
@@ -86,22 +73,22 @@ std::string getAppLogFile();
 /**
  * @brief Get the App Home Page
  *
- * @return std::string
+ * @return const char*
  */
-std::string getAppHomePage();
+const char* getAppHomePage();
 
 /**
  * @brief Get the App Issue Page
  *
- * @return std::string
+ * @return const char*
  */
-std::string getAppIssuePage();
+const char* getAppIssuePage();
 
 /**
  * @brief Get the App Donate Page
- * @return std::string
+ * @return const char*
  */
-std::string getAppDonatePage();
+const char* getAppDonatePage();
 
 /**
  * @brief Get the App Window Ratio
@@ -112,23 +99,23 @@ QSize getAppWindowSize();
 /**
  * @brief Get the MDns Service Name
  *
- * @return std::string
+ * @return const char*
  */
 std::string getMDnsServiceName();
 
 /**
  * @brief Get the MDns Service Type
  *
- * @return std::string
+ * @return const char*
  */
-std::string getMDnsServiceType();
+const char* getMDnsServiceType();
 
 /**
  * @brief Get the App Org Name object
  *
- * @return std::string
+ * @return const char*
  */
-std::string getAppOrgName();
+const char* getAppOrgName();
 
 /**
  * @brief Used to get the certificate expiry time should not be less than 2 months

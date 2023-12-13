@@ -40,10 +40,10 @@ Connect::Connect(QWidget * parent) : QDialog(parent) {
   root->addWidget(button);
 
   // set the icon
-  this->setWindowIcon(QIcon(constants::getAppLogo().c_str()));
+  this->setWindowIcon(QIcon(constants::getAppLogo()));
 
   // set the title
-  this->setWindowTitle(constants::getAppName().c_str());
+  this->setWindowTitle(constants::getAppName());
 
   // set layout
   this->setLayout(root);
