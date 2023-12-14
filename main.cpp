@@ -347,6 +347,7 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::ClipbirdEventFilter;
   using srilakshmikanthanp::clipbirdesk::ClipbirdNativeEventFilter;
   using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
+  using srilakshmikanthanp::clipbirdesk::constants::getAppLogo;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
   using srilakshmikanthanp::clipbirdesk::constants::getAppName;
   using srilakshmikanthanp::clipbirdesk::constants::getAppOrgName;
@@ -363,10 +364,17 @@ auto main(int argc, char **argv) -> int {
     W(getAppOrgName()), W(getAppName()), W(std::string()), W(getAppVersion())
   );
 
-  // is compatible
-  if (!WinToastLib::WinToast::isCompatible()) {
-    return EXIT_FAILURE;
-  }
+  // create the application
+  ClipbirdApplication app(argc, argv);
+
+  // native event filter
+  auto filter = new ClipbirdNativeEventFilter(app.getController());
+
+  // install native event filter
+  app.installNativeEventFilter(filter);
+
+  // install event filter
+  app.installEventFilter(new ClipbirdEventFilter());
 
   // set up wintoast lib
   WinToastLib::WinToast::instance()->setAppName(W(getAppName()));
@@ -374,14 +382,14 @@ auto main(int argc, char **argv) -> int {
 
   // initialize
   if (!WinToastLib::WinToast::instance()->initialize()) {
+    auto dialog = QMessageBox(nullptr);
+    dialog.setText(QObject::tr("Can't Initialize WinToast"));
+    dialog.setIcon(QMessageBox::Critical);
+    dialog.setWindowTitle(getAppName());
+    dialog.setWindowIcon(QIcon(getAppLogo()));
+    dialog.exec();
     return EXIT_FAILURE;
   }
-
-  // create the application
-  ClipbirdApplication app(argc, argv);
-
-  // install event filter
-  app.installEventFilter(new ClipbirdEventFilter());
 
   // Home Directory of the application
   auto path = QString::fromStdString(getAppHome());
@@ -420,12 +428,6 @@ auto main(int argc, char **argv) -> int {
 
   // Set the custom message handler
   qInstallMessageHandler(Logger::handler);
-
-  // native event filter
-  auto filter = new ClipbirdNativeEventFilter(app.getController());
-
-  // install native event filter
-  app.installNativeEventFilter(filter);
 
   // start application and return status code
   return app.exec();
