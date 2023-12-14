@@ -7,38 +7,45 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification {
 /**
- * @brief Called when user Dismissed
+ * @brief Accept Impl
  */
-void JoinRequest::toastDismissed(WinToastDismissalReason state) const {
-  emit onReject();
+void JoinRequest::acceptImpl() const {
+  QMetaObject::invokeMethod(const_cast<JoinRequest*>(this), "onAccept", Qt::QueuedConnection);
+}
+
+/**
+ * @brief Reject Impl
+ */
+void JoinRequest::rejectImpl() const {
+  QMetaObject::invokeMethod(const_cast<JoinRequest*>(this), "onReject", Qt::QueuedConnection);
 }
 
 /**
  * @brief Called when user Activated
  */
 void JoinRequest::toastActivated() const {
-  emit onReject();
+  this->rejectImpl();
 }
 
 /**
  * @brief Called when user Failed
  */
 void JoinRequest::toastFailed() const {
-  emit onReject();
+  this->rejectImpl();
+}
+
+/**
+ * @brief Called when user Dismissed
+ */
+void JoinRequest::toastDismissed(WinToastDismissalReason state) const {
+  if (state == WinToastDismissalReason::UserCanceled) this->rejectImpl();
 }
 
 /**
  * @brief Called when user Activated
  */
 void JoinRequest::toastActivated(int actionIndex) const {
-  switch (actionIndex) {
-  case 0:
-    emit onAccept();
-    break;
-  case 1:
-    emit onReject();
-    break;
-  }
+  actionIndex == 0 ? this->acceptImpl() : this->rejectImpl();
 }
 
 /**
@@ -55,14 +62,13 @@ JoinRequest::JoinRequest(QObject *parent) : QObject(parent) {
  */
 void JoinRequest::show(const types::device::Device &device) {
   auto toast = WinToastLib::WinToastTemplate(WinToastLib::WinToastTemplate::ImageAndText01);
-  auto text  = QObject::tr("Device %1 wants to Join to your Group").arg(device.name);
-
+  auto text  = QObject::tr("%1 wants to Join to your Group").arg(device.name);
   toast.setTextField(text.toStdWString(), WinToastLib::WinToastTemplate::FirstLine);
 
-  std::vector<std::wstring> actions;
-
-  actions.push_back(tr("Accept").toStdWString());
-  actions.push_back(tr("Reject").toStdWString());
+  std::vector<std::wstring> actions{
+    tr("Accept").toStdWString(),    // 0
+    tr("Reject").toStdWString(),    // 1
+  };
 
   for (auto const &action : actions) {
     toast.addAction(action);

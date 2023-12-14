@@ -8,6 +8,7 @@
 #include <wintoastlib.h>
 
 #include <QObject>
+#include <QMetaObject>
 
 #include "constants/constants.hpp"
 #include "types/device/device.hpp"
@@ -54,6 +55,16 @@ class JoinRequest : public QObject, public WinToastLib::IWinToastHandler {
    * @brief Called when user Activated
    */
   void toastActivated(int actionIndex) const;
+
+  /**
+   * @brief Accept Impl
+   */
+  void acceptImpl() const;
+
+  /**
+   * @brief Reject Impl
+   */
+  void rejectImpl() const;
 
  public:
 

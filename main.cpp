@@ -4,8 +4,6 @@
 // https://opensource.org/licenses/MIT
 
 // Qt Headers
-#include <wintoastlib.h>
-
 #include <QAbstractNativeEventFilter>
 #include <QApplication>
 #include <QFile>
@@ -19,6 +17,7 @@
 
 // C++ Headers
 #include <csignal>
+#include <wintoastlib.h>
 
 // Project Headers
 #include "constants/constants.hpp"
@@ -422,11 +421,8 @@ auto main(int argc, char **argv) -> int {
   // Set the custom message handler
   qInstallMessageHandler(Logger::handler);
 
-  // controller
-  auto controller = app.getController();
-
   // native event filter
-  auto filter     = new ClipbirdNativeEventFilter(controller);
+  auto filter = new ClipbirdNativeEventFilter(app.getController());
 
   // install native event filter
   app.installNativeEventFilter(filter);

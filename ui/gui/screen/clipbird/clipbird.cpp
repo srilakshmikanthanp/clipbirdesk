@@ -122,19 +122,29 @@ void Clipbird::handleServerStateChange(bool isStarted) {
  */
 void Clipbird::handleAuthRequest(const types::device::Device& client) {
   // get the user input
-  auto toast = new notification::JoinRequest(this);
+  notification::JoinRequest* toast = new notification::JoinRequest(this);
 
   // connect the dialog to window AuthSuccess signal
   const auto signal_s = &notification::JoinRequest::onAccept;
   const auto slot_s   = [=] { controller->authSuccess(client); };
-  connect(toast, signal_s, slot_s);
+  const auto conn_s   = connect(toast, signal_s, slot_s);
   connect(toast, signal_s, toast, &QObject::deleteLater);
+
+  // disconnect all signals on tab change signal
+  connect(this, &Clipbird::onTabChanged, [=]{
+    QObject::disconnect(conn_s);
+  });
 
   // connect the dialog to window AuthFail signal
   const auto signal_f = &notification::JoinRequest::onReject;
   const auto slot_f   = [=] { controller->authFailed(client); };
-  connect(toast, signal_f, slot_f);
+  const auto conn_f   = connect(toast, signal_f, slot_f);
   connect(toast, signal_f, toast, &QObject::deleteLater);
+
+  // disconnect all signals on tab change signal
+  connect(this, &Clipbird::onTabChanged, [=]{
+    QObject::disconnect(conn_f);
+  });
 
   // shoe the notification
   toast->show(client);
