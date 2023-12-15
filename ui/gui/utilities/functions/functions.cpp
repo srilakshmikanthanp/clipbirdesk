@@ -23,11 +23,6 @@ void setPlatformAttributes(QWidget *widget) {
     sizeof(isDark)
   );
 
-  // suppress -2147024890 Invalid Handle error
-  if (result == -2147024890) {
-    return;
-  }
-
   // if success return
   if (result == S_OK) {
     return;
