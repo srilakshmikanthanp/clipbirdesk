@@ -23,10 +23,35 @@ void setPlatformAttributes(QWidget *widget) {
     sizeof(isDark)
   );
 
-  // if success return
-  if (result != S_OK) {
-    qWarning() << "DwmSetWindowAttribute failed with error code: " << result;
+  // suppress -2147024890 Invalid Handle error
+  if (result == -2147024890) {
+    return;
   }
+
+  // if success return
+  if (result == S_OK) {
+    return;
+  }
+
+  // get the string of the error
+  LPSTR errorText = nullptr;
+
+  // get the error string
+  FormatMessageA(
+    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+    nullptr,
+    result,
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+    reinterpret_cast<LPSTR>(&errorText),
+    0,
+    nullptr
+  );
+
+  // log code: string
+  qWarning() << result << " : " << errorText;
+
+  // free the error string
+  LocalFree(errorText);
 #endif
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::utilities

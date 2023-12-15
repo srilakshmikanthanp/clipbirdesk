@@ -110,14 +110,6 @@ class Clipbird : public QFrame {
  signals:  // signals
   void onTabChanged(Tabs tab);  // emit when tab changed
 
- private:  // constant for keys (Server)
-
-  QString create_group = QObject::tr("Create Group");
-
- private:  // constant for keys (Client)
-
-  QString join_group = QObject::tr("Join Group");
-
  private:  // private slots
 
   //------------------------------ slots for Clipbird -------------------------//

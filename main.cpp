@@ -100,8 +100,8 @@ class ClipbirdApplication : public SingleApplication {
     }
 
     // log the certificate and key
-    qInfo("Certificate: " + config.localCertificate().toPem());
-    qInfo("Key: " + config.privateKey().toPem());
+    qInfo("Certificate: \n" + config.localCertificate().toPem());
+    qInfo("Key: \n" + config.privateKey().toPem());
 
     // return the configuration
     return config;

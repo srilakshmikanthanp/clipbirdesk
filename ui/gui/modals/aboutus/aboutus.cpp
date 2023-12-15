@@ -45,10 +45,10 @@ AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
   bug->setCursor(Qt::PointingHandCursor);
 
   // Vertical Layout
-  auto layoutVer = new QVBoxLayout(this);
+  auto layoutVer = new QVBoxLayout();
 
   // Horizontal Layout
-  auto layoutHor = new QHBoxLayout(this);
+  auto layoutHor = new QHBoxLayout();
 
   // add logo and version
   layoutVer->addWidget(logo);

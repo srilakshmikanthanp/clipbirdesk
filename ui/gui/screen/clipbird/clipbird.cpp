@@ -32,7 +32,7 @@ void Clipbird::handleTabChangeForClient(Tabs tab) {
   if (tab != Tabs::Client) return;  // if not client tab return
 
   // initialize the client Clipbird
-  this->setStatus(join_group, Status::Disconnected);
+  this->setStatus(QObject::tr("Not Connected"), Status::Disconnected);
 
   // reset the device list
   this->removeAllClient();
@@ -195,7 +195,7 @@ void Clipbird::handleServerStatusChanged(bool isConnected) {
   isConnected = isConnected && server.has_value();
 
   // infer the status from the server state
-  auto groupName = isConnected ? server->name : join_group;
+  auto groupName = isConnected ? server->name : QObject::tr("Not Connected");
   auto servers   = controller->getServerList();
   auto status    = isConnected ? Status::Connected : Status::Disconnected;
 
@@ -505,8 +505,8 @@ void Clipbird::onReceivedClicked() {
  * @brief Function used to set up all text in the label, etc..
  */
 void Clipbird::setUpLanguage() {
-  this->tab->setTabText(0, create_group);
-  this->tab->setTabText(1, join_group);
+  this->tab->setTabText(0, QObject::tr("Create Group"));
+  this->tab->setTabText(1, QObject::tr("Join Group"));
 }
 
 /**
@@ -563,10 +563,13 @@ Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QFrame(p), controller(c)
   clientArea->setAlignment(Qt::AlignCenter);
 
   // add server list to tab
-  tab->addTab(clientArea, this->create_group);
+  tab->addTab(clientArea, "");
 
   // add client list to tab
-  tab->addTab(serverArea, this->join_group);
+  tab->addTab(serverArea, "");
+
+  // set up language
+  this->setUpLanguage();
 
   // add tab to  layout
   root->addWidget(tab);
