@@ -487,15 +487,15 @@ void Clipbird::onReceivedClicked() {
   const auto slot_cc   = [=](auto i) { controller->setClipboard(controller->getHistory().at(i)); };
   connect(&history, signal_cc, slot_cc);
 
-  // connect signal for history change
-  const auto signal_hc = &ClipBird::OnHistoryChanged;
-  const auto slot_hc   = &modals::History::setHistory;
-  connect(controller, signal_hc, &history, slot_hc);
-
   // connect signal for history delete
   const auto signal_hd = &modals::History::onClipDelete;
   const auto slot_hd   = &ClipBird::deleteHistoryAt;
   connect(&history, signal_hd, controller, slot_hd);
+
+  // connect signal for history change
+  const auto signal_hc = &ClipBird::OnHistoryChanged;
+  const auto slot_hc   = &modals::History::setHistory;
+  connect(controller, signal_hc, &history, slot_hc, Qt::QueuedConnection);
 
   // show the dialog
   history.show();
