@@ -153,6 +153,11 @@ ClipHist::ClipHist(QWidget *parent) : QWidget(parent) {
 
   // set up initial language
   this->setUpLanguage();
+
+  // create max clip tile
+  for (auto i = 0; i < constants::getAppMaxHistorySize(); i++) {
+    this->list.append(new ClipTile());
+  }
 }
 
 /**
@@ -183,7 +188,11 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
   // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
-    item->widget()->deleteLater();
+    auto tile = (ClipTile*) item->widget();
+    tile->setClip(QVector<QPair<QString, QByteArray>>());
+    tile->disconnect();
+    tile->setVisible(false);
+    tile->setParent(nullptr);
     delete item;
   }
 
@@ -193,7 +202,7 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
   // set the history
   for (auto idx = 0L; idx < history.size(); idx++) {
     // get the tile from the list
-    ClipTile *tile  = new ClipTile(this);
+    ClipTile *tile  = this->list.at(idx);
 
     // connect the copy signal to this signal
     auto signal_d = &components::ClipTile::onClipDelete;
@@ -210,6 +219,9 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
 
     // add the item to the layout
     verticalLayout->addWidget(tile);
+
+    // set the visibility
+    tile->setVisible(true);
   }
 
   // update
@@ -223,12 +235,19 @@ void ClipHist::clearHistory() {
   // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
-    item->widget()->deleteLater();
+    auto tile = (ClipTile*) item->widget();
+    tile->disconnect();
+    tile->setClip(QVector<QPair<QString, QByteArray>>());
+    tile->setVisible(false);
+    tile->setParent(nullptr);
     delete item;
   }
 
   // update
-  this->update();
+  this->repaint();
+
+  // clear the history
+  this->history.clear();
 }
 
 /**
@@ -245,8 +264,17 @@ ClipHist::~ClipHist() {
   // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
-    item->widget()->deleteLater();
+    auto tile = (ClipTile*) item->widget();
+    tile->disconnect();
+    tile->setClip(QVector<QPair<QString, QByteArray>>());
+    tile->setVisible(false);
+    tile->setParent(nullptr);
     delete item;
+  }
+
+  // delete clipHist
+  for (auto clipHist: this->list) {
+    clipHist->deleteLater();
   }
 }
 

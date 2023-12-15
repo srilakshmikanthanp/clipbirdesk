@@ -107,6 +107,7 @@ class ClipHist : public QWidget {
   QStackedLayout* stackLayout = new QStackedLayout(this);
   QWidget* verticalWidget     = new QWidget(this);
   QVBoxLayout* verticalLayout = new QVBoxLayout(verticalWidget);
+  QList<ClipTile*> list       = QList<ClipTile*>();
   QList<QVector<QPair<QString, QByteArray>>> history;
 
  private:  // Member variable (With Text Info)
