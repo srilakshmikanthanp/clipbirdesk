@@ -171,7 +171,19 @@ void ClipHist::setUpLanguage() {
  * @brief on clipDelete Impl
  */
 void ClipHist::onClipDeleteImpl(int idx) {
-  emit onClipDelete(idx);
+  auto tile = this->list.at(idx);
+  verticalLayout->removeWidget(tile);
+  tile->setVisible(false);
+  tile->setClip(QVector<QPair<QString, QByteArray>>());
+  tile->setVisible(false);
+  tile->disconnect();
+  tile->setParent(nullptr);
+
+  this->repaint();
+
+  QMetaObject::invokeMethod(
+    this, "onClipDelete", Qt::QueuedConnection, Q_ARG(int, idx)
+  );
 }
 
 /**
@@ -190,8 +202,8 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
     auto tile = (ClipTile*) item->widget();
     tile->setClip(QVector<QPair<QString, QByteArray>>());
-    tile->disconnect();
     tile->setVisible(false);
+    tile->disconnect();
     tile->setParent(nullptr);
     delete item;
   }
@@ -204,6 +216,9 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
     // get the tile from the list
     ClipTile *tile  = this->list.at(idx);
 
+    // set the clip
+    tile->setClip(history.at(idx));
+
     // connect the copy signal to this signal
     auto signal_d = &components::ClipTile::onClipDelete;
     auto slot_d   = [=]() { this->onClipDeleteImpl(idx); };
@@ -213,9 +228,6 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
     auto signal_c = &components::ClipTile::onClipCopy;
     auto slot_c   = [=]() { this->onClipCopyImpl(idx); };
     QObject::connect(tile, signal_c, slot_c);
-
-    // set the clip
-    tile->setClip(history.at(idx));
 
     // add the item to the layout
     verticalLayout->addWidget(tile);
@@ -236,9 +248,9 @@ void ClipHist::clearHistory() {
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
     auto tile = (ClipTile*) item->widget();
-    tile->disconnect();
     tile->setClip(QVector<QPair<QString, QByteArray>>());
     tile->setVisible(false);
+    tile->disconnect();
     tile->setParent(nullptr);
     delete item;
   }
