@@ -185,14 +185,14 @@ void ClipHist::setUpLanguage() {
  * @brief on clipDelete Impl
  */
 void ClipHist::onClipDeleteImpl(int idx) {
-  QMetaObject::invokeMethod(this, "onClipDelete", Qt::DirectConnection, Q_ARG(int, idx));
+  emit onClipDelete(idx);
 }
 
 /**
  * @brief on clipCopy Impl
  */
 void ClipHist::onClipCopyImpl(int idx) {
-  QMetaObject::invokeMethod(this, "onClipSelected", Qt::DirectConnection, Q_ARG(int, idx));
+  emit onClipSelected(idx);
 }
 
 /**
@@ -232,7 +232,7 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
   }
 
   // update
-  this->update();
+  this->repaint();
 }
 
 /**
