@@ -205,6 +205,7 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
     auto tile = (ClipTile*) item->widget();
     tile->disconnect();
     tile->clearClip();
+    tile->setVisible(false);
     tile->setParent(nullptr);
     delete item;
   }
@@ -229,6 +230,9 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
 
     // add the item to the layout
     verticalLayout->addWidget(tile);
+
+    // show the tile
+    tile->setVisible(true);
   }
 
   // update

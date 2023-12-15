@@ -495,7 +495,7 @@ void Clipbird::onReceivedClicked() {
   // connect signal for history change
   const auto signal_hc = &ClipBird::OnHistoryChanged;
   const auto slot_hc   = &modals::History::setHistory;
-  connect(controller, signal_hc, &history, slot_hc, Qt::QueuedConnection);
+  connect(controller, signal_hc, &history, slot_hc);
 
   // show the dialog
   history.show();
