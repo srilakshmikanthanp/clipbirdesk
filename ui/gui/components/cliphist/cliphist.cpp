@@ -96,20 +96,6 @@ void ClipTile::setClip(const QVector<QPair<QString, QByteArray>> &clip) {
 /**
  * @brief Clear the clip
  */
-void ClipTile::clearClip() {
-  item->clear();
-}
-
-/**
- * @brief Has Clip
- */
-bool ClipTile::hasClip() {
-  return !this->clip.isEmpty();
-}
-
-/**
- * @brief Clear the clip
- */
 QVector<QPair<QString, QByteArray>> ClipTile::getClip() {
   return this->clip;
 }
@@ -167,11 +153,6 @@ ClipHist::ClipHist(QWidget *parent) : QWidget(parent) {
 
   // set up initial language
   this->setUpLanguage();
-
-  // create all items
-  for (auto i = 0L; i < constants::getAppMaxHistorySize(); ++i) {
-    this->list.append(new ClipTile());
-  }
 }
 
 /**
@@ -202,18 +183,17 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
   // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
-    auto tile = (ClipTile*) item->widget();
-    tile->disconnect();
-    tile->clearClip();
-    tile->setVisible(false);
-    tile->setParent(nullptr);
+    item->widget()->deleteLater();
     delete item;
   }
+
+  // set history
+  this->history = history;
 
   // set the history
   for (auto idx = 0L; idx < history.size(); idx++) {
     // get the tile from the list
-    ClipTile *tile  = (ClipTile*) this->list.at(idx);
+    ClipTile *tile  = new ClipTile(this);
 
     // connect the copy signal to this signal
     auto signal_d = &components::ClipTile::onClipDelete;
@@ -230,9 +210,6 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
 
     // add the item to the layout
     verticalLayout->addWidget(tile);
-
-    // show the tile
-    tile->setVisible(true);
   }
 
   // update
@@ -246,6 +223,7 @@ void ClipHist::clearHistory() {
   // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
+    item->widget()->deleteLater();
     delete item;
   }
 
@@ -257,16 +235,6 @@ void ClipHist::clearHistory() {
  * @brief get the History
  */
 QList<QVector<QPair<QString, QByteArray>>> ClipHist::getHistory() {
-  QList<QVector<QPair<QString, QByteArray>>> history;
-
-  for (auto tile: this->list) {
-    if (tile->hasClip()) {
-      history.append(tile->getClip());
-    } else {
-      break;
-    }
-  }
-
   return history;
 }
 
@@ -277,19 +245,8 @@ ClipHist::~ClipHist() {
   // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
-    auto tile = (ClipTile*) item->widget();
-    tile->disconnect();
-    tile->clearClip();
-    tile->setParent(nullptr);
+    item->widget()->deleteLater();
     delete item;
-  }
-
-  // delete all the items
-  for (auto item: this->list) {
-    item->disconnect();
-    item->setParent(nullptr);
-    item->clearClip();
-    item->deleteLater();
   }
 }
 

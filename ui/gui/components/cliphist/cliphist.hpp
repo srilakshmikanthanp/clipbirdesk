@@ -80,16 +80,6 @@ class ClipTile : public QWidget {
   void setClip(const QVector<QPair<QString, QByteArray>> &clip);
 
   /**
-   * @brief Clear the clip
-   */
-  void clearClip();
-
-  /**
-   * @brief Has Clip
-   */
-  bool hasClip();
-
-  /**
    * @brief get the Clip
    */
   QVector<QPair<QString, QByteArray>> getClip();
@@ -117,7 +107,7 @@ class ClipHist : public QWidget {
   QStackedLayout* stackLayout = new QStackedLayout(this);
   QWidget* verticalWidget     = new QWidget(this);
   QVBoxLayout* verticalLayout = new QVBoxLayout(verticalWidget);
-  QList<ClipTile*> list   = QList<ClipTile*>();
+  QList<QVector<QPair<QString, QByteArray>>> history;
 
  private:  // Member variable (With Text Info)
 
