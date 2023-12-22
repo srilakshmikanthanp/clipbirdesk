@@ -181,6 +181,11 @@ void Browser::removeCallback(QString serviceName) {
   auto service = this->serviceMap.find(serviceName);
   auto device = types::device::Device();
 
+  // if not found
+  if (service == this->serviceMap.end()) {
+    return;
+  }
+
   // get the QHostAddress
   device.port = service->second;
   device.name = serviceName;

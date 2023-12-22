@@ -240,7 +240,7 @@ class ClipbirdEventFilter : public QObject {
   }
 
   void handleWindowShownEvent(QWidget *window) {
-    if (!(window->windowFlags() & Qt::FramelessWindowHint) && window->isWindow()) {
+    if (!(window->windowFlags() & Qt::FramelessWindowHint)) {
       ui::gui::utilities::setPlatformAttributes(window);
     }
   }

@@ -21,6 +21,7 @@
 #include <QUdpSocket>
 #include <QtLogging>
 #include <QtTypes>
+#include <QMutex>
 
 // mDNS headers
 #include <dns_sd.h>
