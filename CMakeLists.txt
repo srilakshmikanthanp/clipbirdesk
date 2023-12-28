@@ -25,11 +25,11 @@ include(FetchContent)
 # set the APPLICATION_ISSUEPAGE
 set(APPLICATION_ISSUEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk/issues")
 
-# Set the APPLICATION_HOMEPAGE
-set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
-
 # Set the DONATE_URL
 set(DONATE_URL "https://srilakshmikanthanp.github.io/donate")
+
+# Set the APPLICATION_HOMEPAGE
+set(APPLICATION_HOMEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk")
 
 # Set the Version
 set(VERSION ${PROJECT_VERSION})

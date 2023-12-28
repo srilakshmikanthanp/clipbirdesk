@@ -1,4 +1,4 @@
-#if defined(_WIN32) || defined(__APPLE__)   // Only for Linux Operating System that supports bonjour
+#if defined(_WIN32) || defined(__APPLE__) || defined(__linux__) // Only for Operating System that supports bonjour
 
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //

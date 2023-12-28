@@ -1,11 +1,12 @@
+#pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include <QObject>
-
-#if defined _WIN32 || defined __APPLE__  // for windows and macos using bonjour
+// for windows and macos using bonjour & avahi compact
+#if defined _WIN32 || defined __APPLE__ || __linux__
 
 #include "network/service/mdns/browser/browser.hpp"
 #include "network/service/mdns/register/register.hpp"
@@ -17,6 +18,6 @@ using mdnsBrowser  = mdns::Browser;
 
 #else  // any other platforms
 
-#Error "Currently We don't Support Any platform other than Apple and windows"
+#Error "This platform is Not Supported for mDns"
 
 #endif
