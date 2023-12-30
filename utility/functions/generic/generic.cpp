@@ -3,10 +3,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#include "platform.hpp"
+#include "generic.hpp"
 
+#ifdef __linux__ // Only for linux to set the socket as non blocking
 #include <fcntl.h>
 #include <unistd.h>
+#endif
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions::platform {
 /**
@@ -28,5 +30,4 @@ int setSocketNonBlocking(int fd) {
 #endif
 }
 #endif  // __linux__
-
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions::linux

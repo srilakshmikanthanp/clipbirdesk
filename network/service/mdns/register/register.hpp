@@ -23,8 +23,6 @@
 // htons, ntohs
 #ifdef __linux__
   #include <arpa/inet.h>
-#elif defined(_WIN32)
-  #include <winsock2.h>
 #endif
 
 // mDNS headers

@@ -26,8 +26,6 @@
 // htons, ntohs
 #ifdef __linux__
   #include <arpa/inet.h>
-#else
-  #include <winsock2.h>
 #endif
 
 // mDNS headers
@@ -40,7 +38,7 @@
 #include "utility/functions/ipconv/ipconv.hpp"
 
 // Platform headers
-#include "utility/functions/platform/platform.hpp"
+#include "utility/functions/generic/generic.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
 /**
