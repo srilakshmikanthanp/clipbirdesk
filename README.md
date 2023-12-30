@@ -99,7 +99,7 @@ Just go to Github Release choose the suitable version for your system and downlo
 
 ### Building Clipbird on a Windows Platform
 
-In the following steps, we will see how to build the project in the Windows platform, We use choco and vcpkg to install the dependencies in the Windows platform. If you don't have choco or vcpkg installed in your system, you can install it from [here](https://chocolatey.org/install) and [here](https://vcpkg.io/en/getting-started)
+In the following steps, we will see how to build the project in the Windows platform, We use choco to install the dependencies. If you don't have choco installed in your system, you can install it from [here](https://chocolatey.org/install).
 
 #### Prerequisites
 
@@ -131,15 +131,16 @@ Just go to [Bonjour](https://developer.apple.com/bonjour/) and download the Bonj
 | `OPENSSL_ROOT_DIR`  | OpenSSL installation directory     |
 | `QT_CMAKE_DIR`      | Qt6 cmake directory                |
 | `BONJOUR_SDK_HOME`  | Bonjour SDK directory              |
-| `VCPKG_TOOLCHAIN`   | vcpkg toolchain file               |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Building Clipbird on a Linux Platform
 
-In the following steps, we will see how to build the project in the Linux platform, We use vcpkg to install the dependencies in the Linux platform. If you don't have vcpkg installed in your system, you can install it from [here](https://vcpkg.io/en/getting-started).
+Currently, it does not work well in Linux as it works in Windows just added some conditions to compile in the Linux Platform, In the following steps, we will see how to do it. Here are some noticed bugs,
 
-Note: Currently it does not work as well in Linux as it works in Windows just added some conditions to compile in the Linux Environment
+* The position of the window is not set properly.
+* The notification is Not implemented.
+* The Clipboard data is not synced properly.
 
 #### Prerequisites
 
@@ -151,7 +152,7 @@ Note: Currently it does not work as well in Linux as it works in Windows just ad
 
 #### Installing OpenSSL
 
-Install OpenSSL using the following command and set the environment variable `OPENSSL_ROOT_DIR` to the OpenSSL installation directory.
+Install OpenSSL using the following command.
 
 ~~~sh
 sudo apt-get install libssl-dev
@@ -163,7 +164,7 @@ Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installe
 
 #### Installing Avahi
 
-Install Avahi using the following command and set the environment variable `AVAHI_DIR` to the Avahi installation directory.
+Install Avahi using the following command.
 
 ~~~sh
 sudo apt-get install libavahi-compat-libdnssd-dev
@@ -171,7 +172,7 @@ sudo apt-get install libavahi-compat-libdnssd-dev
 
 #### Installing libnotify
 
-Install libnotify using the following command and set the environment variable `LIBNOTIFY_DIR` to the libnotify installation directory.
+Install libnotify using the following command.
 
 ~~~sh
 sudo apt-get install libnotify-dev
@@ -181,11 +182,7 @@ sudo apt-get install libnotify-dev
 
 | Variable            | Value                              |
 |---------------------|------------------------------------|
-| `OPENSSL_ROOT_DIR`  | OpenSSL installation directory     |
 | `QT_CMAKE_DIR`      | Qt6 cmake directory                |
-| `AVAHI_DIR`         | Avahi installation directory       |
-| `LIBNOTIFY_DIR`     | libnotify installation directory   |
-| `VCPKG_TOOLCHAIN`   | vcpkg toolchain file               |
 
 <!-- ROADMAP -->
 ## Roadmap
@@ -232,7 +229,9 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 * [OpenSSL](https://www.openssl.org/)
 * [Qt](https://www.qt.io/)
 * [C++](https://isocpp.org/)
+* [Avahi](https://avahi.org/)
 * [Bonjour](https://developer.apple.com/bonjour/)
+* [libnotify](https://developer.gnome.org/libnotify/)
 
 ## Bonjour Integration
 
