@@ -23,6 +23,13 @@
 #include <QtTypes>
 #include <QMutex>
 
+// htons, ntohs
+#ifdef __linux__
+  #include <arpa/inet.h>
+#else
+  #include <winsock2.h>
+#endif
+
 // mDNS headers
 #include <dns_sd.h>
 
@@ -31,6 +38,9 @@
 #include "types/enums/enums.hpp"
 #include "types/device/device.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
+
+// Platform headers
+#include "utility/functions/platform/platform.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
 /**

@@ -31,6 +31,7 @@ void Client::processSslErrors(const QList<QSslError>& errors) {
   // Ignore the errors
   ignoredErrors.append(QSslError::SelfSignedCertificate);
   ignoredErrors.append(QSslError::HostNameMismatch);
+  ignoredErrors.append(QSslError::UnspecifiedError);
   ignoredErrors.append(QSslError::CertificateUntrusted);
 
   // make copy of errors

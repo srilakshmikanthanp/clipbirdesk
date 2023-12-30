@@ -5,8 +5,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-#ifdef _WIN32
-  #include "ui/gui/notification/windows/joinrequest/joinrequest.hpp"
-#else
-  #Error "Not implemented for this platform"
+#ifdef __linux__
+  #include "ui/gui/notification/linux/joinrequest/joinrequest.hpp"
+#elif _WIN32
+  #include "ui/gui/notification/win/joinrequest/joinrequest.hpp"
 #endif

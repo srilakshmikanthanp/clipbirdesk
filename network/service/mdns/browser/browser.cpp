@@ -105,6 +105,11 @@ void Browser::browseCallback(
     return;
   }
 
+  // set as non blocking
+#ifdef __linux__
+  utility::functions::platform::setSocketNonBlocking(DNSServiceRefSockFD(browserObj->m_res_ref));
+#endif
+
   // create socket notifier
   browserObj->m_res_notify = new QSocketNotifier(
       DNSServiceRefSockFD(browserObj->m_res_ref),    // socket
@@ -161,13 +166,9 @@ void Browser::addedCallback(
   auto hostname   = QString::fromUtf8(hosttarget);
 
   // bind the iAdded and port
-  auto callback = std::bind(
-    &onHostResolved,                                 // Function
-    browserObj,                                      // this
-    ntohs(port),                                     // port
-    serviceName,                                     // srvName
-    std::placeholders::_1                            // QHostInfo
-  );
+  auto callback = [=](const QHostInfo& hostInfo) {
+    browserObj->onHostResolved(ntohs(port), serviceName, hostInfo);
+  };
 
   // Resolve the ip address from hostname
   QHostInfo::lookupHost(hostname, callback);

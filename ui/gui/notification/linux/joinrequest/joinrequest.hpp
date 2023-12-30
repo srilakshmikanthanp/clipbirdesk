@@ -1,11 +1,10 @@
+#ifdef __linux__  // Only for linux using libnotify see https://developer.gnome.org/libnotify/
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
-
-#include <wintoastlib.h>
 
 #include <QObject>
 #include <QMetaObject>
@@ -17,7 +16,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification {
 /**
  * @brief Notification class
  */
-class JoinRequest : public QObject, public WinToastLib::IWinToastHandler {
+class JoinRequest : public QObject {
  private:  // disable copy and move for this class
 
   Q_DISABLE_COPY_MOVE(JoinRequest)
@@ -35,26 +34,6 @@ class JoinRequest : public QObject, public WinToastLib::IWinToastHandler {
   void onReject() const;
 
  private:  // Member Functions
-
-  /**
-   * @brief Called when user Dismissed
-   */
-  void toastDismissed(WinToastDismissalReason state) const;
-
-  /**
-   * @brief Called when user Activated
-   */
-  void toastActivated() const;
-
-  /**
-   * @brief Called when user Failed
-   */
-  void toastFailed() const;
-
-  /**
-   * @brief Called when user Activated
-   */
-  void toastActivated(int actionIndex) const;
 
   /**
    * @brief Accept Impl
@@ -87,3 +66,4 @@ class JoinRequest : public QObject, public WinToastLib::IWinToastHandler {
   virtual ~JoinRequest() = default;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification
+#endif  // __linux__
