@@ -139,6 +139,8 @@ Just go to [Bonjour](https://developer.apple.com/bonjour/) and download the Bonj
 
 In the following steps, we will see how to build the project in the Linux platform, We use vcpkg to install the dependencies in the Linux platform. If you don't have vcpkg installed in your system, you can install it from [here](https://vcpkg.io/en/getting-started).
 
+Note: Currently it does not work as well in Linux as it works in Windows just added some conditions to compile in the Linux Environment
+
 #### Prerequisites
 
 * Avahi
