@@ -7,6 +7,7 @@
 
 #include <exception>
 #include <string>
+#include <cstdint>
 
 namespace srilakshmikanthanp::clipbirdesk::types::except {
 /**

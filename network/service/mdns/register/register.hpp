@@ -20,6 +20,11 @@
 #include <QUdpSocket>
 #include <QtLogging>
 
+// htons, ntohs
+#ifdef __linux__
+  #include <arpa/inet.h>
+#endif
+
 // mDNS headers
 #include <dns_sd.h>
 

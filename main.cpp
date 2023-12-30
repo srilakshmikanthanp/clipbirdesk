@@ -17,7 +17,11 @@
 
 // C++ Headers
 #include <csignal>
-#include <wintoastlib.h>
+
+// Windows Headers
+#if defined(_WIN32) || defined(_WIN64)
+  #include <wintoastlib.h>
+#endif
 
 // Project Headers
 #include "constants/constants.hpp"
@@ -257,13 +261,16 @@ class ClipbirdNativeEventFilter : public QAbstractNativeEventFilter {
   bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override {
     constexpr const char *WIN_MSG = "windows_generic_MSG";
 
+#if defined(_WIN32) || defined(_WIN64)
     if (eventType == WIN_MSG) {
       handleWindowsGenericMessage(static_cast<MSG *>(message));
     }
+#endif
 
     return false;
   }
 
+#if defined(_WIN32) || defined(_WIN64)
   void handleWindowsGenericMessage(MSG *msg) {
     if (msg->message == WM_POWERBROADCAST) {
       switch (msg->wParam) {
@@ -277,6 +284,7 @@ class ClipbirdNativeEventFilter : public QAbstractNativeEventFilter {
       }
     }
   }
+#endif
 
   void handleSleepEvent() {
     switch (controller->getHostType()) {
@@ -359,11 +367,6 @@ auto main(int argc, char **argv) -> int {
     return std::wstring(str.begin(), str.end());
   };
 
-  // create AUMI
-  auto appAumi = WinToastLib::WinToast::configureAUMI(
-    W(getAppOrgName()), W(getAppName()), W(std::string()), W(getAppVersion())
-  );
-
   // create the application
   ClipbirdApplication app(argc, argv);
 
@@ -375,6 +378,12 @@ auto main(int argc, char **argv) -> int {
 
   // install event filter
   app.installEventFilter(new ClipbirdEventFilter());
+
+#if defined(_WIN32) || defined(_WIN64)
+  // create AUMI
+  auto appAumi = WinToastLib::WinToast::configureAUMI(
+    W(getAppOrgName()), W(getAppName()), W(std::string()), W(getAppVersion())
+  );
 
   // set up wintoast lib
   WinToastLib::WinToast::instance()->setAppName(W(getAppName()));
@@ -390,6 +399,7 @@ auto main(int argc, char **argv) -> int {
     dialog.exec();
     return EXIT_FAILURE;
   }
+#endif
 
   // Home Directory of the application
   auto path = QString::fromStdString(getAppHome());

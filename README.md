@@ -135,6 +135,58 @@ Just go to [Bonjour](https://developer.apple.com/bonjour/) and download the Bonj
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+### Building Clipbird on a Linux Platform
+
+In the following steps, we will see how to build the project in the Linux platform, We use vcpkg to install the dependencies in the Linux platform. If you don't have vcpkg installed in your system, you can install it from [here](https://vcpkg.io/en/getting-started).
+
+Note: Currently it does not work as well in Linux as it works in Windows just added some conditions to compile in the Linux Environment
+
+#### Prerequisites
+
+* Avahi
+* C++
+* Qt6
+* libnotify
+* OpenSSL
+
+#### Installing OpenSSL
+
+Install OpenSSL using the following command and set the environment variable `OPENSSL_ROOT_DIR` to the OpenSSL installation directory.
+
+~~~sh
+sudo apt-get install libssl-dev
+~~~
+
+#### Installing Qt6
+
+Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for Linux, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
+
+#### Installing Avahi
+
+Install Avahi using the following command and set the environment variable `AVAHI_DIR` to the Avahi installation directory.
+
+~~~sh
+sudo apt-get install libavahi-compat-libdnssd-dev
+~~~
+
+#### Installing libnotify
+
+Install libnotify using the following command and set the environment variable `LIBNOTIFY_DIR` to the libnotify installation directory.
+
+~~~sh
+sudo apt-get install libnotify-dev
+~~~
+
+#### Environment Variables
+
+| Variable            | Value                              |
+|---------------------|------------------------------------|
+| `OPENSSL_ROOT_DIR`  | OpenSSL installation directory     |
+| `QT_CMAKE_DIR`      | Qt6 cmake directory                |
+| `AVAHI_DIR`         | Avahi installation directory       |
+| `LIBNOTIFY_DIR`     | libnotify installation directory   |
+| `VCPKG_TOOLCHAIN`   | vcpkg toolchain file               |
+
 <!-- ROADMAP -->
 ## Roadmap
 

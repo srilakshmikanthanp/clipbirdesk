@@ -1,3 +1,5 @@
+#ifdef _WIN32 // Only for windows using wintoast see https://github.com/mohabouje/WinToast
+
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
 //
 // This software is released under the MIT License.
@@ -77,3 +79,4 @@ void JoinRequest::show(const types::device::Device &device) {
   WinToastLib::WinToast::instance()->showToast(toast, this);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification
+#endif  // _WIN32

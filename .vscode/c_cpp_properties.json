@@ -24,6 +24,24 @@
       "cppStandard": "c++17",
       "intelliSenseMode": "msvc-x64",
       "configurationProvider": "ms-vscode.cpptools"
+    },
+    {
+      "compilerPath": "/usr/bin/g++",
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "/usr/include/**",
+        "/usr/local/include/**"
+      ],
+      "defines": [
+        "_UNICODE",
+        "_DEBUG",
+        "UNICODE"
+      ],
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "gcc-x64",
+      "configurationProvider": "ms-vscode.cpptools"
     }
   ],
   "version": 4

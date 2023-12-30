@@ -68,6 +68,17 @@ cmake_policy(SET CMP0071 NEW)
 cmake_policy(SET CMP0135 NEW)
 
 # --------------------------------- Main Project ---------------------------------#
+# Fetch https://github.com/mohabouje/WinToast.git only if windows
+if (WIN32)
+  FetchContent_Declare(WinToast
+    GIT_REPOSITORY https://github.com/mohabouje/WinToast.git
+    GIT_TAG        v1.3.0
+  )
+
+  # Make Available WinToast
+  FetchContent_MakeAvailable(WinToast)
+endif()
+
 # Fetch SingleApplication from github
 FetchContent_Declare(SingleApplication
   GIT_REPOSITORY https://github.com/itay-grudev/SingleApplication.git
@@ -95,15 +106,6 @@ set(WITH_TOOLS OFF CACHE BOOL "" FORCE)
 # Make Available qzxing
 FetchContent_MakeAvailable(libqrencode)
 
-# Fetch https://github.com/mohabouje/WinToast.git
-FetchContent_Declare(WinToast
-  GIT_REPOSITORY https://github.com/mohabouje/WinToast.git
-  GIT_TAG        v1.3.0
-)
-
-# Make Available WinToast
-FetchContent_MakeAvailable(WinToast)
-
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
 
@@ -128,9 +130,19 @@ find_package(Qt6 REQUIRED COMPONENTS
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
 
-# Find Bonjour on windows and mac
+# Find DNS-SD libraries for different platforms
 if(WIN32 OR APPLE)
   find_package(Bonjour REQUIRED)
+elseif(LINUX)
+  find_package(Avahi REQUIRED)
+else()
+  message(FATAL_ERROR "Platform not supported")
+endif()
+
+# Finc D-Bus
+if (UNIX AND NOT APPLE)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(DBUS dbus-1 REQUIRED)
 endif()
 
 # set up project using Qt
@@ -171,8 +183,7 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Concurrent
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto
-  PRIVATE qrencode
-  PRIVATE WinToast)
+  PRIVATE qrencode)
 
 # set target properties
 set_target_properties(clipbird PROPERTIES
@@ -190,6 +201,7 @@ endif()
 # Add Platform specific definitions for win
 if(WIN32)
   target_include_directories(clipbird PUBLIC ${BONJOUR_INCLUDE_DIR})
+  target_link_libraries(clipbird PRIVATE WinToast)
   target_link_libraries(clipbird PRIVATE Dwmapi.lib)
   target_link_libraries(clipbird PRIVATE runtimeobject.lib)
   target_link_libraries(clipbird PRIVATE ${BONJOUR_LIBRARIES})
@@ -198,6 +210,10 @@ endif()
 
 # Add Platform specific definitions for linux
 if(UNIX AND NOT APPLE)
+  target_include_directories(clipbird PUBLIC ${Avahi_INCLUDE_DIRS})
+  target_link_libraries(clipbird PUBLIC ${Avahi_LIBRARIES})
+  target_include_directories(clipbird PUBLIC ${DBUS_INCLUDE_DIRS})
+  target_link_libraries(clipbird PUBLIC ${DBUS_LIBRARIES})
   add_definitions(-D__linux__)
 endif()
 
