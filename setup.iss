@@ -67,10 +67,10 @@ Name      : "{autoprograms}\{#ClipbirdName}"; \
 Filename  : "{app}\{#ClipbirdExeName}"
 
 [Run]
-; Install Bonjour service for Windows
-Filename    : msiexec.exe;                                    \
-Parameters  : "/i ""{app}\Bonjour64.msi"" /qn /norestart";    \
-StatusMsg   : "Installing Bonjour..."
+; Install Bonjour service for Windows //-> Enable on Apple Approval
+; Filename    : msiexec.exe;                                    \
+; Parameters  : "/i ""{app}\Bonjour64.msi"" /qn /norestart";    \
+; StatusMsg   : "Installing Bonjour..."
 
 ; Install VC++ Redistributables
 Filename    : {app}\vc_redist.x64.exe;              \

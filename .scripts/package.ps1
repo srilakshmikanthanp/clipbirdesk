@@ -45,9 +45,9 @@ New-Item -ItemType Directory -Force -Path $ClipbirDir/assets/images
 Write-Host "Copying ./assets/images/* to $ClipbirDir/assets/images" -ForegroundColor Green
 Copy-Item ./assets/images/* $ClipbirDir/assets/images
 
-# copy the bonjour installer to the package directory from env
-Write-Host "Copying $env:BONJOUR_SDK_HOME/Installer/Bonjour64.msi to $ClipbirDir" -ForegroundColor Green
-Copy-Item "$env:BONJOUR_SDK_HOME/Installer/Bonjour64.msi" $ClipbirDir
+# copy the bonjour installer to the package directory from env //-> Enable on Apple Approval
+# Write-Host "Copying $env:BONJOUR_SDK_HOME/Installer/Bonjour64.msi to $ClipbirDir" -ForegroundColor Green
+# Copy-Item "$env:BONJOUR_SDK_HOME/Installer/Bonjour64.msi" $ClipbirDir
 
 # Copy All openssl dlls to the package directory
 Write-Host "Copying $env:OPENSSL_ROOT_DIR /bin/*.dll to $ClipbirDir" -ForegroundColor Green
