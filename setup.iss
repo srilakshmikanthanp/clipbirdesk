@@ -3,8 +3,8 @@
 ; constants used in the script
 #define ClipbirdPublisher "srilakshmikanthanp"
 #define ClipbirdName "clipbird"
-#define ClipbirdVersion "{code:GetValue}\'VERSION'"
-#define ClipbirdUUID "{code:GetValue}\'APPUUID'"
+#define ClipbirdVersion "1.2.0"
+#define ClipbirdUUID "3A8D9FCA-9F95-4947-8AB0-3E364ED765E1"
 #define ClipbirdURL "https://github.com/srilakshmikanthanp/clipbirdesk"
 #define ClipbirdExeName "clipbird.exe"
 
@@ -81,17 +81,3 @@ StatusMsg   : "Installing VC++ Redistributables..."
 Filename    : "{app}\{#ClipbirdExeName}";                                    \
 Description : "{cm:LaunchProgram,{#StringChange(ClipbirdName, '&', '&&')}}"; \
 Flags       : nowait postinstall skipifsilent
-
-
-; function used read Version from file
-[Code]
-function GetValue(Key: string): string;
-var
-  FilePath: string;
-  Value: AnsiString;
-begin
-  FilePath  := ExpandConstant('{src}\conf\') + Key;
-  LoadStringFromFile(FilePath, Value);
-  Result := Value;
-  if Result = '' then RaiseException('Cannot find Key');
-end;
