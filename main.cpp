@@ -52,6 +52,14 @@ class ClipbirdApplication : public SingleApplication {
     QSslKey key          = QSslKey(storage.getHostKey(), QSsl::Rsa);
     QSslConfiguration sslConfig;
 
+    // get cert name
+    auto name = cert.subjectInfo(QSslCertificate::CommonName);
+
+    // Name is updated
+    if (name != QString::fromStdString(constants::getAppName())) {
+      return getNewSslConfiguration();
+    }
+
     // set the certificate and key
     sslConfig.setLocalCertificate(cert);
     sslConfig.setPrivateKey(key);
