@@ -246,6 +246,7 @@ This project utilizes Bonjour technology by Apple for Advertising and Discovery 
 
 * [Suryanarayanan](https://github.com/suryanarayanandv)
 * [Dharun RK](https://github.com/rkdharun)
+* [Kaaviya S](https://github.com/kaaviya-s)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
