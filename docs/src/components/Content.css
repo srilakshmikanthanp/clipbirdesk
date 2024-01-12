@@ -1,0 +1,29 @@
+.content{
+    display: flex;
+    flex-wrap: wrap;
+    width:100%;    
+    justify-content: center;
+    align-content: center;
+    padding: 10vh 50px 3vh;
+}
+
+.content p{
+    width:50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 5% 7vh;
+    font-size: 1.8rem;
+
+}
+.youtubeVideo{
+    width:500px;
+    height:430px;    
+}
+
+@media (max-width: 1200px){
+    .youtubeVideo {
+        width: 400px;
+        height: 350px;
+    }
+}

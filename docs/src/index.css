@@ -1,0 +1,13 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Fredoka', sans-serif;
+  font-family: 'Roboto', sans-serif;
+}
+body{
+  /* background-color: rgb(252, 250, 247); */
+  background-color: #fff;
+  min-height: 100vh;
+  margin:0;
+}
