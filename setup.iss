@@ -67,7 +67,7 @@ Name      : "{autoprograms}\{#ClipbirdName}"; \
 Filename  : "{app}\{#ClipbirdExeName}"
 
 [Run]
-Install Bonjour service for Windows
+; Install Bonjour service for Windows
 Filename    : msiexec.exe;                                    \
 Parameters  : "/i ""{app}\Bonjour64.msi"" /qn /norestart";    \
 StatusMsg   : "Installing Bonjour..."
