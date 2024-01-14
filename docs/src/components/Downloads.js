@@ -6,6 +6,10 @@ import android from '../images/android.png';
 const Downloads = () => {
   return (
     <div className='downloads'>
+      <div className="downloadsContent">
+        <h2>Downloads</h2>
+        <p>Download it from the github releases</p>
+      </div>
       <div className="downloadWrap">
         <div className="os windows">
           <img className="image" src={windows} />

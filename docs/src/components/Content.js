@@ -4,6 +4,9 @@ import './Content.css';
 const Content = () => {
   return (
     <div class="content">
+      <p class="desc">
+        A Bird that syncs your clipboard data between devices connected in a local network
+      </p>
       <div class="youtubeVideo">
         <iframe width="100%" height="100%"
           src="https://www.youtube.com/embed/Hu4Yvq-g7_Y"
@@ -13,9 +16,6 @@ const Content = () => {
           allowfullscreen>
         </iframe>
       </div>
-      <p class="desc">
-        A Bird that syncs your clipboard data between devices connected in a local network
-      </p>
     </div>
   )
 }

@@ -1,21 +1,21 @@
 import React from 'react';
 import './Header.css';
 import logo from '../images/logo.png';
-import git from '../images/git.png';
+import git from '../images/github.png';
 
 const Header = () => {
   return (
     <header>
       <section>
         <div className="logoName">
-          <img className="logo" src={logo} />
+          <img className="icon" src={logo} />
         </div>
       </section>
-      <nav className='headerNav'>
-        <ul>
-          <li><a href="https://github.com/srilakshmikanthanp/clipbirdesk" target='_blank'><img className='gitLogo' src={git}></img></a></li>
-        </ul>
-      </nav>
+      <section>
+        <a href="https://github.com/srilakshmikanthanp/clipbirdesk" target='_blank'>
+          <img className='icon' src={git}/>
+        </a>
+      </section>
     </header>
   )
 }

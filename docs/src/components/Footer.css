@@ -1,11 +1,10 @@
-footer{
-    background-color: black;
-    width:100%;
-    color: azure;
-    margin-bottom:0px;
+footer {
+  display: block;
+  padding-top: 40px;
+  padding: 10px;
+  padding-bottom: 0%;
 }
-.copyrights{
-    margin-bottom: 0px;
-    height:auto;
-    text-align: center;
+
+.copyrights {
+  text-align: center;
 }

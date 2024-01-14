@@ -15,9 +15,9 @@ const Footer = () => {
   }, []);
   return (
     <>
-        <footer>
-            <p className='copyrights'>&copy; {currentYear} ClipBird. All rights reserved.</p>
-        </footer> 
+      <footer>
+        <p className='copyrights'>&copy; {currentYear} Clipbird. All rights reserved.</p>
+      </footer>
     </>
   )
 }

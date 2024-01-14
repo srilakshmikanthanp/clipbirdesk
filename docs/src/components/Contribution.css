@@ -1,45 +1,45 @@
-.contributeContent{
-    width:70%;
-    height:auto;
-    margin-left: 15%;
-    padding:2%;
-}
-.navContribute{
-    padding:2%;
-    width:100%;
-}
-.contributeOsList{
-    width:100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-
+.contributeContent {
+  margin: auto;
+  height: auto;
+  padding: 20px;
+  text-align: center;
 }
 
-.gitLink{
+.contributeOsList {
+  margin-top: 20px;
+  display: flex;
+  gap: 50px;
+  align-items: center;
+  justify-content: center;
+}
+
+.gitLink {
   list-style: none;
   background: #f2f8fd;
-  width: max-content;
   height: 30px;
   border-radius: 10px;
-  margin-top: 2vh;
-  margin-left: 20px;
-  margin-bottom: 15px;
-  padding: 15px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.howToContribute{
-    margin-top: 10vh;
-}
-p,ol li{
-    line-height: 2;
+.gitLink a {
+  text-decoration: none;
+  font-weight: bold;
+  display: block;
+  color: black;
 }
 
-@media (max-width: 690px) {
-    .navContribute li {
-      margin: 10px 15px;
-      font-size: 1.2rem;
-      padding: 1px;
-      font-weight: bold;
-    }
+.contributeContent section {
+  margin-top: 50px;
+}
+
+.contributeContent section p {
+  max-width: 700px;
+  margin: auto;
+}
+
+ol li {
+  list-style: none;
 }
