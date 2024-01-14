@@ -2,7 +2,6 @@ import React from 'react'
 import './Downloads.css';
 import windows from '../images/windows.png';
 import android from '../images/android.png';
-import linux from '../images/linux.png';
 
 const Downloads = () => {
   return (
