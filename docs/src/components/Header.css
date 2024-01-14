@@ -29,6 +29,12 @@ nav li {
   margin: 0 15px;
   font-size: 1.5rem;
   padding: 2px;
+  display: flex;
+  align-items: center;
+}
+
+.gitLogo{
+  width:90px;
 }
 
 nav li a {

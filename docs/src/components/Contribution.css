@@ -1,0 +1,45 @@
+.contributeContent{
+    width:70%;
+    height:auto;
+    margin-left: 15%;
+    padding:2%;
+}
+.navContribute{
+    padding:2%;
+    width:100%;
+}
+.contributeOsList{
+    width:100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+
+}
+
+.gitLink{
+  list-style: none;
+  background: #f2f8fd;
+  width: max-content;
+  height: 30px;
+  border-radius: 10px;
+  margin-top: 2vh;
+  margin-left: 20px;
+  margin-bottom: 15px;
+  padding: 15px;
+}
+
+.howToContribute{
+    margin-top: 10vh;
+}
+p,ol li{
+    line-height: 2;
+}
+
+@media (max-width: 690px) {
+    .navContribute li {
+      margin: 10px 15px;
+      font-size: 1.2rem;
+      padding: 1px;
+      font-weight: bold;
+    }
+}
