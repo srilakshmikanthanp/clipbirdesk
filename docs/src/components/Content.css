@@ -26,6 +26,6 @@
 }
 
 .youtubeVideo iframe {
-  aspect-ratio: 9/6;
+  aspect-ratio: 16/9;
   max-width: 700px;
 }
