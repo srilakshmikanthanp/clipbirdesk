@@ -9,8 +9,8 @@ const Content = () => {
       </p>
       <div class="youtubeVideo">
         <iframe width="100%" height="100%"
-          src="https://www.youtube.com/embed/Hu4Yvq-g7_Y"
-          title="How to Get Your Brain to Focus | Chris Bailey | TEDxManchester"
+          src="https://www.youtube.com/embed/WO0KbtN8sq4?si=Mct5kbsqxty8d9kA"
+          title="Clipbird"
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowfullscreen>
