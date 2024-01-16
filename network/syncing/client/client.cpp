@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  */
 bool Client::verifyCert(const QSslCertificate& certificate) {
   // common name of the server
-  auto name = certificate.subjectInfo(QSslCertificate::CommonName);
+  auto name = certificate.subjectInfo(QSslCertificate::CommonName).constFirst();
 
   // check the basic conditions
   if (certificate.isNull() || name.isEmpty()) {

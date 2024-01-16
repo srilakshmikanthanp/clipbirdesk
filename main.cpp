@@ -53,10 +53,10 @@ class ClipbirdApplication : public SingleApplication {
     QSslConfiguration sslConfig;
 
     // get cert name
-    auto name = cert.subjectInfo(QSslCertificate::CommonName);
+    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
     // Name is updated
-    if (name != QString::fromStdString(constants::getAppName())) {
+    if (name != QString::fromStdString(constants::getMDnsServiceName())) {
       return getNewSslConfiguration();
     }
 
