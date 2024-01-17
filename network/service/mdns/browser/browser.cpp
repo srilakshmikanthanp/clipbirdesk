@@ -17,8 +17,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
 void Browser::onHostResolved(quint16 port, QString srvName, const QHostInfo& info) {
   // check for error
   if (info.error() != QHostInfo::NoError || info.addresses().isEmpty()) {
-    qWarning() << LOG("Unable to resolve service");
-    return;
+    qWarning() << LOG("Unable to resolve service"); return;
   }
 
   // remove the service type from service name
@@ -75,8 +74,7 @@ void Browser::browseCallback(
 
   // check for Error
   if (errorCode != kDNSServiceErr_NoError) {
-    qWarning() << LOG("DNSServiceBrowse failed");
-    return;
+    qWarning() << LOG("DNSServiceBrowse failed"); return;
   }
 
   // create context with service name and this
@@ -101,8 +99,7 @@ void Browser::browseCallback(
 
   // check for error
   if (errorType != kDNSServiceErr_NoError) {
-    qWarning() << LOG("DNSServiceResolve failed");
-    return;
+    qWarning() << LOG("DNSServiceResolve failed"); return;
   }
 
   // set as non blocking
@@ -158,8 +155,7 @@ void Browser::addedCallback(
 
   // check for Error
   if (errorCode != kDNSServiceErr_NoError) {
-    qWarning() << LOG("DNSServiceResolve failed");
-    return;
+    qWarning() << LOG("DNSServiceResolve failed"); return;
   }
 
   // service name
@@ -228,8 +224,7 @@ void Browser::startBrowsing() {
 
   // check for error
   if (errorType != kDNSServiceErr_NoError) {
-    qWarning() << LOG("DNSServiceBrowse failed");
-    return;
+    qWarning() << LOG("DNSServiceBrowse failed"); return;
   }
 
   // create socket notifier

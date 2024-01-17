@@ -34,7 +34,7 @@ void Register::publishCallback(
 
   // check for Error
   if (errorCode != kDNSServiceErr_NoError) {
-    throw std::runtime_error("DNSServiceRegister failed");
+    qWarning() << LOG("DNSServiceRegister failed"); return;
   }
 
   // emit the signal
@@ -46,7 +46,7 @@ void Register::publishCallback(
  */
 void Register::processActivated() {
   if (DNSServiceProcessResult(this->m_serviceRef) != kDNSServiceErr_NoError) {
-    throw std::runtime_error("DNSServiceProcessResult failed");
+    qWarning() << LOG("DNSServiceProcessResult failed"); return;
   }
 }
 
@@ -84,7 +84,7 @@ void Register::registerServiceAsync() {
 
   // check for error
   if (errorType != kDNSServiceErr_NoError) {
-    throw std::runtime_error("DNSServiceRegister failed");
+    qWarning() << LOG("DNSServiceRegister failed"); return;
   }
 
   // create socket notifier
