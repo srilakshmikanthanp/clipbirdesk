@@ -51,6 +51,7 @@ void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors
 
   // Ignore the errors
   ignoredErrors.append(QSslError::SelfSignedCertificate);
+  ignoredErrors.append(QSslError::UnspecifiedError);
 
   // make copy of errors
   auto errorsCopy = errors;
