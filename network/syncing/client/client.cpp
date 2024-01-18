@@ -59,7 +59,7 @@ void Client::processSslErrors(const QList<QSslError>& errors) {
   const auto certificate = this->m_ssl_socket->peerCertificate();
 
   // if any error occurred
-  if (errors.length() > 0 && !this->verifyCert(certificate)) {
+  if (!this->verifyCert(certificate)) {
     return this->m_ssl_socket->abort();
   }
 
