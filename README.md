@@ -226,12 +226,12 @@ Project Link: [https://github.com/srilakshmikanthanp/clipbirdesk](https://github
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
+* [libnotify](https://developer-old.gnome.org/libnotify/)
 * [OpenSSL](https://www.openssl.org/)
 * [Qt](https://www.qt.io/)
 * [C++](https://isocpp.org/)
 * [Avahi](https://avahi.org/)
 * [Bonjour](https://developer.apple.com/bonjour/)
-* [libnotify](https://developer.gnome.org/libnotify/)
 
 ## Bonjour Integration
 
