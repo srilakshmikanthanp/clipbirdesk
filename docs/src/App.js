@@ -1,20 +1,22 @@
 import './App.css';
-import Content from './components/Content';
-import Contribution from './components/Contribution';
-import Downloads from './components/Downloads';
-import Footer from './components/Footer';
-import Header from './components/Header';
+import Contributions from './components/Contributions';
+import Downloads from './components/Download';
+import Features from './components/Features';
+import Header from "./components/Header";
+import Home from './components/Home';
+import Work from './components/Work';
+
 
 function App() {
   return (
-    <>
-      <Header />
-      <Content />
-      <div className="spacer"></div>
-      <Downloads />
-      <Contribution />
-      <Footer />
-    </>
+    <div className="App">
+     <Header/>
+     <Home/>
+     <Features/>
+     <Downloads/>
+     <Contributions/>
+     <Work/>
+    </div>
   );
 }
 
