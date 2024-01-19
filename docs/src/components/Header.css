@@ -18,6 +18,11 @@
     margin-right: 950px;
     /* Add styles for your logo container if needed */
   }
+  .slk{
+    align-items: center;
+    text-align: center;
+    margin-left: -500px;
+  }
   
   .menu-btn {
     cursor: pointer;

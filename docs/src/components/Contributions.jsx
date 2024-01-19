@@ -8,10 +8,10 @@ const Contributions = () => {
     <div className="contributions" id="Contributions">
       <div className="contributionsContent">
         <h2 className="tittle">Contributions</h2>
-        <p>
-          ClipBird is an open-source project, and we welcome contributions from
-          the community. Whether you want to change, add a feature, or fix a
-          bug, your contributions are valuable to us. Here's how you can
+        <p className="content">
+          ClipBird is an open-source project,<br></br> and we welcome contributions from
+          the community. Whether you want to<br></br> change, add a feature, or fix a
+          bug,<br></br> your contributions are valuable to us. Here's how you can
           contribute:
         </p>
 
@@ -54,6 +54,7 @@ const Contributions = () => {
             height="20"
             title="GitHub"
             aria-hidden="false"
+            className="star"
           ></iframe>
         </div>
 

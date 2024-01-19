@@ -13,7 +13,9 @@ const Header = () => {
             className="logo"
             style={{ width: "50px", height: "50px" }}
           />
+          
         </div>
+        
 
         <ul className="naa">
           <li>
