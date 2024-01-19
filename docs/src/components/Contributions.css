@@ -55,9 +55,8 @@ h3 {
 .contributeLink:hover {
   color: #2196f3; /* Slightly darker blue on hover */
 }
-.tittle{
+.tittle {
   color: #ffd700;
-
 }
 
 /* Keyframes for fade-in animation */
@@ -69,5 +68,14 @@ h3 {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+@media (max-width: 768px) {
+  .contributionStep {
+    width: calc(70% - 20px);
+    align-items: center;
+    text-align: center;
+    padding: auto;
+    margin-left: 50px;
   }
 }

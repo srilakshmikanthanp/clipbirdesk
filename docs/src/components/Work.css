@@ -70,4 +70,12 @@
     margin-top: 20px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   }
-  
+  @media (max-width: 768px) {
+    .step {
+      width: calc(70% - 20px);
+      align-items: center;
+      text-align: center;
+      padding: auto;
+      margin-left: 70px;
+    }
+  }
