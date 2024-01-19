@@ -1,13 +1,48 @@
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  height: 12vh;
-  width: 100%;
-}
-
-.icon {
-  height: 40px;
-  width: 40px;
-}
+#nav {
+    background-color: #4682b4;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+  }
+  
+  .nav-content {
+    display: flex;
+    align-items: center;
+    margin-left: auto; /* Move the content to the right */
+  }
+  
+  .logo-container {
+    margin-right: 950px;
+    /* Add styles for your logo container if needed */
+  }
+  
+  .menu-btn {
+    cursor: pointer;
+    font-size: 24px;
+  }
+  
+  .naa {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+  }
+  
+  .naa li {
+    margin-right: 20px;
+  }
+  
+  .link-styled {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .link-styled:hover {
+    color: #61dafb;
+  }
+  
