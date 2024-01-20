@@ -57,11 +57,9 @@ const Home = () => {
           </p>
           <div className="youtubeVideo">
             <iframe
-              width="100%"
-              height="315" // Adjust the height as needed
+              width="100%" height="100%"
               src="https://www.youtube.com/embed/WO0KbtN8sq4?si=uTdLg83GyKeyyOo7"
               title="Clipbird"
-              frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
             ></iframe>

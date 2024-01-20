@@ -50,7 +50,7 @@ const Contributions = () => {
             src="https://ghbtns.com/github-btn.html?user=srilakshmikanthanp&repo=clipbirdesk&type=star&count=true"
             frameborder="0"
             scrolling="0"
-            width="110"
+            width="70"
             height="20"
             title="GitHub"
             aria-hidden="false"

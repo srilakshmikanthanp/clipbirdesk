@@ -7,15 +7,6 @@ import moment from 'moment';
 
 
 const Work = () => {
-  const [currentYear, setCurrentYear] = useState(moment().format('YYYY'));
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentYear(moment().format('YYYY'));
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, []);
   return (
     <div className="howItWorks"id="Work">
       <div className="howItWorksContent">
@@ -44,7 +35,7 @@ const Work = () => {
             <div className="stepContent">
               <h3>Create a Group</h3>
               <p>
-                Create a group on one device frome same loacal network to establish a connection between
+                Create a group on one device from same local network to establish a connection between
                 the devices you want to sync.
               </p>
             </div>
@@ -73,10 +64,6 @@ const Work = () => {
             </div>
           </div>
         </div>
-
-        <footer>
-        <p className='copyrights'>&copy; {currentYear} Clipbird. All rights reserved.</p>
-      </footer>
       </div>
     </div>
   );

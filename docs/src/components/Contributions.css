@@ -33,6 +33,11 @@ p {
   animation: fadeInUp 1s ease-out; /* Simple fade-in animation */
 }
 
+.contributionStep iframe {
+  margin: auto;
+  padding: 0%;
+}
+
 h3 {
   font-size: 1.8rem;
   margin-bottom: 10px;

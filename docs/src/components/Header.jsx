@@ -1,50 +1,24 @@
 import React from "react";
 import logo from "../images/logo.png";
+import github from "../images/github.png";
 
 import "./Header.css";
+
 const Header = () => {
   return (
     <nav id="nav">
-      <div className="nav-content">
         <div className="logo-container">
-          <img
-            src={logo}
-            alt="QuickNote"
-            className="logo"
-            style={{ width: "50px", height: "50px" }}
-          />
-          
+          <img src={logo} alt="Clipbird" className="logo" style={{ width: "50px", height: "50px" }}/>
         </div>
-        
-
-        <ul className="naa">
-          <li>
-            <a className="link-styled" href="#home">
-              Home
-            </a>
-          </li>
-          <li>
-            <a className="link-styled" href="#Features">
-              Features
-            </a>
-          </li>
-          <li>
-            <a className="link-styled" href="#Downloads">
-              Downloads
-            </a>
-          </li>
-          <li>
-            <a className="link-styled" href="#Contributions">
-              Contributions
-            </a>
-          </li>
-          <li>
-            <a className="link-styled" href="#support">
-              Works
-            </a>
-          </li>
-        </ul>
-      </div>
+        <div className="gitlink">
+          <a
+            href="https://srilakshmikanthanp.github.io/clipbirdesk/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src={github} alt="github" className="github" style={{ width: "40px", height: "40px" }}/>
+          </a>
+        </div>
     </nav>
   );
 };
