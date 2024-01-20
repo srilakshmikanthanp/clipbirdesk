@@ -35,8 +35,8 @@ const Work = () => {
             <div className="stepContent">
               <h3>Create a Group</h3>
               <p>
-                Create a group on one device from same local network to establish a connection between
-                the devices you want to sync.
+                Create a group on one device to establish a secure
+                connection between the devices.
               </p>
             </div>
           </div>
@@ -46,8 +46,8 @@ const Work = () => {
             <div className="stepContent">
               <h3>Join the Group</h3>
               <p>
-                Join the created group from another device to establish a secure
-                connection between the devices.
+                Join the created group from another device from same local network
+                to establish a connection between the devices you want to sync.
               </p>
             </div>
           </div>
