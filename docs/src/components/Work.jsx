@@ -28,7 +28,6 @@ const Work = () => {
               </p>
             </div>
           </div>
-
           {/* Step 2 */}
           <div className="step">
             <div className="stepNumber">2</div>
@@ -40,7 +39,6 @@ const Work = () => {
               </p>
             </div>
           </div>
-
           <div className="step">
             <div className="stepNumber">3</div>
             <div className="stepContent">
@@ -51,7 +49,6 @@ const Work = () => {
               </p>
             </div>
           </div>
-
           {/* Step 4 */}
           <div className="step">
             <div className="stepNumber">4</div>
