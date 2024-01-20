@@ -11,11 +11,7 @@ const Header = () => {
           <img src={logo} alt="Clipbird" className="logo" style={{ width: "50px", height: "50px" }}/>
         </div>
         <div className="gitlink">
-          <a
-            href="https://srilakshmikanthanp.github.io/clipbirdesk/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="https://github.com/srilakshmikanthanp/clipbirdesk" target="_blank" rel="noopener noreferrer">
             <img src={github} alt="github" className="github" style={{ width: "40px", height: "40px" }}/>
           </a>
         </div>
