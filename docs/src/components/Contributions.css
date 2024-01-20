@@ -4,6 +4,7 @@
   background-color: #f5f5f5;
   padding: 60px 0;
   text-align: center;
+  z-index: -9999;
 }
 
 .contributionsContent {
@@ -51,7 +52,7 @@ h3 {
 .contributeIcon {
   font-size: 2rem;
   margin-right: 10px;
-  color: #61dafb; /* Bright blue color */
+  color: #ffffff; /* Bright blue color */
 }
 
 .contributeLink {

@@ -75,7 +75,7 @@ const Contributions = () => {
             becoming a sponsor.
           </p>
           {/* Link to GitHub Sponsors */}
-          <span className="button sponsor-button">
+          <span className="button fork-button">
             <i className="fas fa-heart"></i>{" "}
             {/* Use a heart icon or any other suitable icon */}
             <a href="https://srilakshmikanthanp.github.io/donate">Sponsor Now</a>
