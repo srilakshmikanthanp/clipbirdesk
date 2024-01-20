@@ -1,13 +1,19 @@
-header {
+#nav {
+  background-color: #4682b4;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  height: 12vh;
-  width: 100%;
+  flex-direction: row;
+  width: 100vw;
+  max-width: 100%;
+  color: white;
+  position: fixed;
 }
 
-.icon {
-  height: 40px;
-  width: 40px;
+.logo-container {
+  padding: 20px;
+  margin-right: auto;
+}
+
+.gitlink {
+  padding: 20px;
+  margin-left: auto;
 }

@@ -1,4 +1,8 @@
-# Getting Started with Create React App
+# Clipbird Docs
+
+To see technical documentation, please Read [design](./design/README.md) document.
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

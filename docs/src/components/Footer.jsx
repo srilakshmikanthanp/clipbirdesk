@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react'
 import './Footer.css';
 import moment from 'moment';
+import { useEffect, useState } from 'react';
 
-
-const Footer = () => {
+function Footer() {
   const [currentYear, setCurrentYear] = useState(moment().format('YYYY'));
 
   useEffect(() => {
@@ -13,12 +13,11 @@ const Footer = () => {
 
     return () => clearInterval(intervalId);
   }, []);
+
   return (
-    <>
-      <footer>
-        <p className='copyrights'>&copy; {currentYear} Clipbird. All rights reserved.</p>
-      </footer>
-    </>
+    <footer>
+      <p className='copyrights'>&copy; {currentYear} Clipbird. All rights reserved.</p>
+    </footer>
   )
 }
 

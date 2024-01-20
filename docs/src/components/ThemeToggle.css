@@ -1,0 +1,16 @@
+/* ThemeToggle.css */
+
+.theme-toggle {
+    background-color: #4caf50; /* Light theme button color */
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .dark-theme {
+    background-color: #212121; /* Dark theme background color */
+    color: #fff;
+  }
+  
