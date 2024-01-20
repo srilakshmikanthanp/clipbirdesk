@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/clipbirdesk/static/css/main.fa8124a5.css",
-    "main.js": "/clipbirdesk/static/js/main.0a2ed4be.js",
+    "main.css": "/clipbirdesk/static/css/main.03419984.css",
+    "main.js": "/clipbirdesk/static/js/main.faf978dc.js",
     "static/js/787.72af5d7c.chunk.js": "/clipbirdesk/static/js/787.72af5d7c.chunk.js",
     "static/media/logo.png": "/clipbirdesk/static/media/logo.9c3ca6fffde4b8fc5818.png",
     "static/media/giphy-unscreen.gif": "/clipbirdesk/static/media/giphy-unscreen.3f54801113060e0b9f78.gif",
     "index.html": "/clipbirdesk/index.html",
-    "main.fa8124a5.css.map": "/clipbirdesk/static/css/main.fa8124a5.css.map",
-    "main.0a2ed4be.js.map": "/clipbirdesk/static/js/main.0a2ed4be.js.map",
+    "main.03419984.css.map": "/clipbirdesk/static/css/main.03419984.css.map",
+    "main.faf978dc.js.map": "/clipbirdesk/static/js/main.faf978dc.js.map",
     "787.72af5d7c.chunk.js.map": "/clipbirdesk/static/js/787.72af5d7c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.fa8124a5.css",
-    "static/js/main.0a2ed4be.js"
+    "static/css/main.03419984.css",
+    "static/js/main.faf978dc.js"
   ]
 }
