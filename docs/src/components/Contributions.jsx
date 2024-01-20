@@ -21,6 +21,14 @@ const Contributions = () => {
             Start by forking the ClipBird repository on GitHub to create your
             copy of the project.
           </p>
+          <a
+            className="button fork-button"
+            href="https://github.com/srilakshmikanthanp/clipbirdesk"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <i className="fas fa-code-branch"></i> Fork and Contribute
+          </a>
         </div>
 
         <div className="contributionStep">
@@ -29,6 +37,7 @@ const Contributions = () => {
             Make the desired changes, add new features, or fix bugs in your
             forked repository.
           </p>
+          
         </div>
 
         <div className="contributionStep">
