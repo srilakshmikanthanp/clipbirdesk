@@ -9,3 +9,36 @@ footer p {
   font-size: 1.2rem;
   margin-bottom: 20px;
 }
+.arrow {
+  float: right;
+  margin-right: 50px;
+  margin-top: -60px;
+  background: #ffd700;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.donate-image {
+  /* background: #ffd700; */
+  border-radius: 40%;
+  color: #ffffff;
+  margin-top: 10px;
+  background: #ffd700;
+  border-radius: 50%;
+}
+.donate {
+  float: right;
+  margin-right: 52px;
+}
+@media (max-width: 768px) {
+  .arrow {
+    margin-top: 2px;
+    margin-right: 48px;
+  }
+  .donate {
+    margin-top: -80px;
+    margin-right: -65px;
+  }
+  .copyrights {
+    margin-bottom: -80px;
+  }
+}
