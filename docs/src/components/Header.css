@@ -12,17 +12,8 @@
   padding: 15px;
   margin-right: auto;
 }
-.slk{
-  padding: 15px;
-
-}
 
 .gitlink {
   padding: 15px;
   margin-left: auto;
-}
-@media (max-width: 768px) {
-  .logo{
-    margin-top: 5px;
-  }
 }
