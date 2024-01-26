@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/clipbirdesk/static/css/main.3b6f83c5.css",
+    "main.css": "/clipbirdesk/static/css/main.7f2a7bf3.css",
     "main.js": "/clipbirdesk/static/js/main.aa00d5af.js",
     "static/js/787.72af5d7c.chunk.js": "/clipbirdesk/static/js/787.72af5d7c.chunk.js",
     "static/media/logo.png": "/clipbirdesk/static/media/logo.9c3ca6fffde4b8fc5818.png",
@@ -9,12 +9,12 @@
     "static/media/heartt.png": "/clipbirdesk/static/media/heartt.1bb8cb5a75e4b9c4afed.png",
     "static/media/arrow.png": "/clipbirdesk/static/media/arrow.e1f248039b9675538f04.png",
     "index.html": "/clipbirdesk/index.html",
-    "main.3b6f83c5.css.map": "/clipbirdesk/static/css/main.3b6f83c5.css.map",
+    "main.7f2a7bf3.css.map": "/clipbirdesk/static/css/main.7f2a7bf3.css.map",
     "main.aa00d5af.js.map": "/clipbirdesk/static/js/main.aa00d5af.js.map",
     "787.72af5d7c.chunk.js.map": "/clipbirdesk/static/js/787.72af5d7c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.3b6f83c5.css",
+    "static/css/main.7f2a7bf3.css",
     "static/js/main.aa00d5af.js"
   ]
 }
