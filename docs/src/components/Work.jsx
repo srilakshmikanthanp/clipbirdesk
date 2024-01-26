@@ -56,7 +56,7 @@ const Work = () => {
               <h3>Copy and Paste</h3>
               <p>
                 Copy text, images, or emojis on one device, and seamlessly paste
-                them into another device's clipboard.
+                them into another device.
               </p>
             </div>
           </div>
