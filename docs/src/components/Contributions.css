@@ -81,6 +81,10 @@ h3 {
   transition: background-color 0.3s ease;
 }
 
+.button a{
+  color: #ffffff; /* White text color */
+}
+
 .fork-button {
   background-color: #0366d6; /* GitHub blue color */
   color: #ffffff; /* White text color */
@@ -90,7 +94,6 @@ h3 {
 .fork-button:hover {
   background-color: #0645ad; /* Darker blue on hover */
 }
-
 
 /* Keyframes for fade-in animation */
 @keyframes fadeInUp {

@@ -37,7 +37,7 @@ const Contributions = () => {
             Make the desired changes, add new features, or fix bugs in your
             forked repository.
           </p>
-          
+
         </div>
 
         <div className="contributionStep">
@@ -75,7 +75,7 @@ const Contributions = () => {
             becoming a sponsor.
           </p>
           {/* Link to GitHub Sponsors */}
-          <span className="button fork-button">
+          <span className="button donate-button">
             <i className="fas fa-heart"></i>{" "}
             {/* Use a heart icon or any other suitable icon */}
             <a href="https://srilakshmikanthanp.github.io/donate">Sponsor Now</a>
