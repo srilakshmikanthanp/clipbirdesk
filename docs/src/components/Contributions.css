@@ -81,17 +81,19 @@ h3 {
   transition: background-color 0.3s ease;
 }
 
-.button a{
+.button a {
   color: #ffffff; /* White text color */
 }
 
-.fork-button {
+.fork-button,
+.donate-button {
   background-color: #0366d6; /* GitHub blue color */
   color: #ffffff; /* White text color */
   border: 1px solid #0366d6;
 }
 
-.fork-button:hover {
+.fork-button:hover,
+.donate-button:hover {
   background-color: #0645ad; /* Darker blue on hover */
 }
 
