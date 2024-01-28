@@ -78,7 +78,9 @@ const Contributions = () => {
           <span className="button donate-button">
             <i className="fas fa-heart"></i>{" "}
             {/* Use a heart icon or any other suitable icon */}
-            <a href="https://srilakshmikanthanp.github.io/donate">Sponsor Now</a>
+            <a target="_blank" rel="noopener noreferrer" href="https://srilakshmikanthanp.github.io/donate">
+              Sponsor Now
+            </a>
           </span>
         </div>
 
