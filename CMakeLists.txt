@@ -139,6 +139,11 @@ else()
   message(FATAL_ERROR "Platform not supported")
 endif()
 
+# Find LibNotify on linux
+if(LINUX)
+  find_package(LibNotify REQUIRED)
+endif()
+
 # Finc D-Bus
 if (UNIX AND NOT APPLE)
   find_package(PkgConfig REQUIRED)
@@ -214,6 +219,8 @@ if(UNIX AND NOT APPLE)
   target_link_libraries(clipbird PUBLIC ${Avahi_LIBRARIES})
   target_include_directories(clipbird PUBLIC ${DBUS_INCLUDE_DIRS})
   target_link_libraries(clipbird PUBLIC ${DBUS_LIBRARIES})
+  target_include_directories(clipbird PUBLIC ${LIBNOTIFY_INCLUDE_DIRS})
+  target_link_libraries(clipbird PUBLIC ${LIBNOTIFY_LIBRARIES})
   add_definitions(-D__linux__)
 endif()
 
