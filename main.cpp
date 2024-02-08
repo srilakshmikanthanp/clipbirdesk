@@ -441,11 +441,11 @@ auto main(int argc, char **argv) -> int {
   Logger::setLogStream(&logstream);
 #endif
 
-  // Set the global error handler
-  std::set_terminate(globalErrorHandler);
-
   // Set the custom message handler
   qInstallMessageHandler(Logger::handler);
+
+  // Set the global error handler
+  std::set_terminate(globalErrorHandler);
 
   // start application and return status code
   return app.exec();

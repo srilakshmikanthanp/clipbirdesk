@@ -1,4 +1,4 @@
-#if defined(_WIN32) || defined(__APPLE__) || defined(__linux__) // Only for Operating System that supports bonjour
+#if defined(_WIN32) || defined(__APPLE__) || defined(__linux__) // Only for Operating System that supports bonjour or compatible to it
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
 // Copyright (c) 2023 Sri Lakshmi Kanthan P
