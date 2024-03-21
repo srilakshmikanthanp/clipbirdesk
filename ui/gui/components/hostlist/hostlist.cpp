@@ -126,7 +126,7 @@ HostList::HostList(QWidget* parent) : QWidget(parent) {
  * @brief Function used to set up all text in the label, etc..
  */
 void HostList::setUpLanguage() {
-  this->label->setText(QObject::tr("Nothing so far"));
+  this->label->setText(QObject::tr("No Devices"));
 }
 
 /**
