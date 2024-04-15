@@ -3,7 +3,7 @@
 ; constants used in the script
 #define ClipbirdPublisher "srilakshmikanthanp"
 #define ClipbirdName "clipbird"
-#define ClipbirdVersion "1.3.1"
+#define ClipbirdVersion "1.3.2"
 #define ClipbirdUUID "3A8D9FCA-9F95-4947-8AB0-3E364ED765E1"
 #define ClipbirdURL "https://github.com/srilakshmikanthanp/clipbirdesk"
 #define ClipbirdExeName "clipbird.exe"
@@ -20,7 +20,7 @@ AppUpdatesURL={#ClipbirdURL}
 DefaultDirName={autopf}\{#ClipbirdName}
 DisableProgramGroupPage=yes
 LicenseFile=NOTICE
-OutputBaseFilename=Setup
+OutputBaseFilename=clipbird-x64s
 SetupIconFile=assets\images\logo.ico
 OutputDir=.\dist
 Compression=lzma
