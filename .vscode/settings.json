@@ -3,9 +3,6 @@
   "grammarly.files.exclude": [
     "**/CMakeLists.txt"
   ],
-  "cmake.configureArgs": [
-    "-DCMAKE_TOOLCHAIN_FILE=${env:VCPKG_TOOLCHAIN}"
-  ],
   "cSpell.words": [
     "Antialiasing",
     "Cilp",
