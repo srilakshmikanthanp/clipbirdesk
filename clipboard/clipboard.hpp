@@ -22,10 +22,15 @@
 #include <QVector>
 #include <QtConcurrent>
 
+#ifdef __linux__
+#include <KSystemClipboard>
+#endif
+
 // project header
 #include "types/except/except.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::clipboard {
+
 /**
  * @brief Class to manage clipboard such get,
  * set and notify the clipboard change
@@ -41,7 +46,13 @@ class Clipboard : public QObject {
 
  private:  // members
 
+  // Use m_clipboard to only get, set and clear the clipboard
+  // for other operations use QApplication::clipboard()
+#ifdef __linux__
+  KSystemClipboard *m_clipboard = KSystemClipboard::instance();
+#else
   QClipboard *m_clipboard = QApplication::clipboard();
+#endif
 
  private:  // just for Qt
 

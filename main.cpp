@@ -112,8 +112,8 @@ class ClipbirdApplication : public SingleApplication {
     }
 
     // log the certificate and key
-    qInfo("Certificate: \n" + config.localCertificate().toPem());
-    qInfo("Key: \n" + config.privateKey().toPem());
+    qInfo() << "Certificate: \n" << config.localCertificate().toPem();
+    qInfo() << "Key: \n" << config.privateKey().toPem();
 
     // return the configuration
     return config;
@@ -407,6 +407,45 @@ auto main(int argc, char **argv) -> int {
     dialog.exec();
     return EXIT_FAILURE;
   }
+#elif __linux__
+  // create glib main loop
+  auto g_main_loop = g_main_loop_new(nullptr, false);
+
+  // start glib main loop
+  auto thread = std::thread([g_main_loop]() {
+    g_main_loop_run(g_main_loop);
+    qInfo() << "Glib Main Loop Exited";
+  });
+
+  // detach
+  thread.detach();
+
+  // quiter
+  auto quiter = [g_main_loop]() {
+    g_main_loop_quit(g_main_loop);
+  };
+
+  // set the signal handler
+  QObject::connect(&app, &QApplication::aboutToQuit, quiter);
+
+  // initialize libNotify
+  if(!notify_init(getAppName())) {
+    auto dialog = QMessageBox(nullptr);
+    dialog.setText(QObject::tr("Can't Initialize libNotify"));
+    dialog.setIcon(QMessageBox::Critical);
+    dialog.setWindowTitle(getAppName());
+    dialog.setWindowIcon(QIcon(getAppLogo()));
+    dialog.exec();
+    return EXIT_FAILURE; 
+  }
+
+  // uninitializer
+  auto uniniter = []() {
+    notify_uninit();
+  };
+
+  // uninitialize
+  QObject::connect(&app, &QApplication::aboutToQuit, uniniter);
 #endif
 
   // Home Directory of the application

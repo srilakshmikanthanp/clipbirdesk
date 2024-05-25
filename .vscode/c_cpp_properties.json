@@ -1,48 +1,52 @@
 {
-  "configurations": [
-    {
-      "compilerPath": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.39.33519\\bin\\Hostx64\\x64\\cl.exe",
-      "name": "Win32",
-      "includePath": [
-        "C:/Program Files/OpenSSL-Win64/include/**",
-        "${workspaceFolder}/",
-        "${workspaceFolder}/build/_deps/**",
-        "C:/Qt/6.5.2/msvc2019_64/include/QtCore",
-        "C:/Qt/6.5.2/msvc2019_64/include/**",
-        "C:/Qt/6.5.2/msvc2019_64/include/QtGui",
-        "${workspaceFolder}/build/_deps/singleapplication-src",
-        "${workspaceFolder}/build",
-        "C:\\Program Files\\Bonjour SDK\\Include",
-        "C:\\dev\\vcpkg\\packages\\protobuf_x64-windows\\include"
-      ],
-      "defines": [
-        "_UNICODE",
-        "_DEBUG",
-        "UNICODE"
-      ],
-      "cStandard": "c17",
-      "cppStandard": "c++17",
-      "intelliSenseMode": "msvc-x64",
-      "configurationProvider": "ms-vscode.cpptools"
-    },
-    {
-      "compilerPath": "/usr/bin/g++",
-      "name": "Linux",
-      "includePath": [
-        "${workspaceFolder}/**",
-        "/usr/include/**",
-        "/usr/local/include/**"
-      ],
-      "defines": [
-        "_UNICODE",
-        "_DEBUG",
-        "UNICODE"
-      ],
-      "cStandard": "c17",
-      "cppStandard": "c++17",
-      "intelliSenseMode": "gcc-x64",
-      "configurationProvider": "ms-vscode.cpptools"
-    }
-  ],
-  "version": 4
+    "configurations": [
+        {
+            "compilerPath": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.39.33519\\bin\\Hostx64\\x64\\cl.exe",
+            "name": "Win32",
+            "includePath": [
+                "C:/Program Files/OpenSSL-Win64/include/**",
+                "${workspaceFolder}/",
+                "${workspaceFolder}/build/_deps/**",
+                "C:/Qt/6.5.2/msvc2019_64/include/QtCore",
+                "C:/Qt/6.5.2/msvc2019_64/include/**",
+                "C:/Qt/6.5.2/msvc2019_64/include/QtGui",
+                "${workspaceFolder}/build/_deps/singleapplication-src",
+                "${workspaceFolder}/build",
+                "C:\\Program Files\\Bonjour SDK\\Include",
+                "C:\\dev\\vcpkg\\packages\\protobuf_x64-windows\\include"
+            ],
+            "defines": [
+                "_UNICODE",
+                "_DEBUG",
+                "UNICODE"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64",
+            "configurationProvider": "ms-vscode.cpptools"
+        },
+        {
+            "compilerPath": "/usr/bin/g++",
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include/**",
+                "/usr/local/include/**",
+                "/opt/kderoot/include/**",
+                "/usr/include/glib-2.0",
+                "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
+                "/opt/Qt/6.6.3/gcc_64/include/**"
+            ],
+            "defines": [
+                "_UNICODE",
+                "_DEBUG",
+                "UNICODE"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64",
+            "configurationProvider": "ms-vscode.cpptools"
+        }
+    ],
+    "version": 4
 }

@@ -64,9 +64,6 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{QT_CMAKE_DIR})
 # set CMP0071 to NEW
 cmake_policy(SET CMP0071 NEW)
 
-# set CMP0135 to NEW
-cmake_policy(SET CMP0135 NEW)
-
 # --------------------------------- Main Project ---------------------------------#
 # Fetch https://github.com/mohabouje/WinToast.git only if windows
 if (WIN32)
@@ -133,14 +130,15 @@ find_package(OpenSSL REQUIRED)
 # Find DNS-SD libraries for different platforms
 if(WIN32 OR APPLE)
   find_package(Bonjour REQUIRED)
-elseif(LINUX)
+elseif(UNIX AND NOT APPLE)
+  find_package(KF6GuiAddons REQUIRED)
   find_package(Avahi REQUIRED)
 else()
   message(FATAL_ERROR "Platform not supported")
 endif()
 
 # Find LibNotify on linux
-if(LINUX)
+if(UNIX AND NOT APPLE)
   find_package(LibNotify REQUIRED)
 endif()
 
@@ -156,6 +154,14 @@ qt_standard_project_setup()
 # add resources to project
 qt_add_resources(RESOURCES
   ${PROJECT_SOURCE_DIR}/assets/resources.qrc)
+
+# copy assets to build directory
+file(
+  COPY 
+  ${PROJECT_SOURCE_DIR}/assets 
+  DESTINATION 
+  ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 # if windows
 if(WIN32)
@@ -215,6 +221,7 @@ endif()
 
 # Add Platform specific definitions for linux
 if(UNIX AND NOT APPLE)
+  target_link_libraries(clipbird PRIVATE KF6::GuiAddons)
   target_include_directories(clipbird PUBLIC ${Avahi_INCLUDE_DIRS})
   target_link_libraries(clipbird PUBLIC ${Avahi_LIBRARIES})
   target_include_directories(clipbird PUBLIC ${DBUS_INCLUDE_DIRS})

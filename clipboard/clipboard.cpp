@@ -12,7 +12,7 @@ namespace srilakshmikanthanp::clipbirdesk::clipboard {
  * @brief Slot to notify the clipboard change
  */
 void Clipboard::onClipboardChangeImpl() {
-  if (!this->m_clipboard->ownsClipboard()) {
+  if (!QApplication::clipboard()->ownsClipboard()) {
     Q_UNUSED(QtConcurrent::run([this]() { emit OnClipboardChange(this->get()); }));
   }
 }
@@ -27,9 +27,10 @@ void Clipboard::onClipboardChangeImpl() {
 Clipboard::Clipboard(QObject* parent) : QObject(parent) {
   // connect the clipboard change signal to the slot
   // that is used to notify the listeners
+  const auto clipboard = QApplication::clipboard();
   const auto signal = &QClipboard::changed;
   const auto slot   = &Clipboard::onClipboardChangeImpl;
-  QObject::connect(m_clipboard, signal, this, slot);
+  QObject::connect(clipboard, signal, this, slot);
 }
 
 /**

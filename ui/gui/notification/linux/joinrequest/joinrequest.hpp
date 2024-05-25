@@ -6,8 +6,19 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+#include <QApplication>
 #include <QObject>
 #include <QMetaObject>
+
+#ifdef signals
+#define WAS_SIGNALS_DEFINED
+#undef signals
+#endif
+#include <libnotify/notify.h>
+#ifdef WAS_SIGNALS_DEFINED
+#define signals Q_SIGNALS
+#undef WAS_SIGNALS_DEFINED
+#endif
 
 #include "constants/constants.hpp"
 #include "types/device/device.hpp"
@@ -34,6 +45,16 @@ class JoinRequest : public QObject {
   void onReject() const;
 
  private:  // Member Functions
+
+  /**
+   * @brief Callback for the accept action
+   */
+  static void onAcceptAction(NotifyNotification* notification, char* action, gpointer user_data);
+
+  /**
+   * @brief Callback for the reject action
+   */
+  static void onRejectAction(NotifyNotification* notification, char* action, gpointer user_data);
 
   /**
    * @brief Accept Impl

@@ -168,6 +168,8 @@
     "qscrollarea": "cpp",
     "qstylehints": "cpp",
     "qguiapplication": "cpp",
-    "qscrollbar": "cpp"
+    "qscrollbar": "cpp",
+    "qurl": "cpp",
+    "ksystemclipboard": "cpp"
   },
 }

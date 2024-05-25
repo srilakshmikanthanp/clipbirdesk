@@ -175,6 +175,7 @@ sudo apt-get install libavahi-compat-libdnssd-dev
 Install libnotify using the following command.
 
 ~~~sh
+sudo apt-get install libglib2.0-dev
 sudo apt-get install libnotify-dev
 ~~~
 

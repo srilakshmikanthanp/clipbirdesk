@@ -9,6 +9,26 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification {
 /**
+ * @brief Callback for the accept action
+ */
+void JoinRequest::onAcceptAction(NotifyNotification* notification, char* action, gpointer user_data) {
+  auto joinRequest = static_cast<JoinRequest*>(user_data);
+  if (joinRequest) {
+    joinRequest->acceptImpl();
+  }
+}
+
+/**
+ * @brief Callback for the reject action
+ */
+void JoinRequest::onRejectAction(NotifyNotification* notification, char* action, gpointer user_data) {
+  auto joinRequest = static_cast<JoinRequest*>(user_data);
+  if (joinRequest) {
+    joinRequest->rejectImpl();
+  }
+}
+
+/**
  * @brief Accept Impl
  */
 void JoinRequest::acceptImpl() const {
@@ -28,14 +48,42 @@ void JoinRequest::rejectImpl() const {
  * @param parent
  */
 JoinRequest::JoinRequest(QObject *parent) : QObject(parent) {
-  // Do nothing
+  // do nothing
 }
 
 /**
  * @brief Show the notification
  */
 void JoinRequest::show(const types::device::Device &device) {
+  auto body = QObject::tr("%1 wants to Join to your Group").arg(device.name).toStdString();
+  auto icon = (qApp->applicationDirPath() + "/assets/images/logo.png").toStdString(); 
 
+  NotifyNotification* notification = notify_notification_new(
+    constants::getAppName(), body.c_str(), icon.c_str()
+  );
+
+  notify_notification_add_action(
+    notification, 
+    "accept", 
+    "Accept", 
+    NOTIFY_ACTION_CALLBACK(JoinRequest::onAcceptAction), 
+    this, 
+    nullptr);
+  
+  notify_notification_add_action(
+    notification, 
+    "reject", 
+    "Reject", 
+    NOTIFY_ACTION_CALLBACK(onRejectAction),
+    this, 
+    nullptr);
+
+  if (!notify_notification_show(notification, nullptr)) {
+    qErrnoWarning("Failed to show notification");
+  }
+
+  // Unref the notification object to avoid memory leak
+  g_object_unref(G_OBJECT(notification));
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification
 #endif  // __linux__
