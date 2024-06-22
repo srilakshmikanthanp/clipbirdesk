@@ -46,13 +46,7 @@ class Clipboard : public QObject {
 
  private:  // members
 
-  // Use m_clipboard to only get, set and clear the clipboard
-  // for other operations use QApplication::clipboard()
-#ifdef __linux__
-  KSystemClipboard *m_clipboard = KSystemClipboard::instance();
-#else
   QClipboard *m_clipboard = QApplication::clipboard();
-#endif
 
  private:  // just for Qt
 

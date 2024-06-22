@@ -49,7 +49,7 @@
 #include "ui/gui/modals/history/history.hpp"
 #include "ui/gui/modals/connect/connect.hpp"
 #include "ui/gui/modals/group/group.hpp"
-#include "ui/gui/notification/joinrequest.hpp"
+#include "ui/gui/notification/joinrequest/joinrequest.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 class Clipbird : public QFrame {

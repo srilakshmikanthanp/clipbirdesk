@@ -157,9 +157,9 @@ qt_add_resources(RESOURCES
 
 # copy assets to build directory
 file(
-  COPY 
-  ${PROJECT_SOURCE_DIR}/assets 
-  DESTINATION 
+  COPY
+  ${PROJECT_SOURCE_DIR}/assets
+  DESTINATION
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 

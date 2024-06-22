@@ -436,7 +436,7 @@ auto main(int argc, char **argv) -> int {
     dialog.setWindowTitle(getAppName());
     dialog.setWindowIcon(QIcon(getAppLogo()));
     dialog.exec();
-    return EXIT_FAILURE; 
+    return EXIT_FAILURE;
   }
 
   // uninitializer
