@@ -112,8 +112,10 @@ class ClipbirdApplication : public SingleApplication {
     }
 
     // log the certificate and key
-    qInfo() << "Certificate: \n" << config.localCertificate().toPem();
-    qInfo() << "Key: \n" << config.privateKey().toPem();
+    qInfo() << "Certificate: " << "\n";
+    qInfo() << config.localCertificate().toPem();
+    qInfo() << "Key: " << "\n";
+    qInfo() << config.privateKey().toPem();
 
     // return the configuration
     return config;
@@ -153,7 +155,6 @@ class ClipbirdApplication : public SingleApplication {
   controller::ClipBird *controller;
   ui::gui::Clipbird *content;
   ui::gui::Container *window;
-  QSystemTrayIcon *trayIcon;
 
  private:  // Disable Copy, Move and Assignment
 
@@ -172,7 +173,6 @@ class ClipbirdApplication : public SingleApplication {
     controller = new controller::ClipBird(this->getSslConfiguration());
     content    = new ui::gui::Clipbird(controller);
     window     = new ui::gui::Container();
-    trayIcon   = new QSystemTrayIcon(this);
 
     // set the signal handler for all os
     signal(SIGTERM, [](int sig) { qApp->quit(); });
@@ -182,14 +182,8 @@ class ClipbirdApplication : public SingleApplication {
     // set initial theme
     setQssFile(QGuiApplication::styleHints()->colorScheme());
 
-    // set ToolTip
-    trayIcon->setToolTip(QString::fromStdString(constants::getAppName()));
-
     // set not to quit on last content closed
     qApp->setQuitOnLastWindowClosed(false);
-
-    // set the QSystemTrayIcon
-    content->setTrayIcon(trayIcon);
 
     // set the content Ratio
     window->setFixedSize(constants::getAppWindowSize());
@@ -203,20 +197,28 @@ class ClipbirdApplication : public SingleApplication {
     // using some classes
     using ui::gui::Clipbird;
 
+    QSystemTrayIcon *trayIcon = content->getTrayIcon();
+
     // tray icon click from content
-    const auto signal_tic = &QSystemTrayIcon::activated;
-    const auto slot_tic   = &ClipbirdApplication::onTrayIconClicked;
-    QObject::connect(trayIcon, signal_tic, this, slot_tic);
+    QObject::connect(
+      trayIcon, &QSystemTrayIcon::activated,
+      this, &ClipbirdApplication::onTrayIconClicked
+    );
 
     // set the signal for instance Started
-    const auto signal_is = &SingleApplication::instanceStarted;
-    const auto slot_is   = &Clipbird::show;
-    QObject::connect(this, signal_is, window, slot_is);
+    QObject::connect(
+      this, &SingleApplication::instanceStarted,
+      window, &Clipbird::show
+    );
 
     // detect the system theme
-    const auto signal = &QStyleHints::colorSchemeChanged;
-    const auto slot   = &ClipbirdApplication::setQssFile;
-    QObject::connect(QGuiApplication::styleHints(), signal, this, slot);
+    QObject::connect(
+      QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged,
+      this, &ClipbirdApplication::setQssFile
+    );
+
+    // show the tray icon
+    trayIcon->show();
   }
 
   /**

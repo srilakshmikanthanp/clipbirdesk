@@ -28,9 +28,12 @@ Clipboard::Clipboard(QObject* parent) : QObject(parent) {
   // connect the clipboard change signal to the slot
   // that is used to notify the listeners
   const auto clipboard = QApplication::clipboard();
-  const auto signal = &QClipboard::changed;
-  const auto slot   = &Clipboard::onClipboardChangeImpl;
-  QObject::connect(clipboard, signal, this, slot);
+
+  // connect the clipboard change signal to the slot
+  QObject::connect(
+    clipboard, &QClipboard::changed,
+    this, &Clipboard::onClipboardChangeImpl
+  );
 }
 
 /**

@@ -47,13 +47,13 @@ void ClipBird::handleServerStatusChanged(bool status, types::device::Device host
 
   // get the client and disconnect the signals
   auto signal  = &clipboard::Clipboard::OnClipboardChange;
+  auto slot    = &Client::syncItems;
   auto *client = &std::get<Client>(m_host);
-  auto slot_n  = &Client::syncItems;
   auto &store  = storage::Storage::instance();
 
   // if the client is connected then connect the signals
   if (status) {
-    connect(&m_clipboard, signal, client, slot_n);
+    connect(&m_clipboard, signal, client, slot);
     auto cert = client->getConnectedServerCertificate();
     auto name = host.name;
     store.setServerCert(name, cert.toPem());
@@ -63,7 +63,7 @@ void ClipBird::handleServerStatusChanged(bool status, types::device::Device host
   }
 
   // Disconnect the Signal
-  disconnect(&m_clipboard, signal, client, slot_n);
+  disconnect(&m_clipboard, signal, client, slot);
 
   // Get all server
   for (auto s : client->getServerList()) {
@@ -197,41 +197,56 @@ void ClipBird::setCurrentHostAsServer() {
   server->setSslConfiguration(m_sslConfig);
 
   // Connect the onClientStateChanged signal to the signal
-  const auto slot_hcs  = &ClipBird::handleClientStateChanged;
-  const auto signal_cs = &Server::OnCLientStateChanged;
-  const auto slot_cs   = &ClipBird::OnCLientStateChanged;
-  connect(server, signal_cs, this, slot_cs);
-  connect(server, signal_cs, this, slot_hcs);
+  connect(
+    server, &Server::OnCLientStateChanged,
+    this, &ClipBird::OnCLientStateChanged
+  );
+
+  connect(
+    server, &Server::OnCLientStateChanged,
+    this, &ClipBird::handleClientStateChanged
+  );
 
   // connect OnAuthRequest to clipbird OnAuthRequest
   // Connect the onSyncRequest signal to the clipboard
-  const auto signal_sa = &Server::OnAuthRequest;
-  const auto slot_sa   = &ClipBird::handleAuthRequest;
-  connect(server, signal_sa, this, slot_sa);
+  connect(
+    server,  &Server::OnAuthRequest,
+    this, &ClipBird::handleAuthRequest
+  );
 
   // Connect the onSyncRequest signal to the clipboard
-  const auto signal_sr  = &Server::OnSyncRequest;
-  const auto slot_sr    = &clipboard::Clipboard::set;
-  const auto slot_hsr   = &ClipBird::handleSyncRequest;
-  const auto signal_hsr = &ClipBird::OnSyncRequest;
-  connect(server, signal_sr, this, signal_hsr);
-  connect(server, signal_sr, this, slot_hsr);
-  connect(server, signal_sr, &m_clipboard, slot_sr);
+  connect(
+    server, &Server::OnSyncRequest,
+    this, &ClipBird::OnSyncRequest
+  );
+
+  connect(
+    server, &Server::OnSyncRequest,
+    this, &ClipBird::handleSyncRequest
+  );
+
+  connect(
+    server, &Server::OnSyncRequest,
+    &m_clipboard, &clipboard::Clipboard::set
+  );
 
   // connect the OnClipboardChange signal to the server
-  const auto signal_cc = &clipboard::Clipboard::OnClipboardChange;
-  const auto slot_si   = &Server::syncItems;
-  connect(&m_clipboard, signal_cc, server, slot_si);
+  connect(
+    &m_clipboard, &clipboard::Clipboard::OnClipboardChange,
+    server, &Server::syncItems
+  );
 
   // Connect the onClientListChanged signal to the signal
-  const auto signal_lc = &Server::OnClientListChanged;
-  const auto slot_lc   = &ClipBird::OnClientListChanged;
-  connect(server, signal_lc, this, slot_lc);
+  connect(
+    server, &Server::OnClientListChanged,
+    this, &ClipBird::OnClientListChanged
+  );
 
   // Connect the onServerStateChanged signal to the signal
-  const auto signal_ss = &Server::OnServerStateChanged;
-  const auto slot_ss   = &ClipBird::OnServerStateChanged;
-  connect(server, signal_ss, this, slot_ss);
+  connect(
+    server, &Server::OnServerStateChanged,
+    this, &ClipBird::OnServerStateChanged
+  );
 
   // get the storage instance
   auto &store = storage::Storage::instance();
@@ -257,42 +272,60 @@ void ClipBird::setCurrentHostAsClient() {
   client->setSslConfiguration(m_sslConfig);
 
   // Connect the onServerListChanged signal to the signal
-  const auto signal_sl = &Client::OnServerListChanged;
-  const auto slot_sl   = &ClipBird::OnServerListChanged;
-  connect(client, signal_sl, this, slot_sl);
+  connect(
+    client, &Client::OnServerListChanged,
+    this, &ClipBird::OnServerListChanged
+  );
 
   // Connect the onServerFound signal to the signal
-  const auto signal_fn = &Client::OnServerFound;
-  const auto slot_hfn  = &ClipBird::handleServerFound;
-  const auto slot_fn   = &ClipBird::OnServerFound;
-  connect(client, signal_fn, this, slot_hfn);
-  connect(client, signal_fn, this, slot_fn);
+  connect(
+    client, &Client::OnServerFound,
+    this, &ClipBird::handleServerFound
+  );
+
+  connect(
+    client, &Client::OnServerFound,
+    this, &ClipBird::OnServerFound
+  );
 
   // Connect the OnServerGone signal to the signal
-  const auto signal_sg = &Client::OnServerGone;
-  const auto slot_sg   = &ClipBird::OnServerGone;
-  connect(client, signal_sg, this, slot_sg);
+  connect(
+    client, &Client::OnServerGone,
+    this, &ClipBird::OnServerGone
+  );
 
   // Connect the onServerStateChanged signal to the signal
-  const auto slot_hc   = &ClipBird::handleServerStatusChanged;
-  const auto signal_sc = &Client::OnServerStatusChanged;
-  const auto slot_sc   = &ClipBird::OnServerStatusChanged;
-  connect(client, signal_sc, this, slot_sc);
-  connect(client, signal_sc, this, slot_hc);
+  connect(
+    client, &Client::OnServerStatusChanged,
+    this, &ClipBird::OnServerStatusChanged
+  );
+
+  connect(
+    client, &Client::OnServerStatusChanged,
+    this, &ClipBird::handleServerStatusChanged
+  );
 
   // Connect the onSyncRequest signal to the clipboard
-  const auto signal_rq  = &Client::OnSyncRequest;
-  const auto slot_hrq   = &ClipBird::handleSyncRequest;
-  const auto slot_rq    = &clipboard::Clipboard::set;
-  const auto signal_hrq = &ClipBird::OnSyncRequest;
-  connect(client, signal_rq, this, signal_hrq);
-  connect(client, signal_rq, this, slot_hrq);
-  connect(client, signal_rq, &m_clipboard, slot_rq);
+  connect(
+    client, &Client::OnSyncRequest,
+    this, &ClipBird::OnSyncRequest
+  );
+
+  connect(
+    client, &Client::OnSyncRequest,
+    this, &ClipBird::handleSyncRequest
+  );
+
+  connect(
+    client, &Client::OnSyncRequest,
+    &m_clipboard, &clipboard::Clipboard::set
+  );
 
   // connect onConnectionError to the signal
-  const auto signal_ce = &Client::OnConnectionError;
-  const auto slot_ce   = &ClipBird::OnConnectionError;
-  connect(client, signal_ce, this, slot_ce);
+  connect(
+    client, &Client::OnConnectionError,
+    this, &ClipBird::OnConnectionError
+  );
 
   // get the storage instance
   auto &store = storage::Storage::instance();

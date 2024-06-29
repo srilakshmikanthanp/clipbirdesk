@@ -11,7 +11,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui {
 /**
  * @brief handle the host action from the window
  */
-void Clipbird::handleHostAction(Tabs t, components::Host::Value h) {
+void Clipbird::handleHostAction(Tabs t, components::HostTile::Value h) {
   if (t == Tabs::Server && std::get<1>(h) == Action::Disconnect) {
     controller->disconnectClient(std::get<0>(h));
   }
@@ -75,7 +75,7 @@ void Clipbird::handleTabChangeForServer(Tabs tab) {
  */
 void Clipbird::handleClientListChange(QList<types::device::Device> clients) {
   // Create a list of tuple with Action
-  QList<components::Host::Value> clients_m;
+  QList<components::HostTile::Value> clients_m;
 
   // Add the clients to the list
   for (auto c : clients) {
@@ -92,7 +92,7 @@ void Clipbird::handleClientListChange(QList<types::device::Device> clients) {
 void Clipbird::handleServerStateChange(bool isStarted) {
   // infer the status from the server state
   auto groupName  = QString::fromStdString(constants::getMDnsServiceName());
-  auto status_m   = isStarted ? Status::Active : Status::Inactive;
+  auto status     = isStarted ? Status::Active : Status::Inactive;
   auto clients    = controller->getConnectedClientsList();
 
   // If the server is started
@@ -101,18 +101,18 @@ void Clipbird::handleServerStateChange(bool isStarted) {
   }
 
   // set the server status
-  this->setStatus(groupName, status_m);
+  this->setStatus(groupName, status);
 
   // Create a list of tuple with Action
-  QList<components::Host::Value> clients_m;
+  QList<components::HostTile::Value> clientTiles;
 
   // Add the clients to the list
   for (auto c : clients) {
-    clients_m.append({c, Action::Disconnect});
+    clientTiles.append({c, Action::Disconnect});
   }
 
   // set the client list to the window
-  this->setClientList(clients_m);
+  this->setClientList(clientTiles);
 }
 
 /**
@@ -125,25 +125,35 @@ void Clipbird::handleAuthRequest(const types::device::Device& client) {
   notification::JoinRequest* toast = new notification::JoinRequest(this);
 
   // connect the dialog to window AuthSuccess signal
-  const auto signal_s = &notification::JoinRequest::onAccept;
-  const auto slot_s   = [=] { controller->authSuccess(client); };
-  const auto conn_s   = connect(toast, signal_s, slot_s);
-  connect(toast, signal_s, toast, &QObject::deleteLater);
+  const auto connectionAccept = connect(
+    toast, &notification::JoinRequest::onAccept,
+    [=] { controller->authSuccess(client); }
+  );
+
+  connect(
+    toast, &notification::JoinRequest::onAccept,
+    toast, &QObject::deleteLater
+  );
 
   // disconnect all signals on tab change signal
   connect(this, &Clipbird::onTabChanged, [=]{
-    QObject::disconnect(conn_s);
+    QObject::disconnect(connectionAccept);
   });
 
   // connect the dialog to window AuthFail signal
-  const auto signal_f = &notification::JoinRequest::onReject;
-  const auto slot_f   = [=] { controller->authFailed(client); };
-  const auto conn_f   = connect(toast, signal_f, slot_f);
-  connect(toast, signal_f, toast, &QObject::deleteLater);
+  const auto connectionReject   = connect(
+    toast, &notification::JoinRequest::onReject,
+    [=] { controller->authFailed(client); }
+  );
+
+  connect(
+    toast, &notification::JoinRequest::onReject,
+    toast, &QObject::deleteLater
+  );
 
   // disconnect all signals on tab change signal
   connect(this, &Clipbird::onTabChanged, [=]{
-    QObject::disconnect(conn_f);
+    QObject::disconnect(connectionReject);
   });
 
   // shoe the notification
@@ -157,7 +167,7 @@ void Clipbird::handleAuthRequest(const types::device::Device& client) {
  */
 void Clipbird::handleServerListChange(QList<types::device::Device> servers) {
   // Create a list of tuple with Action
-  QList<components::Host::Value> servers_m;
+  QList<components::HostTile::Value> serversTile;
 
   // get the action for the server
   const auto getAction = [=](const auto& s) {
@@ -172,16 +182,16 @@ void Clipbird::handleServerListChange(QList<types::device::Device> servers) {
 
   // add the server to the list
   for (auto s : servers) {
-    servers_m.append({s, getAction(s)});
+    serversTile.append({s, getAction(s)});
   }
 
   // show the connected server always on top
-  std::sort(servers_m.begin(), servers_m.end(), [=](const auto& a, const auto& b) {
+  std::sort(serversTile.begin(), serversTile.end(), [=](const auto& a, const auto& b) {
     return std::get<1>(a) != Action::Disconnect;
   });
 
   // set the server list to the window
-  this->setServerList(servers_m);
+  this->setServerList(serversTile);
 }
 
 /**
@@ -218,30 +228,30 @@ void Clipbird::handleServerStatusChanged(bool isConnected) {
   };
 
   // Create a list of tuple with Action
-  QList<components::Host::Value> servers_m;
+  QList<components::HostTile::Value> serversTiles;
 
   // set the server status
   this->setStatus(groupName, status);
 
   // add the server to the list
   for (auto s : servers) {
-    servers_m.append({s, getAction(s)});
+    serversTiles.append({s, getAction(s)});
   }
 
   // if the server is not in the list
-  if (isConnected && !std::any_of(servers_m.begin(), servers_m.end(), [=](const auto& s) {
+  if (isConnected && !std::any_of(serversTiles.begin(), serversTiles.end(), [=](const auto& s) {
     return serverCompare(std::get<0>(s));
   })) {
-    servers_m.append({server.value(), Action::Disconnect});
+    serversTiles.append({server.value(), Action::Disconnect});
   }
 
   // show the connected server always on top
-  std::sort(servers_m.begin(), servers_m.end(), [=](const auto& a, const auto& b) {
+  std::sort(serversTiles.begin(), serversTiles.end(), [=](const auto& a, const auto& b) {
     return std::get<1>(a) != Action::Disconnect;
   });
 
   // set the server list to the window
-  this->setServerList(servers_m);
+  this->setServerList(serversTiles);
 }
 
 /**
@@ -483,19 +493,24 @@ void Clipbird::onReceivedClicked() {
   history.setFixedSize(QSize(350, 380));
 
   // connect signal for Clipboard Copy
-  const auto signal_cc = &modals::History::onClipSelected;
-  const auto slot_cc   = [=](auto i) { controller->setClipboard(controller->getHistory().at(i)); };
-  connect(&history, signal_cc, slot_cc);
+  connect(
+    &history, &modals::History::onClipSelected,
+    [=](auto i) {
+      controller->setClipboard(controller->getHistory().at(i));
+    }
+  );
 
   // connect signal for history delete
-  const auto signal_hd = &modals::History::onClipDelete;
-  const auto slot_hd   = &ClipBird::deleteHistoryAt;
-  connect(&history, signal_hd, controller, slot_hd);
+  connect(
+    &history, &modals::History::onClipDelete,
+    controller, &ClipBird::deleteHistoryAt
+  );
 
   // connect signal for history change
-  const auto signal_hc = &ClipBird::OnHistoryChanged;
-  const auto slot_hc   = &modals::History::setHistory;
-  connect(controller, signal_hc, &history, slot_hc);
+  connect(
+    controller, &ClipBird::OnHistoryChanged,
+    &history, &modals::History::setHistory
+  );
 
   // show the dialog
   history.show();
@@ -519,6 +534,18 @@ void Clipbird::setUpLanguage() {
 Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QFrame(p), controller(c) {
   // set no taskbar icon & no window Frame & always on top
   setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+
+  // set the icon to tray
+  trayIcon->setIcon(QIcon(constants::getAppLogo()));
+
+  // set the tray menu
+  trayIcon->setContextMenu(trayMenu);
+
+  // set tooltip
+  trayIcon->setToolTip(constants::getAppName());
+
+  // set ToolTip
+  trayIcon->setToolTip(QString::fromStdString(constants::getAppName()));
 
   // set object name
   this->setObjectName("Clipbird");
@@ -595,99 +622,116 @@ Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QFrame(p), controller(c)
   // clang-format on
 
   // set the signal for menus QrCode click
-  const auto signal_qc = &ui::gui::TrayMenu::OnQrCodeClicked;
-  const auto slot_qc   = &Clipbird::onQrCodeClicked;
-  QObject::connect(trayMenu, signal_qc, this, slot_qc);
+  QObject::connect(
+    trayMenu, &ui::gui::TrayMenu::OnQrCodeClicked,
+    this, &Clipbird::onQrCodeClicked
+  );
 
   // set the signal for menus Connect click
-  const auto signal_cc = &ui::gui::TrayMenu::OnConnectClicked;
-  const auto slot_cc   = &Clipbird::onConnectClicked;
-  QObject::connect(trayMenu, signal_cc, this, slot_cc);
+  QObject::connect(
+    trayMenu, &ui::gui::TrayMenu::OnConnectClicked,
+    this, &Clipbird::onConnectClicked
+  );
 
   // set the signal for menus About click
-  const auto signal_ac = &ui::gui::TrayMenu::OnAboutClicked;
-  const auto slot_ac   = &Clipbird::onAboutClicked;
-  QObject::connect(trayMenu, signal_ac, this, slot_ac);
+  QObject::connect(
+    trayMenu, &ui::gui::TrayMenu::OnAboutClicked,
+    this, &Clipbird::onAboutClicked
+  );
 
   // set the signal for menus Open App click
-  const auto signal_oc = &ui::gui::TrayMenu::OnOpenAppClicked;
-  const auto slot_oc   = &Clipbird::onOpenAppClicked;
-  QObject::connect(trayMenu, signal_oc, this, slot_oc);
+  QObject::connect(
+    trayMenu, &ui::gui::TrayMenu::OnOpenAppClicked,
+    this, &Clipbird::onOpenAppClicked
+  );
 
   // set the signal for menus Send click
-  const auto signal_sc = &ui::gui::TrayMenu::OnSendClicked;
-  const auto slot_sc   = &Clipbird::onSendClicked;
-  QObject::connect(trayMenu, signal_sc, this, slot_sc);
+  QObject::connect(
+    trayMenu, &ui::gui::TrayMenu::OnSendClicked,
+    this, &Clipbird::onSendClicked
+  );
 
   // send the signal for menus Received click
-  const auto signal_rcv = &ui::gui::TrayMenu::OnHistoryClicked;
-  const auto slot_rcv   = &Clipbird::onReceivedClicked;
-  QObject::connect(trayMenu, signal_rcv, this, slot_rcv);
+  QObject::connect(
+    trayMenu, &ui::gui::TrayMenu::OnHistoryClicked,
+    this, &Clipbird::onReceivedClicked
+  );
 
   // set the signal for menus Reset click
-  const auto signal_rc = &ui::gui::TrayMenu::OnResetClicked;
-  const auto slot_rc   = &Clipbird::onResetClicked;
-  QObject::connect(trayMenu, signal_rc, this, slot_rc);
+  QObject::connect(
+    trayMenu, &ui::gui::TrayMenu::OnResetClicked,
+    this, &Clipbird::onResetClicked
+  );
 
   // set the signal for menus Quit click
-  const auto signal_ec = &ui::gui::TrayMenu::OnExitClicked;
-  const auto slot_ec   = [] { QApplication::quit(); };
-  QObject::connect(trayMenu, signal_ec, this, slot_ec);
+  QObject::connect(
+    trayMenu, &ui::gui::TrayMenu::OnExitClicked,
+    [this] { QApplication::quit(); }
+  );
 
   // connect server list signal
-  const auto signal_so = &components::HostList::onAction;
-  const auto slot_so   = serverListSlot;
-  connect(serverList, signal_so, slot_so);
+  connect(
+    serverList, &components::HostList::onAction, serverListSlot
+  );
 
   // connect client list signal
-  const auto signal_co = &components::HostList::onAction;
-  const auto slot_co   = clientListSlot;
-  connect(clientList, signal_co, slot_co);
+  connect(
+    clientList, &components::HostList::onAction, clientListSlot
+  );
 
   // Connect the signal and slot for client list change
-  const auto signal_cl = &ClipBird::OnClientListChanged;
-  const auto slot_cl   = &Clipbird::handleClientListChange;
-  connect(controller, signal_cl, this, slot_cl);
+  connect(
+    controller, &ClipBird::OnClientListChanged,
+    this, &Clipbird::handleClientListChange
+  );
 
   // Connect the signal and slot for server list change
-  const auto signal_sl = &ClipBird::OnServerListChanged;
-  const auto slot_sl   = &Clipbird::handleServerListChange;
-  connect(controller, signal_sl, this, slot_sl);
+  connect(
+    controller, &ClipBird::OnServerListChanged,
+    this, &Clipbird::handleServerListChange
+  );
 
   // Connect the signal and slot for server status change
-  const auto signal_st = &ClipBird::OnServerStateChanged;
-  const auto slot_st   = &Clipbird::handleServerStateChange;
-  connect(controller, signal_st, this, slot_st);
+  connect(
+    controller, &ClipBird::OnServerStateChanged,
+    this, &Clipbird::handleServerStateChange
+  );
 
   // connect signal and slot for OnAuthRequest
-  const auto signal_or = &ClipBird::OnAuthRequest;
-  const auto slot_or = &Clipbird::handleAuthRequest;
-  connect(controller, signal_or, this, slot_or);
+  connect(
+    controller, &ClipBird::OnAuthRequest,
+    this, &Clipbird::handleAuthRequest
+  );
 
   // Connect the signal and slot for server status change
-  const auto signal_ss = &ClipBird::OnServerStatusChanged;
-  const auto slot_ss   = &Clipbird::handleServerStatusChanged;
-  connect(controller, signal_ss, this, slot_ss);
+  connect(
+    controller, &ClipBird::OnServerStatusChanged,
+    this, &Clipbird::handleServerStatusChanged
+  );
 
   // Connect the signal and slot for host action
-  const auto signal_ha = &Clipbird::onHostAction;
-  const auto slot_ha   = &Clipbird::handleHostAction;
-  connect(this, signal_ha, this, slot_ha);
+  connect(
+    this, &Clipbird::onHostAction,
+    this, &Clipbird::handleHostAction
+  );
 
   // Connect the signal and slot for tab change(client)
-  const auto signal_tc = &Clipbird::onTabChanged;
-  const auto slot_tc   = &Clipbird::handleTabChangeForClient;
-  connect(this, signal_tc, this, slot_tc);
+  connect(
+    this, &Clipbird::onTabChanged,
+    this, &Clipbird::handleTabChangeForClient
+  );
 
   // Connect the signal and slot for tab change(server)
-  const auto signal_ts = &Clipbird::onTabChanged;
-  const auto slot_ts   = &Clipbird::handleTabChangeForServer;
-  connect(this, signal_ts, this, slot_ts);
+  connect(
+    this, &Clipbird::onTabChanged,
+    this, &Clipbird::handleTabChangeForServer
+  );
 
   // Connect the signal and slot for OnConnectionError
-  const auto signal_ce = &ClipBird::OnConnectionError;
-  const auto slot_ce   = &Clipbird::handleConnectionError;
-  connect(controller, signal_ce, this, slot_ce);
+  connect(
+    controller, &ClipBird::OnConnectionError,
+    this, &Clipbird::handleConnectionError
+  );
 
   // if host is lastly server
   if (controller->isLastlyHostIsServer()) {
@@ -726,25 +770,6 @@ void Clipbird::setTabAsServer() {
 }
 
 /**
- * @brief Set the QSystemTrayIcon
- */
-void Clipbird::setTrayIcon(QSystemTrayIcon* trayIcon) {
-  this->trayIcon = trayIcon;
-
-  // set the icon to tray
-  trayIcon->setIcon(QIcon(constants::getAppLogo()));
-
-  // set the tray menu
-  trayIcon->setContextMenu(trayMenu);
-
-  // set tooltip
-  trayIcon->setToolTip(constants::getAppName());
-
-  // show tray icon
-  trayIcon->show();
-}
-
-/**
  * @brief Get System Tray Icon
  */
 QSystemTrayIcon* Clipbird::getTrayIcon() {
@@ -756,28 +781,28 @@ QSystemTrayIcon* Clipbird::getTrayIcon() {
 /**
  * @brief Set the Server List object
  */
-void Clipbird::setClientList(const QList<components::Host::Value>& hosts) {
+void Clipbird::setClientList(const QList<components::HostTile::Value>& hosts) {
   clientList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List object
  */
-QList<components::Host::Value> Clipbird::getClientList() {
+QList<components::HostTile::Value> Clipbird::getClientList() {
   return clientList->getHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
-void Clipbird::addClient(components::Host::Value host) {
+void Clipbird::addClient(components::HostTile::Value host) {
   clientList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
-void Clipbird::removeClient(components::Host::Value host) {
+void Clipbird::removeClient(components::HostTile::Value host) {
   clientList->removeHost(host);
 }
 
@@ -793,28 +818,28 @@ void Clipbird::removeAllClient() {
 /**
  * @brief Set the Server List object
  */
-void Clipbird::setServerList(const QList<components::Host::Value>& hosts) {
+void Clipbird::setServerList(const QList<components::HostTile::Value>& hosts) {
   serverList->setHosts(hosts);
 }
 
 /**
  * @brief Get the Server List from the tab
  */
-QList<components::Host::Value> Clipbird::getServerList() {
+QList<components::HostTile::Value> Clipbird::getServerList() {
   return serverList->getHosts();
 }
 
 /**
  * @brief Add Server to the list
  */
-void Clipbird::addServer(components::Host::Value host) {
+void Clipbird::addServer(components::HostTile::Value host) {
   serverList->addHost(host);
 }
 
 /**
  * @brief Remove a Server from the list
  */
-void Clipbird::removeServer(components::Host::Value host) {
+void Clipbird::removeServer(components::HostTile::Value host) {
   serverList->removeHost(host);
 }
 

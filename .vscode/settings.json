@@ -20,6 +20,8 @@
     "unauthed"
   ],
   "files.associations": {
+    "*.erd": "json",
+    "*.vuerd": "json",
     ".env*": "dotenv",
     "stdexcept": "cpp",
     "atomic": "cpp",
@@ -170,6 +172,16 @@
     "qguiapplication": "cpp",
     "qscrollbar": "cpp",
     "qurl": "cpp",
-    "ksystemclipboard": "cpp"
+    "ksystemclipboard": "cpp",
+    "stdfloat": "cpp",
+    "knotification": "cpp",
+    "qfile": "cpp",
+    "qsharedpointer": "cpp",
+    "qlocalsocket": "cpp",
+    "qthread": "cpp",
+    "qstackedwidget": "cpp",
+    "qprogressbar": "cpp",
+    "qstackedlayout": "cpp",
+    "qstyleoption": "cpp"
   },
 }

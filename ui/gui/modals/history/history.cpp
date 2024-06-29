@@ -25,9 +25,12 @@ History::History(QWidget * parent) : QDialog(parent) {
   historyArea->setAlignment(Qt::AlignCenter);
 
   // always set scroll bar at top
-  const auto signal = &QScrollBar::rangeChanged;
-  const auto slot   = [historyArea]() { historyArea->verticalScrollBar()->setValue(0); };
-  QObject::connect(historyArea->verticalScrollBar(), signal, this, slot);
+  QObject::connect(
+    historyArea->verticalScrollBar(), &QScrollBar::rangeChanged,
+    this, [historyArea]() {
+      historyArea->verticalScrollBar()->setValue(0);
+    }
+  );
 
   // create layout VBox
   auto vBox = new QVBoxLayout();
@@ -42,14 +45,16 @@ History::History(QWidget * parent) : QDialog(parent) {
   this->setUpLanguage();
 
   // connect the signals
-  auto signal_s = &components::ClipHist::onClipSelected;
-  auto slot_s  = &History::onClipSelected;
-  QObject::connect(this->clipHist, signal_s, this, slot_s);
+  QObject::connect(
+    this->clipHist, &components::ClipHist::onClipSelected,
+    this, &History::onClipSelected
+  );
 
   // connect the signals
-  auto signal_d = &components::ClipHist::onClipDelete;
-  auto slot_d  = &History::onClipDelete;
-  QObject::connect(this->clipHist, signal_d, this, slot_d);
+  QObject::connect(
+    this->clipHist, &components::ClipHist::onClipDelete,
+    this, &History::onClipDelete
+  );
 }
 
 /**

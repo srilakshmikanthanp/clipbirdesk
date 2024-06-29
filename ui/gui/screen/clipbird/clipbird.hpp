@@ -56,7 +56,7 @@ class Clipbird : public QFrame {
  private:  // Member variable (Tray)
 
   ui::gui::components::Status *status = new ui::gui::components::Status(this);  // Status
-  QSystemTrayIcon *trayIcon = nullptr;  // Tray Icon
+  QSystemTrayIcon *trayIcon = new QSystemTrayIcon(this);  // Tray Icon
   ui::gui::TrayMenu *trayMenu = new ui::gui::TrayMenu(this);  // Tray Menu
 
  private:  // Member variable (Tabs)
@@ -78,7 +78,7 @@ class Clipbird : public QFrame {
  public:  // typedefs used in this class
 
   using Status = components::Status::Value;
-  using Action = components::Host::Action;
+  using Action = components::HostTile::Action;
 
  private:  // typedefs used in this class
 
@@ -234,11 +234,6 @@ class Clipbird : public QFrame {
    * @brief Set tab as server
    */
   void setTabAsServer();
-
-  /**
-   * @brief Set the QSystemTrayIcon
-   */
-  void setTrayIcon(QSystemTrayIcon* trayIcon);
 
   /**
    * @brief Get System Tray Icon

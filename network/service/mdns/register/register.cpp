@@ -95,9 +95,10 @@ void Register::registerServiceAsync() {
   );
 
   // connect the socket notifier to slot
-  const auto signal = &QSocketNotifier::activated;
-  const auto slot = &Register::processActivated;
-  connect(this->m_notifier, signal, this, slot);
+  connect(
+    this->m_notifier, &QSocketNotifier::activated,
+    this, &Register::processActivated
+  );
 }
 
 /**

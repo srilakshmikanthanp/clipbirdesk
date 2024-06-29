@@ -50,9 +50,10 @@ Group::Group(QWidget *parent) : QDialog(parent) {
 
   // detect the system theme
   const auto styleHints = QGuiApplication::styleHints();
-  const auto signal = &QStyleHints::colorSchemeChanged;
-  const auto slot = &Group::setUpQrCode;
-  QObject::connect(styleHints, signal, this, slot);
+  QObject::connect(
+    styleHints, &QStyleHints::colorSchemeChanged,
+    this, &Group::setUpQrCode
+  );
 }
 
 /**

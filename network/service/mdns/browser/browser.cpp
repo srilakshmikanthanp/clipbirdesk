@@ -122,9 +122,10 @@ void Browser::browseCallback(
   };
 
   // connect the socket notifier to slot
-  const auto signal = &QSocketNotifier::activated;
-  const auto slot   = processResSock;
-  connect(browserObj->m_res_notify, signal, slot);
+  connect(
+    browserObj->m_res_notify,  &QSocketNotifier::activated,
+    processResSock
+  );
 }
 
 /**
@@ -242,9 +243,10 @@ void Browser::startBrowsing() {
   };
 
   // connect the socket notifier to slot
-  const auto signal = &QSocketNotifier::activated;
-  const auto slot   = processBrowseSock;
-  connect(this->m_browse_notify, signal, slot);
+  connect(
+    this->m_browse_notify, &QSocketNotifier::activated,
+    processBrowseSock
+  );
 }
 
 /**

@@ -7,93 +7,103 @@
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 /**
- * @brief Construct a new Device object
- * with parent as QWidget
- * @param parent parent object
+ * @brief Get the All Hosts from the list
  */
-Host::Host(QWidget *parent) : QWidget(parent) {
-  // connect the button signal to this signal
-  QObject::connect(actBtn, &QPushButton::clicked, [this]() {
-    emit onAction({device, action});
-  });
+QList<components::HostTile::Value> HostList::getHosts() {
+  // create a list of hosts
+  QList<components::HostTile::Value> hosts;
 
-  // vertical alignment of the labels as center
-  this->hostName->setAlignment(Qt::AlignVCenter);
+  // iterate over the layout
+  for (int i = 0; i < verticalLayout->count(); i++) {
+    hosts.append(dynamic_cast<components::HostTile*>(verticalLayout->itemAt(i)->widget())->getHost());
+  }
 
-  // create a layout to align the widgets
-  QHBoxLayout *layout = new QHBoxLayout();
-
-  // Ad the host name to left
-  layout->addWidget(hostName, 0, Qt::AlignLeft);
-
-  // add the button to right
-  layout->addWidget(actBtn, 0, Qt::AlignRight);
-
-  // ActBtn cursor as pointer
-  actBtn->setCursor(Qt::PointingHandCursor);
-
-  // set the layout
-  this->setLayout(layout);
-
-  // set id for styling
-  this->setObjectName("Device");
+  // return the list of hosts
+  return hosts;
 }
 
 /**
- * @brief Function used to set up all text in the label, etc..
+ * @brief Remove all Hosts from the list
  */
-void Host::setUpLanguage() {
-  // Nothing to do
+void HostList::removeHosts() {
+  // iterate over the layout
+  QLayoutItem* item;
+  while ((item = verticalLayout->takeAt(0)) != nullptr) {
+    verticalLayout->removeItem(item);
+    delete item->widget();
+    delete item;
+  }
+
+  // Redraw the widget
+  this->repaint();
 }
 
 /**
- * @brief Set the Device
+ * @brief Add Device to the list
  */
-void Host::setHost(Host::Value host) {
-  // set the address and port
-  this->device  = std::get<0>(host);
-  this->action  = std::get<1>(host);
+void HostList::addHost(components::HostTile::Value host) {
+  // create a new host view
+  auto hostView = new components::HostTile();
 
-  // set the host name
-  this->hostName->setText(device.name);
+  // set the host
+  hostView->setHost(host);
 
-  // action text to set
-  const auto a = action == Action::Disconnect ? disconnect : connect;
+  // connect the host view signal to this signal
+  QObject::connect(
+    hostView, &components::HostTile::onAction,
+    [&](auto h) { emit onAction(h); }
+  );
 
-  // set the action
-  this->actBtn->setText(a);
+  // add the host view to the layout
+  verticalLayout->addWidget(hostView);
 
-  // set the object name to identify
-  this->actBtn->setObjectName(a);
+  // Redraw the widget
+  this->repaint();
 }
 
 /**
- * @brief Get the Device
+ * @brief Remove All the Device as same as the given host
  */
-Host::Value Host::getHost() const {
-  return std::make_tuple(device, action);
+void HostList::removeHost(components::HostTile::Value host) {
+  // iterate over the layout and remove all the host as same as the given host
+  for (int i = 0; i < verticalLayout->count(); i++) {
+    auto hostView = dynamic_cast<components::HostTile*>(verticalLayout->itemAt(i)->widget());
+    if (hostView->getHost() == host) {
+      verticalLayout->removeWidget(hostView);
+      delete hostView;
+    }
+  }
+
+  // Redraw the widget
+  this->repaint();
 }
 
 /**
- * @brief Override paint for custom style
+ * @brief Override the showEvent
  */
-void Host::paintEvent(QPaintEvent *event) {
-  QStyleOption opt;
-  opt.initFrom(this);
-  QPainter p(this);
-  style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+void HostList::paintEvent(QPaintEvent *event) {
+  // if the vertical layout is empty then add a label
+  if (verticalLayout->count() == 0) {
+    this->stackLayout->setCurrentIndex(0);
+  } else {
+    this->stackLayout->setCurrentIndex(1);
+  }
+
+  // call the base class
+  QWidget::paintEvent(event);
 }
 
 /**
  * @brief change event
  */
-void Host::changeEvent(QEvent *event) {
+void HostList::changeEvent(QEvent *event) {
   if (event->type() == QEvent::LanguageChange) {
     this->setUpLanguage();
   }
 
   QWidget::changeEvent(event);
 }
+
 
 // Host List
 HostList::HostList(QWidget* parent) : QWidget(parent) {
@@ -132,7 +142,7 @@ void HostList::setUpLanguage() {
 /**
  * @brief Set the Hosts to the list
  */
-void HostList::setHosts(QList<components::Host::Value> hosts) {
+void HostList::setHosts(QList<components::HostTile::Value> hosts) {
   // get All Hosts from the list and compare with the given list
   auto currHosts = getHosts();
 
@@ -153,102 +163,4 @@ void HostList::setHosts(QList<components::Host::Value> hosts) {
   // Redraw the widget
   this->repaint();
 }
-
-/**
- * @brief Get the All Hosts from the list
- */
-QList<components::Host::Value> HostList::getHosts() {
-  // create a list of hosts
-  QList<components::Host::Value> hosts;
-
-  // iterate over the layout
-  for (int i = 0; i < verticalLayout->count(); i++) {
-    hosts.append(dynamic_cast<components::Host*>(verticalLayout->itemAt(i)->widget())->getHost());
-  }
-
-  // return the list of hosts
-  return hosts;
-}
-
-/**
- * @brief Remove all Hosts from the list
- */
-void HostList::removeHosts() {
-  // iterate over the layout
-  QLayoutItem* item;
-  while ((item = verticalLayout->takeAt(0)) != nullptr) {
-    verticalLayout->removeItem(item);
-    delete item->widget();
-    delete item;
-  }
-
-  // Redraw the widget
-  this->repaint();
-}
-
-/**
- * @brief Add Device to the list
- */
-void HostList::addHost(components::Host::Value host) {
-  // create a new host view
-  auto hostView = new components::Host();
-
-  // set the host
-  hostView->setHost(host);
-
-  // connect the host view signal to this signal
-  const auto signal = &components::Host::onAction;
-  const auto slot   = [&](auto h) { emit onAction(h); };
-  QObject::connect(hostView, signal, slot);
-
-  // add the host view to the layout
-  verticalLayout->addWidget(hostView);
-
-  // Redraw the widget
-  this->repaint();
-}
-
-/**
- * @brief Remove All the Device as same as the given host
- */
-void HostList::removeHost(components::Host::Value host) {
-  // iterate over the layout and remove all the host as same as the given host
-  for (int i = 0; i < verticalLayout->count(); i++) {
-    auto hostView = dynamic_cast<components::Host*>(verticalLayout->itemAt(i)->widget());
-    if (hostView->getHost() == host) {
-      verticalLayout->removeWidget(hostView);
-      delete hostView;
-    }
-  }
-
-  // Redraw the widget
-  this->repaint();
-}
-
-/**
- * @brief Override the showEvent
- */
-void HostList::paintEvent(QPaintEvent *event) {
-  // if the vertical layout is empty then add a label
-  if (verticalLayout->count() == 0) {
-    this->stackLayout->setCurrentIndex(0);
-  } else {
-    this->stackLayout->setCurrentIndex(1);
-  }
-
-  // call the base class
-  QWidget::paintEvent(event);
-}
-
-/**
- * @brief change event
- */
-void HostList::changeEvent(QEvent *event) {
-  if (event->type() == QEvent::LanguageChange) {
-    this->setUpLanguage();
-  }
-
-  QWidget::changeEvent(event);
-}
-
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window
