@@ -393,33 +393,40 @@ void Client::processPongTimeout() {
  */
 Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
   // connect the signals and slots for the errorOccurred
-  const auto signal_e = &QSslSocket::errorOccurred;
-  const auto slot_e   = [=]{ this->OnConnectionError(this->m_ssl_socket->errorString()); };
-  connect(m_ssl_socket, signal_e, this, slot_e);
+  connect(
+    m_ssl_socket, &QSslSocket::errorOccurred,
+    [=]{
+      this->OnConnectionError(this->m_ssl_socket->errorString());
+    }
+  );
 
   // connect the signals and slots for the socket
   // readyRead signal to process the packet
-  const auto signal_r = &QSslSocket::readyRead;
-  const auto slot_r   = &Client::processReadyRead;
-  connect(m_ssl_socket, signal_r, this, slot_r);
+  connect(
+    m_ssl_socket, &QSslSocket::readyRead,
+    this, &Client::processReadyRead
+  );
 
   // disconnected signal to emit the signal for
   // server state changed
-  const auto signal_d = &QSslSocket::disconnected;
-  const auto slot_d   = &Client::processDisconnection;
-  connect(m_ssl_socket, signal_d, this, slot_d);
+  connect(
+    m_ssl_socket, &QSslSocket::disconnected,
+    this, &Client::processDisconnection
+  );
 
   // Connect the socket to the callback function that
   // process the timeout
-  const auto signal_w = &QTimer::timeout;
-  const auto slot_w   = &Client::processPingTimeout;
-  QObject::connect(m_pingTimer, signal_w, this, slot_w);
+  QObject::connect(
+    m_pingTimer, &QTimer::timeout,
+    this, &Client::processPingTimeout
+  );
 
   // Connect the socket to the callback function that
   // process the timeout
-  const auto signal_tr = &QTimer::timeout;
-  const auto slot_tr   = &Client::processPongTimeout;
-  QObject::connect(m_pongTimer, signal_tr, this, slot_tr);
+  QObject::connect(
+    m_pongTimer, &QTimer::timeout,
+    this, &Client::processPongTimeout
+  );
 }
 
 /**

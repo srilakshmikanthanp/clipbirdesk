@@ -353,32 +353,37 @@ Server::Server(QObject *parent) : service::mdnsRegister(parent) {
   // Connect the socket to the callback function that
   // process the connections when the socket is ready
   // to read so the listener can be notified
-  const auto signal_c = &QSslServer::pendingConnectionAvailable;
-  const auto slot_c   = &Server::processPendingConnections;
-  QObject::connect(m_server, signal_c, this, slot_c);
+  QObject::connect(
+    m_server, &QSslServer::pendingConnectionAvailable,
+    this, &Server::processPendingConnections
+  );
 
   // Notify the listeners that the server is started
-  const auto signal = &service::mdnsRegister::OnServiceRegistered;
-  const auto slot   = [=] { emit OnServerStateChanged(true); };
-  QObject::connect(this, signal, this, slot);
+  QObject::connect(
+    this, &service::mdnsRegister::OnServiceRegistered,
+    [=] { emit OnServerStateChanged(true); }
+  );
 
   // Connect the socket to the callback function that
   // process the SSL errors
-  const auto signal_e = &QSslServer::sslErrors;
-  const auto slot_e   = &Server::processSslErrors;
-  QObject::connect(m_server, signal_e, this, slot_e);
+  QObject::connect(
+    m_server, &QSslServer::sslErrors,
+    this, &Server::processSslErrors
+  );
 
   // Connect the socket to the callback function that
   // process the timeout
-  const auto signal_w = &QTimer::timeout;
-  const auto slot_w   = &Server::processPingTimeout;
-  QObject::connect(m_pingTimer, signal_w, this, slot_w);
+  QObject::connect(
+    m_pingTimer, &QTimer::timeout,
+    this, &Server::processPingTimeout
+  );
 
   // Connect the socket to the callback function that
   // process the timeout
-  const auto signal_r = &QTimer::timeout;
-  const auto slot_r   = &Server::processPongTimeout;
-  QObject::connect(m_pongTimer, signal_r, this, slot_r);
+  QObject::connect(
+    m_pongTimer, &QTimer::timeout,
+    this, &Server::processPongTimeout
+  );
 }
 
 /**
