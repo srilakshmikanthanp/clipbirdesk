@@ -7,10 +7,10 @@
 #include <gtest/gtest.h>
 
 // Local header files
-#include "tests/network/packets/authentication.hpp"
-#include "tests/network/packets/invalidrequest.hpp"
-#include "tests/network/packets/pingpacket.hpp"
-#include "tests/network/packets/syncingpacket.hpp"
+#include "network/packets/authentication.hpp"
+#include "network/packets/invalidrequest.hpp"
+#include "network/packets/pingpacket.hpp"
+#include "network/packets/syncingpacket.hpp"
 
 /**
  * @brief Testing the clipbirdesk Application

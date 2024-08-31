@@ -1,7 +1,7 @@
 // Contributions.js
 
 import React from "react";
-import "./Contributions.css"; // Add your Contributions section styles
+import "./Contributions.css";
 
 const Contributions = () => {
   return (

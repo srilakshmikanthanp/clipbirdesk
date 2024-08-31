@@ -13,7 +13,7 @@
                 "${workspaceFolder}/build/_deps/singleapplication-src",
                 "${workspaceFolder}/build",
                 "C:\\Program Files\\Bonjour SDK\\Include",
-                "C:\\dev\\vcpkg\\packages\\protobuf_x64-windows\\include"
+                "${workspaceFolder}/build/_deps/libqrencode-src"
             ],
             "defines": [
                 "_UNICODE",
