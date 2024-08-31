@@ -254,9 +254,9 @@ This project utilizes Bonjour technology by Apple for Advertising and Discovery 
 
 ## Screenshots
 
-|![clipbird](.images/clipbird_light.png) | ![history](.images/history_light.png) |
+|![clipbird](assets/images/clipbird_light.png) | ![history](assets/images/history_light.png) |
 |--------------------------------------- | --------------------------------------|
-|![clipbird](.images/clipbird_dark.png)  | ![history](.images/history_dark.png)  |
+|![clipbird](assets/images/clipbird_dark.png)  | ![history](assets/images/history_dark.png)  |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
