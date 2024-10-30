@@ -9,6 +9,8 @@
 #include <QApplication>
 #include <QObject>
 #include <QMetaObject>
+#include <QBuffer>
+#include <QUuid>
 
 #ifdef signals
 #define WAS_SIGNALS_DEFINED
@@ -55,6 +57,11 @@ class JoinRequest : public QObject {
    * @brief Callback for the reject action
    */
   static void onRejectAction(NotifyNotification* notification, char* action, gpointer user_data);
+
+  /**
+   * @brief Handle notification closure
+   */
+  static void onClosed(NotifyNotification* notification, gpointer user_data);
 
   /**
    * @brief Accept Impl

@@ -416,7 +416,6 @@ auto main(int argc, char **argv) -> int {
   // start glib main loop
   auto thread = std::thread([g_main_loop]() {
     g_main_loop_run(g_main_loop);
-    qInfo() << "Glib Main Loop Exited";
   });
 
   // detach

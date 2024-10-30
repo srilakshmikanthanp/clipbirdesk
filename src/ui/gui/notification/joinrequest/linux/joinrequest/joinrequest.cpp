@@ -13,9 +13,12 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification {
  */
 void JoinRequest::onAcceptAction(NotifyNotification* notification, char* action, gpointer user_data) {
   auto joinRequest = static_cast<JoinRequest*>(user_data);
+  
   if (joinRequest) {
     joinRequest->acceptImpl();
   }
+
+  g_object_unref(G_OBJECT(notification));
 }
 
 /**
@@ -23,9 +26,25 @@ void JoinRequest::onAcceptAction(NotifyNotification* notification, char* action,
  */
 void JoinRequest::onRejectAction(NotifyNotification* notification, char* action, gpointer user_data) {
   auto joinRequest = static_cast<JoinRequest*>(user_data);
+  
   if (joinRequest) {
     joinRequest->rejectImpl();
   }
+
+  g_object_unref(G_OBJECT(notification));
+}
+
+/**
+ * @brief Handle notification closure
+ */
+void JoinRequest::onClosed(NotifyNotification* notification, gpointer user_data) {
+  auto joinRequest = static_cast<JoinRequest*>(user_data);
+  
+  if (joinRequest) {
+    joinRequest->rejectImpl();
+  }
+
+  g_object_unref(G_OBJECT(notification));
 }
 
 /**
@@ -55,11 +74,27 @@ JoinRequest::JoinRequest(QObject *parent) : QObject(parent) {
  * @brief Show the notification
  */
 void JoinRequest::show(const types::device::Device &device) {
+  auto icon = QDir::tempPath() + QDir::separator() + QUuid::createUuid().toString(QUuid::StringFormat::Id128) + ".png";
   auto body = QObject::tr("%1 wants to Join to your Group").arg(device.name).toStdString();
-  auto icon = (qApp->applicationDirPath() + "/assets/images/logo.png").toStdString(); 
+  
+  // Create a image for the notification
+  QImage image(":/images/logo.png");
+  QByteArray byteArray;
+  QBuffer buffer(&byteArray);
+  buffer.open(QIODevice::WriteOnly);
+  image.save(&buffer, "PNG"); // Save as PNG format
+
+  // Write the image to a temp file
+  QFile tempFile(icon);
+  if (tempFile.open(QIODevice::WriteOnly)) {
+    tempFile.write(byteArray);
+    tempFile.close();
+  }
+
+  auto path = icon.toLocal8Bit().data();
 
   NotifyNotification* notification = notify_notification_new(
-    constants::getAppName(), body.c_str(), icon.c_str()
+    constants::getAppName(), body.c_str(), path
   );
 
   notify_notification_add_action(
@@ -78,12 +113,18 @@ void JoinRequest::show(const types::device::Device &device) {
     this, 
     nullptr);
 
+  g_signal_connect(
+    notification, 
+    "closed", 
+    G_CALLBACK(onClosed), 
+    this
+  );
+
   if (!notify_notification_show(notification, nullptr)) {
     qErrnoWarning("Failed to show notification");
+    g_object_unref(G_OBJECT(notification));
+    return;
   }
-
-  // Unref the notification object to avoid memory leak
-  g_object_unref(G_OBJECT(notification));
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification
 #endif  // __linux__

@@ -107,6 +107,9 @@ class Server : public service::mdnsRegister {
     if (wrote != data.size()) {
       qErrnoWarning("Error while writing to the socket");
     }
+
+    // flush the data
+    client->flush();
   }
 
   /**
