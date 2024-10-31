@@ -41,6 +41,9 @@ set(WITH_TOOLS OFF CACHE BOOL "" FORCE)
 # Make Available qzxing
 FetchContent_MakeAvailable(libqrencode)
 
+# set auto rcc
+set(CMAKE_AUTORCC ON)
+
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp *.cpp)
 

@@ -181,7 +181,12 @@
     "qthread": "cpp",
     "qstackedwidget": "cpp",
     "qprogressbar": "cpp",
+    "qfiledialog": "cpp",
     "qstackedlayout": "cpp",
-    "qstyleoption": "cpp"
+    "qstyleoption": "cpp",
+    "qregularexpression": "cpp",
+    "qnetworkproxy": "cpp",
+    "qgraphicsdropshadoweffect": "cpp",
+    "qabstractnativeeventfilter": "cpp"
   },
 }

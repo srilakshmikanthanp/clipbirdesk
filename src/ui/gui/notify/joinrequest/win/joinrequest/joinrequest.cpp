@@ -7,7 +7,7 @@
 
 #include "joinrequest.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify {
 /**
  * @brief Accept Impl
  */
@@ -78,5 +78,5 @@ void JoinRequest::show(const types::device::Device &device) {
 
   WinToastLib::WinToast::instance()->showToast(toast, this);
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify
 #endif  // _WIN32

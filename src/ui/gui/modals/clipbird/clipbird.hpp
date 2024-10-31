@@ -44,41 +44,27 @@
 #include "types/device/device.hpp"
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/components/hostlist/hostlist.hpp"
-#include "ui/gui/traymenu/traymenu.hpp"
-#include "ui/gui/modals/aboutus/aboutus.hpp"
-#include "ui/gui/modals/history/history.hpp"
-#include "ui/gui/modals/connect/connect.hpp"
-#include "ui/gui/modals/group/group.hpp"
-#include "ui/gui/notification/joinrequest/joinrequest.hpp"
+#include "ui/gui/notify/joinrequest/joinrequest.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui {
-class Clipbird : public QFrame {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
+class Clipbird : public QDialog {
  private:  // Member variable (Tray)
 
   ui::gui::components::Status *status = new ui::gui::components::Status(this);  // Status
-  QSystemTrayIcon *trayIcon = new QSystemTrayIcon(this);  // Tray Icon
-  ui::gui::TrayMenu *trayMenu = new ui::gui::TrayMenu(this);  // Tray Menu
 
  private:  // Member variable (Tabs)
 
   components::HostList* clientList = new components::HostList();  // Server Tab
   components::HostList* serverList = new components::HostList();  // Client Tab
 
- private:  // Member variable (Modals)
-
-  modals::AboutUs aboutUs = modals::AboutUs();
-  modals::Group group = modals::Group();
-  modals::History history = modals::History();
-  modals::Connect joiner = modals::Connect();
-
  private:  // Member variable (Layout)
 
   QTabWidget* tab = new QTabWidget();
 
- public:  // typedefs used in this class
+ private:  // typedefs used in this class
 
-  using Status = components::Status::Value;
   using Action = components::HostTile::Action;
+  using Status = components::Status::Value;
 
  private:  // typedefs used in this class
 
@@ -119,22 +105,22 @@ class Clipbird : public QFrame {
    */
   void handleHostAction(Tabs t, std::tuple<types::device::Device, Action> h);
 
-  /**
-   * @brief On Tab Changed for Client
-   */
-  void handleTabChangeForClient(Tabs tab);
-
-  /**
-   * @brief On Tab Changed for Server
-   */
-  void handleTabChangeForServer(Tabs tab);
-
   //----------------------------- slots for Server --------------------------//
 
   /**
    * @brief Handle the Client List Item Clicked
    */
   void handleClientListChange(QList<types::device::Device> clients);
+
+  /**
+   * @brief Handle the Client Tab Change
+   */
+  void handleTabChangeForClient(Tabs tab);
+
+  /**
+   * @brief Handle the Server Tab Change
+   */
+  void handleTabChangeForServer(Tabs tab);
 
   /**
    * @brief Handle the Server State Change
@@ -157,48 +143,6 @@ class Clipbird : public QFrame {
    * @brief Handle the server status change
    */
   void handleServerStatusChanged(bool status);
-
-  /**
-   * @brief handle onConnectionError
-   */
-  void handleConnectionError(QString error);
-
-  //----------------------------- slots for Tray ----------------------------//
-
-  /**
-   * @brief On Qr Code Clicked
-   */
-  void onQrCodeClicked();
-
-  /**
-   * @brief On Connect Clicked
-   */
-  void onConnectClicked();
-
-  /**
-   * @brief On About Clicked
-   */
-  void onAboutClicked();
-
-  /**
-   * @brief On Open App Clicked
-   */
-  void onOpenAppClicked();
-
-  /**
-   * @brief On Send Clicked
-   */
-  void onSendClicked();
-
-  /**
-   * @brief On Received Clicked
-   */
-  void onReceivedClicked();
-
-  /**
-   * @brief On Reset Clicked
-   */
-  void onResetClicked();
 
   //----------------------------- slots for Event ----------------------------//
 
@@ -234,11 +178,6 @@ class Clipbird : public QFrame {
    * @brief Set tab as server
    */
   void setTabAsServer();
-
-  /**
-   * @brief Get System Tray Icon
-   */
-  QSystemTrayIcon* getTrayIcon();
 
   //---------------------- Server Tab ----------------------//
 
@@ -300,6 +239,11 @@ class Clipbird : public QFrame {
    * @brief Override change event
    */
   void changeEvent(QEvent *) override;
+
+  /**
+   * @brief override set visible
+   */
+  void setVisible(bool visible) override;
 
   /**
   * @brief paint event

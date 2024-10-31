@@ -7,13 +7,13 @@
 
 #include "joinrequest.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify {
 /**
  * @brief Callback for the accept action
  */
 void JoinRequest::onAcceptAction(NotifyNotification* notification, char* action, gpointer user_data) {
   auto joinRequest = static_cast<JoinRequest*>(user_data);
-  
+
   if (joinRequest) {
     joinRequest->acceptImpl();
   }
@@ -26,7 +26,7 @@ void JoinRequest::onAcceptAction(NotifyNotification* notification, char* action,
  */
 void JoinRequest::onRejectAction(NotifyNotification* notification, char* action, gpointer user_data) {
   auto joinRequest = static_cast<JoinRequest*>(user_data);
-  
+
   if (joinRequest) {
     joinRequest->rejectImpl();
   }
@@ -39,7 +39,7 @@ void JoinRequest::onRejectAction(NotifyNotification* notification, char* action,
  */
 void JoinRequest::onClosed(NotifyNotification* notification, gpointer user_data) {
   auto joinRequest = static_cast<JoinRequest*>(user_data);
-  
+
   if (joinRequest) {
     joinRequest->rejectImpl();
   }
@@ -76,7 +76,7 @@ JoinRequest::JoinRequest(QObject *parent) : QObject(parent) {
 void JoinRequest::show(const types::device::Device &device) {
   auto icon = QDir::tempPath() + QDir::separator() + QUuid::createUuid().toString(QUuid::StringFormat::Id128) + ".png";
   auto body = QObject::tr("%1 wants to Join to your Group").arg(device.name).toStdString();
-  
+
   // Create a image for the notification
   QImage image(":/images/logo.png");
   QByteArray byteArray;
@@ -98,25 +98,25 @@ void JoinRequest::show(const types::device::Device &device) {
   );
 
   notify_notification_add_action(
-    notification, 
-    "accept", 
-    "Accept", 
-    NOTIFY_ACTION_CALLBACK(JoinRequest::onAcceptAction), 
-    this, 
+    notification,
+    "accept",
+    "Accept",
+    NOTIFY_ACTION_CALLBACK(JoinRequest::onAcceptAction),
+    this,
     nullptr);
-  
+
   notify_notification_add_action(
-    notification, 
-    "reject", 
-    "Reject", 
+    notification,
+    "reject",
+    "Reject",
     NOTIFY_ACTION_CALLBACK(onRejectAction),
-    this, 
+    this,
     nullptr);
 
   g_signal_connect(
-    notification, 
-    "closed", 
-    G_CALLBACK(onClosed), 
+    notification,
+    "closed",
+    G_CALLBACK(onClosed),
     this
   );
 
@@ -126,5 +126,5 @@ void JoinRequest::show(const types::device::Device &device) {
     return;
   }
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify
 #endif  // __linux__

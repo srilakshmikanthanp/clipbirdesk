@@ -24,227 +24,20 @@
 #endif
 
 // Project Headers
+#include "application.hpp"
 #include "constants/constants.hpp"
 #include "controller/clipbird/clipbird.hpp"
-#include "ui/gui/container/container.hpp"
-#include "ui/gui/screen/clipbird/clipbird.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk {
 /**
- * @brief Single Application class specialization
- * for ClipBird Application
- */
-class ClipbirdApplication : public SingleApplication {
- private:  // Member Functions
-
-  /**
-   * @brief Get the certificate from App Home
-   */
-  QSslConfiguration getOldSslConfiguration() {
-    auto two_months      = std::chrono::milliseconds(constants::getAppCertExpiryInterval());
-    auto &storage        = storage::Storage::instance();
-
-    // read the certificate and key
-    QSslCertificate cert = QSslCertificate(storage.getHostCert(), QSsl::Pem);
-    QSslKey key          = QSslKey(storage.getHostKey(), QSsl::Rsa);
-    QSslConfiguration sslConfig;
-
-    // get cert name
-    auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
-
-    // Name is updated
-    if (name != QString::fromStdString(constants::getMDnsServiceName())) {
-      return getNewSslConfiguration();
-    }
-
-    // set the certificate and key
-    sslConfig.setLocalCertificate(cert);
-    sslConfig.setPrivateKey(key);
-
-    // if the configuration is null
-    if (cert.isNull() || key.isNull() || sslConfig.isNull()) {
-      throw std::runtime_error("Can't Create QSslConfiguration");
-    }
-
-    // if the certificate is going to expiry
-    if (cert.expiryDate() - QDateTime::currentDateTime() < two_months) {
-      return getNewSslConfiguration();
-    }
-
-    // set peer verify
-    sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
-
-    // return the configuration
-    return sslConfig;
-  }
-
-  /**
-   * @brief Get the certificate by creating new one
-   */
-  QSslConfiguration getNewSslConfiguration() {
-    // generate the certificate and key
-    auto sslConfig = utility::functions::getQSslConfiguration();
-
-    // write the certificate and key
-    auto &storage  = storage::Storage::instance();
-    storage.setHostCert(sslConfig.localCertificate().toPem());
-    storage.setHostKey(sslConfig.privateKey().toPem());
-
-    // return the configuration
-    return sslConfig;
-  }
-
-  /**
-   * @brief Get the certificate from App Home
-   * or generate new one and store it
-   */
-  QSslConfiguration getSslConfiguration() {
-    auto &storage = storage::Storage::instance();
-    QSslConfiguration config;
-
-    if (!storage.hasHostCert() || !storage.hasHostKey()) {
-      config = getNewSslConfiguration();
-    } else {
-      config = getOldSslConfiguration();
-    }
-
-    // log the certificate and key
-    qInfo() << "Certificate: " << "\n";
-    qInfo() << config.localCertificate().toPem();
-    qInfo() << "Key: " << "\n";
-    qInfo() << config.privateKey().toPem();
-
-    // return the configuration
-    return config;
-  }
-
-  /**
-   * @brief On Tray Icon Clicked
-   */
-  void onTrayIconClicked(QSystemTrayIcon::ActivationReason reason) {
-    if (reason == QSystemTrayIcon::ActivationReason::Trigger) {
-      window->isVisible() ? window->hide() : window->show();
-    }
-  }
-
-  /**
-   * @brief Set the Qss File for the color scheme
-   */
-  void setQssFile(Qt::ColorScheme scheme) {
-    // detect system theme is dark or light
-    bool isDark     = scheme == Qt::ColorScheme::Dark;
-
-    // qss
-    std::string qss = isDark ? constants::getAppQSSDark() : constants::getAppQSSLight();
-
-    // QFile to read the qss file
-    QFile qssFile(QString::fromStdString(qss));
-
-    // open the qss file
-    qssFile.open(QFile::ReadOnly);
-
-    // set the style sheet
-    qApp->setStyleSheet(qssFile.readAll());
-  }
-
- private:  //  Member Variables and Objects
-
-  controller::ClipBird *controller;
-  ui::gui::Clipbird *content;
-  ui::gui::Container *window;
-
- private:  // Disable Copy, Move and Assignment
-
-  Q_DISABLE_COPY_MOVE(ClipbirdApplication);
-
- public:  // Constructors and Destructors
-
-  /**
-   * @brief Construct a new Clipbird Application object
-   *
-   * @param argc argument count
-   * @param argv argument vector
-   */
-  ClipbirdApplication(int &argc, char **argv) : SingleApplication(argc, argv) {
-    // create the objects of the class
-    controller = new controller::ClipBird(this->getSslConfiguration());
-    content    = new ui::gui::Clipbird(controller);
-    window     = new ui::gui::Container();
-
-    // set the signal handler for all os
-    signal(SIGTERM, [](int sig) { qApp->quit(); });
-    signal(SIGINT, [](int sig) { qApp->quit(); });
-    signal(SIGABRT, [](int sig) { qApp->quit(); });
-
-    // set initial theme
-    setQssFile(QGuiApplication::styleHints()->colorScheme());
-
-    // set not to quit on last content closed
-    qApp->setQuitOnLastWindowClosed(false);
-
-    // set the content Ratio
-    window->setFixedSize(constants::getAppWindowSize());
-
-    // set the content
-    window->setContent(content);
-
-    // set the icon to content
-    window->setWindowIcon(QIcon(constants::getAppLogo()));
-
-    // using some classes
-    using ui::gui::Clipbird;
-
-    QSystemTrayIcon *trayIcon = content->getTrayIcon();
-
-    // tray icon click from content
-    QObject::connect(
-      trayIcon, &QSystemTrayIcon::activated,
-      this, &ClipbirdApplication::onTrayIconClicked
-    );
-
-    // set the signal for instance Started
-    QObject::connect(
-      this, &SingleApplication::instanceStarted,
-      window, &Clipbird::show
-    );
-
-    // detect the system theme
-    QObject::connect(
-      QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged,
-      this, &ClipbirdApplication::setQssFile
-    );
-
-    // show the tray icon
-    trayIcon->show();
-  }
-
-  /**
-   * @brief Destroy the Clipbird Application
-   * Object and it's members
-   */
-  virtual ~ClipbirdApplication() {
-    delete controller;
-    delete content;
-    delete window;
-  }
-
-  /**
-   * @brief get the controller
-   */
-  controller::ClipBird *getController() const {
-    return controller;
-  }
-};
-
-/**
  * @brief Custom event filter for the application that
  * captures window shown event and if the window is decorated
  * apply some attributes to the window
  */
-class ClipbirdEventFilter : public QObject {
+class AppEventFilter : public QObject {
   virtual bool eventFilter(QObject *o, QEvent *e) {
     if (e->type() == QEvent::WindowActivate) {
       handleWindowShownEvent(dynamic_cast<QWidget *>(o));
@@ -265,7 +58,7 @@ class ClipbirdEventFilter : public QObject {
  * captures Native event and if the device is going to sleep
  * or wake up disconnect
  */
-class ClipbirdNativeEventFilter : public QAbstractNativeEventFilter {
+class NativeEventFilter : public QAbstractNativeEventFilter {
  private:
 
   bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override {
@@ -325,12 +118,12 @@ class ClipbirdNativeEventFilter : public QAbstractNativeEventFilter {
   /**
    * @brief Destroy the Clipbird Native Event Filter object
    */
-  virtual ~ClipbirdNativeEventFilter() = default;
+  virtual ~NativeEventFilter() = default;
 
   /**
    * @brief Construct a new Clipbird Native Event Filter object
    */
-  ClipbirdNativeEventFilter(controller::ClipBird *controller) : controller(controller) {}
+  NativeEventFilter(controller::ClipBird *controller) : controller(controller) {}
 };
 }  // namespace srilakshmikanthanp::clipbirdesk
 
@@ -361,15 +154,15 @@ void globalErrorHandler() {
  */
 auto main(int argc, char **argv) -> int {
   // using ClipbirdApplication class from namespace
-  using srilakshmikanthanp::clipbirdesk::ClipbirdApplication;
-  using srilakshmikanthanp::clipbirdesk::ClipbirdEventFilter;
-  using srilakshmikanthanp::clipbirdesk::ClipbirdNativeEventFilter;
   using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogo;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
   using srilakshmikanthanp::clipbirdesk::constants::getAppName;
   using srilakshmikanthanp::clipbirdesk::constants::getAppOrgName;
   using srilakshmikanthanp::clipbirdesk::constants::getAppVersion;
+  using srilakshmikanthanp::clipbirdesk::AppEventFilter;
+  using srilakshmikanthanp::clipbirdesk::NativeEventFilter;
+  using srilakshmikanthanp::clipbirdesk::Application;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
   // std::string to std::wstring
@@ -378,16 +171,16 @@ auto main(int argc, char **argv) -> int {
   };
 
   // create the application
-  ClipbirdApplication app(argc, argv);
+  Application app(argc, argv);
 
   // native event filter
-  auto filter = new ClipbirdNativeEventFilter(app.getController());
+  auto filter = new NativeEventFilter(app.getController());
 
   // install native event filter
   app.installNativeEventFilter(filter);
 
   // install event filter
-  app.installEventFilter(new ClipbirdEventFilter());
+  app.installEventFilter(new AppEventFilter());
 
 #if defined(_WIN32) || defined(_WIN64)
   // create AUMI

@@ -25,7 +25,7 @@
 #include "constants/constants.hpp"
 #include "types/device/device.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify {
 /**
  * @brief Notification class
  */
@@ -93,5 +93,5 @@ class JoinRequest : public QObject {
    */
   virtual ~JoinRequest() = default;
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify
 #endif  // __linux__

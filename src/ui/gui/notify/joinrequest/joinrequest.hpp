@@ -6,7 +6,7 @@
 // https://opensource.org/licenses/MIT
 
 #ifdef __linux__
-  #include "ui/gui/notification/joinrequest/linux/joinrequest/joinrequest.hpp"
+  #include "ui/gui/notify/joinrequest/linux/joinrequest/joinrequest.hpp"
 #elif _WIN32
-  #include "ui/gui/notification/joinrequest/win/joinrequest/joinrequest.hpp"
+  #include "ui/gui/notify/joinrequest/win/joinrequest/joinrequest.hpp"
 #endif

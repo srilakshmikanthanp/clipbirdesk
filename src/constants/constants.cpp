@@ -83,7 +83,7 @@ std::string getAppLogFile() {
  * @return QSize
  */
 QSize getAppWindowSize() {
-  return QSize(375, 460);
+  return QSize(350, 400);
 }
 
 /**
