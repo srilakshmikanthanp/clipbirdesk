@@ -5,13 +5,14 @@
  * https://opensource.org/licenses/MIT
  */
 
-#include "clipboard.hpp"
+#include "applicationclipboard.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::clipboard {
 /**
  * @brief Slot to notify the clipboard change
  */
-void Clipboard::onClipboardChangeImpl() {
+void ApplicationClipboard::onClipboardChangeImpl(QClipboard::Mode mode) {
+  if (mode != QClipboard::Mode::Clipboard) return;
   if (!QApplication::clipboard()->ownsClipboard()) {
     Q_UNUSED(QtConcurrent::run([this]() { emit OnClipboardChange(this->get()); }));
   }
@@ -24,15 +25,11 @@ void Clipboard::onClipboardChangeImpl() {
  * @param clipboard Clipboard that is managed
  * @param parent parent object
  */
-Clipboard::Clipboard(QObject* parent) : QObject(parent) {
-  // connect the clipboard change signal to the slot
-  // that is used to notify the listeners
-  const auto clipboard = QApplication::clipboard();
-
+ApplicationClipboard::ApplicationClipboard(QObject* parent) : QObject(parent) {
   // connect the clipboard change signal to the slot
   QObject::connect(
-    clipboard, &QClipboard::changed,
-    this, &Clipboard::onClipboardChangeImpl
+    this->m_clipboard, &PlatformClipboard::changed,
+    this, &ApplicationClipboard::onClipboardChangeImpl
   );
 }
 
@@ -41,7 +38,7 @@ Clipboard::Clipboard(QObject* parent) : QObject(parent) {
  *
  * @return mime type and data
  */
-QVector<QPair<QString, QByteArray>> Clipboard::get() const {
+QVector<QPair<QString, QByteArray>> ApplicationClipboard::get() const {
   // Default clipboard data & mime data
   QVector<QPair<QString, QByteArray>> items;
 
@@ -77,7 +74,7 @@ QVector<QPair<QString, QByteArray>> Clipboard::get() const {
 /**
  * @brief Clear the clipboard content
  */
-void Clipboard::clear() {
+void ApplicationClipboard::clear() {
   m_clipboard->clear(QClipboard::Mode::Clipboard);
 }
 
@@ -87,7 +84,7 @@ void Clipboard::clear() {
  * @param mime mime type of the data
  * @param data data to be set
  */
-void Clipboard::set(const QVector<QPair<QString, QByteArray>> data) {
+void ApplicationClipboard::set(const QVector<QPair<QString, QByteArray>> data) {
   // create the mime data object
   QMimeData *mimeData = new QMimeData();
 

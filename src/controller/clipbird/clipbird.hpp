@@ -16,7 +16,7 @@
 #include <variant>
 
 // project headers
-#include "clipboard/clipboard.hpp"
+#include "clipboard/applicationclipboard.hpp"
 #include "network/syncing/client/client.hpp"
 #include "network/syncing/server/server.hpp"
 #include "store/storage.hpp"
@@ -91,7 +91,7 @@ class ClipBird : public QObject {
 
   std::variant<Server, Client> m_host;
   QSslConfiguration m_sslConfig;
-  clipboard::Clipboard m_clipboard;
+  clipboard::ApplicationClipboard m_clipboard;
   QVector<QVector<QPair<QString, QByteArray>>> m_history;
 
  private:  // private slots

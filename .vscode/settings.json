@@ -187,6 +187,10 @@
     "qregularexpression": "cpp",
     "qnetworkproxy": "cpp",
     "qgraphicsdropshadoweffect": "cpp",
-    "qabstractnativeeventfilter": "cpp"
+    "qabstractnativeeventfilter": "cpp",
+    "qbuffer": "cpp",
+    "*.moc": "cpp",
+    "qclipboard": "cpp"
   },
+  "clang-format.executable": "clang-format-15",
 }

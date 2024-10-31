@@ -72,7 +72,6 @@ find_package(OpenSSL REQUIRED)
 if(WIN32 OR APPLE)
   find_package(Bonjour REQUIRED)
 elseif(UNIX AND NOT APPLE)
-  find_package(KF6GuiAddons REQUIRED)
   find_package(Avahi REQUIRED)
 else()
   message(FATAL_ERROR "Platform not supported")
@@ -81,6 +80,12 @@ endif()
 # Find LibNotify on linux
 if(UNIX AND NOT APPLE)
   find_package(LibNotify REQUIRED)
+endif()
+
+# find wayland
+if(UNIX AND NOT APPLE)
+  find_package(Wayland REQUIRED COMPONENTS Client)
+  find_package(Qt6 REQUIRED COMPONENTS WaylandCompositor WaylandClient)
 endif()
 
 # Finc D-Bus
@@ -162,7 +167,9 @@ endif()
 
 # Add Platform specific definitions for linux
 if(UNIX AND NOT APPLE)
-  target_link_libraries(clipbird PRIVATE KF6::GuiAddons)
+  target_compile_definitions(clipbird PRIVATE WITH_WAYLAND)
+  target_link_libraries(clipbird PRIVATE Qt6::WaylandCompositor Qt6::WaylandClient Wayland::Client)
+  target_include_directories(clipbird PUBLIC ${WAYLAND_CLIENT_INCLUDE_DIR})
   target_include_directories(clipbird PUBLIC ${Avahi_INCLUDE_DIRS})
   target_link_libraries(clipbird PUBLIC ${Avahi_LIBRARIES})
   target_include_directories(clipbird PUBLIC ${DBUS_INCLUDE_DIRS})
@@ -181,3 +188,12 @@ endif()
 if(MSVC)
   target_compile_options(clipbird PRIVATE /std:c++17)
 endif()
+
+# generate
+# if (UNIX AND NOT APPLE)
+#   qt_generate_wayland_protocol_client_sources(
+#     clipbird
+#     FILES
+#       ${CMAKE_CURRENT_LIST_DIR}/protocols/wlr-data-control-unstable-v1.xml
+#   )
+# endif()

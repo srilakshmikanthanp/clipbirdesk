@@ -13,7 +13,7 @@ file(READ "${CMAKE_CURRENT_LIST_DIR}/conf/VERSION" VERSION)
 file(READ "${CMAKE_CURRENT_LIST_DIR}/conf/APPUUID" UUID)
 
 # set project name and version
-project(clipbird VERSION ${VERSION} LANGUAGES CXX)
+project(clipbird VERSION ${VERSION} LANGUAGES C CXX)
 
 # set c++ standard 17
 set(CMAKE_CXX_STANDARD 17)

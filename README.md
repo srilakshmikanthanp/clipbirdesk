@@ -136,10 +136,9 @@ Just go to [Bonjour](https://developer.apple.com/bonjour/) and download the Bonj
 
 ### Building Clipbird on a Linux Platform
 
-Currently, it does not work well in Linux as it works in Windows just added some conditions to compile in the Linux Platform, In the following steps, we will see how to do it. Here are some noticed bugs,
+Currently clipbird supports only X11, it does not work well in Wayland. Here are some noticed bugs,
 
 * The position of the window is not set properly.
-* The notification is Not implemented.
 * The Clipboard data is not synced properly.
 
 #### Prerequisites

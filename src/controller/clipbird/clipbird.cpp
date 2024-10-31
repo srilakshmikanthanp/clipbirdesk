@@ -46,7 +46,7 @@ void ClipBird::handleServerStatusChanged(bool status, types::device::Device host
   }
 
   // get the client and disconnect the signals
-  auto signal  = &clipboard::Clipboard::OnClipboardChange;
+  auto signal  = &clipboard::ApplicationClipboard::OnClipboardChange;
   auto slot    = &Client::syncItems;
   auto *client = &std::get<Client>(m_host);
   auto &store  = storage::Storage::instance();
@@ -227,12 +227,12 @@ void ClipBird::setCurrentHostAsServer() {
 
   connect(
     server, &Server::OnSyncRequest,
-    &m_clipboard, &clipboard::Clipboard::set
+    &m_clipboard, &clipboard::ApplicationClipboard::set
   );
 
   // connect the OnClipboardChange signal to the server
   connect(
-    &m_clipboard, &clipboard::Clipboard::OnClipboardChange,
+    &m_clipboard, &clipboard::ApplicationClipboard::OnClipboardChange,
     server, &Server::syncItems
   );
 
@@ -318,7 +318,7 @@ void ClipBird::setCurrentHostAsClient() {
 
   connect(
     client, &Client::OnSyncRequest,
-    &m_clipboard, &clipboard::Clipboard::set
+    &m_clipboard, &clipboard::ApplicationClipboard::set
   );
 
   // connect onConnectionError to the signal

@@ -22,11 +22,8 @@
 #include <QVector>
 #include <QtConcurrent>
 
-#ifdef __linux__
-#include <KSystemClipboard>
-#endif
-
 // project header
+#include "clipboard/platformclipboard.hpp"
 #include "types/except/except.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::clipboard {
@@ -35,7 +32,7 @@ namespace srilakshmikanthanp::clipbirdesk::clipboard {
  * @brief Class to manage clipboard such get,
  * set and notify the clipboard change
  */
-class Clipboard : public QObject {
+class ApplicationClipboard : public QObject {
  signals:  // signals
   /**
    * @brief Signal to notify the clipboard change occurrence use
@@ -46,7 +43,7 @@ class Clipboard : public QObject {
 
  private:  // members
 
-  QClipboard *m_clipboard = QApplication::clipboard();
+  PlatformClipboard *m_clipboard = PlatformClipboard::instance();
 
  private:  // just for Qt
 
@@ -55,12 +52,12 @@ class Clipboard : public QObject {
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(Clipboard)
+  Q_DISABLE_COPY_MOVE(ApplicationClipboard)
 
  private:  // private slots
 
   /// @brief Slot to notify the clipboard change
-  void onClipboardChangeImpl();
+  void onClipboardChangeImpl(QClipboard::Mode mode);
 
  private:  // mime types
 
@@ -81,7 +78,7 @@ class Clipboard : public QObject {
    * @param clipboard Clipboard that is managed
    * @param parent parent object
    */
-  explicit Clipboard(QObject* parent = nullptr);
+  explicit ApplicationClipboard(QObject* parent = nullptr);
 
   /**
    * @brief Get the clipboard data from the clipboard
