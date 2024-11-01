@@ -33,7 +33,6 @@ class TrayMenu : public QMenu {
   QAction qrCode    =   QAction();
   QAction reset     =   QAction();
   QAction openApp   =   QAction();
-  QAction send      =   QAction();
   QAction history   =   QAction();
   QAction about     =   QAction();
   QAction exitApp   =   QAction();
@@ -49,9 +48,6 @@ class TrayMenu : public QMenu {
 
  signals:  // signals
   void OnOpenAppClicked();
-
- signals:  // signals
-  void OnSendClicked();
 
  signals:  // signals
   void OnHistoryClicked();

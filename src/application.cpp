@@ -434,12 +434,6 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     this, &Application::openClipbird
   );
 
-  // set the signal for menus Send click
-  QObject::connect(
-    trayMenu, &ui::gui::TrayMenu::OnSendClicked,
-    this, &Application::onSendClicked
-  );
-
   // send the signal for menus Received click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnHistoryClicked,

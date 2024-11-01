@@ -14,7 +14,6 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   QObject::connect(&reset, &QAction::triggered, this, &TrayMenu::OnResetClicked);
   QObject::connect(&exitApp, &QAction::triggered, this, &TrayMenu::OnExitClicked);
   QObject::connect(&openApp, &QAction::triggered, this, &TrayMenu::OnOpenAppClicked);
-  QObject::connect(&send, &QAction::triggered, this, &TrayMenu::OnSendClicked);
   QObject::connect(&history, &QAction::triggered, this, &TrayMenu::OnHistoryClicked);
 
   // set the Menu Items
@@ -23,7 +22,6 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   this->addAction(&reset);
   this->addSeparator();
   this->addAction(&openApp);
-  this->addAction(&send);
   this->addAction(&history);
   this->addSeparator();
   this->addAction(&about);
@@ -42,7 +40,6 @@ void TrayMenu::setUpLanguage() {
   qrCode.setText(QObject::tr("Group QrCode"));
   reset.setText(QObject::tr("Reset Devices"));
   openApp.setText(QObject::tr("Devices"));
-  send.setText(QObject::tr("Send"));
   history.setText(QObject::tr("History"));
   about.setText(QObject::tr("About"));
   exitApp.setText(QObject::tr("Exit"));
@@ -88,13 +85,6 @@ void TrayMenu::setExitEnabled(bool isenabled) {
  */
 void TrayMenu::setOpenAppEnabled(bool isenabled) {
   openApp.setEnabled(isenabled);
-}
-
-/**
- * @brief set Send Enabled or Disabled
- */
-void TrayMenu::setSendEnabled(bool isenabled) {
-  send.setEnabled(isenabled);
 }
 
 /**
@@ -144,13 +134,6 @@ bool TrayMenu::isExitEnabled() const {
  */
 bool TrayMenu::isOpenAppEnabled() const {
   return openApp.isEnabled();
-}
-
-/**
- * @brief is Send Enabled
- */
-bool TrayMenu::isSendEnabled() const {
-  return send.isEnabled();
 }
 
 /**
