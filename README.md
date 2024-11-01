@@ -136,10 +136,10 @@ Just go to [Bonjour](https://developer.apple.com/bonjour/) and download the Bonj
 
 ### Building Clipbird on a Linux Platform
 
-Currently clipbird supports only X11, it does not work well in Wayland. Here are some noticed bugs,
+Limitations on wayland,
 
-* The position of the window is not set properly.
-* The Clipboard data is not synced properly.
+* The Clipboard auto sync feature will not work.
+* The Position of the window cannot be set.
 
 #### Prerequisites
 
@@ -183,7 +183,6 @@ sudo apt-get install libnotify-dev
 | Variable            | Value                              |
 |---------------------|------------------------------------|
 | `QT_CMAKE_DIR`      | Qt6 cmake directory                |
-| `QT_BASE_DIR`       | Qt6 base directory                 |
 
 <!-- ROADMAP -->
 ## Roadmap
