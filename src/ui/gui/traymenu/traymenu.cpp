@@ -41,7 +41,7 @@ void TrayMenu::setUpLanguage() {
   connect.setText(QObject::tr("Join to Group"));
   qrCode.setText(QObject::tr("Group QrCode"));
   reset.setText(QObject::tr("Reset Devices"));
-  openApp.setText(constants::getAppName());
+  openApp.setText(QObject::tr("Devices"));
   send.setText(QObject::tr("Send"));
   history.setText(QObject::tr("History"));
   about.setText(QObject::tr("About"));

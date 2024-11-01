@@ -8,7 +8,10 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
  */
 ClipHistory::ClipHistory(QWidget *parent) : QWidget(parent) {
   // set alignment from start and center
-  verticalLayout->setAlignment(Qt::AlignTop);
+  clipListLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+
+  // set 0 margin
+  clipListLayout->setContentsMargins(0, 0, 0, 0);
 
   // set alignment as center
   label->setAlignment(Qt::AlignCenter);
@@ -23,13 +26,13 @@ ClipHistory::ClipHistory(QWidget *parent) : QWidget(parent) {
   this->stackLayout->setAlignment(label, Qt::AlignCenter);
 
   // add the layout to the stack layout
-  this->stackLayout->addWidget(verticalWidget);
+  this->stackLayout->addWidget(clipListWidget);
 
   // set the layout
   this->setLayout(this->stackLayout);
 
   // set object name
-  this->setObjectName("ClipHist");
+  this->setObjectName("ClipHistory");
 
   // set up initial language
   this->setUpLanguage();
@@ -44,7 +47,7 @@ ClipHistory::ClipHistory(QWidget *parent) : QWidget(parent) {
  * @brief Function used to set up all text in the label, etc..
  */
 void ClipHistory::setUpLanguage() {
-  this->label->setText(QObject::tr("Nothing so far"));
+  this->label->setText(QObject::tr("No History"));
 }
 
 /**
@@ -52,7 +55,7 @@ void ClipHistory::setUpLanguage() {
  */
 void ClipHistory::onClipDeleteImpl(int idx) {
   auto tile = this->list.at(idx);
-  verticalLayout->removeWidget(tile);
+  clipListLayout->removeWidget(tile);
   tile->setVisible(false);
   tile->setClip(QVector<QPair<QString, QByteArray>>());
   tile->setVisible(false);
@@ -79,7 +82,7 @@ void ClipHistory::onClipCopyImpl(int idx) {
 void ClipHistory::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &history) {
   // clear the layout
   QLayoutItem* item;
-  while ((item = verticalLayout->takeAt(0)) != nullptr) {
+  while ((item = clipListLayout->takeAt(0)) != nullptr) {
     auto tile = (ClipTile*) item->widget();
     tile->setClip(QVector<QPair<QString, QByteArray>>());
     tile->setVisible(false);
@@ -112,7 +115,7 @@ void ClipHistory::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &h
     );
 
     // add the item to the layout
-    verticalLayout->addWidget(tile);
+    clipListLayout->addWidget(tile);
 
     // set the visibility
     tile->setVisible(true);
@@ -128,7 +131,7 @@ void ClipHistory::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &h
 void ClipHistory::clearHistory() {
   // clear the layout
   QLayoutItem* item;
-  while ((item = verticalLayout->takeAt(0)) != nullptr) {
+  while ((item = clipListLayout->takeAt(0)) != nullptr) {
     auto tile = (ClipTile*) item->widget();
     tile->setClip(QVector<QPair<QString, QByteArray>>());
     tile->setVisible(false);
@@ -157,7 +160,7 @@ QList<QVector<QPair<QString, QByteArray>>> ClipHistory::getHistory() {
 ClipHistory::~ClipHistory() {
   // clear the layout
   QLayoutItem* item;
-  while ((item = verticalLayout->takeAt(0)) != nullptr) {
+  while ((item = clipListLayout->takeAt(0)) != nullptr) {
     auto tile = (ClipTile*) item->widget();
     tile->disconnect();
     tile->setClip(QVector<QPair<QString, QByteArray>>());
@@ -188,7 +191,7 @@ void ClipHistory::changeEvent(QEvent *event) {
  */
 void ClipHistory::paintEvent(QPaintEvent *event) {
   // if the vertical layout is empty then add a label
-  if (verticalLayout->count() == 0) {
+  if (clipListLayout->count() == 0) {
     this->stackLayout->setCurrentIndex(0);
   } else {
     this->stackLayout->setCurrentIndex(1);

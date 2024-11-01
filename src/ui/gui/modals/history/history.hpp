@@ -13,6 +13,7 @@
 
 // Local headers
 #include "ui/gui/components/cliphistory/cliphistory.hpp"
+#include "ui/gui/components/clipsend/clipsend.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
 class History : public QDialog {
@@ -26,7 +27,8 @@ class History : public QDialog {
 
  private:
 
-  components::ClipHistory *clipHist = new components::ClipHistory(this);
+  components::ClipHistory *clipHist = new components::ClipHistory();
+  components::ClipSend* clipSend    = new components::ClipSend();
 
  signals:  // signals
 
@@ -35,6 +37,9 @@ class History : public QDialog {
 
   // called when the clip is deleted
   void onClipDelete(int index);
+
+  // on send
+  void onClipSend();
 
  private:  // Member Functions
 

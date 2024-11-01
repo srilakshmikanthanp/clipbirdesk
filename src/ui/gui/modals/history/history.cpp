@@ -30,6 +30,11 @@ History::History(QWidget * parent) : QDialog(parent) {
   // create layout VBox
   auto vBox = new QVBoxLayout();
 
+  vBox->setAlignment(Qt::AlignTop | Qt::AlignCenter);
+
+  // add clip send to layout
+  vBox->addWidget(this->clipSend);
+
   // add scroll area to layout
   vBox->addWidget(historyArea);
 
@@ -49,6 +54,12 @@ History::History(QWidget * parent) : QDialog(parent) {
   QObject::connect(
     this->clipHist, &components::ClipHistory::onClipDelete,
     this, &History::onClipDelete
+  );
+
+  // connect the send signal to this signal
+  QObject::connect(
+    this->clipSend, &components::ClipSend::onClipSend,
+    [this]() { emit onClipSend(); }
   );
 }
 

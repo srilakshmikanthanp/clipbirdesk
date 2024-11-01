@@ -16,12 +16,7 @@ PlatformClipboard *PlatformClipboard::instance() {
 
 #ifdef __linux__
   if (instance == nullptr && qGuiApp->platformName() == QLatin1String("wayland")) {
-    try {
-      instance = new WaylandClipboard(qGuiApp);
-    } catch (const std::exception &e) {
-      qWarning() << e.what();
-      instance = nullptr;
-    }
+    instance = new WaylandClipboard(qGuiApp);
   }
 #endif
 

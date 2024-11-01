@@ -25,9 +25,9 @@ class ClipHistory : public QWidget {
 
  private:  // Member variable
 
-  QStackedLayout* stackLayout = new QStackedLayout(this);
-  QWidget* verticalWidget     = new QWidget(this);
-  QVBoxLayout* verticalLayout = new QVBoxLayout(verticalWidget);
+  QStackedLayout* stackLayout = new QStackedLayout();
+  QWidget* clipListWidget     = new QWidget();
+  QVBoxLayout* clipListLayout = new QVBoxLayout(clipListWidget);
   QList<ClipTile*> list       = QList<ClipTile*>();
   QList<QVector<QPair<QString, QByteArray>>> history;
 
@@ -42,6 +42,9 @@ class ClipHistory : public QWidget {
 
   // called when the clip is deleted
   void onClipDelete(int index);
+
+  // on send
+  void onClipSend();
 
  private:  // Member Functions
 

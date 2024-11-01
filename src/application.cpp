@@ -200,40 +200,12 @@ void Application::onQrCodeClicked() {
 
   // center the window
   group.move(QGuiApplication::primaryScreen()->availableGeometry().center() - group.rect().center());
-
-  // close on tab change
-  QObject::connect(clipbird, &ui::gui::modals::Clipbird::onTabChanged, &group, &QDialog::close);
 }
 
 /**
  * @brief On Connect Clicked
  */
 void Application::onConnectClicked() {
-  // On HostName successfully resolved
-  const auto slot_hr = [=](const auto dialog, quint16 port, const auto& host) {
-    // if host name is not resolved
-    if (host.error() != QHostInfo::NoError) {
-      return;
-    }
-
-    // close the dialog
-    dialog->close();
-
-    // connect to server
-    controller->connectToServer({
-      host.addresses().first(), port, host.hostName()
-    });
-  };
-
-  // validate the ip and port
-  const auto validator = [](auto ip, auto port) -> bool {
-    if (!QHostAddress(ip).isNull() && port > 0 && port < 65535) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
   // if already visible return
   if (joiner.isVisible()) { return joiner.raise(); }
 
@@ -246,30 +218,11 @@ void Application::onConnectClicked() {
   // set as not resizable
   joiner.setFixedSize(joiner.sizeHint());
 
-  // close on tab change
-  QObject::connect(clipbird, &ui::gui::modals::Clipbird::onTabChanged, &joiner, &QDialog::close);
-
   // show the dialog
   joiner.show();
 
   // center the window
   joiner.move(QGuiApplication::primaryScreen()->availableGeometry().center() - joiner.rect().center());
-
-  // connect the dialog to window clicked signal
-  connect(&joiner, &ui::gui::modals::Connect::onConnect, [=](auto ipv4, auto port) {
-    // validate the ip and port
-    if (!validator(ipv4.toShort(), port.toShort())) {
-      return;
-    }
-
-    // bind the port
-    auto slot = std::bind(
-      slot_hr, &joiner, port.toShort(), std::placeholders::_1
-    );
-
-    // resolve the host name
-    QHostInfo::lookupHost(ipv4, this, slot);
-  });
 }
 
 /**
@@ -340,26 +293,6 @@ void Application::onHistoryClicked() {
   // set size
   history.setFixedSize(constants::getAppWindowSize());
 
-  // connect signal for Clipboard Copy
-  connect(
-    &history, &ui::gui::modals::History::onClipSelected,
-    [=](auto i) {
-      controller->setClipboard(controller->getHistory().at(i));
-    }
-  );
-
-  // connect signal for history delete
-  connect(
-    &history, &ui::gui::modals::History::onClipDelete,
-    controller, &controller::ClipBird::deleteHistoryAt
-  );
-
-  // connect signal for history change
-  connect(
-    controller, &controller::ClipBird::OnHistoryChanged,
-    &history, &ui::gui::modals::History::setHistory
-  );
-
   // show the dialog
   history.show();
 }
@@ -410,6 +343,31 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   clipbird   = new ui::gui::modals::Clipbird(controller);
   trayMenu   = new ui::gui::TrayMenu(clipbird);
   trayIcon   = new QSystemTrayIcon(this);
+
+  // On HostName successfully resolved
+  const auto slot_hr = [=](const auto dialog, quint16 port, const auto& host) {
+    // if host name is not resolved
+    if (host.error() != QHostInfo::NoError) {
+      return;
+    }
+
+    // close the dialog
+    dialog->close();
+
+    // connect to server
+    controller->connectToServer({
+      host.addresses().first(), port, host.hostName()
+    });
+  };
+
+  // validate the ip and port
+  const auto validator = [](auto ip, auto port) -> bool {
+    if (!QHostAddress(ip).isNull() && port > 0 && port < 65535) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   // set the icon to tray
   trayIcon->setIcon(QIcon(constants::getAppLogo()));
@@ -505,6 +463,60 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     clipbird, &ui::gui::modals::Clipbird::onTabChanged,
     this, &Application::handleTabChange
   );
+
+  // set the signal for menus Send click
+  QObject::connect(
+    &history, &ui::gui::modals::History::onClipSend,
+    this, &Application::onSendClicked
+  );
+
+  // close on tab change
+  QObject::connect(
+    clipbird, &ui::gui::modals::Clipbird::onTabChanged, 
+    &group, &QDialog::close
+  );
+
+  // close on tab change
+  QObject::connect(
+    clipbird, &ui::gui::modals::Clipbird::onTabChanged, 
+    &joiner, &QDialog::close
+  );
+
+  // connect signal for history delete
+  connect(
+    &history, &ui::gui::modals::History::onClipDelete,
+    controller, &controller::ClipBird::deleteHistoryAt
+  );
+
+  // connect signal for history change
+  connect(
+    controller, &controller::ClipBird::OnHistoryChanged,
+    &history, &ui::gui::modals::History::setHistory
+  );
+
+  // connect signal for Clipboard Copy
+  connect(
+    &history, &ui::gui::modals::History::onClipSelected,
+    [=](auto i) {
+      controller->setClipboard(controller->getHistory().at(i));
+    }
+  );
+
+  // connect the dialog to window clicked signal
+  connect(&joiner, &ui::gui::modals::Connect::onConnect, [=](auto ipv4, auto port) {
+    // validate the ip and port
+    if (!validator(ipv4.toShort(), port.toShort())) {
+      return;
+    }
+
+    // bind the port
+    auto slot = std::bind(
+      slot_hr, &joiner, port.toShort(), std::placeholders::_1
+    );
+
+    // resolve the host name
+    QHostInfo::lookupHost(ipv4, this, slot);
+  });
 
   // if host is lastly server
   if (controller->isLastlyHostIsServer()) {

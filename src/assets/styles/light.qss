@@ -166,8 +166,8 @@ QFrame#Clipbird {
   background: #ededed;
   color: white;
   border-radius: 10px;
-  max-width: 300;
-  min-width: 300;
+  max-width: 320;
+  min-width: 320;
 }
 
 #ClipTile > QPushButton {
@@ -178,4 +178,15 @@ QFrame#Clipbird {
   background: #ededed;
   max-height: 80px;
   min-height: 80px;
+}
+
+#ClipSend {
+  background: #ededed;
+  color: white;
+  border-radius: 10px;
+}
+
+#ClipSend > QLabel {
+  background: #ededed;
+  font-size: 12px;
 }
