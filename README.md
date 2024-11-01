@@ -183,6 +183,7 @@ sudo apt-get install libnotify-dev
 | Variable            | Value                              |
 |---------------------|------------------------------------|
 | `QT_CMAKE_DIR`      | Qt6 cmake directory                |
+| `QT_BASE_DIR`       | Qt6 base directory                 |
 
 <!-- ROADMAP -->
 ## Roadmap

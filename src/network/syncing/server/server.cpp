@@ -1,8 +1,3 @@
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 #include "server.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::syncing {
@@ -65,7 +60,7 @@ void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors
   errorsCopy.erase(itr, errorsCopy.end());
 
   // log the errors for debugging
-  for (auto error : errors) {
+  for (auto error : errorsCopy) {
     qWarning() << (LOG(std::to_string(error.error()) + " : " + error.errorString().toStdString()));
   }
 

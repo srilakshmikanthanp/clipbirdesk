@@ -1,9 +1,4 @@
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
-#include "cliphist.hpp"
+#include "cliphistory.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 /**
@@ -11,7 +6,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
  *
  * @param parent
  */
-ClipHist::ClipHist(QWidget *parent) : QWidget(parent) {
+ClipHistory::ClipHistory(QWidget *parent) : QWidget(parent) {
   // set alignment from start and center
   verticalLayout->setAlignment(Qt::AlignTop);
 
@@ -48,14 +43,14 @@ ClipHist::ClipHist(QWidget *parent) : QWidget(parent) {
 /**
  * @brief Function used to set up all text in the label, etc..
  */
-void ClipHist::setUpLanguage() {
+void ClipHistory::setUpLanguage() {
   this->label->setText(QObject::tr("Nothing so far"));
 }
 
 /**
  * @brief on clipDelete Impl
  */
-void ClipHist::onClipDeleteImpl(int idx) {
+void ClipHistory::onClipDeleteImpl(int idx) {
   auto tile = this->list.at(idx);
   verticalLayout->removeWidget(tile);
   tile->setVisible(false);
@@ -74,14 +69,14 @@ void ClipHist::onClipDeleteImpl(int idx) {
 /**
  * @brief on clipCopy Impl
  */
-void ClipHist::onClipCopyImpl(int idx) {
+void ClipHistory::onClipCopyImpl(int idx) {
   emit onClipSelected(idx);
 }
 
 /**
  * @brief Set the History
  */
-void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &history) {
+void ClipHistory::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &history) {
   // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
@@ -130,7 +125,7 @@ void ClipHist::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &hist
 /**
  * @brief Clear the History
  */
-void ClipHist::clearHistory() {
+void ClipHistory::clearHistory() {
   // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
@@ -152,14 +147,14 @@ void ClipHist::clearHistory() {
 /**
  * @brief get the History
  */
-QList<QVector<QPair<QString, QByteArray>>> ClipHist::getHistory() {
+QList<QVector<QPair<QString, QByteArray>>> ClipHistory::getHistory() {
   return history;
 }
 
 /**
  * @brief Destroy the Clip Hist object
  */
-ClipHist::~ClipHist() {
+ClipHistory::~ClipHistory() {
   // clear the layout
   QLayoutItem* item;
   while ((item = verticalLayout->takeAt(0)) != nullptr) {
@@ -180,7 +175,7 @@ ClipHist::~ClipHist() {
 /**
  * @brief change event
  */
-void ClipHist::changeEvent(QEvent *event) {
+void ClipHistory::changeEvent(QEvent *event) {
   if (event->type() == QEvent::LanguageChange) {
     this->setUpLanguage();
   }
@@ -191,7 +186,7 @@ void ClipHist::changeEvent(QEvent *event) {
 /**
  * @brief Paint event
  */
-void ClipHist::paintEvent(QPaintEvent *event) {
+void ClipHistory::paintEvent(QPaintEvent *event) {
   // if the vertical layout is empty then add a label
   if (verticalLayout->count() == 0) {
     this->stackLayout->setCurrentIndex(0);

@@ -1,8 +1,3 @@
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 #include "generic.hpp"
 
 #ifdef __linux__ // Only for linux to set the socket as non blocking

@@ -1,24 +1,19 @@
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 #include "waylandclipboard.hpp"
 
-#include <qprocess.h>
-
 namespace srilakshmikanthanp::clipbirdesk::clipboard {
-WaylandClipboard::WaylandClipboard(QObject *parent) : PlatformClipboard(parent) {}
+WaylandClipboard::WaylandClipboard(QObject *parent) : PlatformClipboard(parent) {
+  // Wayland does not support signals for clipboard change
+}
 
 void WaylandClipboard::setMimeData(QMimeData *mime, QClipboard::Mode mode) {
-  // TODO
+  qGuiApp->clipboard()->setMimeData(mime, mode);
 }
 
 void WaylandClipboard::clear(QClipboard::Mode mode) {
-  // TODO
+  qGuiApp->clipboard()->clear(mode);
 }
 
 const QMimeData *WaylandClipboard::mimeData(QClipboard::Mode mode) const {
-  // TODO
+  return qGuiApp->clipboard()->mimeData(mode);
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::clipboard

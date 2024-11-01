@@ -1,10 +1,5 @@
 #ifdef _WIN32 // Only for windows using wintoast see https://github.com/mohabouje/WinToast
 
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 #include "joinrequest.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify {

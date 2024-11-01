@@ -1,8 +1,3 @@
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 #include "history.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
@@ -46,13 +41,13 @@ History::History(QWidget * parent) : QDialog(parent) {
 
   // connect the signals
   QObject::connect(
-    this->clipHist, &components::ClipHist::onClipSelected,
+    this->clipHist, &components::ClipHistory::onClipSelected,
     this, &History::onClipSelected
   );
 
   // connect the signals
   QObject::connect(
-    this->clipHist, &components::ClipHist::onClipDelete,
+    this->clipHist, &components::ClipHistory::onClipDelete,
     this, &History::onClipDelete
   );
 }

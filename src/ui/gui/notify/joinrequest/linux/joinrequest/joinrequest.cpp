@@ -1,10 +1,5 @@
 #ifdef __linux__ // Only for linux using libnotify see https://developer.gnome.org/libnotify/
 
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 #include "joinrequest.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify {

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Clipbird
+Comment=A bird that syncs your clipboard
+Exec=clipbird
+Icon=clipbird
+Terminal=false
+Categories=Utility;

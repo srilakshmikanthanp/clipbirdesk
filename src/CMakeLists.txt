@@ -1,8 +1,3 @@
-# Copyright (c) 2024 Sri Lakshmi Kanthan P
-#
-# This software is released under the MIT License.
-# https://opensource.org/licenses/MIT
-
 # Fetch https://github.com/mohabouje/WinToast.git only if windows
 if (WIN32)
   FetchContent_Declare(WinToast
@@ -62,8 +57,7 @@ configure_file(
 find_package(Qt6 REQUIRED COMPONENTS
   Concurrent
   Widgets
-  Network
-  Sql)
+  Network)
 
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
@@ -148,6 +142,15 @@ set_target_properties(clipbird PROPERTIES
   MACOSX_BUNDLE TRUE
 )
 
+# generate wayland protocol sources
+if (UNIX AND NOT APPLE)
+  qt_generate_wayland_protocol_client_sources(
+    clipbird
+    FILES
+      ${CMAKE_CURRENT_LIST_DIR}/protocols/wlr-data-control-unstable-v1.xml
+  )
+endif()
+
 # Add Platform specific definitions for apple
 if(APPLE)
   target_include_directories(clipbird PUBLIC ${BONJOUR_INCLUDE_DIR})
@@ -168,7 +171,7 @@ endif()
 # Add Platform specific definitions for linux
 if(UNIX AND NOT APPLE)
   target_compile_definitions(clipbird PRIVATE WITH_WAYLAND)
-  target_link_libraries(clipbird PRIVATE Qt6::WaylandCompositor Qt6::WaylandClient Wayland::Client)
+  target_link_libraries(clipbird PRIVATE Qt6::GuiPrivate Qt6::WaylandCompositor Qt6::WaylandClient Qt6::WaylandClientPrivate Wayland::Client)
   target_include_directories(clipbird PUBLIC ${WAYLAND_CLIENT_INCLUDE_DIR})
   target_include_directories(clipbird PUBLIC ${Avahi_INCLUDE_DIRS})
   target_link_libraries(clipbird PUBLIC ${Avahi_LIBRARIES})
@@ -188,12 +191,3 @@ endif()
 if(MSVC)
   target_compile_options(clipbird PRIVATE /std:c++17)
 endif()
-
-# generate
-# if (UNIX AND NOT APPLE)
-#   qt_generate_wayland_protocol_client_sources(
-#     clipbird
-#     FILES
-#       ${CMAKE_CURRENT_LIST_DIR}/protocols/wlr-data-control-unstable-v1.xml
-#   )
-# endif()

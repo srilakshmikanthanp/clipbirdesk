@@ -1,11 +1,6 @@
 #ifdef _WIN32 // Only for windows using wintoast see https://github.com/mohabouje/WinToast
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 #include <wintoastlib.h>
 
 #include <QObject>

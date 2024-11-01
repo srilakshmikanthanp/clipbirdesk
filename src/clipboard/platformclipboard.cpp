@@ -1,8 +1,3 @@
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 #include "platformclipboard.hpp"
 
 #include <QGuiApplication>
@@ -21,11 +16,16 @@ PlatformClipboard *PlatformClipboard::instance() {
 
 #ifdef __linux__
   if (instance == nullptr && qGuiApp->platformName() == QLatin1String("wayland")) {
-    instance = new WaylandClipboard(qGuiApp);
+    try {
+      instance = new WaylandClipboard(qGuiApp);
+    } catch (const std::exception &e) {
+      qWarning() << e.what();
+      instance = nullptr;
+    }
   }
 #endif
 
-  if(instance == nullptr) {
+  if (instance == nullptr) {
     instance = new QtClipboard(qGuiApp);
   }
 

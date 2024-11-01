@@ -1,10 +1,5 @@
 #if defined(_WIN32) || defined(__APPLE__) || defined(__linux__) // Only for Operating System that supports bonjour or compatible to it
 
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 #include "register.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {

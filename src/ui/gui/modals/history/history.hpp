@@ -1,10 +1,5 @@
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 // Qt header
 #include <QDialog>
 #include <QPainterPath>
@@ -17,7 +12,7 @@
 #include <QVBoxLayout>
 
 // Local headers
-#include "ui/gui/components/cliphist/cliphist.hpp"
+#include "ui/gui/components/cliphistory/cliphistory.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
 class History : public QDialog {
@@ -31,7 +26,7 @@ class History : public QDialog {
 
  private:
 
-  components::ClipHist *clipHist = new components::ClipHist(this);
+  components::ClipHistory *clipHist = new components::ClipHistory(this);
 
  signals:  // signals
 

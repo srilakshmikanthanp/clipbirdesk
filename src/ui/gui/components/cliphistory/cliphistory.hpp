@@ -1,10 +1,5 @@
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 #include <QEvent>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -19,10 +14,10 @@
 #include "ui/gui/components/cliptile/cliptile.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
-class ClipHist : public QWidget {
+class ClipHistory : public QWidget {
  private:  // disable copy and move for this class
 
-  Q_DISABLE_COPY_MOVE(ClipHist)
+  Q_DISABLE_COPY_MOVE(ClipHistory)
 
  private:  // just for Qt
 
@@ -72,12 +67,12 @@ class ClipHist : public QWidget {
    *
    * @param parent
    */
-  ClipHist(QWidget *parent = nullptr);
+  ClipHistory(QWidget *parent = nullptr);
 
   /**
    * @brief Destroy the Clip Hist object
    */
-  ~ClipHist();
+  ~ClipHistory();
 
  public:  // public member function
 

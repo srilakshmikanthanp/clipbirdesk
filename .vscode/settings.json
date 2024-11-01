@@ -190,7 +190,8 @@
     "qabstractnativeeventfilter": "cpp",
     "qbuffer": "cpp",
     "*.moc": "cpp",
-    "qclipboard": "cpp"
+    "qclipboard": "cpp",
+    "qtwaylandclientversion": "cpp"
   },
   "clang-format.executable": "clang-format-15",
 }

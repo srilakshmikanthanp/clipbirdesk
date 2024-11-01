@@ -1,10 +1,5 @@
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
-// Copyright (c) 2023 Sri Lakshmi Kanthan P
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 #include <QClipboard>
 #include <QGuiApplication>
 #include <QMimeData>
@@ -32,8 +27,6 @@ class PlatformClipboard : public QObject {
 
   /**
    * Returns the text content of the Clipboard
-   *
-   * Similar to QClipboard::text(QClipboard::Mode mode)
    */
   QString text(QClipboard::Mode mode);
 
@@ -44,7 +37,7 @@ class PlatformClipboard : public QObject {
 
  signals:
   /**
-   * Emitted when the clipboard changes similar to QClipboard::changed
+   * Emitted when the clipboard changes
    */
   void changed(QClipboard::Mode mode);
 

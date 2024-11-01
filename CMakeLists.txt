@@ -27,6 +27,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 # include cmake modules
 include(FetchContent)
 
+# include ExternalProject
+include(ExternalProject)
+
 # set the APPLICATION_ISSUEPAGE
 set(APPLICATION_ISSUEPAGE "https://github.com/srilakshmikanthanp/clipbirdesk/issues")
 
