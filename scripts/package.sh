@@ -27,10 +27,6 @@ mkdir -p $ClipbirdDir
 echo "Cloning appdir folder to $ClipbirdDir"
 cp -r ./appdir/* $ClipbirdDir
 
-# Clean the package directory items except .gitignore
-echo "Removing existing file in $ClipbirdDir"
-rm "$ClipbirdDir/usr/bin/clipbird"
-
 # Copy the clipbird to the package directory
 echo "Copying ./build/src/Release/clipbird to $ClipbirdDir/usr/bin"
 cp ./build/src/clipbird "$ClipbirdDir/usr/bin"
