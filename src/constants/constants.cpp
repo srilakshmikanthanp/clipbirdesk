@@ -22,7 +22,7 @@ const char* getAppUUID() {
  * @return int
  */
 int getAppMaxHistorySize() {
-  return 10;
+  return 20;
 }
 
 /**

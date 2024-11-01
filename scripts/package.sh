@@ -10,7 +10,7 @@ fi
 
 # Build the clipbird with release configuration
 echo "Building clipbird with Release configuration"
-cmake -G "Unix Makefiles" -B ./build && cmake --build ./build --config Release
+cmake -G "Ninja" -B ./build && cmake --build ./build --config Release
 
 # clipbird package data directory
 ClipbirdDir="./setup"
@@ -30,10 +30,6 @@ cp -r ./appdir/* $ClipbirdDir
 # Copy the clipbird to the package directory
 echo "Copying ./build/src/Release/clipbird to $ClipbirdDir/usr/bin"
 cp ./build/src/clipbird "$ClipbirdDir/usr/bin"
-
-# set qmake path
-echo "Setting qmake path"
-export QMAKE=$QT_BASE_DIR/6.6.3/gcc_64/bin/qmake6
 
 # Run linuxdeploy-x86_64.AppImage to package the clipbird
 # see https://github.com/linuxdeploy/linuxdeploy

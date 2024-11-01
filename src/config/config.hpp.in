@@ -32,3 +32,6 @@
 
 // Log statement for debug
 #define LOG(msg)                   (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " " + msg).c_str()
+
+// META_DATA
+#define META_DATA                  (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " ").c_str()

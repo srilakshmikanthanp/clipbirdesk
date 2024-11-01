@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Clipbird
+Name=clipbird
 Comment=A bird that syncs your clipboard
 Exec=clipbird
 Icon=clipbird

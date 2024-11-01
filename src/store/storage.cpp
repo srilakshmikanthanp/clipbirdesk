@@ -147,17 +147,6 @@ QList<QByteArray> Storage::getAllServerCert() {
 }
 
 /**
- * @brief Set the current state of the server or client
- *
- * @param isServer
- */
-void Storage::setHostIsServer(bool isServer) {
-  settings->beginGroup(generalGroup);
-  settings->setValue(hostStateKey, isServer);
-  settings->endGroup();
-}
-
-/**
  * @brief Clear the server cert
  */
 void Storage::clearServerCert(const QString &name) {
@@ -179,7 +168,7 @@ void Storage::clearAllServerCert() {
  * @brief set the Host certificate
  */
 void Storage::setHostCert(const QByteArray &cert) {
-  settings->beginGroup(generalGroup);
+  settings->beginGroup(commonGroup);
   settings->setValue(hostCertKey, cert);
   settings->endGroup();
 }
@@ -188,7 +177,7 @@ void Storage::setHostCert(const QByteArray &cert) {
  * @brief has Host cert
  */
 bool Storage::hasHostCert() {
-  settings->beginGroup(generalGroup);
+  settings->beginGroup(commonGroup);
   auto cert = settings->value(hostCertKey);
   settings->endGroup();
   return !cert.isNull();
@@ -198,7 +187,7 @@ bool Storage::hasHostCert() {
  * @brief Get the Host certificate
  */
 QByteArray Storage::getHostCert() {
-  settings->beginGroup(generalGroup);
+  settings->beginGroup(commonGroup);
   auto cert = settings->value(hostCertKey);
   settings->endGroup();
 
@@ -213,7 +202,7 @@ QByteArray Storage::getHostCert() {
  * @brief set the Host Key
  */
 void Storage::setHostKey(const QByteArray &key) {
-  settings->beginGroup(generalGroup);
+  settings->beginGroup(commonGroup);
   settings->setValue(hostKeyKey, key);
   settings->endGroup();
 }
@@ -222,7 +211,7 @@ void Storage::setHostKey(const QByteArray &key) {
  * @brief has Host Key
  */
 bool Storage::hasHostKey() {
-  settings->beginGroup(generalGroup);
+  settings->beginGroup(commonGroup);
   auto key = settings->value(hostKeyKey);
   settings->endGroup();
   return !key.isNull();
@@ -232,7 +221,7 @@ bool Storage::hasHostKey() {
  * @brief Get the Host Key
  */
 QByteArray Storage::getHostKey() {
-  settings->beginGroup(generalGroup);
+  settings->beginGroup(commonGroup);
   auto key = settings->value(hostKeyKey);
   settings->endGroup();
 
@@ -244,20 +233,30 @@ QByteArray Storage::getHostKey() {
 }
 
 /**
+ * @brief Set the current state of the server or client
+ *
+ * @param isServer
+ */
+void Storage::setHostIsServer(bool isServer) {
+  settings->beginGroup(commonGroup);
+  settings->setValue(hostStateKey, isServer);
+  settings->endGroup();
+}
+
+/**
  * @brief Get the current state of the server or client
  *
  * @return true  if server
  * @return false if client
  */
 bool Storage::getHostIsServer() {
-  settings->beginGroup(generalGroup);
+  settings->beginGroup(commonGroup);
   auto isServer = settings->value(hostStateKey);
   settings->endGroup();
 
   if (isServer.isNull()) {
     return false;
   }
-  const auto s = isServer.toBool();
   return isServer.toBool();
 }
 

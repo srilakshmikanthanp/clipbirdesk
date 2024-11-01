@@ -78,14 +78,6 @@ QSslConfiguration Application::getSslConfiguration() {
     config = getOldSslConfiguration();
   }
 
-  // log the certificate and key
-  qInfo() << "Certificate: ";
-  qInfo().noquote() << "\n";
-  qInfo() << config.localCertificate().toPem();
-  qInfo() << "Key: ";
-  qInfo().noquote() << "\n";
-  qInfo() << config.privateKey().toPem();
-
   // return the configuration
   return config;
 }
@@ -115,8 +107,8 @@ void Application::handleTabChange(ui::gui::modals::Clipbird::Tabs tab) {
     this->trayMenu->setQrCodeEnabled(false);
     this->trayMenu->setConnectEnabled(true);
   } else {
-    this->trayMenu->setConnectEnabled(false);
     this->trayMenu->setQrCodeEnabled(true);
+    this->trayMenu->setConnectEnabled(false);
   }
 }
 
@@ -324,6 +316,10 @@ void Application::setQssFile(Qt::ColorScheme scheme) {
   // qss
   std::string qss = isDark ? constants::getAppQSSDark() : constants::getAppQSSLight();
 
+  // log
+  qInfo()  << META_DATA << "System Theme: " << (isDark ? "Dark" : "Light");
+  qDebug() << META_DATA << "QSS File: " << QString::fromStdString(qss);
+
   // QFile to read the qss file
   QFile qssFile(QString::fromStdString(qss));
 
@@ -341,8 +337,8 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   // create the objects of the class
   controller = new controller::ClipBird(this->getSslConfiguration());
   clipbird   = new ui::gui::modals::Clipbird(controller);
-  trayMenu   = new ui::gui::TrayMenu(clipbird);
-  trayIcon   = new QSystemTrayIcon(this);
+  trayMenu   = new ui::gui::TrayMenu();
+  trayIcon   = new QSystemTrayIcon();
 
   // On HostName successfully resolved
   const auto slot_hr = [=](const auto dialog, quint16 port, const auto& host) {

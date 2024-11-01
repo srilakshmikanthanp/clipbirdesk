@@ -7,17 +7,19 @@ namespace srilakshmikanthanp::clipbirdesk::storage {
 class Storage : public QObject {
  private:  // settings
 
-  QSettings *settings = new QSettings("srilakshmikanthanp", "clipbird");
+  QSettings *settings = new QSettings("srilakshmikanthanp", "clipbird", this);
 
- private: // groups
-  const char* clientGroup  = "client";
-  const char* generalGroup = "general";
-  const char* serverGroup  = "server";
+ private:  // groups
 
- private: // keys
-  const char* hostStateKey = "hostState";
-  const char* hostCertKey  = "hostCert";
-  const char* hostKeyKey   = "hostKey";
+  const char *clientGroup = "client";
+  const char *commonGroup = "common";
+  const char *serverGroup = "server";
+
+ private:  // keys
+
+  const char *hostStateKey = "hostState";
+  const char *hostCertKey  = "hostCert";
+  const char *hostKeyKey   = "hostKey";
 
  private:  // qt
 
@@ -52,8 +54,8 @@ class Storage : public QObject {
   bool hasClientCert(const QString &name);
 
   /**
-  * @brief Clear the client cert
-  */
+   * @brief Clear the client cert
+   */
   void clearClientCert(const QString &name);
 
   /**
@@ -144,7 +146,7 @@ class Storage : public QObject {
   /**
    * @brief Instance of the storage
    */
-  static Storage& instance();
+  static Storage &instance();
 };
 
 }  // namespace srilakshmikanthanp::clipbirdesk::storage

@@ -388,13 +388,6 @@ Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QDialog(p), controller(c
     this, &Clipbird::onHostAction,
     this, &Clipbird::handleHostAction
   );
-
-  // init tab as current tab
-  if (tab->currentIndex() == 0) {
-    emit onTabChanged((currentTab = Tabs::Client));
-  } else {
-    emit onTabChanged((currentTab = Tabs::Server));
-  }
 }
 
 /**
@@ -415,6 +408,12 @@ QPair<QString, components::Status::Value> Clipbird::getStatus() {
  * @brief Set tab as client
  */
 void Clipbird::setTabAsClient() {
+  // if already just emit the signal
+  if (currentTab == Tabs::Client) {
+    emit onTabChanged(Tabs::Client);
+    return;
+  }
+
   this->tab->setCurrentIndex(1);
 }
 
@@ -422,6 +421,12 @@ void Clipbird::setTabAsClient() {
  * @brief Set tab as server
  */
 void Clipbird::setTabAsServer() {
+  // if already just emit the signal
+  if (currentTab == Tabs::Server) {
+    emit onTabChanged(Tabs::Server);
+    return;
+  }
+
   this->tab->setCurrentIndex(0);
 }
 

@@ -190,3 +190,8 @@ QFrame#Clipbird {
   background: #ededed;
   font-size: 12px;
 }
+
+#ClipSend > QPushButton {
+  background: #167dff;
+  color: white;
+}
