@@ -21,7 +21,7 @@ DefaultDirName={autopf}\{#ClipbirdName}
 DisableProgramGroupPage=yes
 LicenseFile=NOTICE
 OutputBaseFilename=clipbird-x64
-SetupIconFile=assets\images\logo.ico
+SetupIconFile=src\assets\images\logo.ico
 OutputDir=.\dist
 Compression=lzma
 SolidCompression=yes
@@ -40,7 +40,7 @@ Flags     : uninsdeletevalue
 
 [Files]
 ; List of files to be included in the installer
-Source  : ".\.setup\*";                                 \
+Source  : ".\setup\*";                                 \
 DestDir : "{app}";                                      \
 Flags   : ignoreversion recursesubdirs createallsubdirs
 
