@@ -181,6 +181,28 @@ ClipBird::ClipBird(QSslConfiguration config, QObject *parent) : QObject(parent),
 //---------------------- public slots -----------------------//
 
 /**
+ * @brief Set close window on focus out
+ */
+void ClipBird::setEasyHide(bool value) {
+  // storage instance
+  storage::Storage &store = storage::Storage::instance();
+
+  // set the close window on focus out
+  store.setEasyHide(value);
+}
+
+/**
+ * @brief Get the close window on focus out
+ */
+bool ClipBird::getEasyHide() const {
+  // storage instance
+  storage::Storage &store = storage::Storage::instance();
+
+  // get the close window on focus out
+  return store.getEasyHide();
+}
+
+/**
  * @brief set the host as server and start listening
  * to accept the client
  */

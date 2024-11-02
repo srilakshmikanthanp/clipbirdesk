@@ -6,7 +6,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
  *
  * @param parent
  */
-AboutUs::AboutUs(QWidget* parent) : QDialog(parent) {
+AboutUs::AboutUs(QWidget* parent) : QWidget(parent) {
   // Click Handlers
   auto donateClick = [=]() {
     QDesktopServices::openUrl(QUrl(constants::getAppDonatePage()));
@@ -107,4 +107,4 @@ void AboutUs::changeEvent(QEvent *event) {
 
   QWidget::changeEvent(event);
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets

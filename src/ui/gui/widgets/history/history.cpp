@@ -1,12 +1,12 @@
 #include "history.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets {
 /**
  * @brief Construct a new Abstract object
  *
  * @param parent
  */
-History::History(QWidget * parent) : QDialog(parent) {
+History::History(QWidget * parent) : QWidget(parent) {
   // Create QScrollArea
   auto historyArea = new QScrollArea();
 

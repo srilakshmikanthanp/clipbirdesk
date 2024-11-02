@@ -22,13 +22,14 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * the clients
  */
 class Server : public service::mdnsRegister {
+ signals:  // signals for this class
+  /// @brief On Server State Changed
+  void OnServerStateChanged(types::device::Device serverInfo, bool started);
+
+
  signals:  // signals
   /// @brief On client state changed
   void OnCLientStateChanged(types::device::Device, bool connected);
-
- signals:  // signals for this class
-  /// @brief On Server State Changed
-  void OnServerStateChanged(bool started);
 
  signals:  // signals for this class
   /// @brief On Sync Request

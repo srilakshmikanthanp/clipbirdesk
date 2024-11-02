@@ -22,7 +22,7 @@ void Group::setUpQrCode(Qt::ColorScheme scheme) {
  *
  * @param parent
  */
-Group::Group(QWidget *parent) : QDialog(parent) {
+Group::Group(QWidget *parent) : QWidget(parent) {
   // create layout
   auto root = new QVBoxLayout();
 
@@ -100,4 +100,4 @@ void Group::changeEvent(QEvent *event) {
 
   QWidget::changeEvent(event);
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets

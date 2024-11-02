@@ -23,7 +23,7 @@ class ClipBird : public QObject {
 
  signals:  // signals for this class
   /// @brief On Server List Changed (From Client)
-  void OnServerListChanged(QList<types::device::Device> servers);
+  void OnServerListChanged(std::optional<types::device::Device> server, QList<types::device::Device> servers);
 
  signals:  // signals for this class
   /// @brief On Server Found  (From Client)
@@ -43,13 +43,13 @@ class ClipBird : public QObject {
 
   //----------------------- server Signals ------------------------//
 
+ signals:  // signals for this class
+  /// @brief On Server state changed (From Server)
+  void OnServerStateChanged(types::device::Device serverInfo, bool isStarted);
+
  signals:  // signals
   /// @brief On client state changed (From Server)
   void OnCLientStateChanged(types::device::Device client, bool connected);
-
- signals:  // signals for this class
-  /// @brief On Server state changed (From Server)
-  void OnServerStateChanged(bool isStarted);
 
  signals:  // signals for this class
   /// @brief On Sync Request
@@ -129,7 +129,17 @@ class ClipBird : public QObject {
    */
   virtual ~ClipBird() = default;
 
-  //------------------------- public slots -------------------------//
+  //------------------------- settings slots -------------------------//
+
+  /**
+   * @brief Set close window on focus out
+   */
+  void setEasyHide(bool value);
+
+  /**
+   * @brief Get the close window on focus out
+   */
+  bool getEasyHide() const;
 
   /**
    * @brief set the host as server and start listening
@@ -141,8 +151,6 @@ class ClipBird : public QObject {
    * @brief set the host as client
    */
   void setCurrentHostAsClient();
-
-  //------------------- Store functions ------------------------//
 
   /**
    * @brief Clear Server Certificates

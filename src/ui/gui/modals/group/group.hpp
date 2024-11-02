@@ -11,7 +11,7 @@
 #include "utility/functions/qrcode/qrcode.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class Group : public QDialog {
+class Group : public QWidget {
  private:  // disable copy and move for this class
 
   Q_DISABLE_COPY_MOVE(Group)
@@ -85,4 +85,4 @@ class Group : public QDialog {
    */
   void changeEvent(QEvent *) override;
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets

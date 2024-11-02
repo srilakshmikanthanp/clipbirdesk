@@ -39,10 +39,9 @@
 #include "types/device/device.hpp"
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/components/hostlist/hostlist.hpp"
-#include "ui/gui/notify/joinrequest/joinrequest.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class Clipbird : public QDialog {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets {
+class Clipbird : public QWidget {
  private:  // Member variable (Tray)
 
   ui::gui::components::Status *status = new ui::gui::components::Status(this);  // Status
@@ -60,10 +59,6 @@ class Clipbird : public QDialog {
 
   using Action = components::HostTile::Action;
   using Status = components::Status::Value;
-
- private:  // typedefs used in this class
-
-  using ClipBird = controller::ClipBird;
 
  private:  // Disable copy and move
 
@@ -83,29 +78,21 @@ class Clipbird : public QDialog {
 
  private:  // Member Variables
 
-  ClipBird* controller;
+  controller::ClipBird* controller;
 
  signals:  // signals
-  void onHostAction(Tabs tab, std::tuple<types::device::Device, Action>);
 
- signals:  // signals
+  void disconnectFromServer(types::device::Device server);
+  void disconnectClient(types::device::Device client);
+  void connectToServer(types::device::Device server);
   void onTabChanged(Tabs tab);  // emit when tab changed
 
  private:  // private slots
-
-  //------------------------------ slots for Clipbird -------------------------//
 
   /**
    * @brief handle the host action from the window
    */
   void handleHostAction(Tabs t, std::tuple<types::device::Device, Action> h);
-
-  //----------------------------- slots for Server --------------------------//
-
-  /**
-   * @brief Handle the Client List Item Clicked
-   */
-  void handleClientListChange(QList<types::device::Device> clients);
 
   /**
    * @brief Handle the Client Tab Change
@@ -118,33 +105,31 @@ class Clipbird : public QDialog {
   void handleTabChangeForServer(Tabs tab);
 
   /**
-   * @brief Handle the Server State Change
+   * @brief Function used to set up all text in the label, etc..
    */
-  void handleServerStateChange(bool isStarted);
+  void setUpLanguage();
 
-  /**
-   * @brief Handle the Client auth Request
-   */
-  void handleAuthRequest(const types::device::Device& client);
-
-  //----------------------------- slots for Client --------------------------//
+ public: 
 
   /**
    * @brief Handle the Server List Item Clicked
    */
-  void handleServerListChange(QList<types::device::Device> servers);
+  void handleServerListChange(std::optional<types::device::Device> server, QList<types::device::Device> servers);
 
   /**
    * @brief Handle the server status change
    */
-  void handleServerStatusChanged(bool status);
-
-  //----------------------------- slots for Event ----------------------------//
+  void handleServerStatusChanged(bool status, types::device::Device server);
 
   /**
-   * @brief Function used to set up all text in the label, etc..
+   * @brief Handle the Server State Change
    */
-  void setUpLanguage();
+  void handleServerStateChange(types::device::Device serverInfo, bool isStarted);
+
+  /**
+   * @brief Handle the Client List Item Clicked
+   */
+  void handleClientListChange(QList<types::device::Device> clients);
 
  public:
 
@@ -152,7 +137,7 @@ class Clipbird : public QDialog {
    * @brief Construct a new Clipbird object
    * with parent as QWidget
    */
-  explicit Clipbird(ClipBird* controller, QWidget* parent = nullptr);
+  explicit Clipbird(QWidget* parent = nullptr);
 
   /**
    * @brief Set the Status object

@@ -186,3 +186,19 @@ QFrame#Clipbird {
   background: #2d2d2d;
   font-size: 12px;
 }
+
+#Settings > #Heading {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+#Settings > #Item {
+  background: #2d2d2d;
+  color: white;
+  border-radius: 10px;
+}
+
+#Settings > #Item > QLabel {
+  background: #2d2d2d;
+  font-size: 12px;
+}

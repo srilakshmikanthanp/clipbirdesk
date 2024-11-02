@@ -169,7 +169,7 @@ void Storage::clearAllServerCert() {
  */
 void Storage::setHostCert(const QByteArray &cert) {
   settings->beginGroup(commonGroup);
-  settings->setValue(hostCertKey, cert);
+  settings->setValue(hostCertificateKey, cert);
   settings->endGroup();
 }
 
@@ -178,7 +178,7 @@ void Storage::setHostCert(const QByteArray &cert) {
  */
 bool Storage::hasHostCert() {
   settings->beginGroup(commonGroup);
-  auto cert = settings->value(hostCertKey);
+  auto cert = settings->value(hostCertificateKey);
   settings->endGroup();
   return !cert.isNull();
 }
@@ -188,7 +188,7 @@ bool Storage::hasHostCert() {
  */
 QByteArray Storage::getHostCert() {
   settings->beginGroup(commonGroup);
-  auto cert = settings->value(hostCertKey);
+  auto cert = settings->value(hostCertificateKey);
   settings->endGroup();
 
   if (cert.isNull()) {
@@ -258,6 +258,28 @@ bool Storage::getHostIsServer() {
     return false;
   }
   return isServer.toBool();
+}
+
+/**
+ * @brief Set close window on focus out
+ */
+void Storage::setEasyHide(bool value) {
+  settings->beginGroup(commonGroup);
+  settings->setValue(closeWindowOnFocusOutKey, value);
+  settings->endGroup();
+}
+
+/**
+ * @brief Get the close window on focus out
+ */
+bool Storage::getEasyHide() const {
+  settings->beginGroup(commonGroup);
+  auto value = settings->value(closeWindowOnFocusOutKey);
+  settings->endGroup();
+  if (value.isNull()) {
+    return true;
+  }
+  return value.toBool();
 }
 
 /**

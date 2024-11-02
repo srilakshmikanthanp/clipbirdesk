@@ -13,7 +13,7 @@
 #include "constants/constants.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class AboutUs : public QDialog {
+class AboutUs : public QWidget {
  private:  // disable copy and move for this class
 
   Q_DISABLE_COPY_MOVE(AboutUs)
@@ -59,4 +59,4 @@ class AboutUs : public QDialog {
    */
   void changeEvent(QEvent *) override;
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets

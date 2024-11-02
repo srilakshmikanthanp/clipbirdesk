@@ -28,10 +28,12 @@
 #include "ui/gui/utilities/functions/functions.hpp"
 #include "ui/gui/traymenu/traymenu.hpp"
 #include "ui/gui/modals/aboutus/aboutus.hpp"
-#include "ui/gui/modals/clipbird/clipbird.hpp"
-#include "ui/gui/modals/history/history.hpp"
 #include "ui/gui/modals/connect/connect.hpp"
 #include "ui/gui/modals/group/group.hpp"
+#include "ui/gui/notify/joinrequest/joinrequest.hpp"
+#include "ui/gui/widgets/clipbird/clipbird.hpp"
+#include "ui/gui/widgets/history/history.hpp"
+#include "ui/gui/widgets/settings/settings.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
 
@@ -63,7 +65,12 @@ class Application : public SingleApplication {
   /**
    * @brief On Tab Changed for Client
    */
-  void handleTabChange(ui::gui::modals::Clipbird::Tabs tab);
+  void handleTabChange(ui::gui::widgets::Clipbird::Tabs tab);
+
+  /**
+   * @brief Handle the Client auth Request
+   */
+  void handleAuthRequest(const types::device::Device& client);
 
   //----------------------------- slots for Tray ----------------------------//
 
@@ -98,6 +105,11 @@ class Application : public SingleApplication {
   void onHistoryClicked();
 
   /**
+   * @brief On Settings Clicked
+   */
+  void onSettingsClicked();
+
+  /**
    * @brief On Reset Clicked
    */
   void onResetClicked();
@@ -114,14 +126,15 @@ class Application : public SingleApplication {
 
  private:  // Member variable (Modals)
 
-  ui::gui::modals::AboutUs aboutUs = ui::gui::modals::AboutUs();
-  ui::gui::modals::Group group = ui::gui::modals::Group();
-  ui::gui::modals::History history = ui::gui::modals::History();
-  ui::gui::modals::Connect joiner = ui::gui::modals::Connect();
+  ui::gui::modals::AboutUs *aboutUs = new ui::gui::modals::AboutUs();
+  ui::gui::modals::Group *group = new ui::gui::modals::Group();
+  ui::gui::modals::Connect *joiner = new ui::gui::modals::Connect();
 
  private:  //  Member Variables and Objects
 
-  ui::gui::modals::Clipbird *clipbird;
+  ui::gui::widgets::Clipbird *clipbird;
+  ui::gui::widgets::History *history;
+  ui::gui::widgets::Settings *settings;
   ui::gui::TrayMenu *trayMenu;
   QSystemTrayIcon *trayIcon;
   controller::ClipBird *controller;

@@ -1,26 +1,22 @@
 #include "clipbird.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-//------------------------------ slots for Clipbird -------------------------//
-
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets {
 /**
  * @brief handle the host action from the window
  */
 void Clipbird::handleHostAction(Tabs t, components::HostTile::Value h) {
   if (t == Tabs::Server && std::get<1>(h) == Action::Disconnect) {
-    controller->disconnectClient(std::get<0>(h));
+    emit disconnectClient(std::get<0>(h));
   }
 
   if (t == Tabs::Client && std::get<1>(h) == Action::Connect) {
-    controller->connectToServer(std::get<0>(h));
+    emit connectToServer(std::get<0>(h));
   }
 
   if (t == Tabs::Client && std::get<1>(h) == Action::Disconnect) {
-    controller->disconnectFromServer(std::get<0>(h));
+    emit disconnectFromServer(std::get<0>(h));
   }
 }
-
-//----------------------------- slots for Server --------------------------//
 
 /**
  * @brief Handle the Client List Item Clicked
@@ -42,123 +38,51 @@ void Clipbird::handleClientListChange(QList<types::device::Device> clients) {
  * @brief On Tab Changed for Client
  */
 void Clipbird::handleTabChangeForClient(Tabs tab) {
-  if (tab != ui::gui::modals::Clipbird::Tabs::Client) return;  // if not client tab return
+  if (tab != ui::gui::widgets::Clipbird::Tabs::Client) return;  // if not client tab return
 
   // initialize the client Clipbird
-  this->setStatus(QObject::tr("Not Connected"), ui::gui::modals::Clipbird::Status::Disconnected);
+  this->setStatus(QObject::tr("Not Connected"), ui::gui::widgets::Clipbird::Status::Disconnected);
 
   // reset the device list
   this->removeAllClient();
-
-  // notify the controller
-  controller->setCurrentHostAsClient();
 }
 
 /**
  * @brief On Tab Changed for Server
  */
 void Clipbird::handleTabChangeForServer(Tabs tab) {
-  if (tab != ui::gui::modals::Clipbird::Tabs::Server) return;  // if not server tab return
+  if (tab != ui::gui::widgets::Clipbird::Tabs::Server) return;  // if not server tab return
 
   // Device mDns name
   auto name = QString::fromStdString(constants::getMDnsServiceName());
 
   // initialize the server Clipbird
-  this->setStatus(name, ui::gui::modals::Clipbird::Status::Inactive);
+  this->setStatus(name, ui::gui::widgets::Clipbird::Status::Inactive);
 
   // reset the device list
   this->removeAllServers();
-
-  // notify the controller
-  controller->setCurrentHostAsServer();
 }
 
 /**
  * @brief Handle the Server State Change
  */
-void Clipbird::handleServerStateChange(bool isStarted) {
+void Clipbird::handleServerStateChange(types::device::Device serverInfo, bool isStarted) {
   // infer the status from the server state
-  auto groupName  = QString::fromStdString(constants::getMDnsServiceName());
-  auto status     = isStarted ? Status::Active : Status::Inactive;
-  auto clients    = controller->getConnectedClientsList();
-
-  // If the server is started
-  if (isStarted) {
-    groupName = controller->getServerInfo().name;
-  }
+  auto status = isStarted ? Status::Active : Status::Inactive;
 
   // set the server status
-  this->setStatus(groupName, status);
-
-  // Create a list of tuple with Action
-  QList<components::HostTile::Value> clientTiles;
-
-  // Add the clients to the list
-  for (auto c : clients) {
-    clientTiles.append({c, Action::Disconnect});
-  }
-
-  // set the client list to the window
-  this->setClientList(clientTiles);
+  this->setStatus(serverInfo.name, status);
 }
-
-/**
- * @brief On New Host Connected
- *
- * @param client
- */
-void Clipbird::handleAuthRequest(const types::device::Device& client) {
-  // get the user input
-  notify::JoinRequest* toast = new notify::JoinRequest(this);
-
-  // connect the dialog to window AuthSuccess signal
-  const auto connectionAccept = connect(
-    toast, &notify::JoinRequest::onAccept,
-    [=] { controller->authSuccess(client); }
-  );
-
-  connect(
-    toast, &notify::JoinRequest::onAccept,
-    toast, &QObject::deleteLater
-  );
-
-  // disconnect all signals on tab change signal
-  connect(this, &Clipbird::onTabChanged, [=]{
-    QObject::disconnect(connectionAccept);
-  });
-
-  // connect the dialog to window AuthFail signal
-  const auto connectionReject   = connect(
-    toast, &notify::JoinRequest::onReject,
-    [=] { controller->authFailed(client); }
-  );
-
-  connect(
-    toast, &notify::JoinRequest::onReject,
-    toast, &QObject::deleteLater
-  );
-
-  // disconnect all signals on tab change signal
-  connect(this, &Clipbird::onTabChanged, [=]{
-    QObject::disconnect(connectionReject);
-  });
-
-  // shoe the notification
-  toast->show(client);
-}
-
-//----------------------------- slots for Client --------------------------//
 
 /**
  * @brief Handle the Server List Item Clicked
  */
-void Clipbird::handleServerListChange(QList<types::device::Device> servers) {
+void Clipbird::handleServerListChange(std::optional<types::device::Device> server, QList<types::device::Device> servers) {
   // Create a list of tuple with Action
   QList<components::HostTile::Value> serversTile;
 
   // get the action for the server
   const auto getAction = [=](const auto& s) {
-    auto server = controller->getConnectedServer();
     if (!server.has_value()) return Action::Connect;
     if (s.ip == server->ip && s.port == server->port) {
       return Action::Disconnect;
@@ -184,61 +108,13 @@ void Clipbird::handleServerListChange(QList<types::device::Device> servers) {
 /**
  * @brief Handle the server status change
  */
-void Clipbird::handleServerStatusChanged(bool isConnected) {
-  // get the connected server
-  auto server = controller->getConnectedServer();
-
-  // if server is not connected
-  isConnected = isConnected && server.has_value();
-
+void Clipbird::handleServerStatusChanged(bool isConnected, types::device::Device server) {
   // infer the status from the server state
-  auto groupName = isConnected ? server->name : QObject::tr("Not Connected");
-  auto servers   = controller->getServerList();
+  auto groupName = isConnected ? server.name : QObject::tr("Not Connected");
   auto status    = isConnected ? Status::Connected : Status::Disconnected;
-
-  // server compare
-  const auto serverCompare = [=](const auto& device) -> bool {
-    if (isConnected) {
-      return server->ip == device.ip && server->port == device.port;
-    } else {
-      return false;
-    }
-  };
-
-  // get the action for the server
-  const auto getAction = [=](const auto& s) {
-    if (serverCompare(s)) {
-      return Action::Disconnect;
-    } else {
-      return Action::Connect;
-    }
-  };
-
-  // Create a list of tuple with Action
-  QList<components::HostTile::Value> serversTiles;
 
   // set the server status
   this->setStatus(groupName, status);
-
-  // add the server to the list
-  for (auto s : servers) {
-    serversTiles.append({s, getAction(s)});
-  }
-
-  // if the server is not in the list
-  if (isConnected && !std::any_of(serversTiles.begin(), serversTiles.end(), [=](const auto& s) {
-    return serverCompare(std::get<0>(s));
-  })) {
-    serversTiles.append({server.value(), Action::Disconnect});
-  }
-
-  // show the connected server always on top
-  std::sort(serversTiles.begin(), serversTiles.end(), [=](const auto& a, const auto& b) {
-    return std::get<1>(a) != Action::Disconnect;
-  });
-
-  // set the server list to the window
-  this->setServerList(serversTiles);
 }
 
 /**
@@ -256,7 +132,7 @@ void Clipbird::setUpLanguage() {
  * @param c controller
  * @param p parent
  */
-Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QDialog(p), controller(c) {
+Clipbird::Clipbird(QWidget* p) : QWidget(p) {
   // create the  layout
   QVBoxLayout* root = new QVBoxLayout();
 
@@ -310,7 +186,7 @@ Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QDialog(p), controller(c
 
   // add  layout to this
   this->setLayout(root);
-
+  
   // set object name
   this->setObjectName("Clipbird");
 
@@ -322,12 +198,12 @@ Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QDialog(p), controller(c
   // clang-format off
   // server list slot
   auto serverListSlot  = [=](const auto& host) {
-    emit onHostAction(Tabs::Client, host);
+    this->handleHostAction(Tabs::Client, host);
   };
 
   // client list slot
   auto clientListSlot  = [=](const auto& host) {
-    emit onHostAction(Tabs::Server, host);
+    this->handleHostAction(Tabs::Server, host);
   };
   // clang-format on
 
@@ -351,42 +227,6 @@ Clipbird::Clipbird(Clipbird::ClipBird* c, QWidget* p) : QDialog(p), controller(c
   connect(
     this, &Clipbird::onTabChanged,
     this, &Clipbird::handleTabChangeForServer
-  );
-
-  // Connect the signal and slot for client list change
-  connect(
-    controller, &ClipBird::OnClientListChanged,
-    this, &Clipbird::handleClientListChange
-  );
-
-  // Connect the signal and slot for server list change
-  connect(
-    controller, &ClipBird::OnServerListChanged,
-    this, &Clipbird::handleServerListChange
-  );
-
-  // Connect the signal and slot for server status change
-  connect(
-    controller, &ClipBird::OnServerStateChanged,
-    this, &Clipbird::handleServerStateChange
-  );
-
-  // connect signal and slot for OnAuthRequest
-  connect(
-    controller, &ClipBird::OnAuthRequest,
-    this, &Clipbird::handleAuthRequest
-  );
-
-  // Connect the signal and slot for server status change
-  connect(
-    controller, &ClipBird::OnServerStatusChanged,
-    this, &Clipbird::handleServerStatusChanged
-  );
-
-  // Connect the signal and slot for host action
-  connect(
-    this, &Clipbird::onHostAction,
-    this, &Clipbird::handleHostAction
   );
 }
 

@@ -15,7 +15,7 @@
 
 // Windows Headers
 #if defined(_WIN32) || defined(_WIN64)
-  #include <wintoastlib.h>
+#include <wintoastlib.h>
 #endif
 
 // Project Headers
@@ -33,9 +33,23 @@ namespace srilakshmikanthanp::clipbirdesk {
  * apply some attributes to the window
  */
 class AppEventFilter : public QObject {
+ private:
+
   virtual bool eventFilter(QObject *o, QEvent *e) {
+    // if esc 
+    if (e->type() == QEvent::KeyPress) {
+      QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
+      QWidget *window = dynamic_cast<QWidget *>(o);
+      if (keyEvent && window && keyEvent->key() == Qt::Key_Escape) {
+        handleEscKeyPressEvent(window);
+      }
+    }
+
     if (e->type() == QEvent::WindowActivate) {
-      handleWindowShownEvent(dynamic_cast<QWidget *>(o));
+      QWidget *window = dynamic_cast<QWidget *>(o);
+      if (window) {
+        handleWindowShownEvent(window);
+      }
     }
 
     return QObject::eventFilter(o, e);
@@ -45,6 +59,30 @@ class AppEventFilter : public QObject {
     if (!(window->windowFlags() & Qt::FramelessWindowHint)) {
       ui::gui::utilities::setPlatformAttributes(window);
     }
+  }
+
+  void handleEscKeyPressEvent(QWidget *window) {
+    if (controller->getEasyHide() && window->isWindow()) {
+      window->hide();
+    }
+  }
+
+ private:
+
+  controller::ClipBird *controller;
+
+ public:
+
+  /**
+   * @brief Destroy the Clipbird Application Event Filter object
+   */
+  virtual ~AppEventFilter() = default;
+
+  /**
+   * @brief Construct a new Clipbird Application Event Filter object
+   */
+  AppEventFilter(controller::ClipBird *controller) : controller(controller) {
+    // Nothing to do
   }
 };
 
@@ -149,15 +187,15 @@ void globalErrorHandler() {
  */
 auto main(int argc, char **argv) -> int {
   // using ClipbirdApplication class from namespace
+  using srilakshmikanthanp::clipbirdesk::AppEventFilter;
+  using srilakshmikanthanp::clipbirdesk::Application;
+  using srilakshmikanthanp::clipbirdesk::NativeEventFilter;
   using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
-  using srilakshmikanthanp::clipbirdesk::constants::getAppLogo;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
+  using srilakshmikanthanp::clipbirdesk::constants::getAppLogo;
   using srilakshmikanthanp::clipbirdesk::constants::getAppName;
   using srilakshmikanthanp::clipbirdesk::constants::getAppOrgName;
   using srilakshmikanthanp::clipbirdesk::constants::getAppVersion;
-  using srilakshmikanthanp::clipbirdesk::AppEventFilter;
-  using srilakshmikanthanp::clipbirdesk::NativeEventFilter;
-  using srilakshmikanthanp::clipbirdesk::Application;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
   // std::string to std::wstring
@@ -175,12 +213,12 @@ auto main(int argc, char **argv) -> int {
   app.installNativeEventFilter(filter);
 
   // install event filter
-  app.installEventFilter(new AppEventFilter());
+  app.installEventFilter(new AppEventFilter(app.getController()));
 
 #if defined(_WIN32) || defined(_WIN64)
   // create AUMI
   auto appAumi = WinToastLib::WinToast::configureAUMI(
-    W(getAppOrgName()), W(getAppName()), W(std::string()), W(getAppVersion())
+      W(getAppOrgName()), W(getAppName()), W(std::string()), W(getAppVersion())
   );
 
   // set up wintoast lib
@@ -198,27 +236,20 @@ auto main(int argc, char **argv) -> int {
     return EXIT_FAILURE;
   }
 #elif __linux__
-  // create glib main loop
-  auto g_main_loop = g_main_loop_new(nullptr, false);
-
-  // start glib main loop
-  auto thread = std::thread([g_main_loop]() {
-    g_main_loop_run(g_main_loop);
-  });
+  auto loop   = g_main_loop_new(nullptr, false);
+  auto thread = std::thread([loop]() { g_main_loop_run(loop); });
 
   // detach
   thread.detach();
 
   // quiter
-  auto quiter = [g_main_loop]() {
-    g_main_loop_quit(g_main_loop);
-  };
+  auto quiter = [loop]() { g_main_loop_quit(loop); };
 
   // set the signal handler
   QObject::connect(&app, &QApplication::aboutToQuit, quiter);
 
   // initialize libNotify
-  if(!notify_init(getAppName())) {
+  if (!notify_init(getAppName())) {
     auto dialog = QMessageBox(nullptr);
     dialog.setText(QObject::tr("Can't Initialize libNotify"));
     dialog.setIcon(QMessageBox::Critical);
@@ -229,9 +260,7 @@ auto main(int argc, char **argv) -> int {
   }
 
   // uninitializer
-  auto uniniter = []() {
-    notify_uninit();
-  };
+  auto uniniter = []() { notify_uninit(); };
 
   // uninitialize
   QObject::connect(&app, &QApplication::aboutToQuit, uniniter);

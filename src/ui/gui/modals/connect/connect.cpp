@@ -6,7 +6,7 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
  *
  * @param parent
  */
-Connect::Connect(QWidget * parent) : QDialog(parent) {
+Connect::Connect(QWidget * parent) : QWidget(parent) {
   // create root layout
   auto root = new QVBoxLayout(this);
 

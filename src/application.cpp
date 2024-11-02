@@ -102,14 +102,61 @@ void Application::handleConnectionError(QString error) {
 /**
  * @brief On Tab Changed for Client
  */
-void Application::handleTabChange(ui::gui::modals::Clipbird::Tabs tab) {
-  if (tab == ui::gui::modals::Clipbird::Tabs::Client) {
+void Application::handleTabChange(ui::gui::widgets::Clipbird::Tabs tab) {
+  if (tab == ui::gui::widgets::Clipbird::Tabs::Client) {
     this->trayMenu->setQrCodeEnabled(false);
     this->trayMenu->setConnectEnabled(true);
+    controller->setCurrentHostAsClient();
   } else {
     this->trayMenu->setQrCodeEnabled(true);
     this->trayMenu->setConnectEnabled(false);
+    controller->setCurrentHostAsServer();
   }
+}
+
+/**
+ * @brief On New Host Connected
+ *
+ * @param client
+ */
+void Application::handleAuthRequest(const types::device::Device& client) {
+  // get the user input
+  ui::gui::notify::JoinRequest* toast = new ui::gui::notify::JoinRequest(this);
+
+  // connect the dialog to window AuthSuccess signal
+  const auto connectionAccept = connect(
+    toast, &ui::gui::notify::JoinRequest::onAccept,
+    [=] { controller->authSuccess(client); }
+  );
+
+  connect(
+    toast, &ui::gui::notify::JoinRequest::onAccept,
+    toast, &QObject::deleteLater
+  );
+
+  // disconnect all signals on tab change signal
+  connect(clipbird, &ui::gui::widgets::Clipbird::onTabChanged, [=]{
+    QObject::disconnect(connectionAccept);
+  });
+
+  // connect the dialog to window AuthFail signal
+  const auto connectionReject   = connect(
+    toast, &ui::gui::notify::JoinRequest::onReject,
+    [=] { controller->authFailed(client); }
+  );
+
+  connect(
+    toast, &ui::gui::notify::JoinRequest::onReject,
+    toast, &QObject::deleteLater
+  );
+
+  // disconnect all signals on tab change signal
+  connect(clipbird, &ui::gui::widgets::Clipbird::onTabChanged, [=]{
+    QObject::disconnect(connectionReject);
+  });
+
+  // shoe the notification
+  toast->show(client);
 }
 
 //----------------------------- slots for Tray ----------------------------//
@@ -119,7 +166,7 @@ void Application::handleTabChange(ui::gui::modals::Clipbird::Tabs tab) {
  */
 void Application::onQrCodeClicked() {
   // if already visible return
-  if (group.isVisible()) { return group.raise(); }
+  if (group->isVisible()) { return group->raise(); }
 
   // generate the qr code with all inteface ip and port in format
   auto interfaces = QNetworkInterface::allInterfaces();
@@ -170,28 +217,28 @@ void Application::onQrCodeClicked() {
   qDebug() << "QR Code Info: " << QString(info);
 
   // set the icon
-  group.setWindowIcon(QIcon(constants::getAppLogo()));
+  group->setWindowIcon(QIcon(constants::getAppLogo()));
 
   // set the title
-  group.setWindowTitle(constants::getAppName());
+  group->setWindowTitle(constants::getAppName());
 
   // set Fixed Size
-  group.setFixedSize(group.sizeHint());
+  group->setFixedSize(group->sizeHint());
 
   // set the info
-  group.setQrCode(QString(info));
+  group->setQrCode(QString(info));
 
   // set port
-  group.setPort(QString::number(server.port));
+  group->setPort(QString::number(server.port));
 
   // show the dialog
-  group.show();
+  group->show();
 
   // set as not resizable
-  group.setFixedSize(group.sizeHint());
+  group->setFixedSize(group->sizeHint());
 
   // center the window
-  group.move(QGuiApplication::primaryScreen()->availableGeometry().center() - group.rect().center());
+  group->move(QGuiApplication::primaryScreen()->availableGeometry().center() - group->rect().center());
 }
 
 /**
@@ -199,22 +246,22 @@ void Application::onQrCodeClicked() {
  */
 void Application::onConnectClicked() {
   // if already visible return
-  if (joiner.isVisible()) { return joiner.raise(); }
+  if (joiner->isVisible()) { return joiner->raise(); }
 
   // set the icon
-  joiner.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
+  joiner->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
 
   // set the title
-  joiner.setWindowTitle(constants::getAppName());
+  joiner->setWindowTitle(constants::getAppName());
 
   // set as not resizable
-  joiner.setFixedSize(joiner.sizeHint());
+  joiner->setFixedSize(joiner->sizeHint());
 
   // show the dialog
-  joiner.show();
+  joiner->show();
 
   // center the window
-  joiner.move(QGuiApplication::primaryScreen()->availableGeometry().center() - joiner.rect().center());
+  joiner->move(QGuiApplication::primaryScreen()->availableGeometry().center() - joiner->rect().center());
 }
 
 /**
@@ -222,19 +269,22 @@ void Application::onConnectClicked() {
  */
 void Application::onAboutClicked() {
   // if already visible return
-  if (aboutUs.isVisible()) { return aboutUs.raise(); }
+  if (aboutUs->isVisible()) { return aboutUs->raise(); }
 
   // set the icon
-  aboutUs.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
+  aboutUs->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
 
   // set the title
-  aboutUs.setWindowTitle(constants::getAppName());
+  aboutUs->setWindowTitle(constants::getAppName());
+
+  // set as not resizable
+  aboutUs->setFixedSize(aboutUs->sizeHint());
 
   // show the dialog
-  aboutUs.show();
+  aboutUs->show();
 
   // center the window
-  aboutUs.move(QGuiApplication::primaryScreen()->availableGeometry().center() - aboutUs.rect().center());
+  aboutUs->move(QGuiApplication::primaryScreen()->availableGeometry().center() - aboutUs->rect().center());
 }
 
 /**
@@ -271,22 +321,45 @@ void Application::onSendClicked() {
  */
 void Application::onHistoryClicked() {
   // if already visible return
-  if (history.isVisible()) { return history.raise(); }
+  if (history->isVisible()) { return history->raise(); }
 
   // set the icon
-  history.setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
+  history->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
 
   // set the title
-  history.setWindowTitle(constants::getAppName());
+  history->setWindowTitle(constants::getAppName());
 
   // set history
-  history.setHistory(controller->getHistory());
+  history->setHistory(controller->getHistory());
 
   // set size
-  history.setFixedSize(constants::getAppWindowSize());
+  history->setFixedSize(constants::getAppWindowSize());
 
   // show the dialog
-  history.show();
+  history->show();
+}
+
+/**
+ * @brief On Settings Clicked
+ */
+void Application::onSettingsClicked() {
+  // if already visible return
+  if (settings->isVisible()) { return settings->raise(); }
+
+  // set the icon
+  settings->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
+
+  // set the title
+  settings->setWindowTitle(constants::getAppName());
+
+  // set as not resizable
+  settings->setFixedSize(settings->sizeHint());
+
+  // show the dialog
+  settings->show();
+
+  // center the window
+  settings->move(QGuiApplication::primaryScreen()->availableGeometry().center() - settings->rect().center());
 }
 
 /**
@@ -336,19 +409,21 @@ void Application::setQssFile(Qt::ColorScheme scheme) {
 Application::Application(int &argc, char **argv) : SingleApplication(argc, argv) {
   // create the objects of the class
   controller = new controller::ClipBird(this->getSslConfiguration());
-  clipbird   = new ui::gui::modals::Clipbird(controller);
+  clipbird   = new ui::gui::widgets::Clipbird();
+  history    = new ui::gui::widgets::History();
+  settings   = new ui::gui::widgets::Settings();
   trayMenu   = new ui::gui::TrayMenu();
   trayIcon   = new QSystemTrayIcon();
-
+  
   // On HostName successfully resolved
-  const auto slot_hr = [=](const auto dialog, quint16 port, const auto& host) {
+  const auto slot_hr = [=](QWidget* dialog, quint16 port, const auto& host) {
     // if host name is not resolved
     if (host.error() != QHostInfo::NoError) {
       return;
     }
 
     // close the dialog
-    dialog->close();
+    dialog->setVisible(false);
 
     // connect to server
     controller->connectToServer({
@@ -365,18 +440,13 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     }
   };
 
-  // set the icon to tray
+  settings->setEasyHide(controller->getEasyHide());
+
   trayIcon->setIcon(QIcon(constants::getAppLogo()));
-
-  // set the tray menu
   trayIcon->setContextMenu(trayMenu);
-
-  // set tooltip
   trayIcon->setToolTip(constants::getAppName());
-
-  // set ToolTip
   trayIcon->setToolTip(QString::fromStdString(constants::getAppName()));
-
+  
   // set the signal handler for all os
   signal(SIGTERM, [](int sig) { qApp->quit(); });
   signal(SIGINT, [](int sig) { qApp->quit(); });
@@ -397,7 +467,7 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   // set the signal for instance Started
   QObject::connect(
     this, &SingleApplication::instanceStarted,
-    clipbird, &ui::gui::modals::Clipbird::show
+    clipbird, &ui::gui::widgets::Clipbird::show
   );
 
   // detect the system theme
@@ -436,6 +506,12 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     this, &Application::onHistoryClicked
   );
 
+  // set the signal for menus Settings click
+  QObject::connect(
+    trayMenu, &ui::gui::TrayMenu::OnSettingsClicked,
+    this, &Application::onSettingsClicked
+  );
+
   // set the signal for menus Reset click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnResetClicked,
@@ -450,50 +526,101 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
 
   // Connect the signal and slot for tab change(client)
   connect(
-    clipbird, &ui::gui::modals::Clipbird::onTabChanged,
+    clipbird, &ui::gui::widgets::Clipbird::onTabChanged,
     this, &Application::handleTabChange
   );
 
   // set the signal for menus Send click
   QObject::connect(
-    &history, &ui::gui::modals::History::onClipSend,
+    history, &ui::gui::widgets::History::onClipSend,
     this, &Application::onSendClicked
   );
 
   // close on tab change
   QObject::connect(
-    clipbird, &ui::gui::modals::Clipbird::onTabChanged, 
-    &group, &QDialog::close
+    clipbird, &ui::gui::widgets::Clipbird::onTabChanged, 
+    group, &QDialog::close
   );
 
   // close on tab change
   QObject::connect(
-    clipbird, &ui::gui::modals::Clipbird::onTabChanged, 
-    &joiner, &QDialog::close
+    clipbird, &ui::gui::widgets::Clipbird::onTabChanged, 
+    joiner, &QDialog::close
   );
 
   // connect signal for history delete
   connect(
-    &history, &ui::gui::modals::History::onClipDelete,
+    history, &ui::gui::widgets::History::onClipDelete,
     controller, &controller::ClipBird::deleteHistoryAt
   );
 
   // connect signal for history change
   connect(
     controller, &controller::ClipBird::OnHistoryChanged,
-    &history, &ui::gui::modals::History::setHistory
+    history, &ui::gui::widgets::History::setHistory
   );
 
   // connect signal for Clipboard Copy
   connect(
-    &history, &ui::gui::modals::History::onClipSelected,
+    history, &ui::gui::widgets::History::onClipSelected,
     [=](auto i) {
       controller->setClipboard(controller->getHistory().at(i));
     }
   );
 
+  // connect signal for Settings Change
+  connect(
+    settings, &ui::gui::widgets::Settings::closeWindowOnFocusOut,
+    controller, &controller::ClipBird::setEasyHide
+  );
+
+  // Connect the signal and slot for client list change
+  connect(
+    controller, &controller::ClipBird::OnClientListChanged,
+    clipbird, &ui::gui::widgets::Clipbird::handleClientListChange
+  );
+
+  // Connect the signal and slot for server list change
+  connect(
+    controller, &controller::ClipBird::OnServerListChanged,
+    clipbird, &ui::gui::widgets::Clipbird::handleServerListChange
+  );
+
+  // Connect the signal and slot for server status change
+  connect(
+    controller, &controller::ClipBird::OnServerStateChanged,
+    clipbird, &ui::gui::widgets::Clipbird::handleServerStateChange
+  );
+
+  // connect signal and slot for OnAuthRequest
+  connect(
+    controller, &controller::ClipBird::OnAuthRequest,
+    this, &Application::handleAuthRequest
+  );
+
+  // Connect the signal and slot for server status change
+  connect(
+    controller, &controller::ClipBird::OnServerStatusChanged,
+    clipbird, &ui::gui::widgets::Clipbird::handleServerStatusChanged
+  );
+
+  connect(
+    clipbird, &ui::gui::widgets::Clipbird::disconnectFromServer,
+    controller, &controller::ClipBird::disconnectFromServer
+  );
+
+  connect(
+    clipbird, &ui::gui::widgets::Clipbird::disconnectClient,
+    controller, &controller::ClipBird::disconnectClient
+  );
+
+  connect(
+    clipbird, &ui::gui::widgets::Clipbird::connectToServer,
+    controller, &controller::ClipBird::connectToServer
+  );
+
   // connect the dialog to window clicked signal
-  connect(&joiner, &ui::gui::modals::Connect::onConnect, [=](auto ipv4, auto port) {
+  connect(joiner, &ui::gui::modals::Connect::onConnect, [=](auto ipv4, auto port) {
     // validate the ip and port
     if (!validator(ipv4.toShort(), port.toShort())) {
       return;
@@ -501,7 +628,7 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
 
     // bind the port
     auto slot = std::bind(
-      slot_hr, &joiner, port.toShort(), std::placeholders::_1
+      slot_hr, joiner, port.toShort(), std::placeholders::_1
     );
 
     // resolve the host name
@@ -525,8 +652,13 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
 Application::~Application() {
   delete controller;
   delete clipbird;
+  delete history;
+  delete settings;
   delete trayMenu;
   delete trayIcon;
+  delete aboutUs;
+  delete group;
+  delete joiner;
 }
 
 /**

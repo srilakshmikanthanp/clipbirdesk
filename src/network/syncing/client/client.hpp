@@ -36,7 +36,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 class Client : public service::mdnsBrowser {
  signals:  // signals for this class
   /// @brief On Server List Changed
-  void OnServerListChanged(QList<types::device::Device> servers);
+  void OnServerListChanged(std::optional<types::device::Device> server, QList<types::device::Device> servers);
 
  signals:  // signals for this class
   /// @brief On Server Found

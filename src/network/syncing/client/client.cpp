@@ -617,7 +617,7 @@ void Client::onServiceAdded(types::device::Device server) {
   this->m_servers.append(server);
 
   // emit the signal
-  emit OnServerListChanged(getServerList());
+  emit OnServerListChanged(this->getConnectedServer(), getServerList());
 }
 
 /**
@@ -649,6 +649,6 @@ void Client::onServiceRemoved(types::device::Device server) {
   m_servers.erase(device);
 
   // emit the signal
-  emit OnServerListChanged(getServerList());
+  emit OnServerListChanged(this->getConnectedServer(), getServerList());
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

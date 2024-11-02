@@ -17,9 +17,10 @@ class Storage : public QObject {
 
  private:  // keys
 
-  const char *hostStateKey = "hostState";
-  const char *hostCertKey  = "hostCert";
-  const char *hostKeyKey   = "hostKey";
+  const char *hostStateKey             = "hostState";
+  const char *hostKeyKey               = "hostKey";
+  const char *hostCertificateKey       = "hostCert";
+  const char *closeWindowOnFocusOutKey = "closeWindowOnFocusOut";
 
  private:  // qt
 
@@ -142,6 +143,16 @@ class Storage : public QObject {
    * @brief Get the Host Key
    */
   QByteArray getHostKey();
+
+  /**
+   * @brief Set close window on focus out
+   */
+  void setEasyHide(bool value);
+
+  /**
+   * @brief Get the close window on focus out
+   */
+  bool getEasyHide() const;
 
   /**
    * @brief Instance of the storage

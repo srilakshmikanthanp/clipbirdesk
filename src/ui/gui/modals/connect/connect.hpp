@@ -13,7 +13,7 @@
 #include "constants/constants.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class Connect : public QDialog {
+class Connect : public QWidget {
  private:  // disable copy and move for this class
 
   Q_DISABLE_COPY_MOVE(Connect)
@@ -54,4 +54,4 @@ class Connect : public QDialog {
    */
   void changeEvent(QEvent *) override;
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets

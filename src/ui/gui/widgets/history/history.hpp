@@ -15,8 +15,8 @@
 #include "ui/gui/components/cliphistory/cliphistory.hpp"
 #include "ui/gui/components/clipsend/clipsend.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
-class History : public QDialog {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets {
+class History : public QWidget {
  private:  // disable copy and move for this class
 
   Q_DISABLE_COPY_MOVE(History)
@@ -89,4 +89,4 @@ class History : public QDialog {
    */
   void changeEvent(QEvent *) override;
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets
