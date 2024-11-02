@@ -113,6 +113,29 @@ void Clipbird::handleServerStatusChanged(bool isConnected, types::device::Device
   auto groupName = isConnected ? server.name : QObject::tr("Not Connected");
   auto status    = isConnected ? Status::Connected : Status::Disconnected;
 
+  // get the servers
+  auto servers = this->getServerList();
+
+  // get action for the server
+  const auto getAction = [=](const auto& s) {
+    if (std::get<0>(s).ip == server.ip && std::get<0>(s).port == server.port) {
+      return isConnected ? Action::Disconnect : Action::Connect;
+    } else {
+      return std::get<1>(s);
+    }
+  };
+
+  // update the server list
+  this->setServerList(
+    std::accumulate(
+      servers.begin(), servers.end(), QList<components::HostTile::Value>(),
+      [&](auto acc, const auto& s) {
+        acc.append({std::get<0>(s), getAction(s)});
+        return acc;
+      }
+    )
+  );
+
   // set the server status
   this->setStatus(groupName, status);
 }
@@ -186,7 +209,7 @@ Clipbird::Clipbird(QWidget* p) : QWidget(p) {
 
   // add  layout to this
   this->setLayout(root);
-  
+
   // set object name
   this->setObjectName("Clipbird");
 
