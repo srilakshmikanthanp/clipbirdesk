@@ -24,6 +24,15 @@ set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleAp
 # Make Available SingleApplication
 FetchContent_MakeAvailable(SingleApplication)
 
+# Fetch https://github.com/Skycoder42/QHotkey.git
+FetchContent_Declare(QHotkey
+  GIT_REPOSITORY https://github.com/Skycoder42/QHotkey.git
+  GIT_TAG bb630252684d3556b79ac7a521616692f348fcf7
+)
+
+# Make Available QHotkey
+FetchContent_MakeAvailable(QHotkey)
+
 # Fetch qzxing from libqrencode
 FetchContent_Declare(libqrencode
   GIT_REPOSITORY https://github.com/fukuchi/libqrencode.git
@@ -134,7 +143,8 @@ target_link_libraries(clipbird
   PRIVATE Qt6::Concurrent
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto
-  PRIVATE qrencode)
+  PRIVATE qrencode
+  PRIVATE QHotkey::QHotkey)
 
 # set target properties
 set_target_properties(clipbird PROPERTIES

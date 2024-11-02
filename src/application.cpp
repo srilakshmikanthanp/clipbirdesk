@@ -409,12 +409,13 @@ void Application::setQssFile(Qt::ColorScheme scheme) {
 Application::Application(int &argc, char **argv) : SingleApplication(argc, argv) {
   // create the objects of the class
   controller = new controller::ClipBird(this->getSslConfiguration());
+  hotkey     = new QHotkey(QKeySequence(constants::getAppHistoryShortcut()), true, this);
   clipbird   = new ui::gui::widgets::Clipbird();
   history    = new ui::gui::widgets::History();
   settings   = new ui::gui::widgets::Settings();
   trayMenu   = new ui::gui::TrayMenu();
   trayIcon   = new QSystemTrayIcon();
-  
+
   // On HostName successfully resolved
   const auto slot_hr = [=](QWidget* dialog, quint16 port, const auto& host) {
     // if host name is not resolved
@@ -446,7 +447,7 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   trayIcon->setContextMenu(trayMenu);
   trayIcon->setToolTip(constants::getAppName());
   trayIcon->setToolTip(QString::fromStdString(constants::getAppName()));
-  
+
   // set the signal handler for all os
   signal(SIGTERM, [](int sig) { qApp->quit(); });
   signal(SIGINT, [](int sig) { qApp->quit(); });
@@ -538,13 +539,13 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
 
   // close on tab change
   QObject::connect(
-    clipbird, &ui::gui::widgets::Clipbird::onTabChanged, 
+    clipbird, &ui::gui::widgets::Clipbird::onTabChanged,
     group, &QDialog::close
   );
 
   // close on tab change
   QObject::connect(
-    clipbird, &ui::gui::widgets::Clipbird::onTabChanged, 
+    clipbird, &ui::gui::widgets::Clipbird::onTabChanged,
     joiner, &QDialog::close
   );
 
@@ -617,6 +618,11 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   connect(
     clipbird, &ui::gui::widgets::Clipbird::connectToServer,
     controller, &controller::ClipBird::connectToServer
+  );
+
+  connect(
+    hotkey, &QHotkey::activated,
+    this, &Application::onHistoryClicked
   );
 
   // connect the dialog to window clicked signal

@@ -153,4 +153,11 @@ long long getAppMaxReadIdleTime() {
 long long getAppMaxWriteIdleTime() {
   return 10 * 1000;
 }
+
+/**
+ * @brief Used to get Keyboard shortcut for Clipbird history
+ */
+const char* getAppHistoryShortcut()  {
+  return "Ctrl+Alt+C";
+}
 }  // namespace srilakshmikanthanp::clipbirdesk::config

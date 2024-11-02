@@ -18,6 +18,7 @@
 #include <QStyleHints>
 #include <QSystemTrayIcon>
 #include <SingleApplication>
+#include <QHotkey>
 
 // C++ Headers
 #include <csignal>
@@ -138,6 +139,10 @@ class Application : public SingleApplication {
   ui::gui::TrayMenu *trayMenu;
   QSystemTrayIcon *trayIcon;
   controller::ClipBird *controller;
+
+ private:  //  Member Variables and Objects
+
+  QHotkey *hotkey;
 
  private:  // Disable Copy, Move and Assignment
 

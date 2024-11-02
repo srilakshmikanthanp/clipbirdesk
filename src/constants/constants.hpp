@@ -126,4 +126,9 @@ long long getAppMaxReadIdleTime();
  * @brief Used to get the max write idle time
  */
 long long getAppMaxWriteIdleTime();
+
+/**
+ * @brief Used to get Keyboard shortcut for Clipbird history
+ */
+const char* getAppHistoryShortcut();
 }  // namespace srilakshmikanthanp::clipbirdesk::config
