@@ -78,17 +78,17 @@ class Application : public SingleApplication {
   /**
    * @brief On Qr Code Clicked
    */
-  void onQrCodeClicked();
+  void openQrCode();
 
   /**
    * @brief On Connect Clicked
    */
-  void onConnectClicked();
+  void openConnect();
 
   /**
    * @brief On About Clicked
    */
-  void onAboutClicked();
+  void openAbout();
 
   /**
    * @brief On Open App Clicked
@@ -98,22 +98,22 @@ class Application : public SingleApplication {
   /**
    * @brief On Send Clicked
    */
-  void onSendClicked();
+  void sendClipboard();
 
   /**
    * @brief On Received Clicked
    */
-  void onHistoryClicked();
+  void openHistory();
 
   /**
    * @brief On Settings Clicked
    */
-  void onSettingsClicked();
+  void openSettings();
 
   /**
    * @brief On Reset Clicked
    */
-  void onResetClicked();
+  void resetDevices();
 
   /**
    * @brief On Tray Icon Clicked

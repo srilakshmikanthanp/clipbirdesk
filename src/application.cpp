@@ -164,7 +164,7 @@ void Application::handleAuthRequest(const types::device::Device& client) {
 /**
  * @brief On Qr Code Clicked
  */
-void Application::onQrCodeClicked() {
+void Application::openQrCode() {
   // if already visible return
   if (group->isVisible()) { return group->raise(); }
 
@@ -244,7 +244,7 @@ void Application::onQrCodeClicked() {
 /**
  * @brief On Connect Clicked
  */
-void Application::onConnectClicked() {
+void Application::openConnect() {
   // if already visible return
   if (joiner->isVisible()) { return joiner->raise(); }
 
@@ -267,7 +267,7 @@ void Application::onConnectClicked() {
 /**
  * @brief On About Clicked
  */
-void Application::onAboutClicked() {
+void Application::openAbout() {
   // if already visible return
   if (aboutUs->isVisible()) { return aboutUs->raise(); }
 
@@ -307,7 +307,7 @@ void Application::openClipbird() {
 /**
  * @brief On Send Clicked
  */
-void Application::onSendClicked() {
+void Application::sendClipboard() {
   Q_UNUSED(QtConcurrent::run([this]() {
     auto content = controller->getClipboard();
     QTimer::singleShot(0, controller, [=]() {
@@ -319,7 +319,7 @@ void Application::onSendClicked() {
 /**
  * @brief On Received Clicked
  */
-void Application::onHistoryClicked() {
+void Application::openHistory() {
   // if already visible return
   if (history->isVisible()) { return history->raise(); }
 
@@ -342,7 +342,7 @@ void Application::onHistoryClicked() {
 /**
  * @brief On Settings Clicked
  */
-void Application::onSettingsClicked() {
+void Application::openSettings() {
   // if already visible return
   if (settings->isVisible()) { return settings->raise(); }
 
@@ -365,7 +365,7 @@ void Application::onSettingsClicked() {
 /**
  * @brief On Reset Clicked
  */
-void Application::onResetClicked() {
+void Application::resetDevices() {
   controller->clearServerCertificates();
   controller->clearClientCertificates();
 }
@@ -480,19 +480,19 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   // set the signal for menus QrCode click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnQrCodeClicked,
-    this, &Application::onQrCodeClicked
+    this, &Application::openQrCode
   );
 
   // set the signal for menus Connect click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnConnectClicked,
-    this, &Application::onConnectClicked
+    this, &Application::openConnect
   );
 
   // set the signal for menus About click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnAboutClicked,
-    this, &Application::onAboutClicked
+    this, &Application::openAbout
   );
 
   // set the signal for menus Open App click
@@ -504,19 +504,19 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   // send the signal for menus Received click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnHistoryClicked,
-    this, &Application::onHistoryClicked
+    this, &Application::openHistory
   );
 
   // set the signal for menus Settings click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnSettingsClicked,
-    this, &Application::onSettingsClicked
+    this, &Application::openSettings
   );
 
   // set the signal for menus Reset click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnResetClicked,
-    this, &Application::onResetClicked
+    this, &Application::resetDevices
   );
 
   // set the signal for menus Quit click
@@ -534,7 +534,7 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   // set the signal for menus Send click
   QObject::connect(
     history, &ui::gui::widgets::History::onClipSend,
-    this, &Application::onSendClicked
+    this, &Application::sendClipboard
   );
 
   // close on tab change
@@ -622,7 +622,7 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
 
   connect(
     hotkey, &QHotkey::activated,
-    this, &Application::onHistoryClicked
+    this, &Application::openHistory
   );
 
   // connect the dialog to window clicked signal
