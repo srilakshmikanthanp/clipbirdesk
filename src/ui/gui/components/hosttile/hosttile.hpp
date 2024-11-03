@@ -17,7 +17,7 @@
 #include <tuple>
 
 // local headers
-#include "types/device/device.hpp"
+#include "types/device.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
 class HostTile : public QWidget {
@@ -31,14 +31,14 @@ class HostTile : public QWidget {
 
  public:  // typedefs
 
-  using Value = std::tuple<types::device::Device, Action>;
+  using Value = std::tuple<types::Device, Action>;
 
  signals:  // Signals
-  void onAction(std::tuple<types::device::Device, Action>);
+  void onAction(std::tuple<types::Device, Action>);
 
  private:  // Member variable
 
-  types::device::Device device;
+  types::Device device;
   Action action;
 
  private:  // Member variable

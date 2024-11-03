@@ -36,7 +36,7 @@
 
 // project headers
 #include "controller/clipbird/clipbird.hpp"
-#include "types/device/device.hpp"
+#include "types/device.hpp"
 #include "ui/gui/components/status/status.hpp"
 #include "ui/gui/components/hostlist/hostlist.hpp"
 
@@ -82,9 +82,9 @@ class Clipbird : public QWidget {
 
  signals:  // signals
 
-  void disconnectFromServer(types::device::Device server);
-  void disconnectClient(types::device::Device client);
-  void connectToServer(types::device::Device server);
+  void disconnectFromServer(types::Device server);
+  void disconnectClient(types::Device client);
+  void connectToServer(types::Device server);
   void onTabChanged(Tabs tab);  // emit when tab changed
 
  private:  // private slots
@@ -92,7 +92,7 @@ class Clipbird : public QWidget {
   /**
    * @brief handle the host action from the window
    */
-  void handleHostAction(Tabs t, std::tuple<types::device::Device, Action> h);
+  void handleHostAction(Tabs t, std::tuple<types::Device, Action> h);
 
   /**
    * @brief Handle the Client Tab Change
@@ -109,27 +109,27 @@ class Clipbird : public QWidget {
    */
   void setUpLanguage();
 
- public: 
+ public:
 
   /**
    * @brief Handle the Server List Item Clicked
    */
-  void handleServerListChange(std::optional<types::device::Device> server, QList<types::device::Device> servers);
+  void handleServerListChange(std::optional<types::Device> server, QList<types::Device> servers);
 
   /**
    * @brief Handle the server status change
    */
-  void handleServerStatusChanged(bool status, types::device::Device server);
+  void handleServerStatusChanged(bool status, types::Device server);
 
   /**
    * @brief Handle the Server State Change
    */
-  void handleServerStateChange(types::device::Device serverInfo, bool isStarted);
+  void handleServerStateChange(types::Device serverInfo, bool isStarted);
 
   /**
    * @brief Handle the Client List Item Clicked
    */
-  void handleClientListChange(QList<types::device::Device> clients);
+  void handleClientListChange(QList<types::Device> clients);
 
  public:
 
@@ -164,22 +164,22 @@ class Clipbird : public QWidget {
   /**
    * @brief Set the Server List object
    */
-  void setClientList(const QList<std::tuple<types::device::Device, Action>>& hosts);
+  void setClientList(const QList<std::tuple<types::Device, Action>>& hosts);
 
   /**
    * @brief Get the Server List object
    */
-  QList<std::tuple<types::device::Device, Action>> getClientList();
+  QList<std::tuple<types::Device, Action>> getClientList();
 
   /**
    * @brief Add Server to the list
    */
-  void addClient(std::tuple<types::device::Device, Action> host);
+  void addClient(std::tuple<types::Device, Action> host);
 
   /**
    * @brief Remove a Server from the list
    */
-  void removeClient(std::tuple<types::device::Device, Action> host);
+  void removeClient(std::tuple<types::Device, Action> host);
 
   /**
    * @brief Remove all servers from the list
@@ -191,22 +191,22 @@ class Clipbird : public QWidget {
   /**
    * @brief Set the Server List object
    */
-  void setServerList(const QList<std::tuple<types::device::Device, Action>>& hosts);
+  void setServerList(const QList<std::tuple<types::Device, Action>>& hosts);
 
   /**
    * @brief Get the Server List from the tab
    */
-  QList<std::tuple<types::device::Device, Action>> getServerList();
+  QList<std::tuple<types::Device, Action>> getServerList();
 
   /**
    * @brief Add Server to the list
    */
-  void addServer(std::tuple<types::device::Device, Action> host);
+  void addServer(std::tuple<types::Device, Action> host);
 
   /**
    * @brief Remove a Server from the list
    */
-  void removeServer(std::tuple<types::device::Device, Action> host);
+  void removeServer(std::tuple<types::Device, Action> host);
 
   /**
    * @brief Remove all servers from the list

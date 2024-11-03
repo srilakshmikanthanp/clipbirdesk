@@ -119,7 +119,7 @@ void Application::handleTabChange(ui::gui::widgets::Clipbird::Tabs tab) {
  *
  * @param client
  */
-void Application::handleAuthRequest(const types::device::Device& client) {
+void Application::handleAuthRequest(const types::Device& client) {
   // get the user input
   ui::gui::notify::JoinRequest* toast = new ui::gui::notify::JoinRequest(this);
 
@@ -571,7 +571,7 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
 
   // connect signal for Settings Change
   connect(
-    settings, &ui::gui::widgets::Settings::closeWindowOnFocusOut,
+    settings, &ui::gui::widgets::Settings::onEasyHideChange,
     controller, &controller::ClipBird::setEasyHide
   );
 

@@ -23,7 +23,7 @@
 // Local headers
 #include "network/service/service.hpp"
 #include "types/enums/enums.hpp"
-#include "types/device/device.hpp"
+#include "types/device.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"
@@ -36,19 +36,19 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 class Client : public service::mdnsBrowser {
  signals:  // signals for this class
   /// @brief On Server List Changed
-  void OnServerListChanged(std::optional<types::device::Device> server, QList<types::device::Device> servers);
+  void OnServerListChanged(std::optional<types::Device> server, QList<types::Device> servers);
 
  signals:  // signals for this class
   /// @brief On Server Found
-  void OnServerFound(types::device::Device);
+  void OnServerFound(types::Device);
 
  signals:  // signals for this class
   /// @brief On Server Gone
-  void OnServerGone(types::device::Device);
+  void OnServerGone(types::Device);
 
  signals:  // signals for this class
   /// @brief On Server state changed
-  void OnServerStatusChanged(bool isConnected, types::device::Device server);
+  void OnServerStatusChanged(bool isConnected, types::Device server);
 
  signals:  // signals for this class
   /// @brief On Connection Error
@@ -81,7 +81,7 @@ class Client : public service::mdnsBrowser {
   QSslConfiguration m_ssl_config;
 
   /// @brief List of Found servers
-  QList<types::device::Device> m_servers;
+  QList<types::Device> m_servers;
 
   /// @brief Timer to send ping packet
   QTimer* m_pingTimer = new QTimer(this);
@@ -223,7 +223,7 @@ class Client : public service::mdnsBrowser {
    *
    * @return QList<QPair<QHostAddress, quint16>> List of servers
    */
-  QList<types::device::Device> getServerList() const;
+  QList<types::Device> getServerList() const;
 
   /**
    * @brief Connect to the server with the given host and port
@@ -232,7 +232,7 @@ class Client : public service::mdnsBrowser {
    * @param host Host address
    * @param port Port number
    */
-  void connectToServerSecured(types::device::Device server);
+  void connectToServerSecured(types::Device server);
 
   /**
    * @brief Connect to the server with the given host and port
@@ -241,12 +241,12 @@ class Client : public service::mdnsBrowser {
    * @param host Host address
    * @param port Port number
    */
-  void connectToServer(types::device::Device client);
+  void connectToServer(types::Device client);
 
   /**
    * @brief Get the Connection Host and Port object
    */
-  std::optional<types::device::Device> getConnectedServer() const;
+  std::optional<types::Device> getConnectedServer() const;
 
   /**
    * @brief Disconnect from the server
@@ -267,7 +267,7 @@ class Client : public service::mdnsBrowser {
    * @param host Host address
    * @param port Port number
    */
-  void onServiceAdded(types::device::Device server) override;
+  void onServiceAdded(types::Device server) override;
 
   /**
    * @brief On server removed function that That Called by the
@@ -275,6 +275,6 @@ class Client : public service::mdnsBrowser {
    *
    * @param server
    */
-  void onServiceRemoved(types::device::Device server) override;
+  void onServiceRemoved(types::Device server) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

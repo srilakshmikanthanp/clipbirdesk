@@ -68,7 +68,7 @@ JoinRequest::JoinRequest(QObject *parent) : QObject(parent) {
 /**
  * @brief Show the notification
  */
-void JoinRequest::show(const types::device::Device &device) {
+void JoinRequest::show(const types::Device &device) {
   auto icon = QDir::tempPath() + QDir::separator() + QUuid::createUuid().toString(QUuid::StringFormat::Id128) + ".png";
   auto body = QObject::tr("%1 wants to Join to your Group").arg(device.name).toStdString();
 

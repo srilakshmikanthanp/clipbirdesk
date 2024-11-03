@@ -3,7 +3,7 @@
 #include <QHostAddress>
 #include <QSslCertificate>
 
-namespace srilakshmikanthanp::clipbirdesk::types::device {
+namespace srilakshmikanthanp::clipbirdesk::types {
 /**
  * @brief Device Class That Represents Device
  */
@@ -17,4 +17,4 @@ struct Device {
   quint16 port;
   QString name;
 };
-}  // namespace srilakshmikanthanp::types::device
+}  // namespace srilakshmikanthanp::types

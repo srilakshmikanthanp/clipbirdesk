@@ -57,7 +57,7 @@ JoinRequest::JoinRequest(QObject *parent) : QObject(parent) {
 /**
  * @brief Show the notification
  */
-void JoinRequest::show(const types::device::Device &device) {
+void JoinRequest::show(const types::Device &device) {
   auto toast = WinToastLib::WinToastTemplate(WinToastLib::WinToastTemplate::ImageAndText01);
   auto text  = QObject::tr("%1 wants to Join to your Group").arg(device.name);
   toast.setTextField(text.toStdWString(), WinToastLib::WinToastTemplate::FirstLine);

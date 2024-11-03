@@ -21,7 +21,7 @@ void Clipbird::handleHostAction(Tabs t, components::HostTile::Value h) {
 /**
  * @brief Handle the Client List Item Clicked
  */
-void Clipbird::handleClientListChange(QList<types::device::Device> clients) {
+void Clipbird::handleClientListChange(QList<types::Device> clients) {
   // Create a list of tuple with Action
   QList<components::HostTile::Value> clients_m;
 
@@ -66,7 +66,7 @@ void Clipbird::handleTabChangeForServer(Tabs tab) {
 /**
  * @brief Handle the Server State Change
  */
-void Clipbird::handleServerStateChange(types::device::Device serverInfo, bool isStarted) {
+void Clipbird::handleServerStateChange(types::Device serverInfo, bool isStarted) {
   // infer the status from the server state
   auto status = isStarted ? Status::Active : Status::Inactive;
 
@@ -77,7 +77,7 @@ void Clipbird::handleServerStateChange(types::device::Device serverInfo, bool is
 /**
  * @brief Handle the Server List Item Clicked
  */
-void Clipbird::handleServerListChange(std::optional<types::device::Device> server, QList<types::device::Device> servers) {
+void Clipbird::handleServerListChange(std::optional<types::Device> server, QList<types::Device> servers) {
   // Create a list of tuple with Action
   QList<components::HostTile::Value> serversTile;
 
@@ -108,7 +108,7 @@ void Clipbird::handleServerListChange(std::optional<types::device::Device> serve
 /**
  * @brief Handle the server status change
  */
-void Clipbird::handleServerStatusChanged(bool isConnected, types::device::Device server) {
+void Clipbird::handleServerStatusChanged(bool isConnected, types::Device server) {
   // infer the status from the server state
   auto groupName = isConnected ? server.name : QObject::tr("Not Connected");
   auto status    = isConnected ? Status::Connected : Status::Disconnected;

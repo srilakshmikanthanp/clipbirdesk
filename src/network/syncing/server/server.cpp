@@ -21,7 +21,7 @@ void Server::processPendingConnections() {
     QObject::connect(client, signal_d, this, slot_d);
 
     // create device object of the client
-    auto device = types::device::Device {
+    auto device = types::Device {
       addr, port, name
     };
 
@@ -106,7 +106,7 @@ void Server::processDisconnection() {
   auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
   // create the device
-  auto device = types::device::Device {
+  auto device = types::Device {
     addr, port, name
   };
 
@@ -396,9 +396,9 @@ void Server::syncItems(QVector<QPair<QString, QByteArray>> items) {
  *
  * @return QList<QSslSocket*> List of clients
  */
-QList<types::device::Device> Server::getConnectedClientsList() const {
+QList<types::Device> Server::getConnectedClientsList() const {
   // List of clients that are connected
-  QList<types::device::Device> list;
+  QList<types::Device> list;
 
   // iterate through the list of clients
   for (auto c : m_clients) {
@@ -416,7 +416,7 @@ QList<types::device::Device> Server::getConnectedClientsList() const {
  *
  * @param client Client to disconnect
  */
-void Server::disconnectClient(types::device::Device client) {
+void Server::disconnectClient(types::Device client) {
   // matcher lambda function to find the client
   const auto matcher = [&client](QSslSocket *c) {
     return (c->peerAddress() == client.ip) && (c->peerPort() == client.port);
@@ -440,9 +440,9 @@ void Server::disconnectAllClients() {
 /**
  * @brief Get the Server QHostAddress & Port
  *
- * @return types::device::Device
+ * @return types::Device
  */
-types::device::Device Server::getServerInfo() const {
+types::Device Server::getServerInfo() const {
   auto cert = m_server->sslConfiguration().localCertificate();
   auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
   return { m_server->serverAddress(), m_server->serverPort(), name };
@@ -522,7 +522,7 @@ void Server::stopServer() {
 /**
  * @brief Get the Device Certificate
  */
-QSslCertificate Server::getUnauthedClientCert(types::device::Device device) const {
+QSslCertificate Server::getUnauthedClientCert(types::Device device) const {
   // matcher lambda function to find the client
   const auto matcher = [&device](QSslSocket *c) {
     return (c->peerAddress() == device.ip) && (c->peerPort() == device.port);
@@ -542,7 +542,7 @@ QSslCertificate Server::getUnauthedClientCert(types::device::Device device) cons
 /**
  * @brief Get the Device Certificate
  */
-QSslCertificate Server::getClientCert(types::device::Device device) const {
+QSslCertificate Server::getClientCert(types::Device device) const {
   // matcher lambda function to find the client
   const auto matcher = [&device](QSslSocket *c) {
     return (c->peerAddress() == device.ip) && (c->peerPort() == device.port);
@@ -564,7 +564,7 @@ QSslCertificate Server::getClientCert(types::device::Device device) const {
  *
  * @param client the client that is currently processed
  */
-void Server::authSuccess(types::device::Device device) {
+void Server::authSuccess(types::Device device) {
   // Matcher Lambda Function to find the client
   const auto matcher = [&device](QSslSocket *c) {
     return (c->peerAddress() == device.ip) && (c->peerPort() == device.port);
@@ -616,7 +616,7 @@ void Server::authSuccess(types::device::Device device) {
  *
  * @param client the client that is currently processed
  */
-void Server::authFailed(types::device::Device device) {
+void Server::authFailed(types::Device device) {
   // Matcher Lambda Function to find the client
   const auto matcher = [&device](QSslSocket *c) {
     return (c->peerAddress() == device.ip) && (c->peerPort() == device.port);

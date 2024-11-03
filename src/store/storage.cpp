@@ -265,7 +265,7 @@ bool Storage::getHostIsServer() {
  */
 void Storage::setEasyHide(bool value) {
   settings->beginGroup(commonGroup);
-  settings->setValue(closeWindowOnFocusOutKey, value);
+  settings->setValue(easyHideKey, value);
   settings->endGroup();
 }
 
@@ -274,7 +274,7 @@ void Storage::setEasyHide(bool value) {
  */
 bool Storage::getEasyHide() const {
   settings->beginGroup(commonGroup);
-  auto value = settings->value(closeWindowOnFocusOutKey);
+  auto value = settings->value(easyHideKey);
   settings->endGroup();
   if (value.isNull()) {
     return true;

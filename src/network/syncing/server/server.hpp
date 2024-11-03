@@ -10,7 +10,7 @@
 #include <QVector>
 
 #include "network/service/service.hpp"
-#include "types/device/device.hpp"
+#include "types/device.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
@@ -24,16 +24,16 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 class Server : public service::mdnsRegister {
  signals:  // signals for this class
   /// @brief On Server State Changed
-  void OnServerStateChanged(types::device::Device serverInfo, bool started);
+  void OnServerStateChanged(types::Device serverInfo, bool started);
 
 
  signals:  // signals
   /// @brief On client state changed
-  void OnCLientStateChanged(types::device::Device, bool connected);
+  void OnCLientStateChanged(types::Device, bool connected);
 
  signals:  // signals for this class
   /// @brief On Sync Request
-  void OnAuthRequest(types::device::Device client);
+  void OnAuthRequest(types::Device client);
 
  signals:  // signals
   /// @brief On Sync Request
@@ -41,7 +41,7 @@ class Server : public service::mdnsRegister {
 
  signals:  // signals for this class
   /// @brief On Sync Request
-  void OnClientListChanged(QList<types::device::Device> clients);
+  void OnClientListChanged(QList<types::Device> clients);
 
  private:  // just for Qt
 
@@ -193,7 +193,7 @@ class Server : public service::mdnsRegister {
   /**
    * @brief Get the Clients that are connected to the server
    */
-  QList<types::device::Device> getConnectedClientsList() const;
+  QList<types::Device> getConnectedClientsList() const;
 
   /**
    * @brief Disconnect the client from the server and delete
@@ -201,7 +201,7 @@ class Server : public service::mdnsRegister {
    *
    * @param client Client to disconnect
    */
-  void disconnectClient(types::device::Device client);
+  void disconnectClient(types::Device client);
 
   /**
    * @brief Disconnect the all the clients from the server
@@ -211,9 +211,9 @@ class Server : public service::mdnsRegister {
   /**
    * @brief Get the Server QHostAddress & Port
    *
-   * @return types::device::Device
+   * @return types::Device
    */
-  types::device::Device getServerInfo() const;
+  types::Device getServerInfo() const;
 
   /**
    * @brief Set the SSL Configuration object
@@ -242,19 +242,19 @@ class Server : public service::mdnsRegister {
   /**
    * @brief Get the Device Certificate
    */
-  QSslCertificate getUnauthedClientCert(types::device::Device device) const;
+  QSslCertificate getUnauthedClientCert(types::Device device) const;
 
   /**
    * @brief Get the Device Certificate
    */
-  QSslCertificate getClientCert(types::device::Device device) const;
+  QSslCertificate getClientCert(types::Device device) const;
 
   /**
    * @brief The function that is called when the client is authenticated
    *
    * @param client the client that is currently processed
    */
-  void authSuccess(types::device::Device device);
+  void authSuccess(types::Device device);
 
   /**
    * @brief The function that is called when the client it not
@@ -262,7 +262,7 @@ class Server : public service::mdnsRegister {
    *
    * @param client the client that is currently processed
    */
-  void authFailed(types::device::Device device);
+  void authFailed(types::Device device);
 
  protected:  // override functions from the base class
 

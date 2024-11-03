@@ -71,7 +71,7 @@ class Application : public SingleApplication {
   /**
    * @brief Handle the Client auth Request
    */
-  void handleAuthRequest(const types::device::Device& client);
+  void handleAuthRequest(const types::Device& client);
 
   //----------------------------- slots for Tray ----------------------------//
 

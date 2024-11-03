@@ -17,10 +17,11 @@ class Storage : public QObject {
 
  private:  // keys
 
-  const char *hostStateKey             = "hostState";
-  const char *hostKeyKey               = "hostKey";
-  const char *hostCertificateKey       = "hostCert";
-  const char *closeWindowOnFocusOutKey = "closeWindowOnFocusOut";
+  const char *hostStateKey       = "hostState";
+  const char *hostKeyKey         = "hostKey";
+  const char *hostCertificateKey = "hostCert";
+  const char *proxyKey           = "proxy";
+  const char *easyHideKey        = "easyHide";
 
  private:  // qt
 
@@ -159,5 +160,4 @@ class Storage : public QObject {
    */
   static Storage &instance();
 };
-
 }  // namespace srilakshmikanthanp::clipbirdesk::storage

@@ -193,5 +193,4 @@
     "qclipboard": "cpp",
     "qtwaylandclientversion": "cpp"
   },
-  "clang-format.executable": "clang-format-15",
 }

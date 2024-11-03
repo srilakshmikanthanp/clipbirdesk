@@ -17,7 +17,7 @@
 #include <tuple>
 
 // local headers
-#include "types/device/device.hpp"
+#include "types/device.hpp"
 #include "ui/gui/components/hosttile/hosttile.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {

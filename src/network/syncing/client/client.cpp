@@ -112,7 +112,7 @@ void Client::processAuthentication(const packets::Authentication& packet) {
   auto port = m_ssl_socket->peerPort();
   auto cert = m_ssl_socket->peerCertificate();
   auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
-  auto host = types::device::Device({addr, port, name});
+  auto host = types::Device({addr, port, name});
 
   // emit the signal
   emit OnServerStatusChanged(true, host);
@@ -193,7 +193,7 @@ void Client::processDisconnection() {
   auto port = m_ssl_socket->peerPort();
   auto cert = m_ssl_socket->peerCertificate();
   auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
-  auto host = types::device::Device({addr, port, name});
+  auto host = types::Device({addr, port, name});
 
   // emit the signal
   emit OnServerStatusChanged(false, host);
@@ -468,7 +468,7 @@ void Client::syncItems(QVector<QPair<QString, QByteArray>> items) {
  *
  * @return QList<QPair<QHostAddress, quint16>> List of servers
  */
-QList<types::device::Device> Client::getServerList() const {
+QList<types::Device> Client::getServerList() const {
   return m_servers;
 }
 
@@ -479,7 +479,7 @@ QList<types::device::Device> Client::getServerList() const {
  * @param host Host address
  * @param port Port number
  */
-void Client::connectToServer(types::device::Device server) {
+void Client::connectToServer(types::Device server) {
   // if Discover Configuration is null the return
   if (this->m_ssl_config.isNull()) {
     throw std::runtime_error("SSL Config Config is not set");
@@ -517,7 +517,7 @@ void Client::connectToServer(types::device::Device server) {
 /**
  * @brief Connect to server Secured
  */
-void Client::connectToServerSecured(types::device::Device server) {
+void Client::connectToServerSecured(types::Device server) {
   // if Discover Configuration is null the return
   if (this->m_ssl_config.isNull()) {
     throw std::runtime_error("SSL Config Config is not set");
@@ -556,10 +556,10 @@ void Client::connectToServerSecured(types::device::Device server) {
  * @brief Get the Connection Host and Port object
  * @return QPair<QHostAddress, quint16>
  */
-std::optional<types::device::Device> Client::getConnectedServer() const {
+std::optional<types::Device> Client::getConnectedServer() const {
   // check if the socket is connected else throw error
   if (this->m_ssl_socket->state() != QAbstractSocket::ConnectedState) {
-    return std::optional<types::device::Device>();
+    return std::optional<types::Device>();
   }
 
   // peer server details
@@ -569,7 +569,7 @@ std::optional<types::device::Device> Client::getConnectedServer() const {
   auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
   // return the host address and port number
-  return std::optional<types::device::Device>({addr, port, name});
+  return std::optional<types::Device>({addr, port, name});
 }
 
 /**
@@ -599,7 +599,7 @@ QSslCertificate Client::getConnectedServerCertificate() const{
  * @param host Host address
  * @param port Port number
  */
-void Client::onServiceAdded(types::device::Device server) {
+void Client::onServiceAdded(types::Device server) {
   // if Discover Configuration is null the return
   if (this->m_ssl_config.isNull()) {
     throw std::runtime_error("SSL Config Config is not set");
@@ -624,9 +624,9 @@ void Client::onServiceAdded(types::device::Device server) {
  * @brief On server removed function that That Called by the
  * discovery client when the server is removed
  */
-void Client::onServiceRemoved(types::device::Device server) {
+void Client::onServiceRemoved(types::Device server) {
   // matcher to get the Device from servers list
-  auto matcher = [server](const types::device::Device& device) {
+  auto matcher = [server](const types::Device& device) {
     return device == server;
   };
 

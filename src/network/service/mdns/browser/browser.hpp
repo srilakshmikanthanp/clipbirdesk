@@ -29,7 +29,7 @@
 // Local headers
 #include "constants/constants.hpp"
 #include "types/enums/enums.hpp"
-#include "types/device/device.hpp"
+#include "types/device.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
 // Platform headers
@@ -141,7 +141,7 @@ class Browser : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServiceAdded(types::device::Device)   = 0;
+  virtual void onServiceAdded(types::Device)   = 0;
 
   /**
    * @brief On Server Removed abstract function that
@@ -150,7 +150,7 @@ class Browser : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServiceRemoved(types::device::Device) = 0;
+  virtual void onServiceRemoved(types::Device) = 0;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd
 #endif

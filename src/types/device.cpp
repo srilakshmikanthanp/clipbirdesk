@@ -1,6 +1,6 @@
 #include "device.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::types::device {
+namespace srilakshmikanthanp::clipbirdesk::types {
 /**
  * @brief operator overloading for ==
  */
@@ -14,4 +14,4 @@ bool Device::operator==(const Device& other) const {
 bool Device::operator!=(const Device& other) const {
   return !(*this == other);
 }
-}  // namespace srilakshmikanthanp::types::device
+}  // namespace srilakshmikanthanp::types

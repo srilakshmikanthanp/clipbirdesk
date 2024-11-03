@@ -15,7 +15,7 @@
 #include "network/syncing/client/client.hpp"
 #include "network/syncing/server/server.hpp"
 #include "store/storage.hpp"
-#include "types/device/device.hpp"
+#include "types/device.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::controller {
 class ClipBird : public QObject {
@@ -23,15 +23,15 @@ class ClipBird : public QObject {
 
  signals:  // signals for this class
   /// @brief On Server List Changed (From Client)
-  void OnServerListChanged(std::optional<types::device::Device> server, QList<types::device::Device> servers);
+  void OnServerListChanged(std::optional<types::Device> server, QList<types::Device> servers);
 
  signals:  // signals for this class
   /// @brief On Server Found  (From Client)
-  void OnServerFound(types::device::Device server);
+  void OnServerFound(types::Device server);
 
  signals:  // signals for this class
   /// @brief On Server Gone
-  void OnServerGone(types::device::Device);
+  void OnServerGone(types::Device);
 
  signals:  // signals for this class
   /// @brief On Connection Error
@@ -39,25 +39,25 @@ class ClipBird : public QObject {
 
  signals:  // signals for this class
   /// @brief On Server state changed (From Client)
-  void OnServerStatusChanged(bool isConnected, types::device::Device);
+  void OnServerStatusChanged(bool isConnected, types::Device);
 
   //----------------------- server Signals ------------------------//
 
  signals:  // signals for this class
   /// @brief On Server state changed (From Server)
-  void OnServerStateChanged(types::device::Device serverInfo, bool isStarted);
+  void OnServerStateChanged(types::Device serverInfo, bool isStarted);
 
  signals:  // signals
   /// @brief On client state changed (From Server)
-  void OnCLientStateChanged(types::device::Device client, bool connected);
+  void OnCLientStateChanged(types::Device client, bool connected);
 
  signals:  // signals for this class
   /// @brief On Sync Request
-  void OnAuthRequest(types::device::Device client);
+  void OnAuthRequest(types::Device client);
 
  signals:  // signals for this class
   /// @brief On Sync Request  (From Server)
-  void OnClientListChanged(QList<types::device::Device> clients);
+  void OnClientListChanged(QList<types::Device> clients);
 
   //----------------------- Common Signals ------------------------//
 
@@ -92,19 +92,19 @@ class ClipBird : public QObject {
  private:  // private slots
 
   /// @brief Handle Client State Changes (From server)
-  void handleClientStateChanged(types::device::Device client, bool connected);
+  void handleClientStateChanged(types::Device client, bool connected);
 
   /// @brief Handle On Server Disconnect (From client)
-  void handleServerStatusChanged(bool status, types::device::Device host);
+  void handleServerStatusChanged(bool status, types::Device host);
 
   /// @brief Handle the Server Found (From client)
-  void handleServerFound(types::device::Device server);
+  void handleServerFound(types::Device server);
 
   /// @brief Handle the sync request (From server)
   void handleSyncRequest(QVector<QPair<QString, QByteArray>> data);
 
   /// @brief Handle the Auth Request (From Server)
-  void handleAuthRequest(types::device::Device host);
+  void handleAuthRequest(types::Device host);
 
  private: // private functions
 
@@ -169,7 +169,7 @@ class ClipBird : public QObject {
    *
    * @return QList<QSslSocket*> List of clients
    */
-  QList<types::device::Device> getConnectedClientsList() const;
+  QList<types::Device> getConnectedClientsList() const;
 
   /**
    * @brief Disconnect the client from the server and delete
@@ -177,7 +177,7 @@ class ClipBird : public QObject {
    * @param host ip address of the client
    * @param ip port number of the client
    */
-  void disconnectClient(const types::device::Device &client);
+  void disconnectClient(const types::Device &client);
 
   /**
    * @brief Disconnect the all the clients from the server
@@ -187,7 +187,7 @@ class ClipBird : public QObject {
   /**
    * @brief Get the server QHostAddress and port
    */
-  types::device::Device getServerInfo() const;
+  types::Device getServerInfo() const;
 
   /**
    * @brief Dispose Server
@@ -199,7 +199,7 @@ class ClipBird : public QObject {
    *
    * @param client the client that is currently processed
    */
-  void authSuccess(const types::device::Device &client);
+  void authSuccess(const types::Device &client);
 
   /**
    * @brief The function that is called when the client it not
@@ -207,16 +207,16 @@ class ClipBird : public QObject {
    *
    * @param client the client that is currently processed
    */
-  void authFailed(const types::device::Device &client);
+  void authFailed(const types::Device &client);
 
   //---------------------- Client functions -----------------------//
 
   /**
    * @brief Get the Server List object
    *
-   * @return QList<types::device::Device> List of servers
+   * @return QList<types::Device> List of servers
    */
-  QList<types::device::Device> getServerList() const;
+  QList<types::Device> getServerList() const;
 
   /**
    * @brief Connect to the server with the given host and port
@@ -225,7 +225,7 @@ class ClipBird : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  void connectToServer(const types::device::Device &host);
+  void connectToServer(const types::Device &host);
 
   /**
    * @brief Dispose Client
@@ -235,14 +235,14 @@ class ClipBird : public QObject {
   /**
    * @brief get the connected server address and port
    *
-   * @return types::device::Device address and port
+   * @return types::Device address and port
    */
-  std::optional<types::device::Device> getConnectedServer() const;
+  std::optional<types::Device> getConnectedServer() const;
 
   /**
    * @brief Disconnect from the server
    */
-  void disconnectFromServer(const types::device::Device &host);
+  void disconnectFromServer(const types::Device &host);
 
   //----------------------- Common functions -------------------------//
 

@@ -14,13 +14,11 @@ Settings::Settings(QWidget * parent): QWidget(parent) {
   this->layout->addWidget(this->label, Qt::AlignCenter);
   this->label->setAlignment(Qt::AlignCenter);
 
+  // Easy Hide
   QHBoxLayout* easyHideLayout = new QHBoxLayout();
   easyHideLayout->addWidget(this->easyHideLabel);
   easyHideLayout->addWidget(this->easyHideCheckBox);
-  QWidget* easyHideWidget = new QWidget();
-  easyHideWidget->setLayout(easyHideLayout);
-  easyHideWidget->setObjectName("Item");
-  this->layout->addWidget(easyHideWidget);
+  this->layout->addLayout(easyHideLayout);
 
   this->setLayout(this->layout);
   this->setUpLanguage();
@@ -28,7 +26,7 @@ Settings::Settings(QWidget * parent): QWidget(parent) {
   QObject::connect(
     this->easyHideCheckBox, &QCheckBox::stateChanged,
     this, [this](int state) {
-      emit this->closeWindowOnFocusOut(state == Qt::Checked);
+      emit this->onEasyHideChange(state == Qt::Checked);
     }
   );
 }

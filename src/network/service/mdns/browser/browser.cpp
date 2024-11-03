@@ -172,7 +172,7 @@ void Browser::addedCallback(
 void Browser::removeCallback(QString serviceName) {
   // remove the service name from service map
   auto service = this->serviceMap.find(serviceName);
-  auto device = types::device::Device();
+  auto device = types::Device();
 
   // if not found
   if (service == this->serviceMap.end()) {

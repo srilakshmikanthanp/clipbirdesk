@@ -1,13 +1,14 @@
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
 // Qt header
+#include <QCheckBox>
 #include <QDialog>
-#include <QPainterPath>
-#include <QPainter>
-#include <QScreen>
 #include <QGuiApplication>
 #include <QLabel>
-#include <QCheckBox>
+#include <QPainter>
+#include <QPainterPath>
+#include <QScreen>
+#include <QTextEdit>
 #include <QVBoxLayout>
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets {
@@ -20,16 +21,17 @@ class Settings : public QWidget {
 
   Q_OBJECT
 
- private:  // Member Variables
+ private:  // Member Variables (UI)
 
-  QVBoxLayout* layout = new QVBoxLayout();
-  QLabel* label = new QLabel(tr("Settings"));
-  QLabel* easyHideLabel = new QLabel();
-  QCheckBox* easyHideCheckBox = new QCheckBox();
+  QVBoxLayout* layout              = new QVBoxLayout();
+  QLabel* label                    = new QLabel(tr("Settings"));
+
+  QLabel* easyHideLabel            = new QLabel();
+  QCheckBox* easyHideCheckBox      = new QCheckBox();
 
  signals:  // signals
 
-  void closeWindowOnFocusOut(bool value);
+  void onEasyHideChange(bool value);
 
  private:  // Member Functions
 
@@ -40,12 +42,12 @@ class Settings : public QWidget {
 
  public:
 
- /**
-  * @brief Construct a new Abstract object
-  *
-  * @param parent
-  */
-  explicit Settings(QWidget * parent = nullptr);
+  /**
+   * @brief Construct a new Abstract object
+   *
+   * @param parent
+   */
+  explicit Settings(QWidget* parent = nullptr);
 
   /**
    * @brief Destroy the Status object
@@ -67,6 +69,6 @@ class Settings : public QWidget {
   /**
    * @brief Override change event
    */
-  void changeEvent(QEvent *) override;
+  void changeEvent(QEvent*) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets
