@@ -295,7 +295,7 @@ void Application::openClipbird() {
   this->clipbird->setFixedSize(constants::getAppWindowSize());
 
   // set the icon to content
-  this->clipbird->setWindowIcon(QIcon(constants::getAppLogo()));
+  this->clipbird->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
 
   // set the title
   this->clipbird->setWindowTitle(constants::getAppName());

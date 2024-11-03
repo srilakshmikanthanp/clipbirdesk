@@ -1,3 +1,18 @@
+# set the main.qss path variable (Light)
+set(APPLICATION_LIGHT_QSS_PATH ":/styles/light.qss")
+
+# set the main.qss path variable (Dark)
+set(APPLICATION_DARK_QSS_PATH ":/styles/dark.qss")
+
+# Set the logo.ico path variable
+set(APPLICATION_LOGO_PATH ":/images/logo.ico")
+
+# Set the BBONJOUR_DIR from env
+set(BONJOUR_SDK_HOME $ENV{BONJOUR_SDK_HOME})
+
+# set OPENSSL_ROOT_DIR
+set(OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT_DIR})
+
 # Fetch https://github.com/mohabouje/WinToast.git only if windows
 if (WIN32)
   FetchContent_Declare(WinToast
