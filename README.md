@@ -89,15 +89,13 @@ Clipbird Software helps you to sync your clipboard data between devices connecte
 
 To Install Clipbird on your system, you can either download the installer from the release or build it from the source. The following steps will guide you through the installation process.
 
-### Installing Clipbird on an Android Platform
-
-Follow the instructions on the [clipbirdroid](https://github.com/srilakshmikanthanp/clipbirdroid) repository to install Clipbird on your Android system.
-
-### Installing Clipbird on a Windows Platform
+### Installing Clipbird
 
 Just go to Github Release choose the suitable version for your system and download it. Then install it in your system.
 
-### Building Clipbird on a Windows Platform
+_For Android, you can download it from [clipbirdroid](https://github.com/srilakshmikanthanp/clipbirdroid)_
+
+### Building Clipbird on a Windows
 
 In the following steps, we will see how to build the project in the Windows platform, We use choco to install the dependencies. If you don't have choco installed in your system, you can install it from [here](https://chocolatey.org/install).
 
@@ -134,7 +132,7 @@ Just go to [Bonjour](https://developer.apple.com/bonjour/) and download the Bonj
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Building Clipbird on a Linux Platform
+### Building Clipbird on a Linux
 
 Limitations on wayland,
 
