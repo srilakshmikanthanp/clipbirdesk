@@ -29,65 +29,6 @@
 namespace srilakshmikanthanp::clipbirdesk {
 /**
  * @brief Custom event filter for the application that
- * captures window shown event and if the window is decorated
- * apply some attributes to the window
- */
-class AppEventFilter : public QObject {
- private:
-
-  virtual bool eventFilter(QObject *o, QEvent *e) {
-    // if esc 
-    if (e->type() == QEvent::KeyPress) {
-      QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
-      QWidget *window = dynamic_cast<QWidget *>(o);
-      if (keyEvent && window && keyEvent->key() == Qt::Key_Escape) {
-        handleEscKeyPressEvent(window);
-      }
-    }
-
-    if (e->type() == QEvent::WindowActivate) {
-      QWidget *window = dynamic_cast<QWidget *>(o);
-      if (window) {
-        handleWindowShownEvent(window);
-      }
-    }
-
-    return QObject::eventFilter(o, e);
-  }
-
-  void handleWindowShownEvent(QWidget *window) {
-    if (!(window->windowFlags() & Qt::FramelessWindowHint)) {
-      ui::gui::utilities::setPlatformAttributes(window);
-    }
-  }
-
-  void handleEscKeyPressEvent(QWidget *window) {
-    if (controller->getEasyHide() && window->isWindow()) {
-      window->hide();
-    }
-  }
-
- private:
-
-  controller::ClipBird *controller;
-
- public:
-
-  /**
-   * @brief Destroy the Clipbird Application Event Filter object
-   */
-  virtual ~AppEventFilter() = default;
-
-  /**
-   * @brief Construct a new Clipbird Application Event Filter object
-   */
-  AppEventFilter(controller::ClipBird *controller) : controller(controller) {
-    // Nothing to do
-  }
-};
-
-/**
- * @brief Custom event filter for the application that
  * captures Native event and if the device is going to sleep
  * or wake up disconnect
  */
@@ -158,6 +99,65 @@ class NativeEventFilter : public QAbstractNativeEventFilter {
    */
   NativeEventFilter(controller::ClipBird *controller) : controller(controller) {}
 };
+
+/**
+ * @brief Custom event filter for the application that
+ * captures window shown event and if the window is decorated
+ * apply some attributes to the window
+ */
+class AppEventFilter : public QObject {
+ private:
+
+  virtual bool eventFilter(QObject *o, QEvent *e) {
+    // if esc
+    if (e->type() == QEvent::KeyPress) {
+      QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
+      QWidget *window = dynamic_cast<QWidget *>(o);
+      if (keyEvent && window && keyEvent->key() == Qt::Key_Escape) {
+        handleEscKeyPressEvent(window);
+      }
+    }
+
+    if (e->type() == QEvent::WindowActivate) {
+      QWidget *window = dynamic_cast<QWidget *>(o);
+      if (window) {
+        handleWindowShownEvent(window);
+      }
+    }
+
+    return QObject::eventFilter(o, e);
+  }
+
+  void handleWindowShownEvent(QWidget *window) {
+    if (!(window->windowFlags() & Qt::FramelessWindowHint)) {
+      ui::gui::utilities::setPlatformAttributes(window);
+    }
+  }
+
+  void handleEscKeyPressEvent(QWidget *window) {
+    if (controller->getEasyHide() && window->isWindow()) {
+      window->hide();
+    }
+  }
+
+ private:
+
+  controller::ClipBird *controller;
+
+ public:
+
+  /**
+   * @brief Destroy the Clipbird Application Event Filter object
+   */
+  virtual ~AppEventFilter() = default;
+
+  /**
+   * @brief Construct a new Clipbird Application Event Filter object
+   */
+  AppEventFilter(controller::ClipBird *controller) : controller(controller) {
+    // Nothing to do
+  }
+};
 }  // namespace srilakshmikanthanp::clipbirdesk
 
 /**
@@ -187,15 +187,15 @@ void globalErrorHandler() {
  */
 auto main(int argc, char **argv) -> int {
   // using ClipbirdApplication class from namespace
-  using srilakshmikanthanp::clipbirdesk::AppEventFilter;
-  using srilakshmikanthanp::clipbirdesk::Application;
-  using srilakshmikanthanp::clipbirdesk::NativeEventFilter;
   using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogo;
   using srilakshmikanthanp::clipbirdesk::constants::getAppName;
   using srilakshmikanthanp::clipbirdesk::constants::getAppOrgName;
   using srilakshmikanthanp::clipbirdesk::constants::getAppVersion;
+  using srilakshmikanthanp::clipbirdesk::AppEventFilter;
+  using srilakshmikanthanp::clipbirdesk::Application;
+  using srilakshmikanthanp::clipbirdesk::NativeEventFilter;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
   // std::string to std::wstring
@@ -205,6 +205,9 @@ auto main(int argc, char **argv) -> int {
 
   // create the application
   Application app(argc, argv);
+
+  // disable proxy for the application
+  QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
 
   // native event filter
   auto filter = new NativeEventFilter(app.getController());
