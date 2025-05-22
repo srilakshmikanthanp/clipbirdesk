@@ -29,10 +29,9 @@
         "${workspaceFolder}/**",
         "/usr/include/**",
         "/usr/local/include/**",
-        "/opt/kderoot/include/**",
         "/usr/include/glib-2.0",
         "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
-        "/opt/Qt/6.6.3/gcc_64/include/**",
+        "/usr/local/Qt-6.9.0/include/**",
         "${workspaceFolder}/src"
       ],
       "defines": ["_UNICODE", "_DEBUG", "UNICODE"],
