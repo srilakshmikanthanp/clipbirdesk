@@ -7,7 +7,7 @@
 #include <QByteArray>
 
 // Local header files
-#include "network/packets/authentication/authentication.hpp"
+#include "packets/authentication/authentication.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"

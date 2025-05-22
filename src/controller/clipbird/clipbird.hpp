@@ -12,8 +12,8 @@
 
 // project headers
 #include "clipboard/applicationclipboard.hpp"
-#include "network/syncing/client/client.hpp"
-#include "network/syncing/server/server.hpp"
+#include "syncing/client/client.hpp"
+#include "syncing/server/server.hpp"
 #include "store/storage.hpp"
 #include "types/device.hpp"
 

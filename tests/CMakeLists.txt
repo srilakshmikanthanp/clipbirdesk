@@ -23,7 +23,7 @@ file(GLOB_RECURSE test_cpp
   ${PROJECT_SOURCE_DIR}/src/utility/functions/packet/*.cpp
   ${PROJECT_SOURCE_DIR}/src/types/*.cpp
   *.cpp
-  ${PROJECT_SOURCE_DIR}/src/network/packets/*.cpp)
+  ${PROJECT_SOURCE_DIR}/src/packets/*.cpp)
 
 # Add Executable to test
 qt_add_executable(check

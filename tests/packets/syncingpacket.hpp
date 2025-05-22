@@ -7,7 +7,7 @@
 #include <QByteArray>
 
 // Local header files
-#include "network/packets/syncingpacket/syncingpacket.hpp"
+#include "packets/syncingpacket/syncingpacket.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"

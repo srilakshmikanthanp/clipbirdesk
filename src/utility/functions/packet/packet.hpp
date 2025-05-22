@@ -9,10 +9,10 @@
 #include <QtTypes>
 
 // Local header files
-#include "network/packets/authentication/authentication.hpp"
-#include "network/packets/invalidrequest/invalidrequest.hpp"
-#include "network/packets/pingpacket/pingpacket.hpp"
-#include "network/packets/syncingpacket/syncingpacket.hpp"
+#include "packets/authentication/authentication.hpp"
+#include "packets/invalidrequest/invalidrequest.hpp"
+#include "packets/pingpacket/pingpacket.hpp"
+#include "packets/syncingpacket/syncingpacket.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 

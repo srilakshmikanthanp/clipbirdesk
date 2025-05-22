@@ -9,7 +9,7 @@
 #include <QSslSocket>
 #include <QVector>
 
-#include "network/service/service.hpp"
+#include "mdns/mdns.hpp"
 #include "types/device.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"

@@ -7,7 +7,7 @@
 #include <QByteArray>
 
 // Local header files
-#include "network/packets/invalidrequest/invalidrequest.hpp"
+#include "packets/invalidrequest/invalidrequest.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"

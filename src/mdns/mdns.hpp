@@ -3,8 +3,8 @@
 // for windows and macos using bonjour & avahi compact
 #if defined _WIN32 || defined __APPLE__ || __linux__
 
-#include "network/service/mdns/browser/browser.hpp"
-#include "network/service/mdns/register/register.hpp"
+#include "mdns/browser/browser.hpp"
+#include "mdns/register/register.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::network::service {
 using mdnsRegister = mdns::Register;

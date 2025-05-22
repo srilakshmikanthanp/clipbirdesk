@@ -1,8 +1,8 @@
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
 // Local header files
-#include "network/packets/invalidrequest/invalidrequest.hpp"
-#include "network/packets/syncingpacket/syncingpacket.hpp"
+#include "packets/invalidrequest/invalidrequest.hpp"
+#include "packets/syncingpacket/syncingpacket.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions {
 /**
