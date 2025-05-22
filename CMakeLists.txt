@@ -4,7 +4,7 @@
 # https://opensource.org/licenses/MIT
 
 # CMakeLists.txt for clipbird
-cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 # read version from ini file
 file(READ "${CMAKE_CURRENT_LIST_DIR}/conf/VERSION" VERSION)
