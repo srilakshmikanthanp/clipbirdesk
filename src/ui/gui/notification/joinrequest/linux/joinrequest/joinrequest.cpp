@@ -2,7 +2,7 @@
 
 #include "joinrequest.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification {
 /**
  * @brief Callback for the accept action
  */
@@ -121,5 +121,5 @@ void JoinRequest::show(const types::Device &device) {
     return;
   }
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification
 #endif  // __linux__

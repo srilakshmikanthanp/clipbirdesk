@@ -8,10 +8,9 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::components {
  */
 ClipHistory::ClipHistory(QWidget *parent) : QWidget(parent) {
   // set alignment from start and center
-  clipListLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-
-  // set 0 margin
+  clipListLayout->setAlignment(Qt::AlignTop);
   clipListLayout->setContentsMargins(0, 0, 0, 0);
+  clipListLayout->setSpacing(0);
 
   // set alignment as center
   label->setAlignment(Qt::AlignCenter);
@@ -114,7 +113,6 @@ void ClipHistory::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &h
       [=]() { this->onClipCopyImpl(idx); }
     );
 
-    // add the item to the layout
     clipListLayout->addWidget(tile);
 
     // set the visibility

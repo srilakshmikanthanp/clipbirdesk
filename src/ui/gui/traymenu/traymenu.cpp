@@ -15,16 +15,13 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   QObject::connect(&exitApp, &QAction::triggered, this, &TrayMenu::OnExitClicked);
   QObject::connect(&openApp, &QAction::triggered, this, &TrayMenu::OnOpenAppClicked);
   QObject::connect(&history, &QAction::triggered, this, &TrayMenu::OnHistoryClicked);
-  QObject::connect(&settings, &QAction::triggered, this, &TrayMenu::OnSettingsClicked);
 
-  // set the Menu Items
-  this->addAction(&qrCode);
-  this->addAction(&connect);
-  this->addAction(&reset);
-  this->addSeparator();
   this->addAction(&openApp);
   this->addAction(&history);
-  this->addAction(&settings);
+  this->addAction(&reset);
+  this->addSeparator();
+  this->addAction(&qrCode);
+  this->addAction(&connect);
   this->addSeparator();
   this->addAction(&about);
   this->addSeparator();
@@ -38,12 +35,11 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
  * @brief Function used to set up all text in the label, etc..
  */
 void TrayMenu::setUpLanguage() {
+  openApp.setText(QObject::tr("Show Devices"));
+  history.setText(QObject::tr("History"));
+  reset.setText(QObject::tr("Reset Devices"));
   connect.setText(QObject::tr("Join to Group"));
   qrCode.setText(QObject::tr("Group QrCode"));
-  reset.setText(QObject::tr("Reset Devices"));
-  openApp.setText(QObject::tr("Devices"));
-  history.setText(QObject::tr("History"));
-  settings.setText(QObject::tr("Settings"));
   about.setText(QObject::tr("About"));
   exitApp.setText(QObject::tr("Exit"));
 }
@@ -98,13 +94,6 @@ void TrayMenu::setHistoryEnabled(bool isenabled) {
 }
 
 /**
- * @brief set Settings Enabled or Disabled
- */
-void TrayMenu::setSettingsEnabled(bool isenabled) {
-  settings.setEnabled(isenabled);
-}
-
-/**
  * @brief Is Connect Enabled
  */
 bool TrayMenu::isConnectEnabled() const {
@@ -151,13 +140,6 @@ bool TrayMenu::isOpenAppEnabled() const {
  */
 bool TrayMenu::isHistoryEnabled() const {
   return history.isEnabled();
-}
-
-/**
- * @brief Is Settings Enabled
- */
-bool TrayMenu::isSettingsEnabled() const {
-  return settings.isEnabled();
 }
 
 /**

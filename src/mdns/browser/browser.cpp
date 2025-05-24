@@ -20,26 +20,41 @@ void Browser::onHostResolved(quint16 port, QString srvName, const QHostInfo& inf
 
   // Replace the \xxx ascii code to char
   QRegularExpression regex("\\\\([0-9]{3})");
+  QString result;
+  QRegularExpressionMatchIterator it = regex.globalMatch(srvName);
 
-  // replace the ascii code to char
-  auto match = regex.match(srvName);
+  int lastIndex                      = 0;
+  while (it.hasNext()) {
+    QRegularExpressionMatch match = it.next();
+    int start                     = match.capturedStart(0);
+    int end                       = match.capturedEnd(0);
+    QString octalStr              = match.captured(1);
+    bool ok;
+    ushort asciiCode = octalStr.toUShort(&ok, 10);
 
-  // check for all matches
-  for (auto nth = 0; nth < match.capturedTexts().size(); ++nth) {
-    auto asciiCode = match.captured(nth).replace("\\", "").toInt();
-    auto cap       = match.captured(nth);
-    auto replace   = QString(static_cast<QChar>(asciiCode));
-    srvName.replace(cap, replace);
+    if (ok) {
+      result    += srvName.mid(lastIndex, start - lastIndex);
+      result    += QChar(asciiCode);
+      lastIndex  = end;
+    }
+  }
+
+  if (result.isEmpty()) {
+    qWarning() << LOG("Service name is empty after removing service type"); return;
+  }
+
+  if (serviceMap.contains(result)) {
+    qWarning() << LOG("Service already exists in the map, ignoring"); return;
   }
 
   // get the ip address
   auto ip = info.addresses().first();
 
   // add to map
-  this->serviceMap[srvName] = {ip, port};
+  this->serviceMap[result] = {ip, port};
 
   // emit the signal
-  emit onServiceAdded({ip, port, srvName});
+  emit onServiceAdded({ip, port, result});
 }
 
 /**

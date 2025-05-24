@@ -121,16 +121,16 @@ void Application::handleTabChange(ui::gui::widgets::Clipbird::Tabs tab) {
  */
 void Application::handleAuthRequest(const types::Device& client) {
   // get the user input
-  ui::gui::notify::JoinRequest* toast = new ui::gui::notify::JoinRequest(this);
+  ui::gui::notification::JoinRequest* toast = new ui::gui::notification::JoinRequest(this);
 
   // connect the dialog to window AuthSuccess signal
   const auto connectionAccept = connect(
-    toast, &ui::gui::notify::JoinRequest::onAccept,
+    toast, &ui::gui::notification::JoinRequest::onAccept,
     [=] { controller->authSuccess(client); }
   );
 
   connect(
-    toast, &ui::gui::notify::JoinRequest::onAccept,
+    toast, &ui::gui::notification::JoinRequest::onAccept,
     toast, &QObject::deleteLater
   );
 
@@ -141,12 +141,12 @@ void Application::handleAuthRequest(const types::Device& client) {
 
   // connect the dialog to window AuthFail signal
   const auto connectionReject   = connect(
-    toast, &ui::gui::notify::JoinRequest::onReject,
+    toast, &ui::gui::notification::JoinRequest::onReject,
     [=] { controller->authFailed(client); }
   );
 
   connect(
-    toast, &ui::gui::notify::JoinRequest::onReject,
+    toast, &ui::gui::notification::JoinRequest::onReject,
     toast, &QObject::deleteLater
   );
 
@@ -340,29 +340,6 @@ void Application::openHistory() {
 }
 
 /**
- * @brief On Settings Clicked
- */
-void Application::openSettings() {
-  // if already visible return
-  if (settings->isVisible()) { return settings->raise(); }
-
-  // set the icon
-  settings->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
-
-  // set the title
-  settings->setWindowTitle(constants::getAppName());
-
-  // set as not resizable
-  settings->setFixedSize(settings->sizeHint());
-
-  // show the dialog
-  settings->show();
-
-  // center the window
-  settings->move(QGuiApplication::primaryScreen()->availableGeometry().center() - settings->rect().center());
-}
-
-/**
  * @brief On Reset Clicked
  */
 void Application::resetDevices() {
@@ -412,7 +389,6 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   hotkey     = new QHotkey(QKeySequence(constants::getAppHistoryShortcut()), true, this);
   clipbird   = new ui::gui::widgets::Clipbird();
   history    = new ui::gui::widgets::History();
-  settings   = new ui::gui::widgets::Settings();
   trayMenu   = new ui::gui::TrayMenu();
   trayIcon   = new QSystemTrayIcon();
 
@@ -440,8 +416,6 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
       return false;
     }
   };
-
-  settings->setEasyHide(controller->getEasyHide());
 
   trayIcon->setIcon(QIcon(constants::getAppLogo()));
   trayIcon->setContextMenu(trayMenu);
@@ -507,12 +481,6 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     this, &Application::openHistory
   );
 
-  // set the signal for menus Settings click
-  QObject::connect(
-    trayMenu, &ui::gui::TrayMenu::OnSettingsClicked,
-    this, &Application::openSettings
-  );
-
   // set the signal for menus Reset click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnResetClicked,
@@ -567,12 +535,6 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     [=](auto i) {
       controller->setClipboard(controller->getHistory().at(i));
     }
-  );
-
-  // connect signal for Settings Change
-  connect(
-    settings, &ui::gui::widgets::Settings::onEasyHideChange,
-    controller, &controller::ClipBird::setEasyHide
   );
 
   // Connect the signal and slot for client list change
@@ -659,7 +621,6 @@ Application::~Application() {
   delete controller;
   delete clipbird;
   delete history;
-  delete settings;
   delete trayMenu;
   delete trayIcon;
   delete aboutUs;

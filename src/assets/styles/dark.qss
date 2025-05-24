@@ -69,22 +69,19 @@ QScrollArea {
 
 QScrollBar::handle:horizontal,
 QScrollBar::handle:vertical {
-  background: #959595; /* Windows 11 scrollbar handle color */
-  border-radius: 15px;
+  background: #959595;
 }
 
 QScrollBar:horizontal {
   background: #272727;
   border: none;
   height: 5px;
-  margin: 0px;
 }
 
 QScrollBar:vertical {
   background: #272727;
   border: none;
   width: 5px;
-  margin: 0px;
 }
 
 QScrollBar::up-arrow:horizontal,
@@ -162,7 +159,6 @@ QFrame#Clipbird {
   background: #2d2d2d;
   color: white;
   border-radius: 10px;
-  max-width: 320;
   min-width: 320;
 }
 
@@ -176,29 +172,6 @@ QFrame#Clipbird {
   min-height: 80px;
 }
 
-#ClipSend {
-  background: #2d2d2d;
-  color: white;
-  border-radius: 10px;
-}
-
 #ClipSend > QLabel {
-  background: #2d2d2d;
-  font-size: 12px;
-}
-
-#Settings > #Heading {
-  font-size: 20px;
-  font-weight: 700;
-}
-
-#Settings > #Item {
-  background: #2d2d2d;
-  color: white;
-  border-radius: 10px;
-}
-
-#Settings > #Item > QLabel {
-  background: #2d2d2d;
   font-size: 12px;
 }

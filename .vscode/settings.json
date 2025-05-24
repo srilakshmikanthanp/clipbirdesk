@@ -191,6 +191,7 @@
     "qbuffer": "cpp",
     "*.moc": "cpp",
     "qclipboard": "cpp",
-    "qtwaylandclientversion": "cpp"
+    "qtwaylandclientversion": "cpp",
+    "qquickstyle": "cpp"
   },
 }

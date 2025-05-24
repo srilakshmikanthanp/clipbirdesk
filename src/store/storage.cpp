@@ -261,28 +261,6 @@ bool Storage::getHostIsServer() {
 }
 
 /**
- * @brief Set close window on focus out
- */
-void Storage::setEasyHide(bool value) {
-  settings->beginGroup(commonGroup);
-  settings->setValue(easyHideKey, value);
-  settings->endGroup();
-}
-
-/**
- * @brief Get the close window on focus out
- */
-bool Storage::getEasyHide() const {
-  settings->beginGroup(commonGroup);
-  auto value = settings->value(easyHideKey);
-  settings->endGroup();
-  if (value.isNull()) {
-    return true;
-  }
-  return value.toBool();
-}
-
-/**
  * @brief Instance of the storage
  */
 Storage& Storage::instance() {

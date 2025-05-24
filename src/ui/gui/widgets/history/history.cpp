@@ -7,41 +7,28 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets {
  * @param parent
  */
 History::History(QWidget * parent) : QWidget(parent) {
-  // Create QScrollArea
-  auto historyArea = new QScrollArea();
-
-  // set the widget as Resizable
-  historyArea->setWidgetResizable(true);
-
-  // set the widget to scroll area
-  historyArea->setWidget(this->clipHist);
-
-  // Align center the List
-  historyArea->setAlignment(Qt::AlignCenter);
+  auto scrollArea = new QScrollArea();
+  scrollArea->setAlignment(Qt::AlignTop);
+  scrollArea->setWidgetResizable(true);
+  scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  scrollArea->setWidget(clipHist);
 
   // always set scroll bar at top
   QObject::connect(
-    historyArea->verticalScrollBar(), &QScrollBar::rangeChanged,
-    this, [historyArea]() {
-      historyArea->verticalScrollBar()->setValue(0);
+    scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged,
+    this, [scrollArea]() {
+      scrollArea->verticalScrollBar()->setValue(0);
     }
   );
 
   // create layout VBox
   auto vBox = new QVBoxLayout();
-
-  vBox->setAlignment(Qt::AlignTop | Qt::AlignCenter);
-
-  // add clip send to layout
+  vBox->setAlignment(Qt::AlignTop);
   vBox->addWidget(this->clipSend);
+  vBox->addWidget(scrollArea);
 
-  // add scroll area to layout
-  vBox->addWidget(historyArea);
-
-  // set layout to widget
   this->setLayout(vBox);
-
-  // set up language
   this->setUpLanguage();
 
   // connect the signals
@@ -119,7 +106,6 @@ void History::setVisible(bool visible) {
   // set the geometry
   this->setGeometry(geometry);
 }
-
 
 /**
  * @brief change event

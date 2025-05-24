@@ -32,7 +32,8 @@
         "/usr/include/glib-2.0",
         "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
         "/usr/local/Qt-6.9.0/include/**",
-        "${workspaceFolder}/src"
+        "${workspaceFolder}/src",
+        "${workspaceFolder}/build"
       ],
       "defines": ["_UNICODE", "_DEBUG", "UNICODE"],
       "cStandard": "c17",

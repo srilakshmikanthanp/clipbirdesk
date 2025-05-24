@@ -146,16 +146,6 @@ class Storage : public QObject {
   QByteArray getHostKey();
 
   /**
-   * @brief Set close window on focus out
-   */
-  void setEasyHide(bool value);
-
-  /**
-   * @brief Get the close window on focus out
-   */
-  bool getEasyHide() const;
-
-  /**
    * @brief Instance of the storage
    */
   static Storage &instance();

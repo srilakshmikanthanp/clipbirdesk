@@ -34,7 +34,6 @@ class TrayMenu : public QMenu {
   QAction reset     =   QAction();
   QAction openApp   =   QAction();
   QAction history   =   QAction();
-  QAction settings  =   QAction();
   QAction about     =   QAction();
   QAction exitApp   =   QAction();
 
@@ -52,9 +51,6 @@ class TrayMenu : public QMenu {
 
  signals:  // signals
   void OnHistoryClicked();
-
- signals:  // signals
-  void OnSettingsClicked();
 
  signals:  // signals
   void OnAboutClicked();
@@ -111,11 +107,6 @@ class TrayMenu : public QMenu {
   void setHistoryEnabled(bool);
 
   /**
-   * @brief set Settings Enabled or Disabled
-   */
-  void setSettingsEnabled(bool);
-
-  /**
    * @brief Is Qr Code Enabled
    */
   bool isQrCodeEnabled() const;
@@ -149,11 +140,6 @@ class TrayMenu : public QMenu {
    * @brief Is Received Enabled
    */
   bool isHistoryEnabled() const;
-
-  /**
-   * @brief Is Settings Enabled
-   */
-  bool isSettingsEnabled() const;
 
  protected:
 

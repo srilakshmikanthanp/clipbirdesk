@@ -129,18 +129,6 @@ class ClipBird : public QObject {
    */
   virtual ~ClipBird() = default;
 
-  //------------------------- settings slots -------------------------//
-
-  /**
-   * @brief Set close window on focus out
-   */
-  void setEasyHide(bool value);
-
-  /**
-   * @brief Get the close window on focus out
-   */
-  bool getEasyHide() const;
-
   /**
    * @brief set the host as server and start listening
    * to accept the client

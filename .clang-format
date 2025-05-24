@@ -91,7 +91,6 @@ EmptyLineAfterAccessModifier: Always
 EmptyLineBeforeAccessModifier: Always
 ExperimentalAutoDetectBinPacking: false
 PackConstructorInitializers: NextLine
-BasedOnStyle:    ''
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 AllowAllConstructorInitializersOnNextLine: true
 FixNamespaceComments: true

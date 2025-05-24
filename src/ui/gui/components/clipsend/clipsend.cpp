@@ -24,8 +24,8 @@ ClipSend::ClipSend(QWidget *parent): QWidget(parent) {
   // pointer
   send->setCursor(Qt::PointingHandCursor);
 
-  layout->addWidget(item, Qt::AlignLeft);
-  layout->addWidget(send, Qt::AlignRight);
+  layout->addWidget(item);
+  layout->addWidget(send);
 
   // add main layout to widget
   this->setLayout(layout);

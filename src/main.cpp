@@ -135,7 +135,7 @@ class AppEventFilter : public QObject {
   }
 
   void handleEscKeyPressEvent(QWidget *window) {
-    if (controller->getEasyHide() && window->isWindow()) {
+    if (window->isWindow()) {
       window->hide();
     }
   }

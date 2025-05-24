@@ -9,7 +9,7 @@
 #include "constants/constants.hpp"
 #include "types/device.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify {
+namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification {
 /**
  * @brief Notification class
  */
@@ -82,5 +82,5 @@ class JoinRequest : public QObject, public WinToastLib::IWinToastHandler {
    */
   virtual ~JoinRequest() = default;
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notify
+}  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification
 #endif  // _WIN32

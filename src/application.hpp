@@ -31,10 +31,9 @@
 #include "ui/gui/modals/aboutus/aboutus.hpp"
 #include "ui/gui/modals/connect/connect.hpp"
 #include "ui/gui/modals/group/group.hpp"
-#include "ui/gui/notify/joinrequest/joinrequest.hpp"
+#include "ui/gui/notification/joinrequest/joinrequest.hpp"
 #include "ui/gui/widgets/clipbird/clipbird.hpp"
 #include "ui/gui/widgets/history/history.hpp"
-#include "ui/gui/widgets/settings/settings.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
 
@@ -106,11 +105,6 @@ class Application : public SingleApplication {
   void openHistory();
 
   /**
-   * @brief On Settings Clicked
-   */
-  void openSettings();
-
-  /**
    * @brief On Reset Clicked
    */
   void resetDevices();
@@ -135,7 +129,6 @@ class Application : public SingleApplication {
 
   ui::gui::widgets::Clipbird *clipbird;
   ui::gui::widgets::History *history;
-  ui::gui::widgets::Settings *settings;
   ui::gui::TrayMenu *trayMenu;
   QSystemTrayIcon *trayIcon;
   controller::ClipBird *controller;
