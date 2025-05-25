@@ -28,9 +28,9 @@ void Browser::onHostResolved(quint16 port, QString srvName, const QHostInfo& inf
     QRegularExpressionMatch match = it.next();
     int start                     = match.capturedStart(0);
     int end                       = match.capturedEnd(0);
-    QString octalStr              = match.captured(1);
+    QString str                   = match.captured(1);
     bool ok;
-    ushort asciiCode = octalStr.toUShort(&ok, 10);
+    ushort asciiCode = str.toUShort(&ok, 10);
 
     if (ok) {
       result    += srvName.mid(lastIndex, start - lastIndex);
