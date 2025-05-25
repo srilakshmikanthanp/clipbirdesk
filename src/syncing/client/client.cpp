@@ -70,6 +70,7 @@ void Client::processSslErrorsSecured(const QList<QSslError>& errors) {
   QList<QSslError::SslError> ignoredErrors;
 
   // Ignore the errors
+  ignoredErrors.append(QSslError::UnspecifiedError);
   ignoredErrors.append(QSslError::HostNameMismatch);
 
   // make copy of errors
