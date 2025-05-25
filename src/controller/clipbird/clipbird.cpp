@@ -239,8 +239,8 @@ void ClipBird::setCurrentHostAsServer() {
 
   // Connect the onServerStateChanged signal to the signal
   connect(
-    server, &Server::OnServerStateChanged,
-    this, &ClipBird::OnServerStateChanged
+    server, &Server::OnMdnsRegisterStatusChangeChanged,
+    this, &ClipBird::OnMdnsRegisterStatusChangeChanged
   );
 
   // get the storage instance

@@ -47,19 +47,13 @@ QTabWidget::tab-bar {
 QTabBar::tab {
   border-bottom: 3px solid #272727;
   padding: 6px;
-  color: gray;
   margin: 2px;
   font-weight: 650;
   background-color: #272727;
 }
 
 QTabBar::tab:selected {
-  color: #E0E0E0;
   border-bottom: 3px solid #167dff;
-}
-
-QTabBar::tab:hover {
-  color: #E0E0E0;
 }
 
 QScrollArea {
@@ -142,13 +136,6 @@ QLineEdit {
 QFrame#Clipbird {
   border: 1px solid rgba(211, 211, 211, 0.110);
   border-radius: 10px;
-}
-
-#Status {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-size: 20px;
-  font-weight: 700;
 }
 
 #Device > * {

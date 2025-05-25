@@ -356,7 +356,7 @@ Server::Server(QObject *parent) : service::mdnsRegister(parent) {
   // Notify the listeners that the server is started
   QObject::connect(
     this, &service::mdnsRegister::OnServiceRegistered,
-    [=] { emit OnServerStateChanged(this->getServerInfo(), true); }
+    [=] { emit OnMdnsRegisterStatusChangeChanged(true); }
   );
 
   // Connect the socket to the callback function that
@@ -503,11 +503,11 @@ void Server::stopServer() {
   // stop the discovery server
   this->unregisterService();
 
+    // Notify the listeners
+  emit OnMdnsRegisterStatusChangeChanged(false);
+
   // disconnect all the clients
   this->disconnectAllClients();
-
-  // Notify the listeners
-  emit OnServerStateChanged(this->getServerInfo(), false);
 
   // stop the ping timer
   m_pingTimer->stop();

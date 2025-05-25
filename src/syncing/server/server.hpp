@@ -24,7 +24,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
 class Server : public service::mdnsRegister {
  signals:  // signals for this class
   /// @brief On Server State Changed
-  void OnServerStateChanged(types::Device serverInfo, bool started);
+  void OnMdnsRegisterStatusChangeChanged(bool started);
 
 
  signals:  // signals

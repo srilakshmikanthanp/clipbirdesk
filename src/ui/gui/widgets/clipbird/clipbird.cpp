@@ -39,11 +39,6 @@ void Clipbird::handleClientListChange(QList<types::Device> clients) {
  */
 void Clipbird::handleTabChangeForClient(Tabs tab) {
   if (tab != ui::gui::widgets::Clipbird::Tabs::Client) return;  // if not client tab return
-
-  // initialize the client Clipbird
-  this->setStatus(QObject::tr("Not Connected"), ui::gui::widgets::Clipbird::Status::Disconnected);
-
-  // reset the device list
   this->removeAllClient();
 }
 
@@ -52,26 +47,15 @@ void Clipbird::handleTabChangeForClient(Tabs tab) {
  */
 void Clipbird::handleTabChangeForServer(Tabs tab) {
   if (tab != ui::gui::widgets::Clipbird::Tabs::Server) return;  // if not server tab return
-
-  // Device mDns name
   auto name = QString::fromStdString(constants::getMDnsServiceName());
-
-  // initialize the server Clipbird
-  this->setStatus(name, ui::gui::widgets::Clipbird::Status::Inactive);
-
-  // reset the device list
   this->removeAllServers();
 }
 
 /**
  * @brief Handle the Server State Change
  */
-void Clipbird::handleServerStateChange(types::Device serverInfo, bool isStarted) {
-  // infer the status from the server state
-  auto status = isStarted ? Status::Active : Status::Inactive;
+void Clipbird::handleMdnsRegisterStatusChange(bool isRegistered) {
 
-  // set the server status
-  this->setStatus(serverInfo.name, status);
 }
 
 /**
@@ -109,10 +93,6 @@ void Clipbird::handleServerListChange(std::optional<types::Device> server, QList
  * @brief Handle the server status change
  */
 void Clipbird::handleServerStatusChanged(bool isConnected, types::Device server) {
-  // infer the status from the server state
-  auto groupName = isConnected ? server.name : QObject::tr("Not Connected");
-  auto status    = isConnected ? Status::Connected : Status::Disconnected;
-
   // get the servers
   auto servers = this->getServerList();
 
@@ -135,9 +115,6 @@ void Clipbird::handleServerStatusChanged(bool isConnected, types::Device server)
       }
     )
   );
-
-  // set the server status
-  this->setStatus(groupName, status);
 }
 
 /**
@@ -158,15 +135,6 @@ void Clipbird::setUpLanguage() {
 Clipbird::Clipbird(QWidget* p) : QWidget(p) {
   // create the  layout
   QVBoxLayout* root = new QVBoxLayout();
-
-  // status text alignment center
-  this->status->setAlignment(Qt::AlignCenter);
-
-  // add top layout to layout
-  root->addWidget(this->status);
-
-  // set status center both horizontally and vertically
-  root->setAlignment(this->status, Qt::AlignCenter);
 
   // set the cursor as arrow
   tab->tabBar()->setCursor(Qt::PointingHandCursor);
@@ -251,20 +219,6 @@ Clipbird::Clipbird(QWidget* p) : QWidget(p) {
     this, &Clipbird::onTabChanged,
     this, &Clipbird::handleTabChangeForServer
   );
-}
-
-/**
- * @brief Set the Status object
- */
-void Clipbird::setStatus(const QString& key, components::Status::Value val) {
-  this->status->set(key, val);
-}
-
-/**
- * @brief Get the Host Status object
- */
-QPair<QString, components::Status::Value> Clipbird::getStatus() {
-  return this->status->get();
 }
 
 /**

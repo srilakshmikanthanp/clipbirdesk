@@ -45,7 +45,7 @@ class ClipBird : public QObject {
 
  signals:  // signals for this class
   /// @brief On Server state changed (From Server)
-  void OnServerStateChanged(types::Device serverInfo, bool isStarted);
+  void OnMdnsRegisterStatusChangeChanged(bool isRegistered);
 
  signals:  // signals
   /// @brief On client state changed (From Server)

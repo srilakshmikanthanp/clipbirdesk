@@ -146,7 +146,7 @@ void Client::processPingPacket(const packets::PingPacket &packet) {
 
   // if it is pong then ignore
   if (packet.getPingType() == types::enums::PingType::Pong) {
-    qInfo() << (LOG("Pong Received")); return;
+    return;
   }
 
   // create the PingPacket

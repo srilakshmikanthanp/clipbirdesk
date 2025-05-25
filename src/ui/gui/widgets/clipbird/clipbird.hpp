@@ -37,15 +37,10 @@
 // project headers
 #include "controller/clipbird/clipbird.hpp"
 #include "types/device.hpp"
-#include "ui/gui/components/status/status.hpp"
 #include "ui/gui/components/hostlist/hostlist.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::widgets {
 class Clipbird : public QWidget {
- private:  // Member variable (Tray)
-
-  ui::gui::components::Status *status = new ui::gui::components::Status(this);  // Status
-
  private:  // Member variable (Tabs)
 
   components::HostList* clientList = new components::HostList();  // Server Tab
@@ -58,7 +53,6 @@ class Clipbird : public QWidget {
  private:  // typedefs used in this class
 
   using Action = components::HostTile::Action;
-  using Status = components::Status::Value;
 
  private:  // Disable copy and move
 
@@ -124,7 +118,7 @@ class Clipbird : public QWidget {
   /**
    * @brief Handle the Server State Change
    */
-  void handleServerStateChange(types::Device serverInfo, bool isStarted);
+  void handleMdnsRegisterStatusChange(bool isRegistered);
 
   /**
    * @brief Handle the Client List Item Clicked
@@ -138,16 +132,6 @@ class Clipbird : public QWidget {
    * with parent as QWidget
    */
   explicit Clipbird(QWidget* parent = nullptr);
-
-  /**
-   * @brief Set the Status object
-   */
-  void setStatus(const QString& key, components::Status::Value val);
-
-  /**
-   * @brief Get the Host Status object
-   */
-  QPair<QString, components::Status::Value> getStatus();
 
   /**
    * @brief Set tab as client
