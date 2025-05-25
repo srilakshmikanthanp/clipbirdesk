@@ -127,7 +127,7 @@ void Browser::browseCallback(
   // process resolve socket
   const auto processResSock = [=] {
     if (DNSServiceProcessResult(browserObj->m_res_ref) != kDNSServiceErr_NoError) {
-      qWarning() << LOG("DNSServiceProcessResult failed");
+      // No action needed, even logging cause huge log spam
     }
   };
 

@@ -18,6 +18,14 @@
 #include <wintoastlib.h>
 #endif
 
+#ifdef _WIN32
+#include <io.h>
+#define null_device "NUL"
+#else
+#include <unistd.h>
+#define null_device "/dev/null"
+#endif
+
 // Project Headers
 #include "application.hpp"
 #include "constants/constants.hpp"
@@ -197,6 +205,8 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::Application;
   using srilakshmikanthanp::clipbirdesk::NativeEventFilter;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
+
+  freopen(null_device, "w", stderr);
 
   // std::string to std::wstring
   const auto W = [](std::string str) -> std::wstring {
