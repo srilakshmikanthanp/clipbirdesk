@@ -1,5 +1,7 @@
 #pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
 
+#include <QSslCertificate>
+#include <QSslKey>
 #include <QObject>
 #include <QSettings>
 
@@ -118,7 +120,7 @@ class Storage : public QObject {
   /**
    * @brief set the Host certificate
    */
-  void setHostCert(const QByteArray &cert);
+  void setHostCert(const QSslCertificate &cert);
 
   /**
    * @brief has Host cert
@@ -128,12 +130,12 @@ class Storage : public QObject {
   /**
    * @brief Get the Host certificate
    */
-  QByteArray getHostCert();
+  QSslCertificate getHostCert();
 
   /**
    * @brief set the Host Key
    */
-  void setHostKey(const QByteArray &key);
+  void setHostKey(const QSslKey &key);
 
   /**
    * @brief has Host Key
@@ -143,7 +145,7 @@ class Storage : public QObject {
   /**
    * @brief Get the Host Key
    */
-  QByteArray getHostKey();
+  QSslKey getHostKey();
 
   /**
    * @brief Instance of the storage

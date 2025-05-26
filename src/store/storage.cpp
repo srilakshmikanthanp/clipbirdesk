@@ -167,9 +167,9 @@ void Storage::clearAllServerCert() {
 /**
  * @brief set the Host certificate
  */
-void Storage::setHostCert(const QByteArray &cert) {
+void Storage::setHostCert(const QSslCertificate &cert) {
   settings->beginGroup(commonGroup);
-  settings->setValue(hostCertificateKey, cert);
+  settings->setValue(hostCertificateKey, cert.toPem());
   settings->endGroup();
 }
 
@@ -178,7 +178,7 @@ void Storage::setHostCert(const QByteArray &cert) {
  */
 bool Storage::hasHostCert() {
   settings->beginGroup(commonGroup);
-  auto cert = settings->value(hostCertificateKey);
+  auto cert = QSslCertificate(settings->value(hostCertificateKey).toByteArray());
   settings->endGroup();
   return !cert.isNull();
 }
@@ -186,24 +186,24 @@ bool Storage::hasHostCert() {
 /**
  * @brief Get the Host certificate
  */
-QByteArray Storage::getHostCert() {
+QSslCertificate Storage::getHostCert() {
   settings->beginGroup(commonGroup);
-  auto cert = settings->value(hostCertificateKey);
+  auto cert = QSslCertificate(settings->value(hostCertificateKey).toByteArray());
   settings->endGroup();
 
   if (cert.isNull()) {
     throw std::invalid_argument("name not found");
   }
 
-  return cert.toByteArray();
+  return cert;
 }
 
 /**
  * @brief set the Host Key
  */
-void Storage::setHostKey(const QByteArray &key) {
+void Storage::setHostKey(const QSslKey &key) {
   settings->beginGroup(commonGroup);
-  settings->setValue(hostKeyKey, key);
+  settings->setValue(hostKeyKey, key.toPem());
   settings->endGroup();
 }
 
@@ -212,7 +212,7 @@ void Storage::setHostKey(const QByteArray &key) {
  */
 bool Storage::hasHostKey() {
   settings->beginGroup(commonGroup);
-  auto key = settings->value(hostKeyKey);
+  auto key = QSslKey(settings->value(hostKeyKey).toByteArray(), QSsl::Rsa);
   settings->endGroup();
   return !key.isNull();
 }
@@ -220,16 +220,16 @@ bool Storage::hasHostKey() {
 /**
  * @brief Get the Host Key
  */
-QByteArray Storage::getHostKey() {
+QSslKey Storage::getHostKey() {
   settings->beginGroup(commonGroup);
-  auto key = settings->value(hostKeyKey);
+  auto key = QSslKey(settings->value(hostKeyKey).toByteArray(), QSsl::Rsa);
   settings->endGroup();
 
   if (key.isNull()) {
     throw std::invalid_argument("name not found");
   }
 
-  return key.toByteArray();
+  return key;
 }
 
 /**

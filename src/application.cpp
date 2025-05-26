@@ -15,8 +15,8 @@ QSslConfiguration Application::getOldSslConfiguration() {
   auto& storage        = storage::Storage::instance();
 
   // read the certificate and key
-  QSslCertificate cert = QSslCertificate(storage.getHostCert(), QSsl::Pem);
-  QSslKey key          = QSslKey(storage.getHostKey(), QSsl::Rsa);
+  QSslCertificate cert = storage.getHostCert();
+  QSslKey key          = storage.getHostKey();
   QSslConfiguration sslConfig;
 
   // get cert name
@@ -57,8 +57,8 @@ QSslConfiguration Application::getNewSslConfiguration() {
 
   // write the certificate and key
   auto& storage  = storage::Storage::instance();
-  storage.setHostCert(sslConfig.localCertificate().toPem());
-  storage.setHostKey(sslConfig.privateKey().toPem());
+  storage.setHostCert(sslConfig.localCertificate());
+  storage.setHostKey(sslConfig.privateKey());
 
   // return the configuration
   return sslConfig;
