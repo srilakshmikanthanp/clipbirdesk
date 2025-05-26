@@ -1,5 +1,4 @@
 // Qt Headers
-#include <QAbstractNativeEventFilter>
 #include <QApplication>
 #include <QFile>
 #include <QGraphicsDropShadowEffect>
@@ -30,143 +29,10 @@
 #include "application.hpp"
 #include "constants/constants.hpp"
 #include "controller/clipbird/clipbird.hpp"
+#include "eventfilter.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
-
-namespace srilakshmikanthanp::clipbirdesk {
-/**
- * @brief Custom event filter for the application that
- * captures Native event and if the device is going to sleep
- * or wake up disconnect
- */
-class NativeEventFilter : public QAbstractNativeEventFilter {
- private:
-
-  bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override {
-    constexpr const char *WIN_MSG = "windows_generic_MSG";
-
-#if defined(_WIN32) || defined(_WIN64)
-    if (eventType == WIN_MSG) {
-      handleWindowsGenericMessage(static_cast<MSG *>(message));
-    }
-#endif
-
-    return false;
-  }
-
-#if defined(_WIN32) || defined(_WIN64)
-  void handleWindowsGenericMessage(MSG *msg) {
-    if (msg->message == WM_POWERBROADCAST) {
-      switch (msg->wParam) {
-      case PBT_APMRESUMESUSPEND:
-        this->handleWakeUpEvent();
-        break;
-
-      case PBT_APMSUSPEND:
-        this->handleSleepEvent();
-        break;
-      }
-    }
-  }
-#endif
-
-  void handleSleepEvent() {
-    switch (controller->getHostType()) {
-    case types::enums::HostType::CLIENT:
-      controller->disposeClient();
-      break;
-
-    case types::enums::HostType::SERVER:
-      controller->disposeServer();
-      break;
-    }
-  }
-
-  void handleWakeUpEvent() {
-    if (controller->isLastlyHostIsServer()) {
-      controller->setCurrentHostAsServer();
-    } else {
-      controller->setCurrentHostAsClient();
-    }
-  }
-
- private:
-
-  controller::ClipBird *controller;
-
- public:
-
-  /**
-   * @brief Destroy the Clipbird Native Event Filter object
-   */
-  virtual ~NativeEventFilter() = default;
-
-  /**
-   * @brief Construct a new Clipbird Native Event Filter object
-   */
-  NativeEventFilter(controller::ClipBird *controller) : controller(controller) {}
-};
-
-/**
- * @brief Custom event filter for the application that
- * captures window shown event and if the window is decorated
- * apply some attributes to the window
- */
-class AppEventFilter : public QObject {
- private:
-
-  virtual bool eventFilter(QObject *o, QEvent *e) {
-    // if esc
-    if (e->type() == QEvent::KeyPress) {
-      QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
-      QWidget *window = dynamic_cast<QWidget *>(o);
-      if (keyEvent && window && keyEvent->key() == Qt::Key_Escape) {
-        handleEscKeyPressEvent(window);
-      }
-    }
-
-    if (e->type() == QEvent::WindowActivate) {
-      QWidget *window = dynamic_cast<QWidget *>(o);
-      if (window) {
-        handleWindowShownEvent(window);
-      }
-    }
-
-    return QObject::eventFilter(o, e);
-  }
-
-  void handleWindowShownEvent(QWidget *window) {
-    if (!(window->windowFlags() & Qt::FramelessWindowHint)) {
-      ui::gui::utilities::setPlatformAttributes(window);
-    }
-  }
-
-  void handleEscKeyPressEvent(QWidget *window) {
-    if (window->isWindow()) {
-      window->hide();
-    }
-  }
-
- private:
-
-  controller::ClipBird *controller;
-
- public:
-
-  /**
-   * @brief Destroy the Clipbird Application Event Filter object
-   */
-  virtual ~AppEventFilter() = default;
-
-  /**
-   * @brief Construct a new Clipbird Application Event Filter object
-   */
-  AppEventFilter(controller::ClipBird *controller) : controller(controller) {
-    // Nothing to do
-  }
-};
-}  // namespace srilakshmikanthanp::clipbirdesk
 
 /**
  * @brief Global Error Handler that helps to log

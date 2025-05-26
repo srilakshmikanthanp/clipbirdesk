@@ -204,6 +204,7 @@ if(UNIX AND NOT APPLE)
   target_link_libraries(clipbird PUBLIC ${DBUS_LIBRARIES})
   target_include_directories(clipbird PUBLIC ${LIBNOTIFY_INCLUDE_DIRS})
   target_link_libraries(clipbird PUBLIC ${LIBNOTIFY_LIBRARIES})
+  target_link_libraries(clipbird PUBLIC Qt6::DBus)
   add_definitions(-D__linux__)
 endif()
 
