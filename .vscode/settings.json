@@ -192,6 +192,7 @@
     "*.moc": "cpp",
     "qclipboard": "cpp",
     "qtwaylandclientversion": "cpp",
-    "qquickstyle": "cpp"
+    "qquickstyle": "cpp",
+    "qdbusunixfiledescriptor": "cpp"
   },
 }
