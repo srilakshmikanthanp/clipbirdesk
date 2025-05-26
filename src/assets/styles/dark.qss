@@ -8,9 +8,9 @@
 /*********************** Common to All ************************/
 
 QFrame, QWidget {
-  background: #272727; /* Dark background color */
-  color: #E0E0E0; /* Light text color */
-  font-family: Segoe UI, sans-serif; /* Windows 11 font */
+  background: #272727;
+  color: #E0E0E0;
+  font-family: Segoe UI, sans-serif;
   margin: 2px 0px 2px 0px;
   font-weight: 550;
 }
@@ -21,15 +21,15 @@ QFrame {
 }
 
 QPushButton {
-  background-color: #424344; /* Windows 11 accent color */
-  color: #FFFFFF; /* Light text on the button */
+  background-color: #424344;
+  color: #FFFFFF;
   border: none;
   border-radius: 5px;
   padding: 6px;
 }
 
 QPushButton:hover {
-  background-color: #167dff; /* Slightly darker accent color on hover */
+  background-color: #167dff;
   color: #FFFFFF;
 }
 

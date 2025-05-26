@@ -8,9 +8,9 @@
 /*********************** Common to All ************************/
 
 QFrame, QWidget {
-  background: #f9f9f9; /* Light background color */
-  color: #000000; /* Dark text color */
-  font-family: Segoe UI, sans-serif; /* Windows 11 font */
+  background: #f9f9f9;
+  color: #000000;
+  font-family: Segoe UI, sans-serif;
   margin: 2px 0px 2px 0px;
   font-weight: 550;
 }
@@ -25,15 +25,15 @@ QLabel {
 }
 
 QPushButton {
-  background-color: #ededed; /* Windows 11 accent color */
-  color: #000000; /* Light text on the button */
+  background-color: #ededed;
+  color: #000000;
   border: none;
   border-radius: 5px;
   padding: 6px;
 }
 
 QPushButton:hover {
-  background-color: #167dff; /* Slightly darker accent color on hover */
+  background-color: #167dff;
   color: #f9f9f9;
 }
 
@@ -163,18 +163,6 @@ QFrame#Clipbird {
   min-height: 80px;
 }
 
-#ClipSend {
-  background: #ededed;
-  color: white;
-  border-radius: 10px;
-}
-
 #ClipSend > QLabel {
-  background: #ededed;
   font-size: 12px;
-}
-
-#ClipSend > QPushButton {
-  background: #167dff;
-  color: white;
 }
