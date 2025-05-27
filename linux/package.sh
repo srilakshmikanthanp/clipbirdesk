@@ -33,4 +33,8 @@ cp ./build/src/clipbird "$ClipbirdDir/usr/bin"
 
 # Run linuxdeploy-x86_64.AppImage to package the clipbird
 # see https://github.com/linuxdeploy/linuxdeploy
-linuxdeploy-x86_64.AppImage --appdir=$ClipbirdDir --plugin qt --output appimage
+linuxdeploy-x86_64.AppImage \
+  --appdir=$ClipbirdDir \
+  --custom-apprun=./linux/AppRun.sh \
+  --plugin qt \
+  --output appimage
