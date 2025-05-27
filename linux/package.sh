@@ -25,7 +25,7 @@ mkdir -p $ClipbirdDir
 
 # clone the appdir folder to setup
 echo "Cloning appdir folder to $ClipbirdDir"
-cp -r ./appdir/* $ClipbirdDir
+cp -r ./linux/appdir/* $ClipbirdDir
 
 # Copy the clipbird to the package directory
 echo "Copying ./build/src/Release/clipbird to $ClipbirdDir/usr/bin"
