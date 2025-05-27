@@ -249,14 +249,6 @@ This project utilizes Bonjour technology by Apple for Advertising and Discovery 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Screenshots
-
-|![clipbird](assets/images/clipbird_light.png) | ![history](assets/images/history_light.png) |
-|--------------------------------------- | --------------------------------------|
-|![clipbird](assets/images/clipbird_dark.png)  | ![history](assets/images/history_dark.png)  |
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [forks-shield]: https://img.shields.io/github/forks/srilakshmikanthanp/clipbirdesk.svg?style=for-the-badge
