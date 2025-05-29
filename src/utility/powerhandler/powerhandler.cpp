@@ -1,17 +1,16 @@
-#include "eventfilter.hpp"
-#include "QMessageBox"
+#include "powerhandler.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk {
 /**
  * @brief Construct a new Clipbird Native Event Filter object
  */
-NativeEventFilter::NativeEventFilter(controller::ClipBird *controller) : controller(controller) {
+PowerHandler::PowerHandler(controller::ClipBird *controller) : controller(controller) {
 #if defined(__linux__)
   this->registerPowerManagementListener();
 #endif
 }
 
-bool NativeEventFilter::nativeEventFilter(
+bool PowerHandler::nativeEventFilter(
     const QByteArray &eventType, void *message, qintptr *result
 ) {
   constexpr const char *WIN_MSG = "windows_generic_MSG";
@@ -26,7 +25,7 @@ bool NativeEventFilter::nativeEventFilter(
 }
 
 #if defined(__linux__)
-bool NativeEventFilter::acquireInhibitLock() {
+bool PowerHandler::acquireInhibitLock() {
   QDBusInterface iface(service, path, interface, QDBusConnection::systemBus());
   QDBusReply<QDBusUnixFileDescriptor> reply = iface.call(
       "Inhibit",                // method name
@@ -45,7 +44,7 @@ bool NativeEventFilter::acquireInhibitLock() {
   }
 }
 
-void NativeEventFilter::releaseInhibitLock() {
+void PowerHandler::releaseInhibitLock() {
   if (inhibitLock) {
     inhibitLock->close();
     delete inhibitLock;
@@ -53,7 +52,7 @@ void NativeEventFilter::releaseInhibitLock() {
   }
 }
 
-void NativeEventFilter::registerPowerManagementListener() {
+void PowerHandler::registerPowerManagementListener() {
   QDBusConnection systemBus = QDBusConnection::systemBus();
 
   if (!systemBus.isConnected()) {
@@ -75,7 +74,7 @@ void NativeEventFilter::registerPowerManagementListener() {
   }
 }
 
-void NativeEventFilter::PrepareForSleep(bool suspending) {
+void PowerHandler::PrepareForSleep(bool suspending) {
   if (suspending && acquireInhibitLock()) {
     handleSleepEvent();
     releaseInhibitLock();
@@ -88,7 +87,7 @@ void NativeEventFilter::PrepareForSleep(bool suspending) {
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-void NativeEventFilter::handleWindowsGenericMessage(MSG *msg) {
+void PowerHandler::handleWindowsGenericMessage(MSG *msg) {
   if (msg->message == WM_POWERBROADCAST) {
     switch (msg->wParam) {
     case PBT_APMRESUMESUSPEND:
@@ -103,7 +102,7 @@ void NativeEventFilter::handleWindowsGenericMessage(MSG *msg) {
 }
 #endif
 
-void NativeEventFilter::handleSleepEvent() {
+void PowerHandler::handleSleepEvent() {
   switch (controller->getHostType()) {
   case types::enums::HostType::CLIENT:
     controller->disposeClient();
@@ -115,7 +114,7 @@ void NativeEventFilter::handleSleepEvent() {
   }
 }
 
-void NativeEventFilter::handleWakeUpEvent() {
+void PowerHandler::handleWakeUpEvent() {
   if (controller->isLastlyHostIsServer()) {
     controller->setCurrentHostAsServer();
   } else {
@@ -126,48 +125,5 @@ void NativeEventFilter::handleWakeUpEvent() {
 /**
  * @brief Destroy the Clipbird Native Event Filter object
  */
-NativeEventFilter::~NativeEventFilter() = default;
-
-/**
- * @brief Construct a new Clipbird Application Event Filter object
- */
-AppEventFilter::AppEventFilter(controller::ClipBird *controller) : controller(controller) {
-  // Nothing to do
-}
-
-bool AppEventFilter::eventFilter(QObject *o, QEvent *e) {
-  if (e->type() == QEvent::KeyPress) {
-    QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
-    QWidget *window     = dynamic_cast<QWidget *>(o);
-    if (keyEvent && window && keyEvent->key() == Qt::Key_Escape) {
-      handleEscKeyPressEvent(window);
-    }
-  }
-
-  if (e->type() == QEvent::WindowActivate) {
-    QWidget *window = dynamic_cast<QWidget *>(o);
-    if (window) {
-      handleWindowShownEvent(window);
-    }
-  }
-
-  return QObject::eventFilter(o, e);
-}
-
-void AppEventFilter::handleWindowShownEvent(QWidget *window) {
-  if (!(window->windowFlags() & Qt::FramelessWindowHint)) {
-    ui::gui::utilities::setPlatformAttributes(window);
-  }
-}
-
-void AppEventFilter::handleEscKeyPressEvent(QWidget *window) {
-  if (window->isWindow()) {
-    window->hide();
-  }
-}
-
-/**
- * @brief Destroy the Clipbird Application Event Filter object
- */
-AppEventFilter::~AppEventFilter() = default;
+PowerHandler::~PowerHandler() = default;
 }  // namespace srilakshmikanthanp::clipbirdesk

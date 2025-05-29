@@ -29,10 +29,11 @@
 #include "application.hpp"
 #include "constants/constants.hpp"
 #include "controller/clipbird/clipbird.hpp"
-#include "eventfilter.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
+#include "utility/appeventfilter/appeventfilter.hpp"
 #include "utility/functions/sslcert/sslcert.hpp"
 #include "utility/logging/logging.hpp"
+#include "utility/powerhandler/powerhandler.hpp"
 
 /**
  * @brief Global Error Handler that helps to log
@@ -69,7 +70,7 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::constants::getAppVersion;
   using srilakshmikanthanp::clipbirdesk::AppEventFilter;
   using srilakshmikanthanp::clipbirdesk::Application;
-  using srilakshmikanthanp::clipbirdesk::NativeEventFilter;
+  using srilakshmikanthanp::clipbirdesk::PowerHandler;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
   freopen(null_device, "w", stderr);
@@ -86,10 +87,10 @@ auto main(int argc, char **argv) -> int {
   QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
 
   // native event filter
-  auto filter = new NativeEventFilter(app.getController());
+  auto powerHandler = new PowerHandler(app.getController());
 
   // install native event filter
-  app.installNativeEventFilter(filter);
+  app.installNativeEventFilter(powerHandler);
 
   // install event filter
   app.installEventFilter(new AppEventFilter(app.getController()));
