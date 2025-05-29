@@ -69,7 +69,7 @@
 </details>
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+## About the Project
 
 Clipbird Software helps you to sync your clipboard data between devices connected to a local network. It is a cross-platform software that works on various platforms. It is free and open-source software that is licensed under the MIT License. It currently supports `Windows` and [`Android`](https://github.com/srilakshmikanthanp/clipbirdroid).
 
@@ -95,7 +95,7 @@ Just go to Github Release choose the suitable version for your system and downlo
 
 _For Android, you can download it from [clipbirdroid](https://github.com/srilakshmikanthanp/clipbirdroid)_
 
-### Building Clipbird on a Windows
+### Building Clipbird on Windows
 
 In the following steps, we will see how to build the project in the Windows platform, We use choco to install the dependencies. If you don't have choco installed in your system, you can install it from [here](https://chocolatey.org/install).
 
@@ -132,7 +132,7 @@ Just go to [Bonjour](https://developer.apple.com/bonjour/) and download the Bonj
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Building Clipbird on a Linux
+### Building Clipbird on Linux
 
 Limitations on wayland,
 
