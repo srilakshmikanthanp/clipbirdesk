@@ -1,0 +1,18 @@
+.features {
+    margin: 8rem auto;
+
+    h2 {
+        text-align: center;
+    }
+
+    .features__list {
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        gap: 4rem;
+
+        div {
+            max-width: 300px;
+        }
+    }
+}

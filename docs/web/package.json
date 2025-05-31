@@ -1,47 +1,34 @@
 {
-  "name": "clipbird-web",
-  "version": "0.1.0",
-  "private": true,
-  "homepage": "https://clipbird.srilakshmikanthanp.com/",
-  "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "clipbird-web": "file:",
-    "gh-pages": "^6.1.1",
-    "gsap": "^3.12.5",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-moment": "^1.1.3",
-    "react-router-dom": "^6.21.2",
-    "react-scripts": "5.0.1",
-    "react-tooltip": "^5.25.2",
-    "web-vitals": "^2.1.4"
-  },
-  "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build --cname clipbird.srilakshmikanthanp.com",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+    "name": "clipbird-web",
+    "private": true,
+    "version": "0.0.0",
+    "homepage": "https://clipbird.srilakshmikanthanp.com/",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc -b && vite build",
+        "lint": "eslint .",
+        "preview": "vite preview",
+        "format": "prettier --write \"**/*.{js,ts,tsx,html,css,json}\""
+    },
+    "dependencies": {
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0",
+        "react-icons": "^5.5.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.25.0",
+        "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+        "@types/react": "^19.1.2",
+        "@types/react-dom": "^19.1.2",
+        "@vitejs/plugin-react-swc": "^3.9.0",
+        "eslint": "^9.25.0",
+        "eslint-plugin-react-hooks": "^5.2.0",
+        "eslint-plugin-react-refresh": "^0.4.19",
+        "globals": "^16.0.0",
+        "prettier": "^3.5.3",
+        "typescript": "~5.8.3",
+        "typescript-eslint": "^8.30.1",
+        "vite": "^6.3.5"
+    }
 }

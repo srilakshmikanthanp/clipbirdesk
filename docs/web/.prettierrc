@@ -1,0 +1,16 @@
+{
+    "trailingComma": "none",
+    "tabWidth": 4,
+    "semi": true,
+    "singleQuote": true,
+    "jsxSingleQuote": false,
+    "bracketSpacing": true,
+    "arrowParens": "avoid",
+    "printWidth": 120,
+    "plugins": ["@trivago/prettier-plugin-sort-imports"],
+    "importOrder": ["^~/(.*)$", "@netlify/(.*)", "@[^ ]+", "^[./]"],
+    "importOrderSeparation": false,
+    "importOrderSortSpecifiers": true,
+    "importOrderCaseInsensitive": true,
+    "importOrderParserPlugins": ["importAssertions", "typescript", "jsx"]
+}
