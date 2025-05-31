@@ -39,6 +39,7 @@ void Clipbird::handleClientListChange(QList<types::Device> clients) {
  */
 void Clipbird::handleTabChangeForClient(Tabs tab) {
   if (tab != ui::gui::widgets::Clipbird::Tabs::Client) return;  // if not client tab return
+  this->serverList->setStatusText(tr("No hosts found"));
   this->removeAllClient();
 }
 
@@ -47,15 +48,15 @@ void Clipbird::handleTabChangeForClient(Tabs tab) {
  */
 void Clipbird::handleTabChangeForServer(Tabs tab) {
   if (tab != ui::gui::widgets::Clipbird::Tabs::Server) return;  // if not server tab return
-  auto name = QString::fromStdString(constants::getMDnsServiceName());
+  this->clientList->setStatusText(tr("Registering"));
   this->removeAllServers();
 }
 
 /**
  * @brief Handle the Server State Change
  */
-void Clipbird::handleMdnsRegisterStatusChange(bool isRegistered) {
-
+void Clipbird::handleMdnsRegisterStatusChanged(bool isRegistered) {
+  this->clientList->setStatusText(tr(isRegistered ? "No device connected" : "Not registered"));
 }
 
 /**
@@ -188,12 +189,12 @@ Clipbird::Clipbird(QWidget* p) : QWidget(p) {
 
   // clang-format off
   // server list slot
-  auto serverListSlot  = [=](const auto& host) {
+  auto serverListSlot = [=](const auto& host) {
     this->handleHostAction(Tabs::Client, host);
   };
 
   // client list slot
-  auto clientListSlot  = [=](const auto& host) {
+  auto clientListSlot = [=](const auto& host) {
     this->handleHostAction(Tabs::Server, host);
   };
   // clang-format on

@@ -47,13 +47,6 @@ class HostList : public QWidget {
 
   QLabel *label = new QLabel(this);
 
- private:  // Member Functions
-
-  /**
-   * @brief Function used to set up all text in the label, etc..
-   */
-  void setUpLanguage();
-
  public:  // Member Functions
 
   explicit HostList(QWidget* parent = nullptr);
@@ -83,16 +76,16 @@ class HostList : public QWidget {
    */
   void removeHost(components::HostTile::Value host);
 
+  /**
+   * @brief Set the text to the label
+   */
+  void setStatusText(const QString& text);
+
  protected:  // Member Functions
 
   /**
    * @brief Override teh show event
    */
   void paintEvent(QPaintEvent* event) override;
-
-  /**
-   * @brief Override change event
-   */
-  void changeEvent(QEvent *) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window

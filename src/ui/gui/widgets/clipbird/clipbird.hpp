@@ -70,10 +70,6 @@ class Clipbird : public QWidget {
 
   Q_OBJECT
 
- private:  // Member Variables
-
-  controller::ClipBird* controller;
-
  signals:  // signals
 
   void disconnectFromServer(types::Device server);
@@ -118,7 +114,7 @@ class Clipbird : public QWidget {
   /**
    * @brief Handle the Server State Change
    */
-  void handleMdnsRegisterStatusChange(bool isRegistered);
+  void handleMdnsRegisterStatusChanged(bool isRegistered);
 
   /**
    * @brief Handle the Client List Item Clicked

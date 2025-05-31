@@ -552,7 +552,7 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   // Connect the signal and slot for server status change
   connect(
     controller, &controller::ClipBird::OnMdnsRegisterStatusChangeChanged,
-    clipbird, &ui::gui::widgets::Clipbird::handleMdnsRegisterStatusChange
+    clipbird, &ui::gui::widgets::Clipbird::handleMdnsRegisterStatusChanged
   );
 
   // connect signal and slot for OnAuthRequest

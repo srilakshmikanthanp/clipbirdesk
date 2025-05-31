@@ -88,18 +88,6 @@ void HostList::paintEvent(QPaintEvent *event) {
   QWidget::paintEvent(event);
 }
 
-/**
- * @brief change event
- */
-void HostList::changeEvent(QEvent *event) {
-  if (event->type() == QEvent::LanguageChange) {
-    this->setUpLanguage();
-  }
-
-  QWidget::changeEvent(event);
-}
-
-
 // Host List
 HostList::HostList(QWidget* parent) : QWidget(parent) {
   // set alignment from start and center
@@ -122,16 +110,6 @@ HostList::HostList(QWidget* parent) : QWidget(parent) {
 
   // set the layout
   this->setLayout(this->stackLayout);
-
-  // set up initial Translation
-  this->setUpLanguage();
-}
-
-/**
- * @brief Function used to set up all text in the label, etc..
- */
-void HostList::setUpLanguage() {
-  this->label->setText(QObject::tr("No Devices"));
 }
 
 /**
@@ -156,6 +134,14 @@ void HostList::setHosts(QList<components::HostTile::Value> hosts) {
   }
 
   // Redraw the widget
+  this->repaint();
+}
+
+/**
+ * @brief Set the text to the label
+ */
+void HostList::setStatusText(const QString& text) {
+  this->label->setText(text);
   this->repaint();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::window
