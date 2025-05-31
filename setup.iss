@@ -3,10 +3,16 @@
 ; constants used in the script
 #define ClipbirdPublisher "srilakshmikanthanp"
 #define ClipbirdName "clipbird"
-#define ClipbirdVersion "1.3.3"
-#define ClipbirdUUID "3A8D9FCA-9F95-4947-8AB0-3E364ED765E1"
 #define ClipbirdURL "https://github.com/srilakshmikanthanp/clipbirdesk"
 #define ClipbirdExeName "clipbird.exe"
+
+#define VersionHandle FileOpen("conf\\VERSION")
+#define ClipbirdVersion Trim(FileRead(VersionHandle))
+#expr FileClose(VersionHandle)
+
+#define UUIDHandle FileOpen("conf\\APPUUID")
+#define ClipbirdUUID Trim(FileRead(UUIDHandle))
+#expr FileClose(UUIDHandle)
 
 [Setup]
 AppPublisher={#ClipbirdPublisher}
