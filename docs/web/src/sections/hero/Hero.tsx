@@ -20,8 +20,8 @@ export default function Hero() {
 
             <figure className={classes.hero__video}>
                 <iframe
-                    width="672"
-                    height="378"
+                    width="568px"
+                    height="auto"
                     src="https://www.youtube-nocookie.com/embed/WO0KbtN8sq4?si=zQr78YmLO9aCRS7g&amp;controls=0"
                     title="YouTube video player"
                     frameBorder="0"

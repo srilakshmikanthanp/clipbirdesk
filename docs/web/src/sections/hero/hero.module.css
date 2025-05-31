@@ -1,6 +1,7 @@
 .hero {
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
     min-height: 100vh;
     padding: 4rem;
     background-color: var(--color-primary);
