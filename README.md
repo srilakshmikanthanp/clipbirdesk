@@ -93,6 +93,14 @@ To Install Clipbird on your system, you can either download the installer from t
 
 Just go to Github Release choose the suitable version for your system and download it. Then install it in your system.
 
+#### Linux
+
+You can Use this command to install Clipbird,
+
+```sh
+bash <(curl -sSL https://raw.githubusercontent.com/srilakshmikanthanp/clipbirdesk/refs/heads/main/linux/install.sh)
+```
+
 _For Android, you can download it from [clipbirdroid](https://github.com/srilakshmikanthanp/clipbirdroid)_
 
 ### Building Clipbird on Windows
