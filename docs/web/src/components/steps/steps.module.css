@@ -8,5 +8,9 @@
         &:not(:last-child) {
             margin-bottom: 4rem;
         }
+
+        .step__cta {
+            display: flex;
+        }
     }
 }

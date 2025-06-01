@@ -1,3 +1,4 @@
+import Contribute from './sections/contribute/Contribute';
 import Download from './sections/downloads/Download';
 import Features from './sections/features/Features';
 import Hero from './sections/hero/Hero';
@@ -10,6 +11,7 @@ export default function App() {
             <Features />
             <SetupInstructions />
             <Download />
+            <Contribute />
         </>
     );
 }

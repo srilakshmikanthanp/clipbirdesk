@@ -12,6 +12,8 @@ export default function StepList({ steps }: { steps: IStep[] }) {
                         <article>
                             <h3>{step.title}</h3>
                             <p>{step.description}</p>
+
+                            <div className={classes.step__cta}>{step.cta}</div>
                         </article>
                     </li>
                 ))}
