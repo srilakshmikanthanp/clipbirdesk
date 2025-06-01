@@ -5,7 +5,7 @@ export default function StepList({ steps }: { steps: IStep[] }) {
     return (
         <ol className={classes.steps}>
             {steps
-                .sort((currStep, prevStep) => (currStep.step_number > prevStep.step_number ? -1 : 0))
+                .sort((currStep, prevStep) => (currStep.step_number < prevStep.step_number ? -1 : 0))
                 .map(step => (
                     <li className={classes.step__item}>
                         <div>{step.icon}</div>
