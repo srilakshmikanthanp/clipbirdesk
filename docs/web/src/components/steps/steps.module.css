@@ -1,0 +1,12 @@
+.steps {
+    list-style: none;
+
+    .step__item {
+        display: flex;
+        gap: 3rem;
+
+        &:not(:last-child) {
+            margin-bottom: 4rem;
+        }
+    }
+}
