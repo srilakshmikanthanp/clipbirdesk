@@ -30,8 +30,10 @@ h1 {
 }
 
 h2 {
+    color: var(--color-primary);
+    text-align: center;
     font-size: 4rem;
-    margin-bottom: .8em;
+    margin-bottom: 1em;
 }
 
 h3 {

@@ -1,9 +1,5 @@
 .features {
-    margin: 8rem auto;
-
-    h2 {
-        text-align: center;
-    }
+    margin: 12rem auto;
 
     .features__list {
         display: flex;
