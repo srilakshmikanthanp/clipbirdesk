@@ -4,7 +4,7 @@ import Features from './sections/features/Features';
 import Footer from './sections/footer/Footer';
 import Header from './sections/header/Header';
 import Hero from './sections/hero/Hero';
-import SetupInstructions from './sections/setup/SetupInstructions';
+import SetupInstructions from './sections/setup-guide/SetupInstructions';
 
 export default function App() {
     return (

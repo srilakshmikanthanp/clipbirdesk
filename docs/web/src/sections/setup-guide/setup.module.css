@@ -1,0 +1,8 @@
+.setup {
+    margin: 0 4rem 8rem 4rem;
+
+    .setup__instructions {
+        margin: auto;
+        max-width: 720px;
+    }
+}
