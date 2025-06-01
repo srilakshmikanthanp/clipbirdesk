@@ -13,8 +13,8 @@
     }
 
     .description {
-        display: flex;
-        align-items: center;
-        gap: .5em;
+        svg {
+            vertical-align: middle;
+        }
     }
 }
