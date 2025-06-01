@@ -1,0 +1,20 @@
+.download {
+    padding: 6rem;
+    background-color: var(--color-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    text-align: center;
+
+    h2, p {
+        color: white;
+        margin-bottom: .1em;
+    }
+
+    .description {
+        display: flex;
+        align-items: center;
+        gap: .5em;
+    }
+}
