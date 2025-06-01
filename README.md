@@ -71,7 +71,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About the Project
 
-Clipbird Software helps you to sync your clipboard data between devices connected to a local network. It is a cross-platform software that works on various platforms. It is free and open-source software that is licensed under the MIT License. It currently supports `Windows` and [`Android`](https://github.com/srilakshmikanthanp/clipbirdroid).
+Clipbird Software helps you to sync your clipboard data between devices connected to a local network. It is a cross-platform software that works on various platforms. It is free and open-source software that is licensed under the MIT License. It currently supports `Windows`, `Linux` and [`Android`](https://github.com/srilakshmikanthanp/clipbirdroid).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -246,6 +246,7 @@ This project utilizes Bonjour technology by Apple for Advertising and Discovery 
 * [Dharun RK](https://github.com/rkdharun)
 * [Kaaviya S](https://github.com/kaaviya-s)
 * [Manoj Raj M](https://github.com/manojrajm)
+* [Krish](https://github.com/krissh-codes)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
