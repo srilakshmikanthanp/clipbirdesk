@@ -14,8 +14,11 @@ export default function Hero() {
                 sharing of text, links, and more.
             </p>
 
-            <Button>
-                <MdOutlineFileDownload size={20} /> Download
+            <Button
+                icon={<MdOutlineFileDownload size={20} />}
+                href="https://github.com/srilakshmikanthanp/clipbirdroid/releases/latest"
+            >
+                Download
             </Button>
 
             <figure className={classes.hero__video}>
