@@ -130,6 +130,14 @@ The **SyncingPacket** is used to transfer clipboard data between the client and 
 | Payload         | varies|       |
 | ...             | ...   | ...   |
 
+#### Possible MimeTypes
+
+| Mime Type           | Description |
+|---------------------|-------------|
+| text/plain          | Text        |
+| image/png           | Image       |
+| text/html           | HTML        |
+
 ### PingPacket
 
 The **PingPacket** is used to check the connection between the client and the server. This packet contains the following fields:
@@ -152,11 +160,3 @@ The **PingPacket** is used to check the connection between the client and the se
 | Packet Length   | 4     |       |
 | Packet Type     | 4     | 0x03  |
 | PingType        | 4     |       |
-
-#### Possible MimeTypes
-
-| Mime Type           | Description |
-|---------------------|-------------|
-| text/plain          | Text        |
-| image/png           | Image       |
-| text/html           | HTML        |
