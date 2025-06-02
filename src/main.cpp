@@ -73,6 +73,8 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::PowerHandler;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
+  QLoggingCategory::setFilterRules("*.debug=false");
+
   freopen(null_device, "w", stderr);
 
   // std::string to std::wstring
