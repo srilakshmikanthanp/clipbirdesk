@@ -137,7 +137,7 @@ void Server::processPingPacket(const packets::PingPacket &packet) {
 
   // if it is pong then ignore
   if (packet.getPingType() == types::enums::PingType::Pong) {
-    qInfo() << (LOG("Pong Received")); return;
+    qDebug() << (LOG("Pong Received")); return;
   }
 
   // using PingPacket Params
@@ -264,12 +264,12 @@ void Server::processReadyRead() {
     this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
     return;
   } catch (const types::except::NotThisPacket &e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
   } catch (const std::exception &e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
     return;
   } catch (...) {
-    qWarning() << (LOG("Unknown Error"));
+    qDebug() << (LOG("Unknown Error"));
     return;
   }
 
@@ -282,12 +282,12 @@ void Server::processReadyRead() {
     this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
     return;
   } catch (const types::except::NotThisPacket &e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
   } catch (const std::exception &e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
     return;
   } catch (...) {
-    qWarning() << (LOG("Unknown Error"));
+    qDebug() << (LOG("Unknown Error"));
     return;
   }
 

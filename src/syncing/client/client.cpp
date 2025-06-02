@@ -276,15 +276,15 @@ void Client::processReadyRead() {
     processAuthentication(fromQByteArray<packets::Authentication>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
     return;
   } catch (const types::except::NotThisPacket& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
   } catch (const std::exception& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
     return;
   } catch (...) {
-    qWarning() << (LOG("Unknown Error"));
+    qDebug() << (LOG("Unknown Error"));
     return;
   }
 
@@ -293,15 +293,15 @@ void Client::processReadyRead() {
     processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
     return;
   } catch (const types::except::NotThisPacket& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
   } catch (const std::exception& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
     return;
   } catch (...) {
-    qWarning() << (LOG("Unknown Error"));
+    qDebug() << (LOG("Unknown Error"));
     return;
   }
 
@@ -310,15 +310,15 @@ void Client::processReadyRead() {
     processPingPacket(fromQByteArray<packets::PingPacket>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
     return;
   } catch (const types::except::NotThisPacket& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
   } catch (const std::exception& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
     return;
   } catch (...) {
-    qWarning() << (LOG("Unknown Error"));
+    qDebug() << (LOG("Unknown Error"));
     return;
   }
 
@@ -327,20 +327,20 @@ void Client::processReadyRead() {
     processInvalidPacket(fromQByteArray<packets::InvalidRequest>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
     return;
   } catch (const types::except::NotThisPacket& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
   } catch (const std::exception& e) {
-    qWarning() << (LOG(e.what()));
+    qDebug() << (LOG(e.what()));
     return;
   } catch (...) {
-    qWarning() << (LOG("Unknown Error"));
+    qDebug() << (LOG("Unknown Error"));
     return;
   }
 
   // if no packet is found
-  qWarning() << (LOG("Unknown Packet Found"));
+  qDebug() << (LOG("Unknown Packet Found"));
 }
 
 /**
