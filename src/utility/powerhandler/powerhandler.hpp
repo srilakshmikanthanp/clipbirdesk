@@ -34,12 +34,14 @@ class PowerHandler : public QObject, public QAbstractNativeEventFilter {
   QString service = "org.freedesktop.login1";
   QString path = "/org/freedesktop/login1";
   QString interface = "org.freedesktop.login1.Manager";
-  QFile *inhibitLock = nullptr;
+  std::unique_ptr<QFile> inhibitLock;
 
  private:
   void registerPowerManagementListener();
   bool acquireInhibitLock();
   void releaseInhibitLock();
+  void handleLinuxSuspendEvent();
+  void handleLinuxResumeEvent();
 
 public slots:
   void PrepareForSleep(bool suspending);

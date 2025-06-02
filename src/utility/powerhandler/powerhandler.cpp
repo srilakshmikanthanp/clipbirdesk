@@ -7,12 +7,11 @@ namespace srilakshmikanthanp::clipbirdesk {
 PowerHandler::PowerHandler(controller::ClipBird *controller) : controller(controller) {
 #if defined(__linux__)
   this->registerPowerManagementListener();
+  this->acquireInhibitLock();
 #endif
 }
 
-bool PowerHandler::nativeEventFilter(
-    const QByteArray &eventType, void *message, qintptr *result
-) {
+bool PowerHandler::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) {
   constexpr const char *WIN_MSG = "windows_generic_MSG";
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -25,33 +24,6 @@ bool PowerHandler::nativeEventFilter(
 }
 
 #if defined(__linux__)
-bool PowerHandler::acquireInhibitLock() {
-  QDBusInterface iface(service, path, interface, QDBusConnection::systemBus());
-  QDBusReply<QDBusUnixFileDescriptor> reply = iface.call(
-      "Inhibit",                // method name
-      "sleep",                  // mode
-      constants::getAppName(),  // app name
-      "Preparing for suspend",  // reason
-      "delay"                   // flags
-  );
-
-  if (reply.isValid()) {
-    (inhibitLock = new QFile())->open(reply.value().fileDescriptor(), QIODevice::ReadWrite);
-    return true;
-  } else {
-    qWarning() << "Failed to acquire delay inhibitor:" << reply.error().message();
-    return false;
-  }
-}
-
-void PowerHandler::releaseInhibitLock() {
-  if (inhibitLock) {
-    inhibitLock->close();
-    delete inhibitLock;
-    inhibitLock = nullptr;
-  }
-}
-
 void PowerHandler::registerPowerManagementListener() {
   QDBusConnection systemBus = QDBusConnection::systemBus();
 
@@ -74,14 +46,61 @@ void PowerHandler::registerPowerManagementListener() {
   }
 }
 
-void PowerHandler::PrepareForSleep(bool suspending) {
-  if (suspending && acquireInhibitLock()) {
+bool PowerHandler::acquireInhibitLock() {
+  QDBusInterface iface(service, path, interface, QDBusConnection::systemBus());
+  QDBusReply<QDBusUnixFileDescriptor> reply = iface.call(
+      "Inhibit",                // method name
+      "sleep",                  // mode
+      constants::getAppName(),  // app name
+      "Preparing for suspend",  // reason
+      "delay"                   // flags
+  );
+
+  if (!reply.isValid()) {
+    qWarning() << "Failed to acquire delay inhibitor:" << reply.error().message();
+    return false;
+  }
+
+  inhibitLock = std::make_unique<QFile>();
+
+  if (!inhibitLock->open(reply.value().fileDescriptor(), QIODevice::ReadWrite)) {
+    qWarning() << "Failed to open inhibit lock file descriptor";
+    return false;
+  } else {
+    qInfo() << "Inhibit lock acquired successfully";
+    return true;
+  }
+}
+
+void PowerHandler::releaseInhibitLock() {
+  if (inhibitLock && inhibitLock->isOpen()) {
+    inhibitLock->close();
+    inhibitLock.reset();
+    qInfo() << "Block inhibitor released.";
+  } else {
+    qWarning() << "No inhibit lock to release.";
+  }
+}
+
+void PowerHandler::handleLinuxSuspendEvent() {
+  if (inhibitLock && inhibitLock->isOpen()) {
     handleSleepEvent();
     releaseInhibitLock();
   }
+}
 
-  if (!suspending) {
-    handleWakeUpEvent();
+void PowerHandler::handleLinuxResumeEvent() {
+  handleWakeUpEvent();
+  acquireInhibitLock();
+}
+
+void PowerHandler::PrepareForSleep(bool suspending) {
+  if (suspending) {
+    qInfo() << "Received suspend signal, preparing for sleep.";
+    handleLinuxSuspendEvent();
+  } else {
+    qInfo() << "Received resume signal, waking up.";
+    handleLinuxResumeEvent();
   }
 }
 #endif
