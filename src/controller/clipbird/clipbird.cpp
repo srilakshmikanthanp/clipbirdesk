@@ -480,6 +480,9 @@ void ClipBird::disposeServer() {
 
   // disconnect all clients
   server->disconnectAllClients();
+
+  // stop the server
+  server->stopServer();
 }
 
 /**
