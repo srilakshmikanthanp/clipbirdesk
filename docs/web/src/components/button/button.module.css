@@ -1,24 +1,24 @@
 .button {
-    border-radius: .5rem;
-    padding: .8rem 2.4rem;
-    border: none;
-    display: flex;
-    align-items: center;
-    gap: .6rem;
-    background-color: var(--color-secondary);
-    box-shadow: 0 0 .5rem rgba(0, 0, 0, .2);
-    color: black;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all .2s;
+  border-radius: .5rem;
+  padding: .8rem 2.4rem;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  background-color: var(--color-secondary);
+  box-shadow: 0 0 .5rem rgba(0, 0, 0, .2);
+  color: black;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .2s;
 
-    &:active {
-        transform: scale(.95);
-        box-shadow: none;
-    }
+  &:active {
+    transform: scale(.95);
+    box-shadow: none;
+  }
 
-    &:hover {
-        box-shadow: 0 0 .8rem rgba(0, 0, 0, .3);
-        transform: scale(1.02);
-    }
+  &:hover {
+    box-shadow: 0 0 .8rem rgba(0, 0, 0, .3);
+    transform: scale(1.02);
+  }
 }

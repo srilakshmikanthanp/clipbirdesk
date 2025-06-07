@@ -17,7 +17,7 @@ const setupSteps: IStep[] = [
         cta: (
             <Button
                 icon={<MdOutlineFileDownload size={20} />}
-                href="https://github.com/srilakshmikanthanp/clipbirdroid/releases/latest"
+                href="#downloads"
             >
                 Download
             </Button>
