@@ -22,14 +22,8 @@
   }
 }
 
-.contribute__forks {
+.contribute__links {
   display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
-
-.contribute__stars {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
+  flex-direction: column;
+  gap: .3em;
 }
