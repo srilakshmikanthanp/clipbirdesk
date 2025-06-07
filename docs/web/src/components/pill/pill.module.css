@@ -1,0 +1,11 @@
+.pill {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 2rem;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 3px 1rem;
+    gap: .5rem;
+}
