@@ -18,8 +18,8 @@ const contributeSteps: IStep[] = [
     description: 'Start by forking the ClipBird repository on GitHub to create your copy of the project.',
     cta: (
       <div className={classes.contribute__links}>
-          <Hyperlink icon={<FaDesktop />} text="srilakshmikanthanp/clipbirdesk" href="https://github.com/srilakshmikanthanp/clipbirdesk" />
-          <Hyperlink icon={<BsAndroid />} text="srilakshmikanthanp/clipbirdroid" href="https://github.com/srilakshmikanthanp/clipbirdroid" />
+          <Hyperlink icon={<FaDesktop />} target="_blank" text="srilakshmikanthanp/clipbirdesk" href="https://github.com/srilakshmikanthanp/clipbirdesk" />
+          <Hyperlink icon={<BsAndroid />} target="_blank" text="srilakshmikanthanp/clipbirdroid" href="https://github.com/srilakshmikanthanp/clipbirdroid" />
       </div>
     )
   },
@@ -46,8 +46,8 @@ const supportSteps: IStep[] = [
     description: 'Copy text, images, or emojis on one device and seamlessly paste them into another device.',
     cta: (
       <div className={classes.contribute__links}>
-          <Hyperlink icon={<FaDesktop />} text="srilakshmikanthanp/clipbirdesk" href="https://github.com/srilakshmikanthanp/clipbirdesk" />
-          <Hyperlink icon={<BsAndroid />} text="srilakshmikanthanp/clipbirdroid" href="https://github.com/srilakshmikanthanp/clipbirdroid" />
+          <Hyperlink icon={<FaDesktop />} target="_blank" text="srilakshmikanthanp/clipbirdesk" href="https://github.com/srilakshmikanthanp/clipbirdesk" />
+          <Hyperlink icon={<BsAndroid />} target="_blank" text="srilakshmikanthanp/clipbirdroid" href="https://github.com/srilakshmikanthanp/clipbirdroid" />
       </div>
     )
   },
