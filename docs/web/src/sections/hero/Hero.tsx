@@ -1,10 +1,13 @@
 import { MdOutlineFileDownload } from 'react-icons/md';
+import { RiSparklingLine } from 'react-icons/ri';
 import Button from '../../components/button/Button';
+import Pill from '../../components/pill/Pill';
 import classes from './hero.module.css';
 
 export default function Hero() {
     return (
         <section className={classes.hero}>
+            <Pill icon={<RiSparklingLine/>}>New: Now available also for Linux!</Pill>
             <h1>Same you, why different clipboards?</h1>
             <p className={classes.hero__primary}>
                 Experience a smarter and secure way of managing clipboard with advanced encryption.

@@ -26,7 +26,7 @@ export default function Download() {
           icon={<BsAndroid2 size={20} />}
           href="https://github.com/srilakshmikanthanp/clipbirdroid/releases/latest"
         >
-          Andrpid
+          Android
         </Button>
       </div>
     </section>

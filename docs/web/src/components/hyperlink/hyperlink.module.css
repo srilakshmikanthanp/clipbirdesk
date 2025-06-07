@@ -1,0 +1,12 @@
+.hyperlink {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 1ex;
+
+    color: var(--color-primary);
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}

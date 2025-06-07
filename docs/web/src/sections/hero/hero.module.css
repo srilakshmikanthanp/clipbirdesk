@@ -10,7 +10,7 @@
   align-items: center;
   text-align: center;
 
-  h1 {
+  & > :first-child {
     margin-top: 20rem;
   }
 

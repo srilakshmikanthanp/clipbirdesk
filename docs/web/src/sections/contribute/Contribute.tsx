@@ -3,6 +3,7 @@ import { IoIosGitPullRequest } from 'react-icons/io';
 import { LuStar } from 'react-icons/lu';
 import { VscGitPullRequestGoToChanges, VscRepoForked } from 'react-icons/vsc';
 import Button from '../../components/button/Button';
+import Hyperlink from '../../components/hyperlink/Hyperlink';
 import type { IStep } from '../../components/steps/IStep';
 import StepList from '../../components/steps/StepList';
 import classes from './contribute.module.css';
@@ -16,9 +17,9 @@ const contributeSteps: IStep[] = [
     title: 'Fork the Repository',
     description: 'Start by forking the ClipBird repository on GitHub to create your copy of the project.',
     cta: (
-      <div className={classes.contribute__forks}>
-        <Button icon={<FaDesktop size={20} />} href="https://github.com/srilakshmikanthanp/clipbirdesk" />
-        <Button icon={<BsAndroid />} href="https://github.com/srilakshmikanthanp/clipbirdroid" />
+      <div className={classes.contribute__links}>
+          <Hyperlink icon={<FaDesktop />} target="_blank" text="srilakshmikanthanp/clipbirdesk" href="https://github.com/srilakshmikanthanp/clipbirdesk" />
+          <Hyperlink icon={<BsAndroid />} target="_blank" text="srilakshmikanthanp/clipbirdroid" href="https://github.com/srilakshmikanthanp/clipbirdroid" />
       </div>
     )
   },
@@ -44,9 +45,9 @@ const supportSteps: IStep[] = [
     title: 'Star the Repository',
     description: 'Copy text, images, or emojis on one device and seamlessly paste them into another device.',
     cta: (
-      <div className={classes.contribute__stars}>
-        <Button icon={<FaDesktop size={20} />} href="https://github.com/srilakshmikanthanp/clipbirdesk" />
-        <Button icon={<BsAndroid />} href="https://github.com/srilakshmikanthanp/clipbirdroid" />
+      <div className={classes.contribute__links}>
+          <Hyperlink icon={<FaDesktop />} target="_blank" text="srilakshmikanthanp/clipbirdesk" href="https://github.com/srilakshmikanthanp/clipbirdesk" />
+          <Hyperlink icon={<BsAndroid />} target="_blank" text="srilakshmikanthanp/clipbirdroid" href="https://github.com/srilakshmikanthanp/clipbirdroid" />
       </div>
     )
   },
