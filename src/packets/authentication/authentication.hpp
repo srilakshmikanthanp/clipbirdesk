@@ -20,16 +20,16 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
  * of the authentication process
  */
 class Authentication {
- private:
-
-  quint32 packetLength;
-  quint32 packetType = 0x01;
-  quint32 authStatus;
-
  public:
 
   /// @brief Allowed Packet Types
   enum PacketType : quint8 { AuthStatus = 0x01 };
+
+ private:
+
+  quint32 packetLength;
+  quint32 packetType = PacketType::AuthStatus;
+  quint32 authStatus;
 
  public:
 

@@ -19,17 +19,17 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
  * on the client side
  */
 class InvalidRequest {
- private:
-
-  quint32 packetLength;
-  quint32 packetType = 0x00;
-  quint32 errorCode;
-  QByteArray errorMessage;
-
  public:
 
   /// @brief Allowed Packet Types
   enum PacketType : quint32 { RequestFailed = 0x00 };
+
+ private:
+
+  quint32 packetLength;
+  quint32 packetType = PacketType::RequestFailed;
+  quint32 errorCode;
+  QByteArray errorMessage;
 
  public:
 

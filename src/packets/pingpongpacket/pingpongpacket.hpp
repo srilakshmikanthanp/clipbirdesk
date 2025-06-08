@@ -19,18 +19,18 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
  * @brief Clipboard Ping Packet's to check the connection
  */
 class PingPongPacket {
- private:  // private members
-
-  quint32 packetLength;
-  quint32 packetType = 0x03;
-  quint32 pingType;
-
  public:
 
   /// @brief Allowed Packet Types
   enum PacketType : quint32 {
     PingPong = 0x03
   };
+
+ private:  // private members
+
+  quint32 packetLength;
+  quint32 packetType = PacketType::PingPong;
+  quint32 pingType;
 
  public:
 

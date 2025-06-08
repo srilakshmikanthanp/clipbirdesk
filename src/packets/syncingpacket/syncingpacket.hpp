@@ -114,17 +114,17 @@ class SyncingItem {
  * @brief Clipboard Sync Packet
  */
 class SyncingPacket {
- private:  // private members
-
-  quint32 packetLength;
-  quint32 packetType = 0x02;
-  quint32 itemCount;
-  QVector<SyncingItem> items;
-
  public:
 
   /// @brief Allowed Packet Types
   enum PacketType : quint32 { SyncPacket = 0x02 };
+
+ private:  // private members
+
+  quint32 packetLength;
+  quint32 packetType = PacketType::SyncPacket;
+  quint32 itemCount;
+  QVector<SyncingItem> items;
 
  public:
 
