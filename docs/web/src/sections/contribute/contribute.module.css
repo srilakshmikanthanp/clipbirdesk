@@ -24,6 +24,7 @@
 
 .contribute__links {
     display: flex;
-    flex-direction: column;
-    gap: 0.3em;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1em;
 }

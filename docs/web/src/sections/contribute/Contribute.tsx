@@ -21,13 +21,13 @@ const contributeSteps: IStep[] = [
                 <Hyperlink
                     icon={<FaDesktop />}
                     target="_blank"
-                    text="srilakshmikanthanp/clipbirdesk"
+                    text="clipbirdesk"
                     href="https://github.com/srilakshmikanthanp/clipbirdesk"
                 />
                 <Hyperlink
                     icon={<BsAndroid />}
                     target="_blank"
-                    text="srilakshmikanthanp/clipbirdroid"
+                    text="clipbirdroid"
                     href="https://github.com/srilakshmikanthanp/clipbirdroid"
                 />
             </div>
@@ -59,13 +59,13 @@ const supportSteps: IStep[] = [
                 <Hyperlink
                     icon={<FaDesktop />}
                     target="_blank"
-                    text="srilakshmikanthanp/clipbirdesk"
+                    text="clipbirdesk"
                     href="https://github.com/srilakshmikanthanp/clipbirdesk"
                 />
                 <Hyperlink
                     icon={<BsAndroid />}
                     target="_blank"
-                    text="srilakshmikanthanp/clipbirdroid"
+                    text="clipbirdroid"
                     href="https://github.com/srilakshmikanthanp/clipbirdroid"
                 />
             </div>
