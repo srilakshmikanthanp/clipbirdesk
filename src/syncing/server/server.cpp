@@ -124,28 +124,28 @@ void Server::processDisconnection() {
 }
 
 /**
- * @brief Precess the PingPacket from the client
+ * @brief Precess the PingPongPacket from the client
  *
- * @param packet PingPacket
+ * @param packet PingPongPacket
  */
-void Server::processPingPacket(const packets::PingPacket &packet) {
+void Server::processPingPacket(const packets::PingPongPacket &packet) {
   // get the Sender of the packet
   auto client = qobject_cast<QSslSocket *>(sender());
 
   // using Ping Packet
-  using packets::PingPacket;
+  using packets::PingPongPacket;
 
   // if it is pong then ignore
   if (packet.getPingType() == types::enums::PingType::Pong) {
     qDebug() << (LOG("Pong Received")); return;
   }
 
-  // using PingPacket Params
+  // using PingPongPacket Params
   using utility::functions::params::PingPacketParams;
 
-  // create the PingPacket
+  // create the PingPongPacket
   auto pingPacket = utility::functions::createPacket(PingPacketParams{
-    PingPacket::PacketType::PingPong,
+    PingPongPacket::PacketType::PingPong,
     types::enums::PingType::Pong
   });
 
@@ -275,7 +275,7 @@ void Server::processReadyRead() {
 
   // Deserialize the data to SyncingPacket
   try {
-    this->processPingPacket(fromQByteArray<packets::PingPacket>(data));
+    this->processPingPacket(fromQByteArray<packets::PingPongPacket>(data));
     return;
   } catch (const types::except::MalformedPacket &e) {
     const auto type = packets::InvalidRequest::PacketType::RequestFailed;
@@ -302,18 +302,18 @@ void Server::processReadyRead() {
  * @brief function to process the timeout
  */
 void Server::processPingTimeout() {
-  // using PingPacket Params
+  // using PingPongPacket Params
   using utility::functions::params::PingPacketParams;
 
   // using Ping Packet
-  using packets::PingPacket;
+  using packets::PingPongPacket;
 
   // create packet
   using utility::functions::createPacket;
 
-  // create the PingPacket
+  // create the PingPongPacket
   auto pingPacket = createPacket(PingPacketParams{
-    PingPacket::PacketType::PingPong,
+    PingPongPacket::PacketType::PingPong,
     types::enums::PingType::Ping
   });
 

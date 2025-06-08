@@ -153,11 +153,11 @@ class Client : public service::mdnsBrowser {
   void processDisconnection();
 
   /**
-   * @brief Precess the PingPacket from the client
+   * @brief Precess the PingPongPacket from the client
    *
-   * @param packet PingPacket
+   * @param packet PingPongPacket
    */
-  void processPingPacket(const packets::PingPacket &packet);
+  void processPingPacket(const packets::PingPongPacket &packet);
 
   /**
    * @brief Process the packet that has been received

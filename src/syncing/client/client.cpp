@@ -134,25 +134,25 @@ void Client::processInvalidPacket(const packets::InvalidRequest& packet) {
 }
 
 /**
- * @brief Precess the PingPacket from the client
+ * @brief Precess the PingPongPacket from the client
  *
- * @param packet PingPacket
+ * @param packet PingPongPacket
  */
-void Client::processPingPacket(const packets::PingPacket &packet) {
-  // using PingPacket Params
+void Client::processPingPacket(const packets::PingPongPacket &packet) {
+  // using PingPongPacket Params
   using utility::functions::params::PingPacketParams;
 
   // using Ping Packet
-  using packets::PingPacket;
+  using packets::PingPongPacket;
 
   // if it is pong then ignore
   if (packet.getPingType() == types::enums::PingType::Pong) {
     return;
   }
 
-  // create the PingPacket
+  // create the PingPongPacket
   auto pingPacket = utility::functions::createPacket(PingPacketParams{
-    PingPacket::PacketType::PingPong,
+    PingPongPacket::PacketType::PingPong,
     types::enums::PingType::Pong
   });
 
@@ -307,7 +307,7 @@ void Client::processReadyRead() {
 
   // try to parse the packet
   try {
-    processPingPacket(fromQByteArray<packets::PingPacket>(data));
+    processPingPacket(fromQByteArray<packets::PingPongPacket>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
     qDebug() << (LOG(e.what()));
@@ -347,18 +347,18 @@ void Client::processReadyRead() {
  * @brief function to process the timeout
  */
 void Client::processPingTimeout() {
-  // using PingPacket Params
+  // using PingPongPacket Params
   using utility::functions::params::PingPacketParams;
 
   // using Ping Packet
-  using packets::PingPacket;
+  using packets::PingPongPacket;
 
   // create packet
   using utility::functions::createPacket;
 
-  // create the PingPacket
+  // create the PingPongPacket
   auto pingPacket = createPacket(PingPacketParams{
-    PingPacket::PacketType::PingPong,
+    PingPongPacket::PacketType::PingPong,
     types::enums::PingType::Ping
   });
 

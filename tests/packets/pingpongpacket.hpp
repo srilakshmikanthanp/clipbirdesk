@@ -7,17 +7,17 @@
 #include <QByteArray>
 
 // Local header files
-#include "packets/pingpacket/pingpacket.hpp"
+#include "packets/pingpongpacket/pingpongpacket.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/nbytes/nbytes.hpp"
 #include "utility/functions/packet/packet.hpp"
 
 /**
- * @brief testing the PingPacket
+ * @brief testing the PingPongPacket
  */
-TEST(PingPacket, TestingPingPacket) {
+TEST(PingPongPacket, TestingPingPacket) {
   // using the AuthenticationPacket
-  using srilakshmikanthanp::clipbirdesk::network::packets::PingPacket;
+  using srilakshmikanthanp::clipbirdesk::network::packets::PingPongPacket;
 
     // using the ErrorCode
   using srilakshmikanthanp::clipbirdesk::types::enums::PingType;
@@ -26,17 +26,17 @@ TEST(PingPacket, TestingPingPacket) {
   using namespace srilakshmikanthanp::clipbirdesk::utility::functions;
 
   // creating the packet
-  PingPacket packet_send, packet_recv;
+  PingPongPacket packet_send, packet_recv;
 
   // constant values
-  const auto packetType = PingPacket::PacketType::PingPong;
+  const auto packetType = PingPongPacket::PacketType::PingPong;
   const auto pingType  = PingType::Ping;
 
   // create packet
   packet_send = createPacket(params::PingPacketParams{packetType, pingType});
 
   // to network byte order
-  packet_recv = fromQByteArray<PingPacket>(toQByteArray(packet_send));
+  packet_recv = fromQByteArray<PingPongPacket>(toQByteArray(packet_send));
 
   // check the packet length
   EXPECT_EQ(packet_recv.getPacketLength(), packet_send.size());

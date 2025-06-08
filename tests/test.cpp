@@ -4,7 +4,7 @@
 // Local header files
 #include "packets/authentication.hpp"
 #include "packets/invalidrequest.hpp"
-#include "packets/pingpacket.hpp"
+#include "packets/pingpongpacket.hpp"
 #include "packets/syncingpacket.hpp"
 
 /**

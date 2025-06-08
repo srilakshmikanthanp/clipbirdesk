@@ -11,7 +11,7 @@
 // Local header files
 #include "packets/authentication/authentication.hpp"
 #include "packets/invalidrequest/invalidrequest.hpp"
-#include "packets/pingpacket/pingpacket.hpp"
+#include "packets/pingpongpacket/pingpongpacket.hpp"
 #include "packets/syncingpacket/syncingpacket.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
@@ -51,7 +51,7 @@ struct SyncingPacketParams {
 };
 
 /**
- * @brief PingPacket parameters
+ * @brief PingPongPacket parameters
  */
 struct PingPacketParams {
   quint32 packetType;
@@ -102,12 +102,12 @@ network::packets::SyncingItem createPacket(params::SyncingItemParams params);
 network::packets::SyncingPacket createPacket(params::SyncingPacketParams params);
 
 /**
- * @brief Create the PingPacket
+ * @brief Create the PingPongPacket
  *
  * @param packetType
  * @param pingType
  *
- * @return PingPacket
+ * @return PingPongPacket
  */
-network::packets::PingPacket createPacket(params::PingPacketParams params);
+network::packets::PingPongPacket createPacket(params::PingPacketParams params);
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

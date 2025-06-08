@@ -123,16 +123,16 @@ network::packets::SyncingPacket createPacket(params::SyncingPacketParams params)
 }
 
 /**
- * @brief Create the PingPacket
+ * @brief Create the PingPongPacket
  *
  * @param packetType
  * @param pingType
  *
- * @return PingPacket
+ * @return PingPongPacket
  */
-network::packets::PingPacket createPacket(params::PingPacketParams params) {
+network::packets::PingPongPacket createPacket(params::PingPacketParams params) {
   // create the packet
-  network::packets::PingPacket packet;
+  network::packets::PingPongPacket packet;
 
   // set the packet type
   packet.setPacketType(params.packetType);

@@ -18,7 +18,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::packets {
 /**
  * @brief Clipboard Ping Packet's to check the connection
  */
-class PingPacket {
+class PingPongPacket {
  private:  // private members
 
   quint32 packetLength;
@@ -91,6 +91,6 @@ class PingPacket {
   /**
    * @brief From Bytes
    */
-  static PingPacket fromBytes(const QByteArray &array);
+  static PingPongPacket fromBytes(const QByteArray &array);
 };
 }
