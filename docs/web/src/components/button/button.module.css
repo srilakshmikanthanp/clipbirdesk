@@ -4,6 +4,7 @@
     border: none;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.6rem;
     background-color: var(--color-secondary);
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.2);
