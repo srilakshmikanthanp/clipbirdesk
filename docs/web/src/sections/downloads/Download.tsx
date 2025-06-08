@@ -13,19 +13,19 @@ export default function Download() {
                 <Button
                     icon={<ImWindows size={20} />}
                     href="https://github.com/srilakshmikanthanp/clipbirdesk/releases/latest"
-                >
+                    target="_blank">
                     Windows
                 </Button>
                 <Button
                     icon={<FaLinux size={20} />}
                     href="https://github.com/srilakshmikanthanp/clipbirdesk/releases/latest"
-                >
+                    target="_blank">
                     Linux
                 </Button>
                 <Button
                     icon={<BsAndroid2 size={20} />}
                     href="https://github.com/srilakshmikanthanp/clipbirdroid/releases/latest"
-                >
+                    target="_blank">
                     Android
                 </Button>
             </div>
