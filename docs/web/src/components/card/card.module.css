@@ -3,10 +3,10 @@
     align-content: center;
     width: 100%;
     border-radius: 1rem;
-    box-shadow: 0 0 1rem rgba(0, 0, 0, .2);
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);
     padding: 2rem;
     text-align: center;
-    transition: transform cubic-bezier(.04,.05,.8,1.22) .2s;
+    transition: transform cubic-bezier(0.04, 0.05, 0.8, 1.22) 0.2s;
 
     &:hover {
         transform: translateY(-1rem);

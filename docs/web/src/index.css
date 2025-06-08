@@ -21,9 +21,14 @@ html {
     scroll-behavior: smooth;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: var(--font-heading);
-    margin-bottom: .3em;
+    margin-bottom: 0.3em;
 }
 
 h1 {
@@ -52,5 +57,5 @@ body {
 }
 
 p {
-    margin-bottom: .4em;
+    margin-bottom: 0.4em;
 }
