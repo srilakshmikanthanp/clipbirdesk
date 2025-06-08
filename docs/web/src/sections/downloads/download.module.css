@@ -1,21 +1,21 @@
 .download {
-  padding: 10rem 4rem;
-  background-color: var(--color-primary);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-  text-align: center;
-
-  h2,
-  p {
-    color: white;
-    margin-bottom: .1em;
-  }
-
-  .links {
+    padding: 10rem 4rem;
+    background-color: var(--color-primary);
     display: flex;
-    flex-direction: row;
-    gap: 1rem;
-  }
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    text-align: center;
+
+    h2,
+    p {
+        color: white;
+        margin-bottom: 0.1em;
+    }
+
+    .links {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+    }
 }

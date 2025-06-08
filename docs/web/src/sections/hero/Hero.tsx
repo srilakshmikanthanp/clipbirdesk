@@ -7,7 +7,7 @@ import classes from './hero.module.css';
 export default function Hero() {
     return (
         <section className={classes.hero}>
-            <Pill icon={<RiSparklingLine/>}>New: Now available also for Linux!</Pill>
+            <Pill icon={<RiSparklingLine />}>New: Now available also for Linux!</Pill>
             <h1>Same you, why different clipboards?</h1>
             <p className={classes.hero__primary}>
                 Experience a smarter and secure way of managing clipboard with advanced encryption.
@@ -17,10 +17,7 @@ export default function Hero() {
                 sharing of text, links, and more.
             </p>
 
-            <Button
-                icon={<MdOutlineFileDownload size={20} />}
-                href="#downloads"
-            >
+            <Button icon={<MdOutlineFileDownload size={20} />} href="#downloads">
                 Download
             </Button>
 

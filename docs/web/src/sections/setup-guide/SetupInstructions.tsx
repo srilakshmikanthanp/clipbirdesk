@@ -15,10 +15,7 @@ const setupSteps: IStep[] = [
         title: 'Download and Install',
         description: 'Download ClipBird from the above the repo and install it on all devices you want to sync.',
         cta: (
-            <Button
-                icon={<MdOutlineFileDownload size={20} />}
-                href="#downloads"
-            >
+            <Button icon={<MdOutlineFileDownload size={20} />} href="#downloads">
                 Download
             </Button>
         )
