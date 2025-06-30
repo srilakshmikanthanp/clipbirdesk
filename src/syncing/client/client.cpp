@@ -643,6 +643,11 @@ void Client::onServiceRemoved(types::Device server) {
     return;
   }
 
+  // if connected to the server
+  if (this->getConnectedServer() && *device == this->getConnectedServer().value()) {
+    this->disconnectFromServer();
+  }
+
   // emit server gone
   emit OnServerGone(*device);
 
