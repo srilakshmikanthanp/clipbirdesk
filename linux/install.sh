@@ -18,7 +18,7 @@ APP_NAME="clipbird.AppImage";
 ICON_LOC="$APP_HOME/clipbird.png"
 SH_LOC="$APP_HOME/clipbird.sh"
 APP_LOC="$APP_HOME/$APP_NAME"
-LOG_FILE="$APP_HOME/log.txt"
+LOG_FILE="$APP_HOME/log.log"
 
 # Conf for .desktop file & auto start
 APPDESKTOP_FILE="$HOME/.local/share/applications/clipbird.desktop"
