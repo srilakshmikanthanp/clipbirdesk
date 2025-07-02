@@ -1,6 +1,7 @@
 #!/bin/bash
 # This Script is used to install or uninstall clipbird in the system
 # pass --install to install the clipbird [default]
+# pass --install-from-path /path/to/clipbird to install the clipbird from a custom path
 # pass --uninstall to uninstall the clipbird
 # pass --help to get the help information
 # pass --purge to uninstall the clipbird and remove the configuration files
@@ -46,14 +47,14 @@ install() {
   # make the directory in HOME
   mkdir -p $APP_HOME
 
-  # Exit immediately if any command fails
-  set -e
-
-  # Echo Information of AppImage
-  echo "Downloading $APP_URL to $APP_HOME"
-
-  # Download the AppImage
-  curl -L -o "$APP_LOC" "$APP_URL"
+  # copy the first argument to APP_HOME if provided or download the AppImage
+  if [ -n "$1" ]; then
+    echo "Installing from provided path: $1"
+    cp "$1" "$APP_LOC"
+  else
+    echo "Downloading AppImage from $APP_URL"
+    curl -L -o "$APP_LOC" "$APP_URL"
+  fi
 
   # Make the AppImage executable
   chmod +x "$APP_LOC"
@@ -94,9 +95,6 @@ install() {
 
   # start the Application
   "$SH_LOC"
-
-  # Log the status of Installation
-  echo "Application Installed to $APP_HOME"
 }
 
 uninstall() {
@@ -135,15 +133,10 @@ uninstall() {
     echo "Removing auto start file..."
     rm "$AUTOSTART_ENTRY"
   fi
-
-  echo "Uninstallation Complete"
 }
 
 purge() {
-  # Call the uninstall function to remove the AppImage and other files
-  uninstall
-  rm -rf "$APP_HOME"
-  echo "Purge Complete"
+  uninstall && rm -rf "$APP_HOME"
 }
 
 help() {
@@ -159,7 +152,7 @@ help() {
 
 main() {
   # parse the command line arguments using getopts
-  OPTIONS=$(getopt -o iuhp --long install,uninstall,purge,help -- "$@")
+  OPTIONS=$(getopt --options "" --long install,install-from:,uninstall,purge,help -- "$@")
 
   if [ $? -ne 0 ]; then
     echo "Error parsing passed options aborting..."
@@ -171,19 +164,27 @@ main() {
 
   while :; do
     case "${1}" in
-    --install | -i)
+    --install-from)
+      install "$2"
+      echo "Clipbird installed from custom path: $2"
+      shift 2
+      ;;
+    --install)
       install
+      echo "Clipbird installed successfully."
       shift 1
       ;;
-    --uninstall | -u)
+    --uninstall)
       uninstall
+      echo "Clipbird uninstalled successfully."
       shift 1
       ;;
-    --purge | -p)
+    --purge)
       purge
+      echo "Clipbird purged successfully."
       shift 1
       ;;
-    --help | -h)
+    --help)
       help
       shift 1
       ;;
