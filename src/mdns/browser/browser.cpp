@@ -12,7 +12,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
 void Browser::onHostResolved(quint16 port, QString srvName, const QHostInfo& info) {
   // check for error
   if (info.error() != QHostInfo::NoError || info.addresses().isEmpty()) {
-    qWarning() << LOG("Unable to resolve service"); return;
+    qWarning() << "Unable to resolve service"; return;
   }
 
   // remove the service type from service name
@@ -40,11 +40,11 @@ void Browser::onHostResolved(quint16 port, QString srvName, const QHostInfo& inf
   }
 
   if (result.isEmpty()) {
-    qWarning() << LOG("Service name is empty after removing service type"); return;
+    qWarning() << "Service name is empty after removing service type"; return;
   }
 
   if (serviceMap.contains(result)) {
-    qWarning() << LOG("Service already exists in the map, ignoring"); return;
+    qWarning() << "Service already exists in the map, ignoring"; return;
   }
 
   // get the ip address
@@ -84,7 +84,7 @@ void Browser::browseCallback(
 
   // check for Error
   if (errorCode != kDNSServiceErr_NoError) {
-    qWarning() << LOG("DNSServiceBrowse failed"); return;
+    qWarning() << "DNSServiceBrowse failed"; return;
   }
 
   // create context with service name and this
@@ -109,7 +109,7 @@ void Browser::browseCallback(
 
   // check for error
   if (errorType != kDNSServiceErr_NoError) {
-    qWarning() << LOG("DNSServiceResolve failed"); return;
+    qWarning() << "DNSServiceResolve failed"; return;
   }
 
   // set as non blocking
@@ -166,7 +166,7 @@ void Browser::addedCallback(
 
   // check for Error
   if (errorCode != kDNSServiceErr_NoError) {
-    qWarning() << LOG("DNSServiceResolve failed"); return;
+    qWarning() << "DNSServiceResolve failed"; return;
   }
 
   // service name
@@ -235,7 +235,7 @@ void Browser::startBrowsing() {
 
   // check for error
   if (errorType != kDNSServiceErr_NoError) {
-    qWarning() << LOG("DNSServiceBrowse failed"); return;
+    qWarning() << "DNSServiceBrowse failed"; return;
   }
 
   // create socket notifier
@@ -248,7 +248,7 @@ void Browser::startBrowsing() {
   // process register socket
   const auto processBrowseSock = [=] {
     if (DNSServiceProcessResult(this->m_browse_ref) != kDNSServiceErr_NoError) {
-      qWarning() << LOG("DNSServiceProcessResult failed");
+      qWarning() << "DNSServiceProcessResult failed";
     }
   };
 

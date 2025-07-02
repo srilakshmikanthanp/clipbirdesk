@@ -61,7 +61,7 @@ void Server::processSslErrors(QSslSocket *socket, const QList<QSslError>& errors
 
   // log the errors for debugging
   for (auto error : errorsCopy) {
-    qWarning() << (LOG(std::to_string(error.error()) + " : " + error.errorString().toStdString()));
+    qWarning() << std::to_string(error.error()) + " : " + error.errorString().toStdString();
   }
 
   // if errorsCopy is not empty
@@ -137,7 +137,7 @@ void Server::processPingPacket(const packets::PingPongPacket &packet) {
 
   // if it is pong then ignore
   if (packet.getPingType() == types::enums::PingType::Pong) {
-    qDebug() << (LOG("Pong Received")); return;
+    qDebug() << "Pong Received"; return;
   }
 
   // using PingPongPacket Params
@@ -264,12 +264,12 @@ void Server::processReadyRead() {
     this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
     return;
   } catch (const types::except::NotThisPacket &e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
   } catch (const std::exception &e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
     return;
   } catch (...) {
-    qDebug() << (LOG("Unknown Error"));
+    qDebug() << "Unknown Error";
     return;
   }
 
@@ -282,12 +282,12 @@ void Server::processReadyRead() {
     this->sendPacket(client, createPacket({type, e.getCode(), e.what()}));
     return;
   } catch (const types::except::NotThisPacket &e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
   } catch (const std::exception &e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
     return;
   } catch (...) {
-    qDebug() << (LOG("Unknown Error"));
+    qDebug() << "Unknown Error";
     return;
   }
 
@@ -484,7 +484,7 @@ void Server::startServer() {
   auto port = std::to_string(m_server->serverPort());
 
   // log port
-  qInfo() << (LOG("Server started at port: " + port));
+  qInfo() << "Server started at port: " + port;
 
   // start the discovery server
   this->registerServiceAsync();

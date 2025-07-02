@@ -42,7 +42,7 @@ void Client::processSslErrors(const QList<QSslError>& errors) {
 
   // log the errors
   for (auto error : errorsCopy) {
-    qWarning() << (LOG(std::to_string(error.error()) + " : " + error.errorString().toStdString()));
+    qWarning() << std::to_string(error.error()) + " : " + error.errorString().toStdString();
   }
 
   // if errorsCopy is not empty
@@ -86,7 +86,7 @@ void Client::processSslErrorsSecured(const QList<QSslError>& errors) {
 
   // log the errors
   for (auto error : errorsCopy) {
-    qWarning() << (LOG(std::to_string(error.error()).c_str()));
+    qWarning() << std::to_string(error.error()).c_str();
   }
 
   // if errors are not empty abort the connection
@@ -276,15 +276,15 @@ void Client::processReadyRead() {
     processAuthentication(fromQByteArray<packets::Authentication>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
     return;
   } catch (const types::except::NotThisPacket& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
   } catch (const std::exception& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
     return;
   } catch (...) {
-    qDebug() << (LOG("Unknown Error"));
+    qDebug() << "Unknown Error";
     return;
   }
 
@@ -293,15 +293,15 @@ void Client::processReadyRead() {
     processSyncingPacket(fromQByteArray<packets::SyncingPacket>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
     return;
   } catch (const types::except::NotThisPacket& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
   } catch (const std::exception& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
     return;
   } catch (...) {
-    qDebug() << (LOG("Unknown Error"));
+    qDebug() << "Unknown Error";
     return;
   }
 
@@ -310,15 +310,15 @@ void Client::processReadyRead() {
     processPingPacket(fromQByteArray<packets::PingPongPacket>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
     return;
   } catch (const types::except::NotThisPacket& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
   } catch (const std::exception& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
     return;
   } catch (...) {
-    qDebug() << (LOG("Unknown Error"));
+    qDebug() << "Unknown Error";
     return;
   }
 
@@ -327,20 +327,20 @@ void Client::processReadyRead() {
     processInvalidPacket(fromQByteArray<packets::InvalidRequest>(data));
     return;
   } catch (const types::except::MalformedPacket& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
     return;
   } catch (const types::except::NotThisPacket& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
   } catch (const std::exception& e) {
-    qDebug() << (LOG(e.what()));
+    qDebug() << e.what();
     return;
   } catch (...) {
-    qDebug() << (LOG("Unknown Error"));
+    qDebug() << "Unknown Error";
     return;
   }
 
   // if no packet is found
-  qDebug() << (LOG("Unknown Packet Found"));
+  qDebug() << "Unknown Packet Found";
 }
 
 /**
@@ -509,7 +509,7 @@ void Client::connectToServer(types::Device server) {
   const auto port = server.port;
 
   // log host and port
-  qInfo() << (LOG("Connecting to server: " + host.toStdString() + ":" + std::to_string(port)));
+  qInfo() << "Connecting to server: " + host.toStdString() + ":" + std::to_string(port);
 
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
@@ -547,7 +547,7 @@ void Client::connectToServerSecured(types::Device server) {
   const auto port = server.port;
 
   // log host and port
-  qInfo() << (LOG("Connecting to server: " + host.toStdString() + ":" + std::to_string(port)));
+  qInfo() << "Connecting to server: " + host.toStdString() + ":" + std::to_string(port);
 
   // connect to the server as encrypted
   m_ssl_socket->connectToHostEncrypted(host, port);
