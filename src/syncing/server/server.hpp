@@ -37,7 +37,7 @@ class Server : public Synchronizer {
 
  signals:  // signals
   /// @brief On Sync Request
-  void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
+  void OnSyncRequest(QVector<QPair<QString, QByteArray>> items) override;
 
  signals:  // signals for this class
   /// @brief On Sync Request

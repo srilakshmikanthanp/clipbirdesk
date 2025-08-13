@@ -29,7 +29,13 @@ class Synchronizer : public QObject {
 
  public:  // methods
 
-  /** @brief Synchronize the clipboard data
+   /**
+   * @brief  On Sync Request
+   */
+  virtual void OnSyncRequest(QVector<QPair<QString, QByteArray>> items) = 0;
+
+  /**
+   * @brief Synchronize the clipboard data
    *
    * This method is responsible for synchronizing the clipboard data
    * between different clients. It will handle the logic to ensure that
