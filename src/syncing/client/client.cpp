@@ -387,7 +387,7 @@ void Client::processPongTimeout() {
  * @param th threshold
  * @param parent Parent
  */
-Client::Client(QString serviceName, QString serviceType, QObject* parent) : QObject(parent), m_mdnsBrowser(new mdns::MdnsBrowser(serviceName, serviceType, this)) {
+Client::Client(QString serviceName, QString serviceType, QObject* parent) : Synchronizer(parent), m_mdnsBrowser(new mdns::MdnsBrowser(serviceName, serviceType, this)) {
   // connect the signals and slots for the errorOccurred
   connect(
     m_ssl_socket, &QSslSocket::errorOccurred,
@@ -456,7 +456,7 @@ QSslConfiguration Client::getSslConfiguration() const {
  *
  * @param items QVector<QPair<QString, QByteArray>>
  */
-void Client::syncItems(QVector<QPair<QString, QByteArray>> items) {
+void Client::synchronize(QVector<QPair<QString, QByteArray>> items) {
   // check if the socket is connected else throw error
   if (!m_ssl_socket->isOpen()) {
     return;

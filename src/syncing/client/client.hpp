@@ -22,6 +22,7 @@
 
 // Local headers
 #include "mdns/mdns.hpp"
+#include "syncing/synchronizer.hpp"
 #include "types/enums/enums.hpp"
 #include "types/device.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
@@ -33,7 +34,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing client that syncs the clipboard data between
  * client and server
  */
-class Client : public QObject {
+class Client : public Synchronizer {
  signals:  // signals for this class
   /// @brief On Server List Changed
   void OnServerListChanged(std::optional<types::Device> server, QList<types::Device> servers);
@@ -219,7 +220,7 @@ class Client : public QObject {
    *
    * @param items QVector<QPair<QString, QByteArray>>
    */
-  void syncItems(QVector<QPair<QString, QByteArray>> items);
+  void synchronize(QVector<QPair<QString, QByteArray>> items);
 
   /**
    * @brief Get the Server List object

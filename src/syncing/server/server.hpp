@@ -10,6 +10,7 @@
 #include <QVector>
 
 #include "mdns/mdns.hpp"
+#include "syncing/synchronizer.hpp"
 #include "types/device.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
@@ -21,7 +22,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing server that syncs the clipboard data between
  * the clients
  */
-class Server : public QObject {
+class Server : public Synchronizer {
  signals:  // signals for this class
   /// @brief On Server State Changed
   void OnMdnsRegisterStatusChangeChanged(bool started);
@@ -190,7 +191,7 @@ class Server : public QObject {
    *
    * @param data QVector<QPair<QString, QByteArray>>
    */
-  void syncItems(QVector<QPair<QString, QByteArray>> items);
+  void synchronize(QVector<QPair<QString, QByteArray>> items);
 
   /**
    * @brief Get the Clients that are connected to the server

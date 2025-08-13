@@ -42,7 +42,7 @@ void ClipBird::handleServerStatusChanged(bool status, types::Device host) {
 
   // get the client and disconnect the signals
   auto signal  = &clipboard::ApplicationClipboard::OnClipboardChange;
-  auto slot    = &Client::syncItems;
+  auto slot    = &network::syncing::Synchronizer::synchronize;
   auto *client = &std::get<Client>(m_host);
   auto &store  = storage::Storage::instance();
 
@@ -231,7 +231,7 @@ void ClipBird::setCurrentHostAsServer() {
   // connect the OnClipboardChange signal to the server
   connect(
     &m_clipboard, &clipboard::ApplicationClipboard::OnClipboardChange,
-    server, &Server::syncItems
+    server, &network::syncing::Synchronizer::synchronize
   );
 
   // Connect the onClientListChanged signal to the signal
@@ -602,13 +602,7 @@ void ClipBird::disposeClient() {
  * @brief Sync the clipboard data with the Group
  */
 void ClipBird::syncClipboard(const QVector<QPair<QString, QByteArray>> &data) {
-  if(std::holds_alternative<Client>(m_host)) {
-    std::get<Client>(m_host).syncItems(data);
-  }
-
-  if (std::holds_alternative<Server>(m_host)) {
-    std::get<Server>(m_host).syncItems(data);
-  }
+  std::visit([&](auto &host) { host.synchronize(data); }, m_host);
 }
 
 /**

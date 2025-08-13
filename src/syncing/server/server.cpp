@@ -344,7 +344,7 @@ void Server::processPongTimeout() {
  * @param config SSL configuration
  * @param parent Parent object
  */
-Server::Server(QString serviceName, QString serviceType, QObject *parent) : QObject(parent), m_mdnsRegister(new mdns::MdnsRegister(serviceName, serviceType, this)) {
+Server::Server(QString serviceName, QString serviceType, QObject *parent) : Synchronizer(parent), m_mdnsRegister(new mdns::MdnsRegister(serviceName, serviceType, this)) {
   // Connect the socket to the callback function that
   // process the connections when the socket is ready
   // to read so the listener can be notified
@@ -386,7 +386,7 @@ Server::Server(QString serviceName, QString serviceType, QObject *parent) : QObj
  *
  * @param data QVector<QPair<QString, QByteArray>>
  */
-void Server::syncItems(QVector<QPair<QString, QByteArray>> items) {
+void Server::synchronize(QVector<QPair<QString, QByteArray>> items) {
   const auto packType = packets::SyncingPacket::PacketType::SyncPacket;
   this->sendPacket(utility::functions::createPacket({packType, items}));
 }

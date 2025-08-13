@@ -12,6 +12,7 @@
 
 // project headers
 #include "clipboard/applicationclipboard.hpp"
+#include "syncing/synchronizer.hpp"
 #include "syncing/client/client.hpp"
 #include "syncing/server/server.hpp"
 #include "store/storage.hpp"
