@@ -21,11 +21,10 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing server that syncs the clipboard data between
  * the clients
  */
-class Server : public service::mdnsRegister {
+class Server : public QObject {
  signals:  // signals for this class
   /// @brief On Server State Changed
   void OnMdnsRegisterStatusChangeChanged(bool started);
-
 
  signals:  // signals
   /// @brief On client state changed
@@ -71,6 +70,9 @@ class Server : public service::mdnsRegister {
 
   /// @brief property to hold read time
   const char* READ_TIME = "READ_TIME";
+
+  /// @brief mDNS Register
+  mdns::MdnsRegister *m_mdnsRegister;
 
  private:  // some typedefs
 
@@ -176,7 +178,7 @@ class Server : public service::mdnsRegister {
    * @param config SSL configuration
    * @param parent Parent object
    */
-  explicit Server(QObject* p = nullptr);
+  explicit Server(QString serviceName, QString serviceType, QObject* p = nullptr);
 
   /**
    * @brief Destroy the Syncing Server object
@@ -264,17 +266,9 @@ class Server : public service::mdnsRegister {
    */
   void authFailed(types::Device device);
 
- protected:  // override functions from the base class
-
   /**
-   * @brief Get the Port number of the Server it can be any port
-   * number from 0 to 65535 but the port number should be greater than 1024
-   * because the port number less than 1024 are reserved for the system
-   * services
-   *
-   * @return types::Port Port number
-   * @throw Any Exception If any error occurs
+   * @brief Get the mDNS Register object
    */
-  virtual quint16 getPort() const override;
+  mdns::MdnsRegister* getMdnsRegister() const;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

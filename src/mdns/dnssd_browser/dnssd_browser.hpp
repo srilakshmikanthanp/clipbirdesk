@@ -17,6 +17,7 @@
 #include <QtLogging>
 #include <QtTypes>
 #include <QMutex>
+#include <QDebug>
 
 // htons, ntohs
 #ifdef __linux__
@@ -27,6 +28,7 @@
 #include <dns_sd.h>
 
 // Local headers
+#include "mdns/browser.hpp"
 #include "constants/constants.hpp"
 #include "types/enums/enums.hpp"
 #include "types/device.hpp"
@@ -35,13 +37,13 @@
 // Platform headers
 #include "utility/functions/generic/generic.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
+namespace srilakshmikanthanp::clipbirdesk::network::mdns {
 /**
  * @brief Discovery client that sends the broadcast message
  * to the server and listen for the response if any server
  * is found then the callback function is called
  */
-class Browser : public QObject {
+class DnssdBrowser : public Browser {
  private:  // private variables
 
   QSocketNotifier* m_browse_notify = nullptr;  ///< Socket notifier
@@ -59,7 +61,7 @@ class Browser : public QObject {
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(Browser)
+  Q_DISABLE_COPY_MOVE(DnssdBrowser)
 
  private:  // private functions
 
@@ -111,16 +113,16 @@ class Browser : public QObject {
  public:
 
   /**
-   * @brief Construct a new Discovery Browser object
+   * @brief Construct a new Discovery MdnsBrowser object
    *
    * @param parent Parent object
    */
-  explicit Browser(QObject* parent = nullptr);
+  explicit DnssdBrowser(QString serviceName, QString serviceType, QObject* parent = nullptr);
 
   /**
-   * @brief Destroy the Discovery Browser object
+   * @brief Destroy the Discovery MdnsBrowser object
    */
-  virtual ~Browser();
+  virtual ~DnssdBrowser();
 
   /**
    * @brief Starts the mDNS Browsing
@@ -132,7 +134,7 @@ class Browser : public QObject {
    */
   void stopBrowsing();
 
- protected:  // abstract functions
+ signals:
 
   /**
    * @brief On server found abstract function that
@@ -141,7 +143,7 @@ class Browser : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServiceAdded(types::Device)   = 0;
+  void onServiceAdded(types::Device) override;
 
   /**
    * @brief On Server Removed abstract function that
@@ -150,7 +152,7 @@ class Browser : public QObject {
    * @param host Host address
    * @param port Port number
    */
-  virtual void onServiceRemoved(types::Device) = 0;
+  void onServiceRemoved(types::Device) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd
 #endif

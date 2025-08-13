@@ -23,7 +23,7 @@ QSslConfiguration Application::getOldSslConfiguration() {
   auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
   // Name is updated
-  if (name != QString::fromStdString(constants::getMDnsServiceName())) {
+  if (name != constants::getMDnsServiceName()) {
     return getNewSslConfiguration();
   }
 

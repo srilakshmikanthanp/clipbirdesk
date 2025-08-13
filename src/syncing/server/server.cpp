@@ -344,7 +344,7 @@ void Server::processPongTimeout() {
  * @param config SSL configuration
  * @param parent Parent object
  */
-Server::Server(QObject *parent) : service::mdnsRegister(parent) {
+Server::Server(QString serviceName, QString serviceType, QObject *parent) : QObject(parent), m_mdnsRegister(new mdns::MdnsRegister(serviceName, serviceType, this)) {
   // Connect the socket to the callback function that
   // process the connections when the socket is ready
   // to read so the listener can be notified
@@ -355,7 +355,7 @@ Server::Server(QObject *parent) : service::mdnsRegister(parent) {
 
   // Notify the listeners that the server is started
   QObject::connect(
-    this, &service::mdnsRegister::OnServiceRegistered,
+    m_mdnsRegister, &mdns::MdnsRegister::OnServiceRegistered,
     [=] { emit OnMdnsRegisterStatusChangeChanged(true); }
   );
 
@@ -487,7 +487,7 @@ void Server::startServer() {
   qInfo() << "Server started at port: " + port;
 
   // start the discovery server
-  this->registerServiceAsync();
+  m_mdnsRegister->registerService(m_server->serverPort());
 
   // start the ping timer
   m_pingTimer->start(constants::getAppMaxWriteIdleTime());
@@ -501,7 +501,7 @@ void Server::startServer() {
  */
 void Server::stopServer() {
   // stop the discovery server
-  this->unregisterService();
+  m_mdnsRegister->unregisterService();
 
     // Notify the listeners
   emit OnMdnsRegisterStatusChangeChanged(false);
@@ -650,15 +650,9 @@ void Server::authFailed(types::Device device) {
 }
 
 /**
- * @brief Get the Port number of the Server it can be any port
- * number from 0 to 65535 but the port number should be greater than 1024
- * because the port number less than 1024 are reserved for the system
- * services
- *
- * @return types::Port Port number
- * @throw Any Exception If any error occurs
+ * @brief Get the mDNS Register object
  */
-quint16 Server::getPort() const {
-  return m_server->serverPort();
+mdns::MdnsRegister* Server::getMdnsRegister() const {
+  return m_mdnsRegister;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

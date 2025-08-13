@@ -14,6 +14,7 @@
 #include <QTimer>
 #include <QUdpSocket>
 #include <QtLogging>
+#include <QDebug>
 
 // htons, ntohs
 #ifdef __linux__
@@ -24,18 +25,18 @@
 #include <dns_sd.h>
 
 // Local headers
-#include "constants/constants.hpp"
+#include "mdns/register.hpp"
 #include "types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
+namespace srilakshmikanthanp::clipbirdesk::network::mdns {
 /**
  * @brief Abstract Discovery server that Listens for the client that send
  * the broadcast message The user of this class should implement the
  * getIpType(), getIPAddress() and getPort() functions to return the
  * IP type, IP address and port number respectively
  */
-class Register : public QObject {
+class DnssdRegister : public Register {
  private:   // private variables
 
   QSocketNotifier* m_notifier = nullptr; ///< Socket notifier
@@ -43,7 +44,7 @@ class Register : public QObject {
 
  signals:
   // Signal for service registered
-  void OnServiceRegistered();
+  void OnServiceRegistered() override;
 
  private:  // typedefs for this class
 
@@ -55,7 +56,7 @@ class Register : public QObject {
 
  private:  // disable copy and move
 
-  Q_DISABLE_COPY_MOVE(Register)
+  Q_DISABLE_COPY_MOVE(DnssdRegister)
 
  private: // private functions
 
@@ -84,35 +85,24 @@ class Register : public QObject {
    *
    * @param parent Parent object
    */
-  explicit Register(QObject* parent = nullptr);
-
- protected:  // protected functions
+  explicit DnssdRegister(QString serviceName, QString serviceType, QObject* parent = nullptr);
 
   /**
    * @brief Destroy the Discovery Register object
    */
-  virtual ~Register();
+  virtual ~DnssdRegister();
 
  public:
 
   /**
    * @brief Register the service
    */
-  void registerServiceAsync();
+  void registerService(int port);
 
   /**
    * @brief Stop the server
    */
   void unregisterService();
-
- protected:  // protected functions
-
-  /**
-   * @brief Get the Port
-   *
-   * @return quint16
-   */
-  virtual quint16 getPort() const = 0;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service
 #endif

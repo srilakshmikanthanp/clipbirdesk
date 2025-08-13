@@ -33,7 +33,7 @@ namespace srilakshmikanthanp::clipbirdesk::network::syncing {
  * @brief Syncing client that syncs the clipboard data between
  * client and server
  */
-class Client : public service::mdnsBrowser {
+class Client : public QObject {
  signals:  // signals for this class
   /// @brief On Server List Changed
   void OnServerListChanged(std::optional<types::Device> server, QList<types::Device> servers);
@@ -91,6 +91,9 @@ class Client : public service::mdnsBrowser {
 
   /// @brief property to hold read time
   const char* READ_TIME = "READ_TIME";
+
+  /// @brief mDNS Browser
+  mdns::MdnsBrowser* m_mdnsBrowser;
 
  private:  // private functions
 
@@ -193,7 +196,7 @@ class Client : public service::mdnsBrowser {
    * @param th threshold
    * @param parent Parent
    */
-  Client(QObject* parent = nullptr);
+  Client(QString serviceName, QString serviceType, QObject* parent = nullptr);
 
   /**
    * @brief Destroy the Syncing Client object
@@ -258,7 +261,12 @@ class Client : public service::mdnsBrowser {
    */
   QSslCertificate getConnectedServerCertificate() const;
 
- protected:  // abstract functions from the base class
+  /**
+   * @brief Get the browser object
+   */
+  mdns::MdnsBrowser* getMdnsBrowser() const;
+
+ private:
 
   /**
    * @brief On server found function that That Called by the
@@ -267,7 +275,7 @@ class Client : public service::mdnsBrowser {
    * @param host Host address
    * @param port Port number
    */
-  void onServiceAdded(types::Device server) override;
+  void handleServiceAdded(types::Device server);
 
   /**
    * @brief On server removed function that That Called by the
@@ -275,6 +283,6 @@ class Client : public service::mdnsBrowser {
    *
    * @param server
    */
-  void onServiceRemoved(types::Device server) override;
+  void handleServiceRemoved(types::Device server);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

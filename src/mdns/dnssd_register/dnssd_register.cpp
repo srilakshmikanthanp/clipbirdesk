@@ -1,15 +1,15 @@
 #if defined(_WIN32) || defined(__APPLE__) || defined(__linux__) // Only for Operating System that supports bonjour or compatible to it
 
-#include "register.hpp"
+#include "dnssd_register.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
+namespace srilakshmikanthanp::clipbirdesk::network::mdns {
 /**
  * @brief Callback function for DNSServiceRegister function
  * This is called when the service is registered, Note
  * this is a static function so we need to pass the
  * Register object as context
  */
-void Register::publishCallback(
+void DnssdRegister::publishCallback(
     DNSServiceRef serviceRef,                   // DNSServiceRef
     DNSServiceFlags flags,                      // DNSServiceFlags
     DNSServiceErrorType errorCode,              // DNSServiceErrorType
@@ -19,7 +19,7 @@ void Register::publishCallback(
     void* context                               // context
 ) {
   // convert context to Register object
-  auto registerObj = static_cast<Register*>(context);
+  auto registerObj = static_cast<DnssdRegister*>(context);
 
   // Avoid warning of unused variables
   Q_UNUSED(flags);
@@ -39,7 +39,7 @@ void Register::publishCallback(
 /**
  * @brief Process Activated
  */
-void Register::processActivated() {
+void DnssdRegister::processActivated() {
   if (DNSServiceProcessResult(this->m_serviceRef) != kDNSServiceErr_NoError) {
     qWarning() << "DNSServiceProcessResult failed"; return;
   }
@@ -50,7 +50,7 @@ void Register::processActivated() {
  *
  * @param parent Parent object
  */
-Register::Register(QObject* parent) : QObject(parent) {
+DnssdRegister::DnssdRegister(QString serviceName, QString serviceType, QObject* parent) : Register(serviceName, serviceType, parent) {
   // Empty Constructor just calls the parent constructor
 }
 
@@ -60,17 +60,20 @@ Register::Register(QObject* parent) : QObject(parent) {
  * @param callback Callback function to be called
  * when service Registered
  */
-void Register::registerServiceAsync() {
+void DnssdRegister::registerService(int port) {
+  const char* serviceName = this->m_serviceName.toUtf8().constData();
+  const char* serviceType = this->m_serviceType.toUtf8().constData();
+
   // register service for clipbird
   auto errorType = DNSServiceRegister(
       &this->m_serviceRef,                      // DNSServiceRef
       kDNSServiceInterfaceIndexAny,             // interfaceIndex
       0,                                        // flags
-      constants::getMDnsServiceName().c_str(),  // server's name
-      constants::getMDnsServiceType(),          // service type
+      serviceName,                              // server's name
+      serviceType,                              // service type
       NULL,                                     // domain
       NULL,                                     // host
-      htons(this->getPort()),                   // port
+      htons(port),                              // port
       0,                                        // txtLen
       0,                                        // txtRecord
       publishCallback,                          // callback
@@ -92,14 +95,14 @@ void Register::registerServiceAsync() {
   // connect the socket notifier to slot
   connect(
     this->m_notifier, &QSocketNotifier::activated,
-    this, &Register::processActivated
+    this, &DnssdRegister::processActivated
   );
 }
 
 /**
  * @brief Stop the server
  */
-void Register::unregisterService() {
+void DnssdRegister::unregisterService() {
   // check for service & notifier
   if (this->m_serviceRef == nullptr || this->m_notifier == nullptr) {
     return;
@@ -124,7 +127,7 @@ void Register::unregisterService() {
 /**
  * @brief Destroy the Discovery Register object
  */
-Register::~Register() {
+DnssdRegister::~DnssdRegister() {
   this->unregisterService();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd

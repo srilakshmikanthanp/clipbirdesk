@@ -111,8 +111,8 @@ const char* getAppDonatePage() {
  *
  * @return const char*
  */
-std::string getMDnsServiceName() {
-  return QSysInfo::machineHostName().toStdString();
+QString getMDnsServiceName() {
+  return QSysInfo::machineHostName();
 }
 
 /**
@@ -120,8 +120,8 @@ std::string getMDnsServiceName() {
  *
  * @return const char*
  */
-const char* getMDnsServiceType() {
-  return "_clipbird._tcp";
+QString getMDnsServiceType() {
+  return QString("_clipbird._tcp");
 }
 
 /**

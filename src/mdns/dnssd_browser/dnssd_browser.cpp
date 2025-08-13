@@ -1,22 +1,22 @@
 #if defined(_WIN32) || defined(__APPLE__) || defined(__linux__)  // Only for Operating System that supports bonjour or compatible to it
 
-#include "browser.hpp"
+#include "dnssd_browser.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service::mdns {
+namespace srilakshmikanthanp::clipbirdesk::network::mdns {
 /**
  * @brief Callback for QHostInfo Address Resolve Function
  *
  * @param isAdded
  * @param const QHostInfo& info
  */
-void Browser::onHostResolved(quint16 port, QString srvName, const QHostInfo& info) {
+void DnssdBrowser::onHostResolved(quint16 port, QString srvName, const QHostInfo& info) {
   // check for error
   if (info.error() != QHostInfo::NoError || info.addresses().isEmpty()) {
     qWarning() << "Unable to resolve service"; return;
   }
 
   // remove the service type from service name
-  srvName.remove("." + QString::fromStdString(constants::getMDnsServiceType() + std::string(".local.")));
+  srvName.remove("." + this->m_serviceType + QString(".local."));
 
   // Replace the \xxx ascii code to char
   QRegularExpression regex("\\\\([0-9]{3})");
@@ -60,7 +60,7 @@ void Browser::onHostResolved(quint16 port, QString srvName, const QHostInfo& inf
 /**
  * @brief Callback function for DNSServiceBrowse function
  */
-void Browser::browseCallback(
+void DnssdBrowser::browseCallback(
     DNSServiceRef serviceRef,                        // DNSServiceRef
     DNSServiceFlags flags,                           // DNSServiceFlags
     uint32_t interfaceIndex,                         // InterfaceIndex
@@ -70,13 +70,13 @@ void Browser::browseCallback(
     const char* domain,                              // domain
     void* context                                    // context
 ) {
+  // convert context to Register object
+  auto browserObj = static_cast<DnssdBrowser*>(context);
+
   // if the service name is same as our service name
-  if (constants::getMDnsServiceName() == std::string(serviceName)) {
+  if (browserObj->m_serviceName == std::string(serviceName)) {
     return;
   }
-
-  // convert context to Register object
-  auto browserObj = static_cast<Browser*>(context);
 
   // Avoid warning of unused variables
   Q_UNUSED(interfaceIndex);
@@ -141,7 +141,7 @@ void Browser::browseCallback(
 /**
  * @brief Callback function for DNSServiceResolve function
  */
-void Browser::addedCallback(
+void DnssdBrowser::addedCallback(
     DNSServiceRef serviceRef,                        // DNSServiceRef
     DNSServiceFlags flags,                           // DNSServiceFlags
     uint32_t interfaceIndex,                         // InterfaceIndex
@@ -154,7 +154,7 @@ void Browser::addedCallback(
     void* context                                    // context
 ) {
   // convert context to Register object
-  auto browserObj = static_cast<Browser*>(context);
+  auto browserObj = static_cast<DnssdBrowser*>(context);
 
   // Avoid warning of unused variables
   Q_UNUSED(interfaceIndex);
@@ -184,7 +184,7 @@ void Browser::addedCallback(
 /**
  * @brief Callback function for DNSServiceResolve function
  */
-void Browser::removeCallback(QString serviceName) {
+void DnssdBrowser::removeCallback(QString serviceName) {
   // remove the service name from service map
   auto service = this->serviceMap.find(serviceName);
   auto device = types::Device();
@@ -207,11 +207,11 @@ void Browser::removeCallback(QString serviceName) {
 }
 
 /**
- * @brief Construct a new Discovery Browser object
+ * @brief Construct a new Discovery DnssdBrowser object
  *
  * @param parent Parent object
  */
-Browser::Browser(QObject* parent) : QObject(parent) {
+DnssdBrowser::DnssdBrowser(QString serviceName, QString serviceType, QObject* parent) : Browser(serviceName, serviceType, parent) {
   // Empty Constructor just calls the parent constructor
 }
 
@@ -221,13 +221,15 @@ Browser::Browser(QObject* parent) : QObject(parent) {
  *
  * @param interval Interval between each broadcast
  */
-void Browser::startBrowsing() {
+void DnssdBrowser::startBrowsing() {
+  const char *serviceType = this->m_serviceType.toStdString().c_str();
+
   // Start to browse for the service
   auto errorType = DNSServiceBrowse(
       &this->m_browse_ref,                           // DNSServiceRef
       0,                                             // DNSServiceFlags
       kDNSServiceInterfaceIndexAny,                  // InterfaceIndex
-      constants::getMDnsServiceType(),               // regtype
+      serviceType,                            // regtype
       NULL,                                          // domain
       browseCallback,                                // callback
       this                                           // context
@@ -260,10 +262,10 @@ void Browser::startBrowsing() {
 }
 
 /**
- * @brief Stops the mDNS Browser by stopping the
+ * @brief Stops the mDNS DnssdBrowser by stopping the
  * socket notifier and service
  */
-void Browser::stopBrowsing() {
+void DnssdBrowser::stopBrowsing() {
   const auto deleter = [=](auto& serviceRef, auto*& notifier) {
     // check for service ref & notifier
     if (serviceRef == nullptr || notifier == nullptr) {
@@ -294,9 +296,9 @@ void Browser::stopBrowsing() {
 }
 
 /**
- * @brief Destroy the Discovery Browser object
+ * @brief Destroy the Discovery DnssdBrowser object
  */
-Browser::~Browser() {
+DnssdBrowser::~DnssdBrowser() {
   this->stopBrowsing();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service::dnsd

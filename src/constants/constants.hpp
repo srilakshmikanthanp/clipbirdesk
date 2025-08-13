@@ -96,14 +96,14 @@ QSize getAppWindowSize();
  *
  * @return const char*
  */
-std::string getMDnsServiceName();
+QString getMDnsServiceName();
 
 /**
  * @brief Get the MDns Service Type
  *
  * @return const char*
  */
-const char* getMDnsServiceType();
+QString getMDnsServiceType();
 
 /**
  * @brief Get the App Org Name object

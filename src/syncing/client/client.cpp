@@ -387,13 +387,24 @@ void Client::processPongTimeout() {
  * @param th threshold
  * @param parent Parent
  */
-Client::Client(QObject* parent) : service::mdnsBrowser(parent) {
+Client::Client(QString serviceName, QString serviceType, QObject* parent) : QObject(parent), m_mdnsBrowser(new mdns::MdnsBrowser(serviceName, serviceType, this)) {
   // connect the signals and slots for the errorOccurred
   connect(
     m_ssl_socket, &QSslSocket::errorOccurred,
     [=]{
       this->OnConnectionError(this->m_ssl_socket->errorString());
     }
+  );
+
+  // connect signals for the mDNS Browser
+  connect(
+    m_mdnsBrowser, &mdns::MdnsBrowser::onServiceAdded,
+    this, &Client::handleServiceAdded
+  );
+
+  connect(
+    m_mdnsBrowser, &mdns::MdnsBrowser::onServiceRemoved,
+    this, &Client::handleServiceRemoved
   );
 
   // connect the signals and slots for the socket
@@ -600,7 +611,7 @@ QSslCertificate Client::getConnectedServerCertificate() const{
  * @param host Host address
  * @param port Port number
  */
-void Client::onServiceAdded(types::Device server) {
+void Client::handleServiceAdded(types::Device server) {
   // if Discover Configuration is null the return
   if (this->m_ssl_config.isNull()) {
     throw std::runtime_error("SSL Config Config is not set");
@@ -625,7 +636,7 @@ void Client::onServiceAdded(types::Device server) {
  * @brief On server removed function that That Called by the
  * discovery client when the server is removed
  */
-void Client::onServiceRemoved(types::Device server) {
+void Client::handleServiceRemoved(types::Device server) {
   // matcher to get the Device from servers list
   auto matcher = [server](const types::Device& device) {
     return device == server;
@@ -656,5 +667,12 @@ void Client::onServiceRemoved(types::Device server) {
 
   // emit the signal
   emit OnServerListChanged(this->getConnectedServer(), getServerList());
+}
+
+/**
+ * @brief Get the browser object
+ */
+mdns::MdnsBrowser* Client::getMdnsBrowser() const {
+  return m_mdnsBrowser;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::network::syncing

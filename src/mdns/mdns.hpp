@@ -3,12 +3,12 @@
 // for windows and macos using bonjour & avahi compact
 #if defined _WIN32 || defined __APPLE__ || __linux__
 
-#include "mdns/browser/browser.hpp"
-#include "mdns/register/register.hpp"
+#include "mdns/dnssd_register/dnssd_register.hpp"
+#include "mdns/dnssd_browser/dnssd_browser.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::service {
-using mdnsRegister = mdns::Register;
-using mdnsBrowser  = mdns::Browser;
+namespace srilakshmikanthanp::clipbirdesk::network::mdns {
+using MdnsRegister = mdns::DnssdRegister;
+using MdnsBrowser  = mdns::DnssdBrowser;
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service
 
 #else  // any other platforms

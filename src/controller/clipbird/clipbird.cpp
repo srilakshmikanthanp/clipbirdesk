@@ -174,7 +174,10 @@ void ClipBird::setSslConfiguration(QSslConfiguration config) {
  * @param board  clipboard that is managed
  * @param parent parent object
  */
-ClipBird::ClipBird(QSslConfiguration config, QObject *parent) : QObject(parent), m_clipboard(this) {
+ClipBird::ClipBird(QSslConfiguration config, QObject *parent)
+    : QObject(parent),
+      m_clipboard(this),
+      m_host(std::in_place_type<Client>, constants::getMDnsServiceName(), constants::getMDnsServiceType(), this) {
   this->setSslConfiguration(config);
 }
 
@@ -186,7 +189,7 @@ ClipBird::ClipBird(QSslConfiguration config, QObject *parent) : QObject(parent),
  */
 void ClipBird::setCurrentHostAsServer() {
   // Emplace the server into the m_host variant variable
-  auto *server = &m_host.emplace<Server>(this);
+  auto *server = &m_host.emplace<Server>(constants::getMDnsServiceName(), constants::getMDnsServiceType(), this);
 
   // Set the QSslConfiguration
   server->setSslConfiguration(m_sslConfig);
@@ -261,7 +264,7 @@ void ClipBird::setCurrentHostAsServer() {
  */
 void ClipBird::setCurrentHostAsClient() {
   // Emplace the client into the m_host variant variable
-  auto *client         = &m_host.emplace<Client>(this);
+  auto *client         = &m_host.emplace<Client>(constants::getMDnsServiceName(), constants::getMDnsServiceType(), this);
 
   // Set the QSslConfiguration
   client->setSslConfiguration(m_sslConfig);
@@ -329,7 +332,7 @@ void ClipBird::setCurrentHostAsClient() {
   store.setHostIsServer(false);
 
   // Start the Discovery
-  client->startBrowsing();
+  client->getMdnsBrowser()->startBrowsing();
 
   // emit the signal for host change
   emit OnHostTypeChanged(types::enums::HostType::CLIENT);
