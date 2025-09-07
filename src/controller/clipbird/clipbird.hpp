@@ -13,8 +13,9 @@
 // project headers
 #include "clipboard/applicationclipboard.hpp"
 #include "syncing/synchronizer.hpp"
-#include "syncing/client/client.hpp"
-#include "syncing/server/server.hpp"
+#include "syncing/lan/client/client.hpp"
+#include "syncing/lan/server/server.hpp"
+#include "syncing/wan/hub/hub_websocket.hpp"
 #include "store/storage.hpp"
 #include "types/device.hpp"
 
@@ -74,10 +75,16 @@ class ClipBird : public QObject {
   /// @brief On Host Type Changed
   void OnHostTypeChanged(types::enums::HostType);
 
+  signals:  // signals for hub
+
+  void OnHubErrorOccurred(QAbstractSocket::SocketError);
+  void OnHubConnected();
+  void OnHubDisconnected();
+
  private:  // typedefs for this class
 
-  using Server = network::syncing::Server;
-  using Client = network::syncing::Client;
+  using Server = syncing::lan::Server;
+  using Client = syncing::lan::Client;
 
  private:  // just for Qt
 
@@ -86,6 +93,7 @@ class ClipBird : public QObject {
  private:  // Member variable
 
   std::variant<Server, Client> m_host;
+  std::optional<syncing::wan::HubWebSocket> m_hub;
   QSslConfiguration m_sslConfig;
   clipboard::ApplicationClipboard m_clipboard;
   QVector<QVector<QPair<QString, QByteArray>>> m_history;
@@ -106,6 +114,12 @@ class ClipBird : public QObject {
 
   /// @brief Handle the Auth Request (From Server)
   void handleAuthRequest(types::Device host);
+
+  /// @brief handle hub connect
+  void handleHubConnected();
+
+  /// @brief handle hub disconnect
+  void handleHubDisconnected();
 
  private: // private functions
 
@@ -278,5 +292,22 @@ class ClipBird : public QObject {
    * @brief Get the Host Type
    */
   types::enums::HostType getHostType() const;
+
+  //---------------------- Hub functions -----------------------//
+
+  /**
+   * @brief Connect to the hub server
+   */
+  void connectToHub(const syncing::wan::HubHostDevice &device);
+
+  /**
+   * @brief is Hub Ready
+   */
+  bool isHubReady();
+
+  /**
+   * @brief Disconnect from the hub server
+   */
+  void disconnectFromHub();
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::controller

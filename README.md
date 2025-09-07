@@ -167,28 +167,31 @@ sudo apt-get install libssl-dev
 
 Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installer for Linux, then install it in your system. After installing Qt, you need to set the environment variable `QT_CMAKE_DIR` to the Qt cmake directory.
 
-#### Installing Avahi
-
-Install Avahi using the following command.
+#### Installing Packages
 
 ~~~sh
 sudo apt-get install libavahi-compat-libdnssd-dev
-~~~
-
-#### Installing libnotify
-
-Install libnotify using the following command.
-
-~~~sh
 sudo apt-get install libglib2.0-dev
 sudo apt-get install libnotify-dev
+sudo apt-get install qtkeychain-qt6-dev
+~~~
+
+~~~sh
+git clone https://github.com/frankosterfeld/qtkeychain.git
+cd qtkeychain
+mkdir build
+cd build
+cmake .. -DBUILD_WITH_QT6=ON -DCMAKE_INSTALL_PREFIX=/usr/local
+make
+make install
 ~~~
 
 #### Environment Variables
 
-| Variable            | Value                              |
-|---------------------|------------------------------------|
-| `QT_CMAKE_DIR`      | Qt6 cmake directory                |
+| Variable                     | Value                              |
+|------------------------------|------------------------------------|
+| `QT_CMAKE_DIR`      `        | Qt6 cmake directory                |
+| `QT_KEYCHAIN_CMAKE_DIR`      | QtKeychain cmake directory         |
 
 <!-- ROADMAP -->
 ## Roadmap

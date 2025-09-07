@@ -6,7 +6,7 @@
 #include "mdns/dnssd_register/dnssd_register.hpp"
 #include "mdns/dnssd_browser/dnssd_browser.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::mdns {
+namespace srilakshmikanthanp::clipbirdesk::mdns {
 using MdnsRegister = mdns::DnssdRegister;
 using MdnsBrowser  = mdns::DnssdBrowser;
 }  // namespace srilakshmikanthanp::clipbirdesk::network::service

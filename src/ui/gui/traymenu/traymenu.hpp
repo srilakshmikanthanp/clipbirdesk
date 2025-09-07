@@ -35,7 +35,14 @@ class TrayMenu : public QMenu {
   QAction openApp   =   QAction();
   QAction history   =   QAction();
   QAction about     =   QAction();
+  QAction hub       =   QAction();
+  QAction account   =   QAction();
   QAction exitApp   =   QAction();
+
+ private:
+
+  bool m_isSignedIn = false;
+  bool m_isJoinedToHub = false;
 
  signals:  // signals
   void OnConnectClicked();
@@ -57,6 +64,12 @@ class TrayMenu : public QMenu {
 
  signals:  // signals
   void OnExitClicked();
+
+ signals:  // signals
+  void OnAccountClicked();
+
+ signals:  // signals
+  void OnHubClicked();
 
  public:  // Member function
   /**
@@ -107,6 +120,16 @@ class TrayMenu : public QMenu {
   void setHistoryEnabled(bool);
 
   /**
+   * @brief Is account In Enabled
+   */
+  void setAccoundEnabled(bool);
+
+  /**
+   * @brief set Hub Enabled or Disabled
+   */
+  void setHubEnabled(bool);
+
+  /**
    * @brief Is Qr Code Enabled
    */
   bool isQrCodeEnabled() const;
@@ -140,6 +163,36 @@ class TrayMenu : public QMenu {
    * @brief Is Received Enabled
    */
   bool isHistoryEnabled() const;
+
+  /**
+   * @brief Is Account Enabled
+   */
+  bool isAccountEnabled() const;
+
+  /**
+   * @brief Is Hub Enabled
+   */
+  bool isHubEnabled() const;
+
+  /**
+   * @brief Is Signed In
+   */
+  void setSignedIn(bool);
+
+  /**
+   * @brief Is Signed In
+   */
+  bool isSignedIn() const;
+
+  /**
+   * @brief set joined to hub
+   */
+  void setJoinedToHub(bool isjoined);
+
+  /**
+   * @brief is joined to hub
+   */
+  bool isJoinedToHub() const;
 
  protected:
 

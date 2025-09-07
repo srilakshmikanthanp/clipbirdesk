@@ -7,6 +7,15 @@ set(APPLICATION_DARK_QSS_PATH ":/styles/dark.qss")
 # Set the logo.ico path variable
 set(APPLICATION_LOGO_PATH ":/images/logo.ico")
 
+# websocket url
+set(CLIPBIRD_WEBSOCKET_URL "wss://${CLIPBIRD_DOMAIN}" CACHE STRING "Clipbird WebSocket URL")
+
+# Base url
+set(CLIPBIRD_API_URL "https://${CLIPBIRD_DOMAIN}" CACHE STRING "Clipbird Base URL")
+
+# Clipbird Domain
+set(CLIPBIRD_DOMAIN "clipbird.srilakshmikanthanp.com" CACHE STRING "Clipbird Domain")
+
 # Set the BBONJOUR_DIR from env
 set(BONJOUR_SDK_HOME $ENV{BONJOUR_SDK_HOME})
 
@@ -29,6 +38,23 @@ FetchContent_Declare(SingleApplication
   GIT_REPOSITORY https://github.com/itay-grudev/SingleApplication.git
   GIT_TAG        v3.4.0
 )
+
+# Fetch https://github.com/nlohmann/json.git
+FetchContent_Declare(json
+  URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+)
+
+# Make Available nlohmann_json
+FetchContent_MakeAvailable(json)
+
+# Fetch https://github.com/libcpr/cpr.git
+FetchContent_Declare(cpr
+  GIT_REPOSITORY https://github.com/libcpr/cpr.git
+  GIT_TAG        1.12.0
+)
+
+# Make Available cpr
+FetchContent_MakeAvailable(cpr)
 
 # set QT_DEFAULT_MAJOR_VERSION to QT_MAJOR_VERSION
 set(QT_DEFAULT_MAJOR_VERSION ${QT_MAJOR_VERSION})
@@ -64,7 +90,72 @@ FetchContent_MakeAvailable(libqrencode)
 set(CMAKE_AUTORCC ON)
 
 # glob pattern for main cpp files exclude
-file(GLOB_RECURSE main_cpp *.cpp)
+file(GLOB_RECURSE main_cpp
+  clipboard/applicationclipboard.cpp
+  clipboard/platformclipboard.cpp
+  clipboard/qtclipboard.cpp
+  clipboard/waylandclipboard.cpp
+  constants/constants.cpp
+  controller/clipbird/clipbird.cpp
+  mdns/browser.cpp
+  mdns/dnssd_browser/dnssd_browser.cpp
+  mdns/dnssd_register/dnssd_register.cpp
+  mdns/register.cpp
+  packets/authentication/authentication.cpp
+  packets/invalidrequest/invalidrequest.cpp
+  packets/pingpongpacket/pingpongpacket.cpp
+  packets/syncingpacket/syncingpacket.cpp
+  store/read_auth_token_dto_job.cpp
+  store/read_hub_host_device_job.cpp
+  store/secure_storage.cpp
+  store/storage.cpp
+  syncing/lan/client/client.cpp
+  syncing/lan/server/server.cpp
+  syncing/synchronizer.cpp
+  syncing/wan/auth/auth_api_client.cpp
+  syncing/wan/auth/auth_token_holder.cpp
+  syncing/wan/device/device_api_client.cpp
+  syncing/wan/device/device_response_dto.cpp
+  syncing/wan/hub/hub_host_device.cpp
+  syncing/wan/hub/hub_message_clipboard_dispatch_payload_handler.cpp
+  syncing/wan/hub/hub_message_device_added_payload_handler.cpp
+  syncing/wan/hub/hub_message_device_removed_payload_handler.cpp
+  syncing/wan/hub/hub_message_device_updated_payload_handler.cpp
+  syncing/wan/hub/hub_message_devices_payload_handler.cpp
+  syncing/wan/hub/hub_message_handler.cpp
+  syncing/wan/hub/hub_message_nonce_challenge_completed_payload_handler.cpp
+  syncing/wan/hub/hub_message_nonce_challenge_request_payload_handler.cpp
+  syncing/wan/hub/hub_websocket.cpp
+  syncing/wan/hub/hub.cpp
+  types/device.cpp
+  types/except/except.cpp
+  ui/gui/components/cliphistory/cliphistory.cpp
+  ui/gui/components/clipsend/clipsend.cpp
+  ui/gui/components/cliptile/cliptile.cpp
+  ui/gui/components/hostlist/hostlist.cpp
+  ui/gui/components/hosttile/hosttile.cpp
+  ui/gui/modals/aboutus/aboutus.cpp
+  ui/gui/modals/connect/connect.cpp
+  ui/gui/modals/group/group.cpp
+  ui/gui/modals/signin/signin.cpp
+  ui/gui/notification/joinrequest/linux/joinrequest/joinrequest.cpp
+  ui/gui/notification/joinrequest/win/joinrequest/joinrequest.cpp
+  ui/gui/traymenu/traymenu.cpp
+  ui/gui/utilities/functions/functions.cpp
+  ui/gui/widgets/clipbird/clipbird.cpp
+  ui/gui/widgets/history/history.cpp
+  utility/appeventfilter/appeventfilter.cpp
+  utility/functions/crypto/crypto.cpp
+  utility/functions/ipconv/ipconv.cpp
+  utility/functions/packet/packet.cpp
+  utility/functions/qrcode/qrcode.cpp
+  utility/functions/socket/socket.cpp
+  utility/functions/ssl/ssl.cpp
+  utility/logging/logging.cpp
+  utility/powerhandler/powerhandler.cpp
+  application.cpp
+  main.cpp
+)
 
 # remove tests folder from list
 list(FILTER main_cpp EXCLUDE REGEX "tests/")
@@ -81,10 +172,14 @@ configure_file(
 find_package(Qt6 REQUIRED COMPONENTS
   Concurrent
   Widgets
-  Network)
+  Network
+  WebSockets)
 
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
+
+# Find qtkeychain
+find_package(Qt6Keychain CONFIG REQUIRED)
 
 # Find DNS-SD libraries for different platforms
 if(WIN32 OR APPLE)
@@ -153,13 +248,17 @@ target_include_directories(clipbird
 # Link libraries
 target_link_libraries(clipbird
   PRIVATE SingleApplication::SingleApplication
+  PRIVATE nlohmann_json::nlohmann_json
+  PRIVATE Qt6Keychain::Qt6Keychain
+  PRIVATE cpr::cpr
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
   PRIVATE Qt6::Concurrent
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto
   PRIVATE qrencode
-  PRIVATE QHotkey::QHotkey)
+  PRIVATE QHotkey::QHotkey
+  PRIVATE Qt6::WebSockets)
 
 # set target properties
 set_target_properties(clipbird PROPERTIES
@@ -208,12 +307,12 @@ if(UNIX AND NOT APPLE)
   add_definitions(-D__linux__)
 endif()
 
-# add target compiler options GCC -std=c++17
+# add target compiler options GCC -std=c++20
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  target_compile_options(clipbird PRIVATE -std=c++17)
+  target_compile_options(clipbird PRIVATE -std=c++20)
 endif()
 
-# add target compiler options MSVC /std:c++17
+# add target compiler options MSVC /std:c++20
 if(MSVC)
-  target_compile_options(clipbird PRIVATE /std:c++17)
+  target_compile_options(clipbird PRIVATE /std:c++20)
 endif()

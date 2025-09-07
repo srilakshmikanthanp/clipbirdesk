@@ -2,7 +2,7 @@
 
 #include "dnssd_browser.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::mdns {
+namespace srilakshmikanthanp::clipbirdesk::mdns {
 /**
  * @brief Callback for QHostInfo Address Resolve Function
  *
@@ -114,7 +114,7 @@ void DnssdBrowser::browseCallback(
 
   // set as non blocking
 #ifdef __linux__
-  utility::functions::platform::setSocketNonBlocking(DNSServiceRefSockFD(browserObj->m_res_ref));
+  utility::functions::setSocketNonBlocking(DNSServiceRefSockFD(browserObj->m_res_ref));
 #endif
 
   // create socket notifier
@@ -248,7 +248,7 @@ void DnssdBrowser::startBrowsing() {
   );
 
   // process register socket
-  const auto processBrowseSock = [=] {
+  const auto processBrowseSock = [=, this] {
     if (DNSServiceProcessResult(this->m_browse_ref) != kDNSServiceErr_NoError) {
       qWarning() << "DNSServiceProcessResult failed";
     }
@@ -266,7 +266,7 @@ void DnssdBrowser::startBrowsing() {
  * socket notifier and service
  */
 void DnssdBrowser::stopBrowsing() {
-  const auto deleter = [=](auto& serviceRef, auto*& notifier) {
+  const auto deleter = [=, this](auto& serviceRef, auto*& notifier) {
     // check for service ref & notifier
     if (serviceRef == nullptr || notifier == nullptr) {
       return;

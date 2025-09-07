@@ -9,9 +9,9 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions {
  *
  * @return Authentication
  */
-network::packets::Authentication createPacket(params::AuthenticationParams params) {
+packets::Authentication createPacket(params::AuthenticationParams params) {
   // create the packet
-  network::packets::Authentication packet;
+  packets::Authentication packet;
 
   // set the packet type
   packet.setPacketType(params.packetType);
@@ -35,9 +35,9 @@ network::packets::Authentication createPacket(params::AuthenticationParams param
  *
  * @return ErrorMessage
  */
-network::packets::InvalidRequest createPacket(params::InvalidPacketParams params) {
+packets::InvalidRequest createPacket(params::InvalidPacketParams params) {
   // create the packet
-  network::packets::InvalidRequest packet;
+  packets::InvalidRequest packet;
 
   // set the packet type
   packet.setPacketType(params.packetType);
@@ -63,9 +63,9 @@ network::packets::InvalidRequest createPacket(params::InvalidPacketParams params
  *
  * @return SyncingItem
  */
-network::packets::SyncingItem createPacket(params::SyncingItemParams params) {
+packets::SyncingItem createPacket(params::SyncingItemParams params) {
   // create the SyncingItem
-  network::packets::SyncingItem syncItem;
+  packets::SyncingItem syncItem;
 
   // set the mime length
   syncItem.setMimeLength(params.mimeType.size());
@@ -91,9 +91,9 @@ network::packets::SyncingItem createPacket(params::SyncingItemParams params) {
  *
  * @return SyncingPacket
  */
-network::packets::SyncingPacket createPacket(params::SyncingPacketParams params) {
+packets::SyncingPacket createPacket(params::SyncingPacketParams params) {
   // create the packet
-  network::packets::SyncingPacket packet;
+  packets::SyncingPacket packet;
 
   // set the packet type
   packet.setPacketType(params.packetType);
@@ -102,7 +102,7 @@ network::packets::SyncingPacket createPacket(params::SyncingPacketParams params)
   packet.setItemCount(params.items.size());
 
   // Convert the items to SyncingItem
-  QVector<network::packets::SyncingItem> items;
+  QVector<packets::SyncingItem> items;
 
   // reserve the memory
   items.reserve(params.items.size());
@@ -130,9 +130,9 @@ network::packets::SyncingPacket createPacket(params::SyncingPacketParams params)
  *
  * @return PingPongPacket
  */
-network::packets::PingPongPacket createPacket(params::PingPacketParams params) {
+packets::PingPongPacket createPacket(params::PingPacketParams params) {
   // create the packet
-  network::packets::PingPongPacket packet;
+  packets::PingPongPacket packet;
 
   // set the packet type
   packet.setPacketType(params.packetType);

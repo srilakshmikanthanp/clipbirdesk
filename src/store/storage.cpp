@@ -261,9 +261,32 @@ bool Storage::getHostIsServer() {
 }
 
 /**
+ * @brief is Hub connected lastly
+ */
+bool Storage::getHubIsConnectedLastly() {
+  settings->beginGroup(commonGroup);
+  auto isConnected = settings->value(hubStateKey);
+  settings->endGroup();
+
+  if (isConnected.isNull()) {
+    return false;
+  }
+  return isConnected.toBool();
+}
+
+/**
+ * @brief set is Hub connected lastly
+ */
+void Storage::setIsUserConnectedToHubLastly(bool isConnected) {
+  settings->beginGroup(commonGroup);
+  settings->setValue(hubStateKey, isConnected);
+  settings->endGroup();
+}
+
+/**
  * @brief Instance of the storage
  */
-Storage& Storage::instance() {
+Storage &Storage::instance() {
   static Storage instance;
   return instance;
 }

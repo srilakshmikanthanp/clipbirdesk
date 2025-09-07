@@ -8,6 +8,50 @@
 namespace srilakshmikanthanp::clipbirdesk {
 
 /**
+ * @brief Update Hub Host Device
+ */
+QFuture<syncing::wan::HubHostDevice> Application::updateHubHostDevice(const syncing::wan::HubHostDevice& device) {
+  auto requestDto = syncing::wan::DeviceRequestDto{ device.publicKey, device.name, device.type };
+  return deviceApiClient->updateDevice(device.id, requestDto).then([=, this](const syncing::wan::DeviceResponseDto& updatedDevice) {
+    auto hubDevice = syncing::wan::HubHostDevice{updatedDevice.id, updatedDevice.name, updatedDevice.type, updatedDevice.publicKey, device.privateKey};
+    return hubDevice;
+  });
+}
+
+/**
+ * @brief Create Hub Host Device
+ */
+QFuture<syncing::wan::HubHostDevice> Application::createHubHostDevice() {
+  auto [privateKey, publicKey] = utility::functions::generateQtKeyPair();
+  auto requestDto = syncing::wan::DeviceRequestDto{ publicKey.toPem(), constants::getMDnsServiceName(), syncing::wan::DeviceType::getCurrentDeviceType() };
+  return deviceApiClient->createDevice(requestDto).then([=, this](const syncing::wan::DeviceResponseDto& device) {
+    auto hubDevice = syncing::wan::HubHostDevice{device.id, device.name, device.type, device.publicKey, privateKey.toPem()};
+    return hubDevice;
+  });
+}
+
+/**
+ * @brief Save the Hub Host Device
+ */
+QFuture<syncing::wan::HubHostDevice> Application::saveHubHostDevice(const syncing::wan::HubHostDevice& device) {
+  QKeychain::WritePasswordJob *job = nullptr;
+  bool status = QMetaObject::invokeMethod(
+    &storage::SecureStorage::instance(),
+    &storage::SecureStorage::setHubHostDevice,
+    Qt::BlockingQueuedConnection,
+    qReturnArg(job),
+    device
+  );
+  assert(status && job != nullptr);
+  return utility::functions::toFuture(job).then([device]() {
+    QPromise<syncing::wan::HubHostDevice> promise;
+    promise.addResult(device);
+    promise.finish();
+    return promise.future();
+  }).unwrap();
+}
+
+/**
  * @brief Get the certificate from App Home
  */
 QSslConfiguration Application::getOldSslConfiguration() {
@@ -100,6 +144,35 @@ void Application::handleConnectionError(QString error) {
 }
 
 /**
+ * @brief Connect to Hub
+ */
+void Application::connectToHub() {
+  utility::functions::toFuture(
+    storage::SecureStorage::instance().getHubHostDevice(),
+    &storage::ReadHubHostDeviceJob::device
+  ).then([=, this](std::optional<syncing::wan::HubHostDevice> device) {
+    if (device.has_value()) {
+      syncing::wan::HubHostDevice hubDevice = device.value();
+      hubDevice.name = constants::getMDnsServiceName();
+      return updateHubHostDevice(hubDevice);
+    } else {
+      return createHubHostDevice();
+    }
+  })
+  .unwrap()
+  .then([=, this](const syncing::wan::HubHostDevice& device) {
+    return saveHubHostDevice(device);
+  })
+  .unwrap()
+  .then([=, this](const syncing::wan::HubHostDevice& device) {
+    controller->connectToHub(device);
+  })
+  .onFailed([=, this](const std::exception& e) {
+    throw std::runtime_error("Error reading Hub Host Device: " + std::string(e.what()));
+  });
+}
+
+/**
  * @brief On Tab Changed for Client
  */
 void Application::handleTabChange(ui::gui::widgets::Clipbird::Tabs tab) {
@@ -126,7 +199,7 @@ void Application::handleAuthRequest(const types::Device& client) {
   // connect the dialog to window AuthSuccess signal
   const auto connectionAccept = connect(
     toast, &ui::gui::notification::JoinRequest::onAccept,
-    [=] { controller->authSuccess(client); }
+    [=, this] { controller->authSuccess(client); }
   );
 
   connect(
@@ -135,14 +208,14 @@ void Application::handleAuthRequest(const types::Device& client) {
   );
 
   // disconnect all signals on tab change signal
-  connect(clipbird, &ui::gui::widgets::Clipbird::onTabChanged, [=]{
+  connect(clipbird, &ui::gui::widgets::Clipbird::onTabChanged, [=, this]{
     QObject::disconnect(connectionAccept);
   });
 
   // connect the dialog to window AuthFail signal
   const auto connectionReject   = connect(
     toast, &ui::gui::notification::JoinRequest::onReject,
-    [=] { controller->authFailed(client); }
+    [=, this] { controller->authFailed(client); }
   );
 
   connect(
@@ -151,12 +224,65 @@ void Application::handleAuthRequest(const types::Device& client) {
   );
 
   // disconnect all signals on tab change signal
-  connect(clipbird, &ui::gui::widgets::Clipbird::onTabChanged, [=]{
+  connect(clipbird, &ui::gui::widgets::Clipbird::onTabChanged, [=, this]{
     QObject::disconnect(connectionReject);
   });
 
   // shoe the notification
   toast->show(client);
+}
+
+/**
+ * @brief handle signin
+ */
+void Application::handleSignin(QString email, QString password) {
+  trayMenu->setAccoundEnabled(false);
+  authApiClient->signIn({email, password}).then([=, this](const syncing::wan::AuthTokenDto& token) {
+    QKeychain::WritePasswordJob *job = nullptr;
+    bool status = QMetaObject::invokeMethod(
+      &storage::SecureStorage::instance(),
+      &storage::SecureStorage::setHubAuthTokenToken,
+      Qt::BlockingQueuedConnection,
+      qReturnArg(job),
+      token
+    );
+    assert(status && job != nullptr);
+    return utility::functions::toFuture(job).then([token, this]() {
+      syncing::wan::AuthTokenHolder::instance().setAuthToken(token);
+      this->signin->setError(std::nullopt);
+      this->signin->reset();
+      this->signin->hide();
+      this->trayMenu->setAccoundEnabled(true);
+    });
+  }).unwrap().onFailed([=, this](const std::exception& e) {
+      this->signin->setError(e.what());
+      this->trayMenu->setAccoundEnabled(true);
+  });
+}
+
+/**
+ * @brief handle hub connect
+ */
+void Application::handleHubConnect() {
+  this->trayMenu->setJoinedToHub(true);
+}
+
+/**
+ * @brief handle hub disconnect
+ */
+void Application::handleHubDisconnect() {
+  this->trayMenu->setJoinedToHub(false);
+}
+
+/**
+ * @brief On Hub Error Occurred
+ */
+void Application::handleHubErrorOccurred(QAbstractSocket::SocketError error) {
+  this->trayIcon->showMessage(
+    constants::getAppName(),
+    QObject::tr("Hub Connection Error Occurred: %1").arg(QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(error)),
+    QIcon(QString::fromStdString(constants::getAppLogo()))
+  );
 }
 
 //----------------------------- slots for Tray ----------------------------//
@@ -310,7 +436,7 @@ void Application::openClipbird() {
 void Application::sendClipboard() {
   Q_UNUSED(QtConcurrent::run([this]() {
     auto content = controller->getClipboard();
-    QTimer::singleShot(0, controller, [=]() {
+    QTimer::singleShot(0, controller, [=, this]() {
       this->controller->syncClipboard(content);
     });
   }));
@@ -345,6 +471,56 @@ void Application::openHistory() {
 void Application::resetDevices() {
   controller->clearServerCertificates();
   controller->clearClientCertificates();
+}
+
+/**
+ * @brief On Account Clicked
+ */
+void Application::onAccountClicked() {
+  if (this->trayMenu->isSignedIn()) {
+    utility::functions::toFuture(storage::SecureStorage::instance().removeHubHostDevice())
+    .then([=, this]() {
+      return utility::functions::toFuture(storage::SecureStorage::instance().removeHubJwtToken());
+    })
+    .unwrap()
+    .then([=, this]() {
+      syncing::wan::AuthTokenHolder::instance().setAuthToken(std::nullopt);
+    })
+    .onFailed([=, this](const std::exception& e) {
+      this->trayIcon->showMessage(constants::getAppName(), QObject::tr("Error Signing Out: %1").arg(e.what()), QIcon(QString::fromStdString(constants::getAppLogo())));
+    });
+    return;
+  }
+
+  // if already visible return
+  if (signin->isVisible()) { return signin->raise(); }
+
+  // set the icon
+  signin->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
+
+  // set the title
+  signin->setWindowTitle(constants::getAppName());
+
+  // set as not resizable
+  signin->setFixedSize(signin->sizeHint());
+
+  // show the dialog
+  signin->show();
+}
+
+/**
+ * @brief On Hub Clicked
+ */
+void Application::onHubClicked() {
+  if (this->trayMenu->isJoinedToHub()) {
+    storage::Storage::instance().setIsUserConnectedToHubLastly(false);
+    controller->disconnectFromHub();
+    this->trayMenu->setJoinedToHub(false);
+    return;
+  } else {
+    storage::Storage::instance().setIsUserConnectedToHubLastly(true);
+    connectToHub();
+  }
 }
 
 /**
@@ -393,7 +569,7 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   trayIcon   = new QSystemTrayIcon();
 
   // On HostName successfully resolved
-  const auto slot_hr = [=](QWidget* dialog, quint16 port, const auto& host) {
+  const auto slot_hr = [=, this](QWidget* dialog, quint16 port, const auto& host) {
     // if host name is not resolved
     if (host.error() != QHostInfo::NoError) {
       return;
@@ -416,6 +592,21 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
       return false;
     }
   };
+
+  utility::functions::toFuture(
+    storage::SecureStorage::instance().getHubAuthToken(),
+    &storage::ReadAuthTokenDtoJob::authToken
+  ).then([=, this](std::optional<syncing::wan::AuthTokenDto> token) {
+    if (!token.has_value()) {
+      return syncing::wan::AuthTokenHolder::instance().setAuthToken(std::nullopt);
+    }
+    syncing::wan::AuthTokenHolder::instance().setAuthToken(token.value());
+    if (storage::Storage::instance().getHubIsConnectedLastly()) {
+      connectToHub();
+    }
+  }).onFailed([=, this](const std::exception& e) {
+    throw std::runtime_error("Error reading Hub JWT Token: " + std::string(e.what()));
+  });
 
   trayIcon->setIcon(QIcon(constants::getAppLogo()));
   trayIcon->setContextMenu(trayMenu);
@@ -493,6 +684,18 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     [this] { QApplication::quit(); }
   );
 
+  // connect the signal for signin
+  QObject::connect(
+    trayMenu, &ui::gui::TrayMenu::OnAccountClicked,
+    this, &Application::onAccountClicked
+  );
+
+  // connect the signal for hub
+  QObject::connect(
+    trayMenu, &ui::gui::TrayMenu::OnHubClicked,
+    this, &Application::onHubClicked
+  );
+
   // Connect the signal and slot for tab change(client)
   connect(
     clipbird, &ui::gui::widgets::Clipbird::onTabChanged,
@@ -532,7 +735,7 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   // connect signal for Clipboard Copy
   connect(
     history, &ui::gui::widgets::History::onClipSelected,
-    [=](auto i) {
+    [=, this](auto i) {
       controller->setClipboard(controller->getHistory().at(i));
     }
   );
@@ -587,8 +790,32 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     this, &Application::openHistory
   );
 
+  connect(
+    &syncing::wan::AuthTokenHolder::instance(),
+    &syncing::wan::AuthTokenHolder::authTokenChanged,
+    [=, this](auto token) {
+      this->trayMenu->setHubEnabled(token.has_value());
+      this->trayMenu->setSignedIn(token.has_value());
+    }
+  );
+
+  connect(
+    controller, &controller::ClipBird::OnHubConnected,
+    this, &Application::handleHubConnect
+  );
+
+  connect(
+    controller, &controller::ClipBird::OnHubDisconnected,
+    this, &Application::handleHubDisconnect
+  );
+
+  connect(
+    controller, &controller::ClipBird::OnHubErrorOccurred,
+    this, &Application::handleHubErrorOccurred
+  );
+
   // connect the dialog to window clicked signal
-  connect(joiner, &ui::gui::modals::Connect::onConnect, [=](auto ipv4, auto port) {
+  connect(joiner, &ui::gui::modals::Connect::onConnect, [=, this](auto ipv4, auto port) {
     // validate the ip and port
     if (!validator(ipv4.toShort(), port.toShort())) {
       return;
@@ -602,6 +829,11 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     // resolve the host name
     QHostInfo::lookupHost(ipv4, this, slot);
   });
+
+  connect(
+    signin, &ui::gui::modals::SignIn::onSignIn,
+    this, &Application::handleSignin
+  );
 
   // if host is lastly server
   if (controller->isLastlyHostIsServer()) {

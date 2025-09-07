@@ -14,7 +14,7 @@
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::packets {
+namespace srilakshmikanthanp::clipbirdesk::packets {
 /**
  * @brief Clipboard Ping Packet's to check the connection
  */

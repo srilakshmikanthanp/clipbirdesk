@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QString>
 
-namespace srilakshmikanthanp::clipbirdesk::network::mdns {
+namespace srilakshmikanthanp::clipbirdesk::mdns {
 /**
  * @brief Abstract Discovery server that Listens for the client that send
  * the broadcast message The user of this class should implement the

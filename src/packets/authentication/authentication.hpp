@@ -14,7 +14,7 @@
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::packets {
+namespace srilakshmikanthanp::clipbirdesk::packets {
 /**
  * @brief Authentication Packet used to indicate the status
  * of the authentication process
@@ -92,4 +92,4 @@ class Authentication {
    */
   static Authentication fromBytes(const QByteArray &array);
 };
-} // namespace srilakshmikanthanp::clipbirdesk::network::packets
+} // namespace srilakshmikanthanp::clipbirdesk::packets

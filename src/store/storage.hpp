@@ -5,6 +5,8 @@
 #include <QObject>
 #include <QSettings>
 
+#include <optional>
+
 namespace srilakshmikanthanp::clipbirdesk::storage {
 class Storage : public QObject {
  private:  // settings
@@ -15,15 +17,18 @@ class Storage : public QObject {
 
   const char *clientGroup = "client";
   const char *commonGroup = "common";
+  const char *hubGroup    = "hub";
   const char *serverGroup = "server";
 
  private:  // keys
 
   const char *hostStateKey       = "hostState";
+  const char *hubStateKey        = "hubState";
   const char *hostKeyKey         = "hostKey";
   const char *hostCertificateKey = "hostCert";
   const char *proxyKey           = "proxy";
   const char *easyHideKey        = "easyHide";
+  const char *hubDeviceIdKey     = "hubDeviceId";
 
  private:  // qt
 
@@ -146,6 +151,16 @@ class Storage : public QObject {
    * @brief Get the Host Key
    */
   QSslKey getHostKey();
+
+  /**
+   * @brief is Hub connected lastly
+   */
+  bool getHubIsConnectedLastly();
+
+  /**
+   * @brief set is Hub connected lastly
+   */
+  void setIsUserConnectedToHubLastly(bool isConnected);
 
   /**
    * @brief Instance of the storage

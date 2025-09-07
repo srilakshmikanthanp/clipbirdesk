@@ -1,6 +1,6 @@
 #include "browser.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::mdns {
+namespace srilakshmikanthanp::clipbirdesk::mdns {
 /**
  * Constructs a new Browser object
  */

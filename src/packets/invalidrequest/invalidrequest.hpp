@@ -13,7 +13,7 @@
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::packets {
+namespace srilakshmikanthanp::clipbirdesk::packets {
 /**
  * @brief Invalid Packet used to indicate the error
  * on the client side
@@ -106,4 +106,4 @@ class InvalidRequest {
    */
   static InvalidRequest fromBytes(const QByteArray &array);
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::network::packets
+}  // namespace srilakshmikanthanp::clipbirdesk::packets

@@ -1,6 +1,6 @@
 #include "syncingpacket.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::packets {
+namespace srilakshmikanthanp::clipbirdesk::packets {
 /**
  * @brief Set the Mime Length object
  */
@@ -324,4 +324,4 @@ SyncingPacket SyncingPacket::fromBytes(const QByteArray &array) {
   // return the packet
   return packet;
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::network::packets
+}  // namespace srilakshmikanthanp::clipbirdesk::packets

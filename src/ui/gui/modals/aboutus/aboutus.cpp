@@ -8,15 +8,15 @@ namespace srilakshmikanthanp::clipbirdesk::ui::gui::modals {
  */
 AboutUs::AboutUs(QWidget* parent) : QWidget(parent) {
   // Click Handlers
-  auto donateClick = [=]() {
+  auto donateClick = [=, this]() {
     QDesktopServices::openUrl(QUrl(constants::getAppDonatePage()));
   };
 
-  auto webClick = [=]() {
+  auto webClick = [=, this]() {
     QDesktopServices::openUrl(QUrl(constants::getAppHomePage()));
   };
 
-  auto bugClick = [=]() {
+  auto bugClick = [=, this]() {
     QDesktopServices::openUrl(QUrl(constants::getAppIssuePage()));
   };
 

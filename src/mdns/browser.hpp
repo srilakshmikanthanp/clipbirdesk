@@ -7,7 +7,7 @@
 // Local headers
 #include "types/device.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::mdns {
+namespace srilakshmikanthanp::clipbirdesk::mdns {
 class Browser : public QObject {
  protected:
 

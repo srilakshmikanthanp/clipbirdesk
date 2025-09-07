@@ -2,7 +2,7 @@
 
 #include <QObject>
 
-namespace srilakshmikanthanp::clipbirdesk::network::syncing {
+namespace srilakshmikanthanp::clipbirdesk::syncing {
 class Synchronizer : public QObject {
  private:  // just for Qt
 
@@ -41,6 +41,6 @@ class Synchronizer : public QObject {
    * between different clients. It will handle the logic to ensure that
    * all clients have the same clipboard content.
    */
-  virtual void synchronize(QVector<QPair<QString, QByteArray>> items) = 0;
+  virtual void synchronize(const QVector<QPair<QString, QByteArray>>& items) = 0;
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::network::syncing
+}  // namespace srilakshmikanthanp::clipbirdesk::syncing

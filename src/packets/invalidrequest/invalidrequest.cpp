@@ -1,6 +1,6 @@
 #include "invalidrequest.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::packets {
+namespace srilakshmikanthanp::clipbirdesk::packets {
 /**
  * @brief Set the Packet Length object
  *
@@ -170,4 +170,4 @@ InvalidRequest InvalidRequest::fromBytes(const QByteArray &array) {
   // Return the InvalidRequest
   return packet;
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::network::packets
+}  // namespace srilakshmikanthanp::clipbirdesk::packets

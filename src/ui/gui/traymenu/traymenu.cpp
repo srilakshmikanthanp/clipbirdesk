@@ -15,6 +15,10 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   QObject::connect(&exitApp, &QAction::triggered, this, &TrayMenu::OnExitClicked);
   QObject::connect(&openApp, &QAction::triggered, this, &TrayMenu::OnOpenAppClicked);
   QObject::connect(&history, &QAction::triggered, this, &TrayMenu::OnHistoryClicked);
+  QObject::connect(&account, &QAction::triggered, this, &TrayMenu::OnAccountClicked);
+  QObject::connect(&hub, &QAction::triggered, this, &TrayMenu::OnHubClicked);
+
+  this->hub.setEnabled(false);
 
   this->addAction(&openApp);
   this->addAction(&history);
@@ -22,6 +26,9 @@ TrayMenu::TrayMenu(QWidget* parent) : QMenu(parent) {
   this->addSeparator();
   this->addAction(&qrCode);
   this->addAction(&connect);
+  this->addSeparator();
+  this->addAction(&hub);
+  this->addAction(&account);
   this->addSeparator();
   this->addAction(&about);
   this->addSeparator();
@@ -38,9 +45,11 @@ void TrayMenu::setUpLanguage() {
   openApp.setText(QObject::tr("Show Devices"));
   history.setText(QObject::tr("History"));
   reset.setText(QObject::tr("Reset Devices"));
-  connect.setText(QObject::tr("Join to Group"));
-  qrCode.setText(QObject::tr("Group QrCode"));
+  connect.setText(QObject::tr("Join Group"));
+  qrCode.setText(QObject::tr("Group Code"));
   about.setText(QObject::tr("About"));
+  account.setText(QObject::tr("Sign In"));
+  hub.setText(QObject::tr("Join Hub"));
   exitApp.setText(QObject::tr("Exit"));
 }
 
@@ -94,6 +103,20 @@ void TrayMenu::setHistoryEnabled(bool isenabled) {
 }
 
 /**
+ * @brief Is account Enabled
+ */
+void TrayMenu::setAccoundEnabled(bool isenabled) {
+  account.setEnabled(isenabled);
+}
+
+/**
+ * @brief set Hub Enabled or Disabled
+ */
+void TrayMenu::setHubEnabled(bool isenabled) {
+  hub.setEnabled(isenabled);
+}
+
+/**
  * @brief Is Connect Enabled
  */
 bool TrayMenu::isConnectEnabled() const {
@@ -140,6 +163,56 @@ bool TrayMenu::isOpenAppEnabled() const {
  */
 bool TrayMenu::isHistoryEnabled() const {
   return history.isEnabled();
+}
+
+/**
+ * @brief Is Account Enabled
+ */
+bool TrayMenu::isAccountEnabled() const {
+  return account.isEnabled();
+}
+
+/**
+ * @brief Is Hub Enabled
+ */
+bool TrayMenu::isHubEnabled() const {
+  return hub.isEnabled();
+}
+
+/**
+ * @brief Is Signed In
+ */
+void TrayMenu::setSignedIn(bool issignedin) {
+  if (m_isSignedIn = issignedin) {
+    account.setText(QObject::tr("Sign Out"));
+  } else {
+    account.setText(QObject::tr("Sign In"));
+  }
+}
+
+/**
+ * @brief Is Signed In
+ */
+bool TrayMenu::isSignedIn() const {
+  return m_isSignedIn;
+}
+
+/**
+ * @brief set joined to hub
+ */
+void TrayMenu::setJoinedToHub(bool isjoinedtohub) {
+  if (m_isJoinedToHub = isjoinedtohub) {
+    hub.setText(QObject::tr("Leave Hub"));
+  } else {
+    hub.setText(QObject::tr("Join Hub"));
+  }
+}
+
+/**
+ * @brief is joined to hub
+ */
+bool TrayMenu::isJoinedToHub() const {
+  return m_isJoinedToHub;
 }
 
 /**

@@ -31,7 +31,7 @@
 #include "controller/clipbird/clipbird.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 #include "utility/appeventfilter/appeventfilter.hpp"
-#include "utility/functions/sslcert/sslcert.hpp"
+#include "utility/functions/ssl/ssl.hpp"
 #include "utility/logging/logging.hpp"
 #include "utility/powerhandler/powerhandler.hpp"
 

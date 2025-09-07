@@ -1,5 +1,5 @@
 #include "synchronizer.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::syncing {
+namespace srilakshmikanthanp::clipbirdesk::syncing {
 Synchronizer::~Synchronizer() = default;
-}  // namespace srilakshmikanthanp::clipbirdesk::network::syncing
+}  // namespace srilakshmikanthanp::clipbirdesk::syncing
