@@ -14,7 +14,7 @@
 #include "types/enums/enums.hpp"
 #include "types/except/except.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::packets {
+namespace srilakshmikanthanp::clipbirdesk::packets {
 /**
  * @brief Clipboard Sync Packet's Payload
  */
@@ -201,4 +201,4 @@ class SyncingPacket {
    */
   static SyncingPacket fromBytes(const QByteArray &array);
 };
-}  // namespace srilakshmikanthanp::clipbirdesk::network::packets
+}  // namespace srilakshmikanthanp::clipbirdesk::packets

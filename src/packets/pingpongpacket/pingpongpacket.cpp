@@ -1,6 +1,6 @@
 #include "pingpongpacket.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::packets {
+namespace srilakshmikanthanp::clipbirdesk::packets {
 /**
  * @brief Set the Packet Length object
  *
@@ -118,4 +118,4 @@ PingPongPacket PingPongPacket::fromBytes(const QByteArray &array) {
 
   return packet;
 }
-}  // namespace srilakshmikanthanp::clipbirdesk::network::packets
+}  // namespace srilakshmikanthanp::clipbirdesk::packets

@@ -17,8 +17,8 @@
  */
 TEST(SyncingPacket, TestingSyncingPacket) {
   // using the ClipboardSyncPacket
-  using srilakshmikanthanp::clipbirdesk::network::packets::SyncingItem;
-  using srilakshmikanthanp::clipbirdesk::network::packets::SyncingPacket;
+  using srilakshmikanthanp::clipbirdesk::packets::SyncingItem;
+  using srilakshmikanthanp::clipbirdesk::packets::SyncingPacket;
 
   // using functions namespace
   using namespace srilakshmikanthanp::clipbirdesk::utility::functions;

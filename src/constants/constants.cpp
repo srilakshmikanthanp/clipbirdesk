@@ -160,4 +160,25 @@ long long getAppMaxWriteIdleTime() {
 const char* getAppHistoryShortcut()  {
   return "Ctrl+Alt+C";
 }
+
+/**
+ * @brief Used to get base url for api
+ */
+const char* getClipbirdDomain() {
+  return CLIPBIRD_DOMAIN;
+}
+
+/**
+ * @brief Used to get base url for api
+ */
+const char* getClipbirdApiUrl() {
+  return CLIPBIRD_API_URL;
+}
+
+/**
+ * @brief Used to get websocket url for api
+ */
+const char* getClipbirdWebSocketUrl() {
+  return CLIPBIRD_WEBSOCKET_URL;
+}
 }  // namespace srilakshmikanthanp::clipbirdesk::config

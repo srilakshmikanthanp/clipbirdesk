@@ -35,9 +35,9 @@
 #include "utility/functions/ipconv/ipconv.hpp"
 
 // Platform headers
-#include "utility/functions/generic/generic.hpp"
+#include "utility/functions/socket/socket.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::mdns {
+namespace srilakshmikanthanp::clipbirdesk::mdns {
 /**
  * @brief Discovery client that sends the broadcast message
  * to the server and listen for the response if any server

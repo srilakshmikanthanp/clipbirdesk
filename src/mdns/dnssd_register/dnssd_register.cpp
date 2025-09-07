@@ -2,7 +2,7 @@
 
 #include "dnssd_register.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::mdns {
+namespace srilakshmikanthanp::clipbirdesk::mdns {
 /**
  * @brief Callback function for DNSServiceRegister function
  * This is called when the service is registered, Note

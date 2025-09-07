@@ -104,13 +104,13 @@ void ClipHistory::setHistory(const QList<QVector<QPair<QString, QByteArray>>> &h
     // connect the copy signal to this signal
     QObject::connect(
       tile, &components::ClipTile::onClipDelete,
-      [=]() { this->onClipDeleteImpl(idx); }
+      [=, this]() { this->onClipDeleteImpl(idx); }
     );
 
     // connect the select signal to this signal
     QObject::connect(
       tile, &components::ClipTile::onClipCopy,
-      [=]() { this->onClipCopyImpl(idx); }
+      [=, this]() { this->onClipCopyImpl(idx); }
     );
 
     clipListLayout->addWidget(tile);

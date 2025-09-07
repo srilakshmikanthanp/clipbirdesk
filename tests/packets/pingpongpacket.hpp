@@ -17,7 +17,7 @@
  */
 TEST(PingPongPacket, TestingPingPacket) {
   // using the AuthenticationPacket
-  using srilakshmikanthanp::clipbirdesk::network::packets::PingPongPacket;
+  using srilakshmikanthanp::clipbirdesk::packets::PingPongPacket;
 
     // using the ErrorCode
   using srilakshmikanthanp::clipbirdesk::types::enums::PingType;

@@ -17,7 +17,7 @@
  */
 TEST(AuthenticationTest, TestingAuthentication) {
   // using the AuthenticationPacket
-  using srilakshmikanthanp::clipbirdesk::network::packets::Authentication;
+  using srilakshmikanthanp::clipbirdesk::packets::Authentication;
 
   // using the ErrorCode
   using srilakshmikanthanp::clipbirdesk::types::enums::AuthStatus;

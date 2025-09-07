@@ -1,6 +1,6 @@
 #include "register.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::network::mdns {
+namespace srilakshmikanthanp::clipbirdesk::mdns {
 /**
  * @brief Construct a new Register object
  */

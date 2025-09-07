@@ -42,7 +42,7 @@ void ClipBird::handleServerStatusChanged(bool status, types::Device host) {
 
   // get the client and disconnect the signals
   auto signal  = &clipboard::ApplicationClipboard::OnClipboardChange;
-  auto slot    = &network::syncing::Synchronizer::synchronize;
+  auto slot    = &syncing::Synchronizer::synchronize;
   auto *client = &std::get<Client>(m_host);
   auto &store  = storage::Storage::instance();
 
@@ -140,6 +140,23 @@ void ClipBird::handleAuthRequest(types::Device host) {
   }
 }
 
+void ClipBird::handleHubConnected() {
+  connect(
+    &m_clipboard, &clipboard::ApplicationClipboard::OnClipboardChange,
+    &m_hub.value(), &syncing::Synchronizer::synchronize
+  );
+  emit OnHubConnected();
+}
+
+void ClipBird::handleHubDisconnected() {
+  disconnect(
+    &m_clipboard, &clipboard::ApplicationClipboard::OnClipboardChange,
+    &m_hub.value(), &syncing::Synchronizer::synchronize
+  );
+  emit OnHubDisconnected();
+  m_hub.reset();
+}
+
 /**
  * @brief Set the SSL Configuration object
  */
@@ -231,7 +248,7 @@ void ClipBird::setCurrentHostAsServer() {
   // connect the OnClipboardChange signal to the server
   connect(
     &m_clipboard, &clipboard::ApplicationClipboard::OnClipboardChange,
-    server, &network::syncing::Synchronizer::synchronize
+    server, &syncing::Synchronizer::synchronize
   );
 
   // Connect the onClientListChanged signal to the signal
@@ -666,5 +683,58 @@ types::enums::HostType ClipBird::getHostType() const {
   }
 
   return types::enums::HostType::NONE;
+}
+
+//---------------------- Hub functions -----------------------//
+/**
+ * @brief Connect to the hub server
+ */
+void ClipBird::connectToHub(const syncing::wan::HubHostDevice &device) {
+  // if the hub is already connected then throw error
+  if (m_hub.has_value() && m_hub->isReady()) {
+    throw std::runtime_error("Hub is already connected");
+  }
+
+  // emplace the hub
+  m_hub.emplace(device, this);
+
+  // connect the signals
+  connect(
+    &*m_hub, &syncing::wan::HubWebSocket::OnErrorOccurred,
+    this, &ClipBird::OnHubErrorOccurred
+  );
+
+  connect(
+    &*m_hub, &syncing::wan::HubWebSocket::OnConnected,
+    this, &ClipBird::handleHubConnected
+  );
+
+  connect(
+    &*m_hub, &syncing::wan::HubWebSocket::OnDisconnected,
+    this, &ClipBird::handleHubDisconnected
+  );
+
+  // connect to the hub
+  m_hub->connect();
+}
+
+/**
+ * @brief is Hub Ready
+ */
+bool ClipBird::isHubReady() {
+  return m_hub.has_value() && m_hub->isReady();
+}
+
+/**
+ * @brief Disconnect from the hub server
+ */
+void ClipBird::disconnectFromHub() {
+  // if the hub is not connected then throw error
+  if (!m_hub.has_value() || !m_hub->isReady()) {
+    throw std::runtime_error("Hub is not connected");
+  }
+
+  // disconnect from the hub
+  m_hub->disconnect();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::controller

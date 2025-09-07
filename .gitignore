@@ -9,3 +9,6 @@ setup
 #-----------------
 .vs
 out
+
+# vcpkg
+CMakeUserPresets.json

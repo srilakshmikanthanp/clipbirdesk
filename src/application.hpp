@@ -26,20 +26,46 @@
 // Project Headers
 #include "constants/constants.hpp"
 #include "controller/clipbird/clipbird.hpp"
+#include "store/secure_storage.hpp"
+#include "store/storage.hpp"
+#include "syncing/wan/auth/auth_api_client.hpp"
+#include "syncing/wan/auth/auth_api_repository.hpp"
+#include "syncing/wan/auth/auth_token_holder.hpp"
+#include "syncing/wan/device/device_api_client.hpp"
+#include "syncing/wan/device/device_api_repository.hpp"
+#include "syncing/wan/device/device_type.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 #include "ui/gui/traymenu/traymenu.hpp"
 #include "ui/gui/modals/aboutus/aboutus.hpp"
 #include "ui/gui/modals/connect/connect.hpp"
 #include "ui/gui/modals/group/group.hpp"
+#include "ui/gui/modals/signin/signin.hpp"
 #include "ui/gui/notification/joinrequest/joinrequest.hpp"
 #include "ui/gui/widgets/clipbird/clipbird.hpp"
 #include "ui/gui/widgets/history/history.hpp"
-#include "utility/functions/sslcert/sslcert.hpp"
+#include "utility/functions/ssl/ssl.hpp"
+#include "utility/functions/keychain/keychain.hpp"
+#include "utility/functions/crypto/crypto.hpp"
 #include "utility/logging/logging.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk {
 class Application : public SingleApplication {
   private:  // Member Functions
+
+  /**
+   * @brief Update Hub Host Device
+   */
+  QFuture<syncing::wan::HubHostDevice> updateHubHostDevice(const syncing::wan::HubHostDevice& device);
+
+  /**
+   * @brief Create Hub Host Device
+   */
+  QFuture<syncing::wan::HubHostDevice> createHubHostDevice();
+
+  /**
+   * @brief Save the Hub Host Device
+   */
+  QFuture<syncing::wan::HubHostDevice> saveHubHostDevice(const syncing::wan::HubHostDevice& device);
 
   /**
    * @brief Get the certificate from App Home
@@ -58,6 +84,11 @@ class Application : public SingleApplication {
   QSslConfiguration getSslConfiguration();
 
   /**
+   * @brief Connect to Hub
+   */
+  void connectToHub();
+
+  /**
    * @brief handle onConnectionError
    */
   void handleConnectionError(QString error);
@@ -71,6 +102,26 @@ class Application : public SingleApplication {
    * @brief Handle the Client auth Request
    */
   void handleAuthRequest(const types::Device& client);
+
+  /**
+   * @brief handle signin
+   */
+  void handleSignin(QString email, QString password);
+
+  /**
+   * @brief handle hub connect
+   */
+  void handleHubConnect();
+
+  /**
+   * @brief handle hub disconnect
+   */
+  void handleHubDisconnect();
+
+  /**
+   * @brief handle hub error occurred
+   */
+  void handleHubErrorOccurred(QAbstractSocket::SocketError);
 
   //----------------------------- slots for Tray ----------------------------//
 
@@ -110,6 +161,16 @@ class Application : public SingleApplication {
   void resetDevices();
 
   /**
+   * @brief On Signin Clicked
+   */
+  void onAccountClicked();
+
+  /**
+   * @brief On Hub Clicked
+   */
+  void onHubClicked();
+
+  /**
    * @brief On Tray Icon Clicked
    */
   void onTrayIconClicked(QSystemTrayIcon::ActivationReason reason);
@@ -124,6 +185,7 @@ class Application : public SingleApplication {
   ui::gui::modals::AboutUs *aboutUs = new ui::gui::modals::AboutUs();
   ui::gui::modals::Group *group = new ui::gui::modals::Group();
   ui::gui::modals::Connect *joiner = new ui::gui::modals::Connect();
+  ui::gui::modals::SignIn *signin = new ui::gui::modals::SignIn();
 
  private:  //  Member Variables and Objects
 
@@ -136,6 +198,10 @@ class Application : public SingleApplication {
  private:  //  Member Variables and Objects
 
   QHotkey *hotkey;
+
+ private:
+  syncing::wan::DeviceRepository *deviceRepository = new syncing::wan::DeviceApiRepository(new syncing::wan::DeviceApiClient(this), this);
+  syncing::wan::AuthRepository *authRepository = new syncing::wan::AuthApiRepository(new syncing::wan::AuthApiClient(this), this);
 
  private:  // Disable Copy, Move and Assignment
 

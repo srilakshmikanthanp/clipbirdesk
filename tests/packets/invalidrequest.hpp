@@ -17,7 +17,7 @@
  */
 TEST(InvalidPacketTest, TestingInvalidPacket) {
   // using the MalformedPacket
-  using srilakshmikanthanp::clipbirdesk::network::packets::InvalidRequest;
+  using srilakshmikanthanp::clipbirdesk::packets::InvalidRequest;
 
   // using the ErrorCode
   using srilakshmikanthanp::clipbirdesk::types::enums::ErrorCode;

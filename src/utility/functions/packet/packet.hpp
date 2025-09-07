@@ -68,7 +68,7 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions {
  *
  * @return Authentication
  */
-network::packets::Authentication createPacket(params::AuthenticationParams params);
+packets::Authentication createPacket(params::AuthenticationParams params);
 
 /**
  * @brief Create the ErrorMessage
@@ -79,7 +79,7 @@ network::packets::Authentication createPacket(params::AuthenticationParams param
  *
  * @return ErrorMessage
  */
-network::packets::InvalidRequest createPacket(params::InvalidPacketParams params);
+packets::InvalidRequest createPacket(params::InvalidPacketParams params);
 
 /**
  * @brief Create the SyncingItem
@@ -89,7 +89,7 @@ network::packets::InvalidRequest createPacket(params::InvalidPacketParams params
  *
  * @return SyncingItem
  */
-network::packets::SyncingItem createPacket(params::SyncingItemParams params);
+packets::SyncingItem createPacket(params::SyncingItemParams params);
 
 /**
  * @brief Create the SyncingPacket
@@ -99,7 +99,7 @@ network::packets::SyncingItem createPacket(params::SyncingItemParams params);
  *
  * @return SyncingPacket
  */
-network::packets::SyncingPacket createPacket(params::SyncingPacketParams params);
+packets::SyncingPacket createPacket(params::SyncingPacketParams params);
 
 /**
  * @brief Create the PingPongPacket
@@ -109,5 +109,5 @@ network::packets::SyncingPacket createPacket(params::SyncingPacketParams params)
  *
  * @return PingPongPacket
  */
-network::packets::PingPongPacket createPacket(params::PingPacketParams params);
+packets::PingPongPacket createPacket(params::PingPacketParams params);
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions

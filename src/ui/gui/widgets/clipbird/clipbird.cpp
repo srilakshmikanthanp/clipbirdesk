@@ -67,7 +67,7 @@ void Clipbird::handleServerListChange(std::optional<types::Device> server, QList
   QList<components::HostTile::Value> serversTile;
 
   // get the action for the server
-  const auto getAction = [=](const auto& s) {
+  const auto getAction = [=, this](const auto& s) {
     if (!server.has_value()) return Action::Connect;
     if (s.ip == server->ip && s.port == server->port) {
       return Action::Disconnect;
@@ -82,7 +82,7 @@ void Clipbird::handleServerListChange(std::optional<types::Device> server, QList
   }
 
   // show the connected server always on top
-  std::sort(serversTile.begin(), serversTile.end(), [=](const auto& a, const auto& b) {
+  std::sort(serversTile.begin(), serversTile.end(), [=, this](const auto& a, const auto& b) {
     return std::get<1>(a) != Action::Disconnect;
   });
 
@@ -98,7 +98,7 @@ void Clipbird::handleServerStatusChanged(bool isConnected, types::Device server)
   auto servers = this->getServerList();
 
   // get action for the server
-  const auto getAction = [=](const auto& s) {
+  const auto getAction = [=, this](const auto& s) {
     if (std::get<0>(s).ip == server.ip && std::get<0>(s).port == server.port) {
       return isConnected ? Action::Disconnect : Action::Connect;
     } else {
@@ -189,12 +189,12 @@ Clipbird::Clipbird(QWidget* p) : QWidget(p) {
 
   // clang-format off
   // server list slot
-  auto serverListSlot = [=](const auto& host) {
+  auto serverListSlot = [=, this](const auto& host) {
     this->handleHostAction(Tabs::Client, host);
   };
 
   // client list slot
-  auto clientListSlot = [=](const auto& host) {
+  auto clientListSlot = [=, this](const auto& host) {
     this->handleHostAction(Tabs::Server, host);
   };
   // clang-format on

@@ -1,8 +1,10 @@
 {
   "C_Cpp.clang_format_fallbackStyle": "Google",
-  "grammarly.files.exclude": [
-    "**/CMakeLists.txt"
-  ],
+  "cmake.configureSettings": {
+    "CLIPBIRD_DOMAIN": "localhost:8080",
+    "CLIPBIRD_API_URL": "http://localhost:8080",
+    "CLIPBIRD_WEBSOCKET_URL": "ws://localhost:8080"
+  },
   "cSpell.words": [
     "Antialiasing",
     "Cilp",
@@ -193,6 +195,8 @@
     "qclipboard": "cpp",
     "qtwaylandclientversion": "cpp",
     "qquickstyle": "cpp",
-    "qdbusunixfiledescriptor": "cpp"
+    "qdbusunixfiledescriptor": "cpp",
+    "qwebsocket": "cpp",
+    "*.inc": "cpp"
   },
 }
