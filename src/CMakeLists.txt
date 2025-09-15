@@ -7,14 +7,14 @@ set(APPLICATION_DARK_QSS_PATH ":/styles/dark.qss")
 # Set the logo.ico path variable
 set(APPLICATION_LOGO_PATH ":/images/logo.ico")
 
+# Clipbird Domain
+set(CLIPBIRD_API_DOMAIN "clipbird-api.srilakshmikanthanp.com" CACHE STRING "Clipbird Domain")
+
 # websocket url
-set(CLIPBIRD_WEBSOCKET_URL "wss://${CLIPBIRD_DOMAIN}" CACHE STRING "Clipbird WebSocket URL")
+set(CLIPBIRD_WEBSOCKET_URL "wss://${CLIPBIRD_API_DOMAIN}" CACHE STRING "Clipbird WebSocket URL")
 
 # Base url
-set(CLIPBIRD_API_URL "https://${CLIPBIRD_DOMAIN}" CACHE STRING "Clipbird Base URL")
-
-# Clipbird Domain
-set(CLIPBIRD_DOMAIN "clipbird.srilakshmikanthanp.com" CACHE STRING "Clipbird Domain")
+set(CLIPBIRD_API_URL "https://${CLIPBIRD_API_DOMAIN}" CACHE STRING "Clipbird Base URL")
 
 # Set the BBONJOUR_DIR from env
 set(BONJOUR_SDK_HOME $ENV{BONJOUR_SDK_HOME})

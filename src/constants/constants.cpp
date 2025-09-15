@@ -165,7 +165,7 @@ const char* getAppHistoryShortcut()  {
  * @brief Used to get base url for api
  */
 const char* getClipbirdDomain() {
-  return CLIPBIRD_DOMAIN;
+  return CLIPBIRD_API_DOMAIN;
 }
 
 /**
