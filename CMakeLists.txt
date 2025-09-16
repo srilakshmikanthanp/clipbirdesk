@@ -7,10 +7,10 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 # read version from ini file
-file(READ "${CMAKE_CURRENT_LIST_DIR}/conf/VERSION" VERSION)
+file(READ "${CMAKE_CURRENT_LIST_DIR}/VERSION" VERSION)
 
 # Read UUID from file
-file(READ "${CMAKE_CURRENT_LIST_DIR}/conf/APPUUID" UUID)
+file(READ "${CMAKE_CURRENT_LIST_DIR}/APPUUID" UUID)
 
 # set project name and version
 project(clipbird VERSION ${VERSION} LANGUAGES C CXX)
