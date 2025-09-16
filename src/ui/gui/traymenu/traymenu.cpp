@@ -185,8 +185,10 @@ bool TrayMenu::isHubEnabled() const {
 void TrayMenu::setSignedIn(bool issignedin) {
   if (m_isSignedIn = issignedin) {
     account.setText(QObject::tr("Sign Out"));
+    this->hub.setEnabled(true);
   } else {
     account.setText(QObject::tr("Sign In"));
+    this->hub.setEnabled(false);
   }
 }
 

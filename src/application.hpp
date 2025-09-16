@@ -86,7 +86,7 @@ class Application : public SingleApplication {
   /**
    * @brief Connect to Hub
    */
-  void connectToHub();
+  QFuture<void> setupHubConnection();
 
   /**
    * @brief handle onConnectionError

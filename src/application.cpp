@@ -13,8 +13,7 @@ namespace srilakshmikanthanp::clipbirdesk {
 QFuture<syncing::wan::HubHostDevice> Application::updateHubHostDevice(const syncing::wan::HubHostDevice& device) {
   auto requestDto = syncing::wan::DeviceRequestDto{ device.publicKey, device.name, device.type };
   return deviceRepository->updateDevice(device.id, requestDto).then([=, this](const syncing::wan::DeviceResponseDto& updatedDevice) {
-    auto hubDevice = syncing::wan::HubHostDevice{updatedDevice.id, updatedDevice.name, updatedDevice.type, updatedDevice.publicKey, device.privateKey};
-    return hubDevice;
+    return syncing::wan::HubHostDevice{updatedDevice.id, updatedDevice.name, updatedDevice.type, updatedDevice.publicKey, device.privateKey};
   });
 }
 
@@ -25,8 +24,7 @@ QFuture<syncing::wan::HubHostDevice> Application::createHubHostDevice() {
   auto [privateKey, publicKey] = utility::functions::generateQtKeyPair();
   auto requestDto = syncing::wan::DeviceRequestDto{ publicKey.toPem(), constants::getMDnsServiceName(), syncing::wan::DeviceType::getCurrentDeviceType() };
   return deviceRepository->createDevice(requestDto).then([=, this](const syncing::wan::DeviceResponseDto& device) {
-    auto hubDevice = syncing::wan::HubHostDevice{device.id, device.name, device.type, device.publicKey, privateKey.toPem()};
-    return hubDevice;
+    return syncing::wan::HubHostDevice{device.id, device.name, device.type, device.publicKey, privateKey.toPem()};
   });
 }
 
@@ -146,8 +144,9 @@ void Application::handleConnectionError(QString error) {
 /**
  * @brief Connect to Hub
  */
-void Application::connectToHub() {
-  utility::functions::toFuture(
+QFuture<void> Application::setupHubConnection() {
+  this->trayMenu->setHubEnabled(false);
+  return utility::functions::toFuture(
     storage::SecureStorage::instance().getHubHostDevice(),
     &storage::ReadHubHostDeviceJob::device
   ).then([=, this](std::optional<syncing::wan::HubHostDevice> device) {
@@ -168,7 +167,12 @@ void Application::connectToHub() {
     controller->connectToHub(device);
   })
   .onFailed([=, this](const std::exception& e) {
-    throw std::runtime_error("Error reading Hub Host Device: " + std::string(e.what()));
+    this->trayMenu->setHubEnabled(true);
+    this->trayIcon->showMessage(
+      constants::getAppName(),
+      QObject::tr("Hub Connection Error Occurred: %1").arg(e.what()),
+      QIcon(QString::fromStdString(constants::getAppLogo()))
+    );
   });
 }
 
@@ -237,6 +241,7 @@ void Application::handleAuthRequest(const types::Device& client) {
  */
 void Application::handleSignin(QString email, QString password) {
   trayMenu->setAccoundEnabled(false);
+  signin->setSigningIn(true);
   authRepository->signIn({email, password}).then([=, this](const syncing::wan::AuthTokenDto& token) {
     QKeychain::WritePasswordJob *job = nullptr;
     bool status = QMetaObject::invokeMethod(
@@ -253,10 +258,12 @@ void Application::handleSignin(QString email, QString password) {
       this->signin->reset();
       this->signin->hide();
       this->trayMenu->setAccoundEnabled(true);
+      this->signin->setSigningIn(false);
     });
   }).unwrap().onFailed([=, this](const std::exception& e) {
       this->signin->setError(e.what());
       this->trayMenu->setAccoundEnabled(true);
+      this->signin->setSigningIn(false);
   });
 }
 
@@ -265,6 +272,7 @@ void Application::handleSignin(QString email, QString password) {
  */
 void Application::handleHubConnect() {
   this->trayMenu->setJoinedToHub(true);
+  this->trayMenu->setHubEnabled(true);
 }
 
 /**
@@ -272,6 +280,7 @@ void Application::handleHubConnect() {
  */
 void Application::handleHubDisconnect() {
   this->trayMenu->setJoinedToHub(false);
+  this->trayMenu->setHubEnabled(true);
 }
 
 /**
@@ -513,14 +522,14 @@ void Application::onAccountClicked() {
  */
 void Application::onHubClicked() {
   if (this->trayMenu->isJoinedToHub()) {
+    this->trayMenu->setHubEnabled(false);
     storage::Storage::instance().setIsUserConnectedToHubLastly(false);
     controller->disconnectFromHub();
-    this->trayMenu->setJoinedToHub(false);
     return;
-  } else {
-    storage::Storage::instance().setIsUserConnectedToHubLastly(true);
-    connectToHub();
   }
+
+  storage::Storage::instance().setIsUserConnectedToHubLastly(true);
+  this->setupHubConnection();
 }
 
 /**
@@ -593,16 +602,21 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     }
   };
 
+  const auto tokenHandler = [=, this](syncing::wan::AuthTokenDto token) {
+    syncing::wan::AuthTokenHolder::instance().setAuthToken(token);
+    if (storage::Storage::instance().getHubIsConnectedLastly()) {
+      setupHubConnection();
+    }
+  };
+
   utility::functions::toFuture(
     storage::SecureStorage::instance().getHubAuthToken(),
     &storage::ReadAuthTokenDtoJob::authToken
   ).then([=, this](std::optional<syncing::wan::AuthTokenDto> token) {
     if (!token.has_value()) {
       return syncing::wan::AuthTokenHolder::instance().setAuthToken(std::nullopt);
-    }
-    syncing::wan::AuthTokenHolder::instance().setAuthToken(token.value());
-    if (storage::Storage::instance().getHubIsConnectedLastly()) {
-      connectToHub();
+    } else {
+      tokenHandler(token.value());
     }
   }).onFailed([=, this](const std::exception& e) {
     throw std::runtime_error("Error reading Hub JWT Token: " + std::string(e.what()));
@@ -794,7 +808,6 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     &syncing::wan::AuthTokenHolder::instance(),
     &syncing::wan::AuthTokenHolder::authTokenChanged,
     [=, this](auto token) {
-      this->trayMenu->setHubEnabled(token.has_value());
       this->trayMenu->setSignedIn(token.has_value());
     }
   );
