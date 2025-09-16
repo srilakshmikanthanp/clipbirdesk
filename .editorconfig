@@ -14,7 +14,10 @@ insert_final_newline = true
 max_line_length = off
 trim_trailing_whitespace = false
 
-# For App Config
-[conf/**]
+[APPUUID]
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+[VERSION]
 insert_final_newline = false
 trim_trailing_whitespace = false
