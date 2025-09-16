@@ -173,7 +173,6 @@ Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installe
 sudo apt-get install libavahi-compat-libdnssd-dev
 sudo apt-get install libglib2.0-dev
 sudo apt-get install libnotify-dev
-sudo apt-get install qtkeychain-qt6-dev
 ~~~
 
 ~~~sh
