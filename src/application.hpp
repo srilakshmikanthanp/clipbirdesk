@@ -25,7 +25,10 @@
 
 // Project Headers
 #include "constants/constants.hpp"
-#include "controller/clipbird/clipbird.hpp"
+#include "controller/clipboard/clipboard_controller.hpp"
+#include "controller/history/history_controller.hpp"
+#include "controller/lan/lan_controller.hpp"
+#include "controller/wan/wan_controller.hpp"
 #include "store/secure_storage.hpp"
 #include "store/storage.hpp"
 #include "syncing/wan/auth/auth_api_client.hpp"
@@ -47,151 +50,83 @@
 #include "utility/functions/keychain/keychain.hpp"
 #include "utility/functions/crypto/crypto.hpp"
 #include "utility/logging/logging.hpp"
+#include "utility/powerhandler/powerhandler.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk {
 class Application : public SingleApplication {
-  private:  // Member Functions
+  private:
 
-  /**
-   * @brief Get the certificate from App Home
-   */
   QSslConfiguration getOldSslConfiguration();
-
-  /**
-   * @brief Get the certificate by creating new one
-   */
   QSslConfiguration getNewSslConfiguration();
-
-  /**
-   * @brief Get the certificate from App Home
-   * or generate new one and store it
-   */
   QSslConfiguration getSslConfiguration();
 
-  /**
-   * @brief Connect to Hub
-   */
   QFuture<void> setupHubConnection();
 
-  /**
-   * @brief handle onConnectionError
-   */
   void handleConnectionError(QString error);
-
-  /**
-   * @brief On Tab Changed for Client
-   */
   void handleTabChange(ui::gui::widgets::Clipbird::Tabs tab);
-
-  /**
-   * @brief Handle the Client auth Request
-   */
   void handleAuthRequest(const types::Device& client);
-
-  /**
-   * @brief Handle the On connect from Connect dialog
-   */
   void handleConnect(QString ip, QString port);
-
-  /**
-   * @brief handle signin
-   */
   void handleSignin(QString email, QString password);
-
-  /**
-   * @brief handle hub connect
-   */
   void handleHubConnect();
-
-  /**
-   * @brief handle hub disconnect
-   */
   void handleHubDisconnect();
-
-  /**
-   * @brief handle hub error occurred
-   */
   void handleHubErrorOccurred(QAbstractSocket::SocketError);
+  void handleSleepEvent();
+  void handleWakeUpEvent();
+  void handleClientStateChanged(types::Device client, bool connected);
+  void handleServerStatusChanged(bool status, types::Device host);
+  void handleServerFound(types::Device server);
+  void handleSyncRequest(QVector<QPair<QString, QByteArray>> data);
 
-  //----------------------------- slots for Tray ----------------------------//
-
-  /**
-   * @brief On Qr Code Clicked
-   */
-  void openQrCode();
-
-  /**
-   * @brief On Connect Clicked
-   */
-  void openConnect();
-
-  /**
-   * @brief On About Clicked
-   */
-  void openAbout();
-
-  /**
-   * @brief On Open App Clicked
-   */
+  void onTrayIconClicked(QSystemTrayIcon::ActivationReason reason);
   void openClipbird();
-
-  /**
-   * @brief On Send Clicked
-   */
+  void openQrCode();
+  void openConnect();
+  void openAbout();
   void sendClipboard();
-
-  /**
-   * @brief On Received Clicked
-   */
   void openHistory();
-
-  /**
-   * @brief On Reset Clicked
-   */
   void resetDevices();
-
-  /**
-   * @brief On Signin Clicked
-   */
   void onAccountClicked();
-
-  /**
-   * @brief On Hub Clicked
-   */
   void onHubClicked();
 
-  /**
-   * @brief On Tray Icon Clicked
-   */
-  void onTrayIconClicked(QSystemTrayIcon::ActivationReason reason);
-
-  /**
-   * @brief Set the Qss File for the color scheme
-   */
   void setQssFile(Qt::ColorScheme scheme);
 
- private:  // Member variable (Modals)
+ private:
 
   ui::gui::modals::AboutUs *aboutUs = new ui::gui::modals::AboutUs();
   ui::gui::modals::Group *group = new ui::gui::modals::Group();
   ui::gui::modals::Connect *joiner = new ui::gui::modals::Connect();
   ui::gui::modals::SignIn *signin = new ui::gui::modals::SignIn();
 
- private:  //  Member Variables and Objects
+ private:
 
+  controller::ClipboardController *clipboardController;
+  controller::HistoryController *historyController;
+  controller::LanController *lanController;
+  controller::WanController *wanController;
   ui::gui::widgets::Clipbird *clipbird;
   ui::gui::widgets::History *history;
   ui::gui::TrayMenu *trayMenu;
   QSystemTrayIcon *trayIcon;
-  controller::ClipBird *controller;
+  PowerHandler *powerHandler;
 
- private:  //  Member Variables and Objects
+ private:
 
   QHotkey *hotkey;
 
  private:
-  syncing::wan::DeviceRepository *deviceRepository = new syncing::wan::DeviceApiRepository(new syncing::wan::DeviceApiClient(this), this);
-  syncing::wan::AuthRepository *authRepository = new syncing::wan::AuthApiRepository(new syncing::wan::AuthApiClient(this), this);
+
+  using DeviceRepository = syncing::wan::DeviceRepository;
+  using AuthRepository = syncing::wan::AuthRepository;
+  using DeviceApiClient = syncing::wan::DeviceApiClient;
+  using AuthApiClient = syncing::wan::AuthApiClient;
+  using DeviceApiRepository = syncing::wan::DeviceApiRepository;
+  using AuthApiRepository = syncing::wan::AuthApiRepository;
+  using Server = syncing::lan::Server;
+  using Client = syncing::lan::Client;
+
+ private:
+  DeviceRepository *deviceRepository = new DeviceApiRepository(new DeviceApiClient(this), this);
+  AuthRepository *authRepository = new AuthApiRepository(new AuthApiClient(this), this);
 
  private:  // Disable Copy, Move and Assignment
 
@@ -199,23 +134,13 @@ class Application : public SingleApplication {
 
  public:  // Constructors and Destructors
 
-  /**
-   * @brief Construct a new Clipbird Application object
-   *
-   * @param argc argument count
-   * @param argv argument vector
-   */
   Application(int &argc, char **argv);
-
-  /**
-   * @brief Destroy the Clipbird Application
-   * Object and it's members
-   */
   virtual ~Application();
 
-  /**
-   * @brief get the controller
-   */
-  controller::ClipBird *getController() const;
+  controller::ClipboardController* getClipboardController() const;
+  controller::HistoryController* getHistoryController() const;
+  controller::LanController* getLanController() const;
+  controller::WanController* getWanController() const;
+  PowerHandler* getPowerHandler() const;
 };
 }

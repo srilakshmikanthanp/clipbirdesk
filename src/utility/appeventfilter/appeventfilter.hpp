@@ -16,7 +16,6 @@
 #endif
 
 #include "constants/constants.hpp"
-#include "controller/clipbird/clipbird.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk {
@@ -32,20 +31,9 @@ class AppEventFilter : public QObject {
   void handleWindowShownEvent(QWidget *window);
   void handleEscKeyPressEvent(QWidget *window);
 
- private:
-
-  controller::ClipBird *controller;
-
  public:
 
-  /**
-   * @brief Destroy the Clipbird Application Event Filter object
-   */
+  AppEventFilter(QObject *parent = nullptr);
   virtual ~AppEventFilter();
-
-  /**
-   * @brief Construct a new Clipbird Application Event Filter object
-   */
-  AppEventFilter(controller::ClipBird *controller);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk

@@ -1,0 +1,35 @@
+#pragma once  // Header guard see https://en.wikipedia.org/wiki/Include_guard
+
+// project headers
+#include "controller/controller.hpp"
+
+namespace srilakshmikanthanp::clipbirdesk::controller {
+class HistoryController : public Controller {
+ private:  // just for Qt
+
+  Q_OBJECT
+
+ private:
+
+  Q_DISABLE_COPY_MOVE(HistoryController)
+
+ private:
+
+  QVector<QVector<QPair<QString, QByteArray>>> m_history;
+
+ public:  // Constructors and Destructors
+
+  HistoryController(QObject *parent = nullptr);
+  virtual ~HistoryController();
+
+ signals:
+
+  void OnHistoryChanged(QVector<QVector<QPair<QString, QByteArray>>>);
+
+ public:  // Member functions
+
+  void addHistory(QVector<QPair<QString, QByteArray>> data);
+  QVector<QVector<QPair<QString, QByteArray>>> getHistory() const;
+  void deleteHistoryAt(int index);
+};
+}  // namespace srilakshmikanthanp::clipbirdesk::controller

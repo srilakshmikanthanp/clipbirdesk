@@ -35,7 +35,6 @@
 #include <variant>
 
 // project headers
-#include "controller/clipbird/clipbird.hpp"
 #include "types/device.hpp"
 #include "ui/gui/components/hostlist/hostlist.hpp"
 
