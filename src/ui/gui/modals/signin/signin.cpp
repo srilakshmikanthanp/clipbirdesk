@@ -46,11 +46,18 @@ void SignIn::setError(const std::optional<QString> &error) {
   }
 }
 
-void SignIn::setSigningIn(bool) {
-  editUser->setDisabled(true);
-  editPass->setDisabled(true);
-  signInBtn->setDisabled(true);
-  signInBtn->setText(tr("Signing In..."));
+void SignIn::setSigningIn(bool isSigningIn) {
+  if (isSigningIn) {
+    editUser->setDisabled(true);
+    editPass->setDisabled(true);
+    signInBtn->setDisabled(true);
+    signInBtn->setText(tr("Signing In..."));
+  } else {
+    editUser->setDisabled(false);
+    editPass->setDisabled(false);
+    signInBtn->setDisabled(false);
+    signInBtn->setText(tr("Sign In"));
+  }
 }
 
 void SignIn::reset() {
