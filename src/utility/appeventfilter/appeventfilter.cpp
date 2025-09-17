@@ -1,12 +1,7 @@
 #include "appeventfilter.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk {
-/**
- * @brief Construct a new Clipbird Application Event Filter object
- */
-AppEventFilter::AppEventFilter(controller::ClipBird *controller) : controller(controller) {
-  // Nothing to do
-}
+AppEventFilter::AppEventFilter(QObject *parent) : QObject(parent) {}
 
 bool AppEventFilter::eventFilter(QObject *o, QEvent *e) {
   if (e->type() == QEvent::KeyPress) {
@@ -39,8 +34,5 @@ void AppEventFilter::handleEscKeyPressEvent(QWidget *window) {
   }
 }
 
-/**
- * @brief Destroy the Clipbird Application Event Filter object
- */
 AppEventFilter::~AppEventFilter() = default;
 }  // namespace srilakshmikanthanp::clipbirdesk

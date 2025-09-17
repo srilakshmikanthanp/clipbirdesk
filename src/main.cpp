@@ -28,7 +28,6 @@
 // Project Headers
 #include "application.hpp"
 #include "constants/constants.hpp"
-#include "controller/clipbird/clipbird.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 #include "utility/appeventfilter/appeventfilter.hpp"
 #include "utility/functions/ssl/ssl.hpp"
@@ -88,14 +87,11 @@ auto main(int argc, char **argv) -> int {
   // disable proxy for the application
   QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
 
-  // native event filter
-  auto powerHandler = new PowerHandler(app.getController());
-
   // install native event filter
-  app.installNativeEventFilter(powerHandler);
+  app.installNativeEventFilter(app.getPowerHandler());
 
   // install event filter
-  app.installEventFilter(new AppEventFilter(app.getController()));
+  app.installEventFilter(new AppEventFilter());
 
 #if defined(_WIN32) || defined(_WIN64)
   // create AUMI

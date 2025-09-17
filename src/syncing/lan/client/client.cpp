@@ -459,7 +459,7 @@ QSslConfiguration Client::getSslConfiguration() const {
 void Client::synchronize(const QVector<QPair<QString, QByteArray>>& items) {
   // check if the socket is connected else throw error
   if (!m_ssl_socket->isOpen()) {
-    return;
+    throw std::runtime_error("Socket is not connected");
   }
 
   // using createPacket to create the packet
@@ -582,6 +582,13 @@ std::optional<types::Device> Client::getConnectedServer() const {
 
   // return the host address and port number
   return std::optional<types::Device>({addr, port, name});
+}
+
+/**
+ * @brief Check if the client is connected to the server
+ */
+bool Client::isConnectedToServer() const {
+  return this->m_ssl_socket->state() == QAbstractSocket::ConnectedState;
 }
 
 /**

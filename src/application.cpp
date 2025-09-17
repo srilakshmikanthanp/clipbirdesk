@@ -7,67 +7,42 @@
 
 namespace srilakshmikanthanp::clipbirdesk {
 
-/**
- * @brief Get the certificate from App Home
- */
 QSslConfiguration Application::getOldSslConfiguration() {
   auto two_months      = std::chrono::milliseconds(constants::getAppCertExpiryInterval());
   auto& storage        = storage::Storage::instance();
-
-  // read the certificate and key
   QSslCertificate cert = storage.getHostCert();
   QSslKey key          = storage.getHostKey();
   QSslConfiguration sslConfig;
 
-  // get cert name
   auto name = cert.subjectInfo(QSslCertificate::CommonName).constFirst();
 
-  // Name is updated
   if (name != constants::getMDnsServiceName()) {
     return getNewSslConfiguration();
   }
 
-  // set the certificate and key
   sslConfig.setLocalCertificate(cert);
   sslConfig.setPrivateKey(key);
 
-  // if the configuration is null
   if (cert.isNull() || key.isNull() || sslConfig.isNull()) {
     throw std::runtime_error("Can't Create QSslConfiguration");
   }
 
-  // if the certificate is going to expiry
   if (cert.expiryDate() - QDateTime::currentDateTime() < two_months) {
     return getNewSslConfiguration();
   }
 
-  // set peer verify
   sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
-
-  // return the configuration
   return sslConfig;
 }
 
-/**
- * @brief Get the certificate by creating new one
- */
 QSslConfiguration Application::getNewSslConfiguration() {
-  // generate the certificate and key
   auto sslConfig = utility::functions::getQSslConfiguration();
-
-  // write the certificate and key
   auto& storage  = storage::Storage::instance();
   storage.setHostCert(sslConfig.localCertificate());
   storage.setHostKey(sslConfig.privateKey());
-
-  // return the configuration
   return sslConfig;
 }
 
-/**
- * @brief Get the certificate from App Home
- * or generate new one and store it
- */
 QSslConfiguration Application::getSslConfiguration() {
   auto& storage = storage::Storage::instance();
   QSslConfiguration config;
@@ -78,73 +53,9 @@ QSslConfiguration Application::getSslConfiguration() {
     config = getOldSslConfiguration();
   }
 
-  // return the configuration
   return config;
 }
 
-/**
- * @brief handle onConnectionError
- */
-void Application::handleConnectionError(QString error) {
-  // Just Show the error info to user via Dialog
-  auto message = QObject::tr("Connection Error: %1").arg(error);
-
-  // Title of the Notification
-  auto title = constants::getAppName();
-
-  // icon for the dialog
-  auto icon = QIcon(QString::fromStdString(constants::getAppLogo()));
-
-  // show notification
-  trayIcon->showMessage(title, message, icon);
-}
-
-/**
- * @brief Handle the On connect from Connect dialog
- */
-void Application::handleConnect(QString ip, QString port) {
-  // On HostName successfully resolved
-  const auto slot_hr = [=, this](QWidget* dialog, quint16 port, const auto& host) {
-    // if host name is not resolved
-    if (host.error() != QHostInfo::NoError) {
-      return;
-    }
-
-    // close the dialog
-    dialog->setVisible(false);
-
-    // connect to server
-    controller->connectToServer({
-      host.addresses().first(), port, host.hostName()
-    });
-  };
-
-  // validate the ip and port
-  const auto validator = [](auto ip, auto port) -> bool {
-    if (!QHostAddress(ip).isNull() && port > 0 && port < 65535) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  // validate the ip and port
-  if (!validator(ip.toShort(), port.toShort())) {
-    return;
-  }
-
-  // bind the port
-  auto slot = std::bind(
-    slot_hr, joiner, port.toShort(), std::placeholders::_1
-  );
-
-  // resolve the host name
-  QHostInfo::lookupHost(ip, this, slot);
-}
-
-/**
- * @brief Connect to Hub
- */
 QFuture<void> Application::setupHubConnection() {
   const auto updateHubHostDevice = [=, this](const syncing::wan::HubHostDevice& device) {
     auto requestDto = syncing::wan::DeviceRequestDto{ device.publicKey, device.name, device.type };
@@ -199,7 +110,7 @@ QFuture<void> Application::setupHubConnection() {
   })
   .unwrap()
   .then([=, this](const syncing::wan::HubHostDevice& device) {
-    controller->connectToHub(device);
+    wanController->connectToHub(device);
   })
   .onFailed([=, this](const std::exception& e) {
     this->trayMenu->setHubEnabled(true);
@@ -211,34 +122,45 @@ QFuture<void> Application::setupHubConnection() {
   });
 }
 
-/**
- * @brief On Tab Changed for Client
- */
+void Application::handleConnectionError(QString error) {
+  auto message = QObject::tr("Connection Error: %1").arg(error);
+  auto title = constants::getAppName();
+  auto icon = QIcon(QString::fromStdString(constants::getAppLogo()));
+  trayIcon->showMessage(title, message, icon);
+}
+
 void Application::handleTabChange(ui::gui::widgets::Clipbird::Tabs tab) {
   if (tab == ui::gui::widgets::Clipbird::Tabs::Client) {
     this->trayMenu->setQrCodeEnabled(false);
     this->trayMenu->setConnectEnabled(true);
-    controller->setCurrentHostAsClient();
+    lanController->setHostAsClient();
   } else {
     this->trayMenu->setQrCodeEnabled(true);
     this->trayMenu->setConnectEnabled(false);
-    controller->setCurrentHostAsServer();
+    lanController->setHostAsServer();
   }
 }
 
-/**
- * @brief On New Host Connected
- *
- * @param client
- */
 void Application::handleAuthRequest(const types::Device& client) {
-  // get the user input
+  auto &m_host = lanController->getHost();
+
+  if (!std::holds_alternative<Server>(m_host)) {
+    throw std::runtime_error("Host is not server");
+  }
+
+  auto cert = std::get<Server>(m_host).getUnauthedClientCert(client);
+  auto &store = storage::Storage::instance();
+  if (store.hasClientCert(client.name)) {
+    if (store.getClientCert(client.name) == cert.toPem()) {
+      return lanController->authSuccess(client);
+    }
+  }
+
   ui::gui::notification::JoinRequest* toast = new ui::gui::notification::JoinRequest(this);
 
-  // connect the dialog to window AuthSuccess signal
   const auto connectionAccept = connect(
     toast, &ui::gui::notification::JoinRequest::onAccept,
-    [=, this] { controller->authSuccess(client); }
+    [=, this] { lanController->authSuccess(client); }
   );
 
   connect(
@@ -246,15 +168,13 @@ void Application::handleAuthRequest(const types::Device& client) {
     toast, &QObject::deleteLater
   );
 
-  // disconnect all signals on tab change signal
   connect(clipbird, &ui::gui::widgets::Clipbird::onTabChanged, [=, this]{
     QObject::disconnect(connectionAccept);
   });
 
-  // connect the dialog to window AuthFail signal
-  const auto connectionReject   = connect(
+  const auto connectionReject = connect(
     toast, &ui::gui::notification::JoinRequest::onReject,
-    [=, this] { controller->authFailed(client); }
+    [=, this] { lanController->authFailed(client); }
   );
 
   connect(
@@ -262,22 +182,49 @@ void Application::handleAuthRequest(const types::Device& client) {
     toast, &QObject::deleteLater
   );
 
-  // disconnect all signals on tab change signal
   connect(clipbird, &ui::gui::widgets::Clipbird::onTabChanged, [=, this]{
     QObject::disconnect(connectionReject);
   });
 
-  // shoe the notification
   toast->show(client);
 }
 
-/**
- * @brief handle signin
- */
+
+void Application::handleConnect(QString ip, QString port) {
+  const auto slot_hr = [=, this](QWidget* dialog, quint16 port, const auto& host) {
+    if (host.error() != QHostInfo::NoError) {
+      return;
+    }
+    dialog->setVisible(false);
+    std::get<Client>(lanController->getHost()).connectToServer(
+      types::Device{host.addresses().first(), port, host.hostName()}
+    );
+  };
+
+  const auto validator = [](auto ip, auto port) -> bool {
+    if (!QHostAddress(ip).isNull() && port > 0 && port < 65535) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  if (!validator(ip.toShort(), port.toShort())) {
+    return;
+  }
+
+  auto slot = std::bind(
+    slot_hr, joiner, port.toShort(), std::placeholders::_1
+  );
+
+  QHostInfo::lookupHost(ip, this, slot);
+}
+
 void Application::handleSignin(QString email, QString password) {
   trayMenu->setAccoundEnabled(false);
   signin->setSigningIn(true);
-  authRepository->signIn({email, password}).then([=, this](const syncing::wan::AuthTokenDto& token) {
+  authRepository->signIn({email, password})
+  .then([=, this](const syncing::wan::AuthTokenDto& token) {
     QKeychain::WritePasswordJob *job = nullptr;
     bool status = QMetaObject::invokeMethod(
       &storage::SecureStorage::instance(),
@@ -302,25 +249,16 @@ void Application::handleSignin(QString email, QString password) {
   });
 }
 
-/**
- * @brief handle hub connect
- */
 void Application::handleHubConnect() {
   this->trayMenu->setJoinedToHub(true);
   this->trayMenu->setHubEnabled(true);
 }
 
-/**
- * @brief handle hub disconnect
- */
 void Application::handleHubDisconnect() {
   this->trayMenu->setJoinedToHub(false);
   this->trayMenu->setHubEnabled(true);
 }
 
-/**
- * @brief On Hub Error Occurred
- */
 void Application::handleHubErrorOccurred(QAbstractSocket::SocketError error) {
   this->trayIcon->showMessage(
     constants::getAppName(),
@@ -329,197 +267,177 @@ void Application::handleHubErrorOccurred(QAbstractSocket::SocketError error) {
   );
 }
 
-//----------------------------- slots for Tray ----------------------------//
+void Application::handleSleepEvent() {
+  switch (lanController->getHostType()) {
+  case types::enums::HostType::CLIENT:
+    lanController->disposeClient();
+    break;
 
-/**
- * @brief On Qr Code Clicked
- */
+  case types::enums::HostType::SERVER:
+    lanController->disposeServer();
+    break;
+  }
+}
+
+void Application::handleWakeUpEvent() {
+  if (storage::Storage::instance().getHostIsServer()) {
+    lanController->setHostAsServer();
+  } else {
+    lanController->setHostAsClient();
+  }
+}
+
+void Application::handleClientStateChanged(types::Device client, bool connected) {
+  auto &host = lanController->getHost();
+
+  if (!std::holds_alternative<Server>(host)) {
+    throw std::runtime_error("Host is not server");
+  }
+
+  if (!connected) return;
+
+  auto cert = std::get<Server>(host).getClientCert(client);
+  auto &store = storage::Storage::instance();
+  store.setClientCert(client.name, cert.toPem());
+  auto sslConfig = lanController->getSslConfiguration();
+  sslConfig.addCaCertificate(cert);
+  lanController->setSslConfiguration(sslConfig);
+}
+
+void Application::handleServerStatusChanged(bool status, types::Device host) {
+  auto &m_host = lanController->getHost();
+
+  if (!std::holds_alternative<Client>(m_host)) {
+    throw std::runtime_error("Host is not client");
+  }
+
+  auto *client = &std::get<Client>(m_host);
+  auto &store  = storage::Storage::instance();
+
+  if (status) {
+    auto cert = client->getConnectedServerCertificate();
+    auto name = host.name;
+    store.setServerCert(name, cert.toPem());
+    auto m_sslConfig = client->getSslConfiguration();
+    m_sslConfig.addCaCertificate(cert);
+    client->setSslConfiguration(m_sslConfig);
+    return;
+  }
+
+  for (auto s : client->getServerList()) {
+    if (host != s && store.hasServerCert(s.name)) {
+      return client->connectToServerSecured(s);
+    }
+  }
+}
+
+void Application::handleServerFound(types::Device server) {
+  auto &m_host = lanController->getHost();
+
+  if (!std::holds_alternative<Client>(m_host)) {
+    throw std::runtime_error("Host is not client");
+  }
+
+  auto connectedServer = std::get<Client>(m_host).getConnectedServer();
+  if (connectedServer.has_value()) return;
+  auto *client = &std::get<Client>(m_host);
+  auto &store  = storage::Storage::instance();
+
+  if (store.hasServerCert(server.name)) {
+    client->connectToServerSecured(server);
+  }
+}
+
+void Application::handleSyncRequest(QVector<QPair<QString, QByteArray>> data) {
+  clipboardController->getClipboard().set(data);
+  historyController->addHistory(data);
+}
+
+void Application::onTrayIconClicked(QSystemTrayIcon::ActivationReason reason) {
+  if (reason == QSystemTrayIcon::ActivationReason::Trigger) {
+    clipbird->isVisible() ? clipbird->hide() : this->openClipbird();
+  }
+}
+
+void Application::openClipbird() {
+  this->clipbird->setFixedSize(constants::getAppWindowSize());
+  this->clipbird->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
+  this->clipbird->setWindowTitle(constants::getAppName());
+  this->clipbird->show();
+}
+
 void Application::openQrCode() {
-  // if already visible return
   if (group->isVisible()) { return group->raise(); }
-
-  // generate the qr code with all inteface ip and port in format
+  auto server = std::get<Server>(lanController->getHost()).getServerInfo();
   auto interfaces = QNetworkInterface::allInterfaces();
-
-  // get server info
-  auto server = controller->getServerInfo();
-
-  // address
   const auto addrs = QNetworkInterface::allAddresses();
 
   // construct json object { "port": 1234, "ips": [...]  }
   QJsonObject json;
-
-  // add port
   json.insert("port", server.port);
-
-  // add ips
   QJsonArray ips;
 
-  // using for loop
   for (auto addr: addrs) {
-    // if not ipv4 then skip
-    if (addr.protocol() == QAbstractSocket::IPv6Protocol) {
-      continue;
+    if (!(addr.protocol() == QAbstractSocket::IPv6Protocol || addr.isLoopback() || addr.toString().startsWith("127."))) {
+      ips.append(addr.toString());
     }
-
-    // if not localhost
-    if (addr.isLoopback()) {
-      continue;
-    }
-
-    // if localhost skip
-    if (addr.toString().startsWith("127.")) {
-      continue;
-    }
-
-    // add the ip to array
-    ips.append(addr.toString());
   }
 
-  // add the ips to json
   json.insert("ips", ips);
 
-  // json to string
   auto info = QJsonDocument(json).toJson(QJsonDocument::Compact);
-
-  // log
-  qDebug() << "QR Code Info: " << QString(info);
-
-  // set the icon
   group->setWindowIcon(QIcon(constants::getAppLogo()));
-
-  // set port
   group->setPort(QString::number(server.port));
-
-  // set the title
   group->setWindowTitle(constants::getAppName());
-
-  // set Fixed Size
   group->setFixedSize(group->sizeHint());
-
-  // set the info
   group->setQrCode(QString(info));
-
-  // show the dialog
   group->show();
-
-  // set as not resizable
   group->setFixedSize(group->sizeHint());
-
-  // center the window
   group->move(QGuiApplication::primaryScreen()->availableGeometry().center() - group->rect().center());
 }
 
-/**
- * @brief On Connect Clicked
- */
 void Application::openConnect() {
-  // if already visible return
   if (joiner->isVisible()) { return joiner->raise(); }
-
-  // set the icon
   joiner->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
-
-  // set the title
   joiner->setWindowTitle(constants::getAppName());
-
-  // set as not resizable
   joiner->setFixedSize(joiner->sizeHint());
-
-  // show the dialog
   joiner->show();
-
-  // center the window
   joiner->move(QGuiApplication::primaryScreen()->availableGeometry().center() - joiner->rect().center());
 }
 
-/**
- * @brief On About Clicked
- */
 void Application::openAbout() {
-  // if already visible return
   if (aboutUs->isVisible()) { return aboutUs->raise(); }
-
-  // set the icon
   aboutUs->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
-
-  // set the title
   aboutUs->setWindowTitle(constants::getAppName());
-
-  // set as not resizable
   aboutUs->setFixedSize(aboutUs->sizeHint());
-
-  // show the dialog
   aboutUs->show();
-
-  // center the window
   aboutUs->move(QGuiApplication::primaryScreen()->availableGeometry().center() - aboutUs->rect().center());
 }
 
-/**
- * @brief On Open App Clicked
- */
-void Application::openClipbird() {
-  // set the content Ratio
-  this->clipbird->setFixedSize(constants::getAppWindowSize());
-
-  // set the icon to content
-  this->clipbird->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
-
-  // set the title
-  this->clipbird->setWindowTitle(constants::getAppName());
-
-  // show the content
-  this->clipbird->show();
-}
-
-/**
- * @brief On Send Clicked
- */
 void Application::sendClipboard() {
   Q_UNUSED(QtConcurrent::run([this]() {
-    auto content = controller->getClipboard();
-    QTimer::singleShot(0, controller, [=, this]() {
-      this->controller->syncClipboard(content);
+    auto content = clipboardController->getClipboard().get();
+    QTimer::singleShot(0, lanController, [=, this]() {
+      lanController->synchronize(content);
+      wanController->synchronize(content);
     });
   }));
 }
 
-/**
- * @brief On Received Clicked
- */
 void Application::openHistory() {
-  // if already visible return
   if (history->isVisible()) { return history->raise(); }
-
-  // set the icon
   history->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
-
-  // set the title
   history->setWindowTitle(constants::getAppName());
-
-  // set history
-  history->setHistory(controller->getHistory());
-
-  // set size
+  history->setHistory(historyController->getHistory());
   history->setFixedSize(constants::getAppWindowSize());
-
-  // show the dialog
   history->show();
 }
 
-/**
- * @brief On Reset Clicked
- */
 void Application::resetDevices() {
-  controller->clearServerCertificates();
-  controller->clearClientCertificates();
+  storage::Storage::instance().clearAllClientCert();
+  storage::Storage::instance().clearAllServerCert();
 }
 
-/**
- * @brief On Account Clicked
- */
 void Application::onAccountClicked() {
   if (this->trayMenu->isSignedIn()) {
     utility::functions::toFuture(storage::SecureStorage::instance().removeHubHostDevice()).then([=, this]() {
@@ -532,80 +450,44 @@ void Application::onAccountClicked() {
     return;
   }
 
-  // if already visible return
   if (signin->isVisible()) { return signin->raise(); }
-
-  // set the icon
   signin->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
-
-  // set the title
   signin->setWindowTitle(constants::getAppName());
-
-  // set as not resizable
   signin->setFixedSize(signin->sizeHint());
-
-  // show the dialog
   signin->show();
 }
 
-/**
- * @brief On Hub Clicked
- */
 void Application::onHubClicked() {
   if (this->trayMenu->isJoinedToHub()) {
     storage::Storage::instance().setIsUserConnectedToHubLastly(false);
     this->trayMenu->setHubEnabled(false);
-    controller->disconnectFromHub();
+    wanController->disconnectFromHub();
   } else {
     storage::Storage::instance().setIsUserConnectedToHubLastly(true);
     this->setupHubConnection();
   }
 }
 
-/**
- * @brief On Tray Icon Clicked
- */
-void Application::onTrayIconClicked(QSystemTrayIcon::ActivationReason reason) {
-  if (reason == QSystemTrayIcon::ActivationReason::Trigger) {
-    clipbird->isVisible() ? clipbird->hide() : this->openClipbird();
-  }
-}
-
-/**
- * @brief Set the Qss File for the color scheme
- */
 void Application::setQssFile(Qt::ColorScheme scheme) {
-  // detect system theme is dark or light
   bool isDark     = scheme == Qt::ColorScheme::Dark;
-
-  // qss
   std::string qss = isDark ? constants::getAppQSSDark() : constants::getAppQSSLight();
 
-  // log
-  qInfo()  << META_DATA << "System Theme: " << (isDark ? "Dark" : "Light");
-  qDebug() << META_DATA << "QSS File: " << QString::fromStdString(qss);
-
-  // QFile to read the qss file
   QFile qssFile(QString::fromStdString(qss));
-
-  // open the qss file
   qssFile.open(QFile::ReadOnly);
-
-  // set the style sheet
   qApp->setStyleSheet(qssFile.readAll());
 }
 
-/**
- * @brief Construct a new Application object
- */
 Application::Application(int &argc, char **argv) : SingleApplication(argc, argv) {
-  // create the objects of the class
-  controller = new controller::ClipBird(this->getSslConfiguration());
-  hotkey     = new QHotkey(QKeySequence(constants::getAppHistoryShortcut()), true, this);
-  clipbird   = new ui::gui::widgets::Clipbird();
-  history    = new ui::gui::widgets::History();
-  trayMenu   = new ui::gui::TrayMenu();
-  trayIcon   = new QSystemTrayIcon();
+  clipboardController = new controller::ClipboardController(this);
+  historyController   = new controller::HistoryController(this);
+  lanController       = new controller::LanController(getSslConfiguration(), this);
+  wanController       = new controller::WanController(this);
+  hotkey              = new QHotkey(QKeySequence(constants::getAppHistoryShortcut()), true, this);
+  clipbird            = new ui::gui::widgets::Clipbird();
+  history             = new ui::gui::widgets::History();
+  trayMenu            = new ui::gui::TrayMenu();
+  trayIcon            = new QSystemTrayIcon();
+  powerHandler        = new PowerHandler(this);
 
   utility::functions::toFuture(
     storage::SecureStorage::instance().getHubAuthToken(),
@@ -622,176 +504,152 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   trayIcon->setToolTip(constants::getAppName());
   trayIcon->setToolTip(QString::fromStdString(constants::getAppName()));
 
-  // set the signal handler for all os
   signal(SIGTERM, [](int sig) { qApp->quit(); });
   signal(SIGINT, [](int sig) { qApp->quit(); });
   signal(SIGABRT, [](int sig) { qApp->quit(); });
 
-  // set initial theme
   setQssFile(QGuiApplication::styleHints()->colorScheme());
 
-  // set not to quit on last content closed
   qApp->setQuitOnLastWindowClosed(false);
 
-  // tray icon click from content
   QObject::connect(
     trayIcon, &QSystemTrayIcon::activated,
     this, &Application::onTrayIconClicked
   );
 
-  // set the signal for instance Started
   QObject::connect(
     this, &SingleApplication::instanceStarted,
     clipbird, &ui::gui::widgets::Clipbird::show
   );
 
-  // detect the system theme
   QObject::connect(
     QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged,
     this, &Application::setQssFile
   );
 
-  // set the signal for menus QrCode click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnQrCodeClicked,
     this, &Application::openQrCode
   );
 
-  // set the signal for menus Connect click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnConnectClicked,
     this, &Application::openConnect
   );
 
-  // set the signal for menus About click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnAboutClicked,
     this, &Application::openAbout
   );
 
-  // set the signal for menus Open App click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnOpenAppClicked,
     this, &Application::openClipbird
   );
 
-  // send the signal for menus Received click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnHistoryClicked,
     this, &Application::openHistory
   );
 
-  // set the signal for menus Reset click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnResetClicked,
     this, &Application::resetDevices
   );
 
-  // set the signal for menus Quit click
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnExitClicked,
     [this] { QApplication::quit(); }
   );
 
-  // connect the signal for signin
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnAccountClicked,
     this, &Application::onAccountClicked
   );
 
-  // connect the signal for hub
   QObject::connect(
     trayMenu, &ui::gui::TrayMenu::OnHubClicked,
     this, &Application::onHubClicked
   );
 
-  // Connect the signal and slot for tab change(client)
   connect(
     clipbird, &ui::gui::widgets::Clipbird::onTabChanged,
     this, &Application::handleTabChange
   );
 
-  // set the signal for menus Send click
   QObject::connect(
     history, &ui::gui::widgets::History::onClipSend,
     this, &Application::sendClipboard
   );
 
-  // close on tab change
   QObject::connect(
     clipbird, &ui::gui::widgets::Clipbird::onTabChanged,
     group, &QDialog::close
   );
 
-  // close on tab change
   QObject::connect(
     clipbird, &ui::gui::widgets::Clipbird::onTabChanged,
     joiner, &QDialog::close
   );
 
-  // connect signal for history delete
   connect(
     history, &ui::gui::widgets::History::onClipDelete,
-    controller, &controller::ClipBird::deleteHistoryAt
+    historyController, &controller::HistoryController::deleteHistoryAt
   );
 
-  // connect signal for history change
   connect(
-    controller, &controller::ClipBird::OnHistoryChanged,
+    historyController, &controller::HistoryController::OnHistoryChanged,
     history, &ui::gui::widgets::History::setHistory
   );
 
-  // connect signal for Clipboard Copy
   connect(
     history, &ui::gui::widgets::History::onClipSelected,
-    [=, this](auto i) {
-      controller->setClipboard(controller->getHistory().at(i));
-    }
+    [=, this](auto i) { clipboardController->getClipboard().set(historyController->getHistory().at(i)); }
   );
 
-  // Connect the signal and slot for client list change
   connect(
-    controller, &controller::ClipBird::OnClientListChanged,
+    lanController, &controller::LanController::OnClientListChanged,
     clipbird, &ui::gui::widgets::Clipbird::handleClientListChange
   );
 
-  // Connect the signal and slot for server list change
   connect(
-    controller, &controller::ClipBird::OnServerListChanged,
+    lanController, &controller::LanController::OnServerListChanged,
     clipbird, &ui::gui::widgets::Clipbird::handleServerListChange
   );
 
-  // Connect the signal and slot for server status change
   connect(
-    controller, &controller::ClipBird::OnMdnsRegisterStatusChangeChanged,
+    lanController, &controller::LanController::OnMdnsRegisterStatusChangeChanged,
     clipbird, &ui::gui::widgets::Clipbird::handleMdnsRegisterStatusChanged
   );
 
-  // connect signal and slot for OnAuthRequest
   connect(
-    controller, &controller::ClipBird::OnAuthRequest,
+    lanController, &controller::LanController::OnAuthRequest,
     this, &Application::handleAuthRequest
   );
 
-  // Connect the signal and slot for server status change
   connect(
-    controller, &controller::ClipBird::OnServerStatusChanged,
+    lanController, &controller::LanController::OnServerStatusChanged,
+    this, &Application::handleServerStatusChanged
+  );
+
+  connect(
+    lanController, &controller::LanController::OnServerStatusChanged,
     clipbird, &ui::gui::widgets::Clipbird::handleServerStatusChanged
   );
 
   connect(
     clipbird, &ui::gui::widgets::Clipbird::disconnectFromServer,
-    controller, &controller::ClipBird::disconnectFromServer
+    [=, this] { std::get<Client>(lanController->getHost()).disconnectFromServer(); }
   );
 
   connect(
     clipbird, &ui::gui::widgets::Clipbird::disconnectClient,
-    controller, &controller::ClipBird::disconnectClient
+    [=, this](auto client) { std::get<Server>(lanController->getHost()).disconnectClient(client); }
   );
 
   connect(
     clipbird, &ui::gui::widgets::Clipbird::connectToServer,
-    controller, &controller::ClipBird::connectToServer
+    [=, this](auto server) { std::get<Client>(lanController->getHost()).connectToServer(server); }
   );
 
   connect(
@@ -802,27 +660,24 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   connect(
     &syncing::wan::AuthTokenHolder::instance(),
     &syncing::wan::AuthTokenHolder::authTokenChanged,
-    [=, this](auto token) {
-      this->trayMenu->setSignedIn(token.has_value());
-    }
+    [=, this](auto token) { this->trayMenu->setSignedIn(token.has_value()); }
   );
 
   connect(
-    controller, &controller::ClipBird::OnHubConnected,
+    wanController, &controller::WanController::OnHubErrorOccurred,
+    this, &Application::handleHubErrorOccurred
+  );
+
+  connect(
+    wanController, &controller::WanController::OnHubConnected,
     this, &Application::handleHubConnect
   );
 
   connect(
-    controller, &controller::ClipBird::OnHubDisconnected,
+    wanController, &controller::WanController::OnHubDisconnected,
     this, &Application::handleHubDisconnect
   );
 
-  connect(
-    controller, &controller::ClipBird::OnHubErrorOccurred,
-    this, &Application::handleHubErrorOccurred
-  );
-
-  // connect the dialog to window clicked signal
   connect(
     joiner, &ui::gui::modals::Connect::onConnect,
     this, &Application::handleConnect
@@ -833,14 +688,56 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     this, &Application::handleSignin
   );
 
-  // if host is lastly server
-  if (controller->isLastlyHostIsServer()) {
+  connect(
+    lanController, &controller::LanController::OnCLientStateChanged,
+    this, &Application::handleClientStateChanged
+  );
+
+  connect(
+    lanController, &controller::LanController::OnServerFound,
+    this, &Application::handleServerFound
+  );
+
+  connect(
+    lanController, &controller::LanController::OnConnectionError,
+    this, &Application::handleConnectionError
+  );
+
+  connect(
+    lanController, &controller::LanController::OnSyncRequest,
+    this, &Application::handleSyncRequest
+  );
+
+  connect(
+    powerHandler, &PowerHandler::OnSleepEvent,
+    this, &Application::handleSleepEvent
+  );
+
+  connect(
+    powerHandler, &PowerHandler::OnWakeUpEvent,
+    this, &Application::handleWakeUpEvent
+  );
+
+  connect(
+    &clipboardController->getClipboard(),
+    &clipboard::ApplicationClipboard::OnClipboardChange,
+    lanController,
+    &controller::LanController::synchronize
+  );
+
+  connect(
+    &clipboardController->getClipboard(),
+    &clipboard::ApplicationClipboard::OnClipboardChange,
+    wanController,
+    &controller::WanController::synchronize
+  );
+
+  if (storage::Storage::instance().getHostIsServer()) {
     clipbird->setTabAsServer();
   } else {
     clipbird->setTabAsClient();
   }
 
-  // show the tray icon
   trayIcon->show();
 }
 
@@ -848,7 +745,10 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
  * @brief Destroy the Application object
  */
 Application::~Application() {
-  delete controller;
+  delete clipboardController;
+  delete historyController;
+  delete lanController;
+  delete wanController;
   delete clipbird;
   delete history;
   delete trayMenu;
@@ -858,10 +758,23 @@ Application::~Application() {
   delete joiner;
 }
 
-/**
- * @brief Get the controller object
- */
-controller::ClipBird* Application::getController() const {
-  return controller;
+controller::ClipboardController* Application::getClipboardController() const {
+  return clipboardController;
+}
+
+controller::HistoryController* Application::getHistoryController() const {
+  return historyController;
+}
+
+controller::LanController* Application::getLanController() const {
+  return lanController;
+}
+
+controller::WanController* Application::getWanController() const {
+  return wanController;
+}
+
+PowerHandler* Application::getPowerHandler() const {
+  return powerHandler;
 }
 }

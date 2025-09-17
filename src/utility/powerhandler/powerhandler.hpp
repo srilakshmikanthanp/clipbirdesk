@@ -1,3 +1,4 @@
+#pragma once
 
 #include <QAbstractNativeEventFilter>
 #include <QObject>
@@ -16,7 +17,7 @@
 #endif
 
 #include "constants/constants.hpp"
-#include "controller/clipbird/clipbird.hpp"
+#include "controller/lan/lan_controller.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk {
@@ -55,24 +56,17 @@ public slots:
  private:
   bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override;
 
+ signals:
+  void OnSleepEvent();
+  void OnWakeUpEvent();
+
  private:
   void handleSleepEvent();
   void handleWakeUpEvent();
 
- private:
-
-  controller::ClipBird *controller;
-
  public:
 
-  /**
-   * @brief Destroy the Clipbird Native Event Filter object
-   */
+  PowerHandler(QObject *parent = nullptr);
   virtual ~PowerHandler();
-
-  /**
-   * @brief Construct a new Clipbird Native Event Filter object
-   */
-  PowerHandler(controller::ClipBird *controller);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk

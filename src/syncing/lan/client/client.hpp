@@ -253,6 +253,11 @@ class Client : public Synchronizer {
   std::optional<types::Device> getConnectedServer() const;
 
   /**
+   * @brief Check if the client is connected to the server
+   */
+  bool isConnectedToServer() const;
+
+  /**
    * @brief Disconnect from the server
    */
   void disconnectFromServer();

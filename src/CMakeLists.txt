@@ -96,7 +96,11 @@ file(GLOB_RECURSE main_cpp
   clipboard/qtclipboard.cpp
   clipboard/waylandclipboard.cpp
   constants/constants.cpp
-  controller/clipbird/clipbird.cpp
+  controller/clipboard/clipboard_controller.cpp
+  controller/history/history_controller.cpp
+  controller/lan/lan_controller.cpp
+  controller/wan/wan_controller.cpp
+  controller/controller.cpp
   mdns/browser.cpp
   mdns/dnssd_browser/dnssd_browser.cpp
   mdns/dnssd_register/dnssd_register.cpp

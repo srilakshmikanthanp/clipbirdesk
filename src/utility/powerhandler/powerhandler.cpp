@@ -4,7 +4,7 @@ namespace srilakshmikanthanp::clipbirdesk {
 /**
  * @brief Construct a new Clipbird Native Event Filter object
  */
-PowerHandler::PowerHandler(controller::ClipBird *controller) : controller(controller) {
+PowerHandler::PowerHandler(QObject *parent) : QObject(parent) {
 #if defined(__linux__)
   this->registerPowerManagementListener();
   this->acquireInhibitLock();
@@ -122,23 +122,11 @@ void PowerHandler::handleWindowsGenericMessage(MSG *msg) {
 #endif
 
 void PowerHandler::handleSleepEvent() {
-  switch (controller->getHostType()) {
-  case types::enums::HostType::CLIENT:
-    controller->disposeClient();
-    break;
-
-  case types::enums::HostType::SERVER:
-    controller->disposeServer();
-    break;
-  }
+  emit OnSleepEvent();
 }
 
 void PowerHandler::handleWakeUpEvent() {
-  if (controller->isLastlyHostIsServer()) {
-    controller->setCurrentHostAsServer();
-  } else {
-    controller->setCurrentHostAsClient();
-  }
+  emit OnWakeUpEvent();
 }
 
 /**
