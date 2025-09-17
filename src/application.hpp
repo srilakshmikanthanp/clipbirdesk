@@ -53,21 +53,6 @@ class Application : public SingleApplication {
   private:  // Member Functions
 
   /**
-   * @brief Update Hub Host Device
-   */
-  QFuture<syncing::wan::HubHostDevice> updateHubHostDevice(const syncing::wan::HubHostDevice& device);
-
-  /**
-   * @brief Create Hub Host Device
-   */
-  QFuture<syncing::wan::HubHostDevice> createHubHostDevice();
-
-  /**
-   * @brief Save the Hub Host Device
-   */
-  QFuture<syncing::wan::HubHostDevice> saveHubHostDevice(const syncing::wan::HubHostDevice& device);
-
-  /**
    * @brief Get the certificate from App Home
    */
   QSslConfiguration getOldSslConfiguration();
@@ -102,6 +87,11 @@ class Application : public SingleApplication {
    * @brief Handle the Client auth Request
    */
   void handleAuthRequest(const types::Device& client);
+
+  /**
+   * @brief Handle the On connect from Connect dialog
+   */
+  void handleConnect(QString ip, QString port);
 
   /**
    * @brief handle signin

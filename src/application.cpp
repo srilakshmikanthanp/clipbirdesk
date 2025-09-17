@@ -8,48 +8,6 @@
 namespace srilakshmikanthanp::clipbirdesk {
 
 /**
- * @brief Update Hub Host Device
- */
-QFuture<syncing::wan::HubHostDevice> Application::updateHubHostDevice(const syncing::wan::HubHostDevice& device) {
-  auto requestDto = syncing::wan::DeviceRequestDto{ device.publicKey, device.name, device.type };
-  return deviceRepository->updateDevice(device.id, requestDto).then([=, this](const syncing::wan::DeviceResponseDto& updatedDevice) {
-    return syncing::wan::HubHostDevice{updatedDevice.id, updatedDevice.name, updatedDevice.type, updatedDevice.publicKey, device.privateKey};
-  });
-}
-
-/**
- * @brief Create Hub Host Device
- */
-QFuture<syncing::wan::HubHostDevice> Application::createHubHostDevice() {
-  auto [privateKey, publicKey] = utility::functions::generateQtKeyPair();
-  auto requestDto = syncing::wan::DeviceRequestDto{ publicKey.toPem(), constants::getMDnsServiceName(), syncing::wan::DeviceType::getCurrentDeviceType() };
-  return deviceRepository->createDevice(requestDto).then([=, this](const syncing::wan::DeviceResponseDto& device) {
-    return syncing::wan::HubHostDevice{device.id, device.name, device.type, device.publicKey, privateKey.toPem()};
-  });
-}
-
-/**
- * @brief Save the Hub Host Device
- */
-QFuture<syncing::wan::HubHostDevice> Application::saveHubHostDevice(const syncing::wan::HubHostDevice& device) {
-  QKeychain::WritePasswordJob *job = nullptr;
-  bool status = QMetaObject::invokeMethod(
-    &storage::SecureStorage::instance(),
-    &storage::SecureStorage::setHubHostDevice,
-    Qt::BlockingQueuedConnection,
-    qReturnArg(job),
-    device
-  );
-  assert(status && job != nullptr);
-  return utility::functions::toFuture(job).then([device]() {
-    QPromise<syncing::wan::HubHostDevice> promise;
-    promise.addResult(device);
-    promise.finish();
-    return promise.future();
-  }).unwrap();
-}
-
-/**
  * @brief Get the certificate from App Home
  */
 QSslConfiguration Application::getOldSslConfiguration() {
@@ -142,10 +100,87 @@ void Application::handleConnectionError(QString error) {
 }
 
 /**
+ * @brief Handle the On connect from Connect dialog
+ */
+void Application::handleConnect(QString ip, QString port) {
+  // On HostName successfully resolved
+  const auto slot_hr = [=, this](QWidget* dialog, quint16 port, const auto& host) {
+    // if host name is not resolved
+    if (host.error() != QHostInfo::NoError) {
+      return;
+    }
+
+    // close the dialog
+    dialog->setVisible(false);
+
+    // connect to server
+    controller->connectToServer({
+      host.addresses().first(), port, host.hostName()
+    });
+  };
+
+  // validate the ip and port
+  const auto validator = [](auto ip, auto port) -> bool {
+    if (!QHostAddress(ip).isNull() && port > 0 && port < 65535) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  // validate the ip and port
+  if (!validator(ip.toShort(), port.toShort())) {
+    return;
+  }
+
+  // bind the port
+  auto slot = std::bind(
+    slot_hr, joiner, port.toShort(), std::placeholders::_1
+  );
+
+  // resolve the host name
+  QHostInfo::lookupHost(ip, this, slot);
+}
+
+/**
  * @brief Connect to Hub
  */
 QFuture<void> Application::setupHubConnection() {
+  const auto updateHubHostDevice = [=, this](const syncing::wan::HubHostDevice& device) {
+    auto requestDto = syncing::wan::DeviceRequestDto{ device.publicKey, device.name, device.type };
+    return deviceRepository->updateDevice(device.id, requestDto).then([=, this](const syncing::wan::DeviceResponseDto& updatedDevice) {
+      return syncing::wan::HubHostDevice{updatedDevice.id, updatedDevice.name, updatedDevice.type, updatedDevice.publicKey, device.privateKey};
+    });
+  };
+
+  const auto createHubHostDevice = [=, this]() {
+    auto [privateKey, publicKey] = utility::functions::generateQtKeyPair();
+    auto requestDto = syncing::wan::DeviceRequestDto{ publicKey.toPem(), constants::getMDnsServiceName(), syncing::wan::DeviceType::getCurrentDeviceType() };
+    return deviceRepository->createDevice(requestDto).then([=, this](const syncing::wan::DeviceResponseDto& device) {
+      return syncing::wan::HubHostDevice{device.id, device.name, device.type, device.publicKey, privateKey.toPem()};
+    });
+  };
+
+  const auto saveHubHostDevice = [=](const syncing::wan::HubHostDevice& device) {
+    QKeychain::WritePasswordJob *job = nullptr;
+    bool status = QMetaObject::invokeMethod(
+      &storage::SecureStorage::instance(),
+      &storage::SecureStorage::setHubHostDevice,
+      Qt::BlockingQueuedConnection,
+      qReturnArg(job),
+      device
+    );
+    assert(status && job != nullptr);
+    return utility::functions::toFuture(job).then([device]() {
+      QPromise<syncing::wan::HubHostDevice> promise;
+      promise.addResult(device);
+      promise.finish();
+      return promise.future();
+    }).unwrap();
+  };
+
   this->trayMenu->setHubEnabled(false);
+
   return utility::functions::toFuture(
     storage::SecureStorage::instance().getHubHostDevice(),
     &storage::ReadHubHostDeviceJob::device
@@ -261,9 +296,9 @@ void Application::handleSignin(QString email, QString password) {
       this->signin->setSigningIn(false);
     });
   }).unwrap().onFailed([=, this](const std::exception& e) {
-      this->signin->setError(e.what());
-      this->trayMenu->setAccoundEnabled(true);
-      this->signin->setSigningIn(false);
+    this->signin->setError(e.what());
+    this->trayMenu->setAccoundEnabled(true);
+    this->signin->setSigningIn(false);
   });
 }
 
@@ -354,6 +389,9 @@ void Application::openQrCode() {
   // set the icon
   group->setWindowIcon(QIcon(constants::getAppLogo()));
 
+  // set port
+  group->setPort(QString::number(server.port));
+
   // set the title
   group->setWindowTitle(constants::getAppName());
 
@@ -362,9 +400,6 @@ void Application::openQrCode() {
 
   // set the info
   group->setQrCode(QString(info));
-
-  // set port
-  group->setPort(QString::number(server.port));
 
   // show the dialog
   group->show();
@@ -487,15 +522,11 @@ void Application::resetDevices() {
  */
 void Application::onAccountClicked() {
   if (this->trayMenu->isSignedIn()) {
-    utility::functions::toFuture(storage::SecureStorage::instance().removeHubHostDevice())
-    .then([=, this]() {
+    utility::functions::toFuture(storage::SecureStorage::instance().removeHubHostDevice()).then([=, this]() {
       return utility::functions::toFuture(storage::SecureStorage::instance().removeHubJwtToken());
-    })
-    .unwrap()
-    .then([=, this]() {
+    }).unwrap().then([=, this]() {
       syncing::wan::AuthTokenHolder::instance().setAuthToken(std::nullopt);
-    })
-    .onFailed([=, this](const std::exception& e) {
+    }).onFailed([=, this](const std::exception& e) {
       this->trayIcon->showMessage(constants::getAppName(), QObject::tr("Error Signing Out: %1").arg(e.what()), QIcon(QString::fromStdString(constants::getAppLogo())));
     });
     return;
@@ -522,14 +553,13 @@ void Application::onAccountClicked() {
  */
 void Application::onHubClicked() {
   if (this->trayMenu->isJoinedToHub()) {
-    this->trayMenu->setHubEnabled(false);
     storage::Storage::instance().setIsUserConnectedToHubLastly(false);
+    this->trayMenu->setHubEnabled(false);
     controller->disconnectFromHub();
-    return;
+  } else {
+    storage::Storage::instance().setIsUserConnectedToHubLastly(true);
+    this->setupHubConnection();
   }
-
-  storage::Storage::instance().setIsUserConnectedToHubLastly(true);
-  this->setupHubConnection();
 }
 
 /**
@@ -577,47 +607,12 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   trayMenu   = new ui::gui::TrayMenu();
   trayIcon   = new QSystemTrayIcon();
 
-  // On HostName successfully resolved
-  const auto slot_hr = [=, this](QWidget* dialog, quint16 port, const auto& host) {
-    // if host name is not resolved
-    if (host.error() != QHostInfo::NoError) {
-      return;
-    }
-
-    // close the dialog
-    dialog->setVisible(false);
-
-    // connect to server
-    controller->connectToServer({
-      host.addresses().first(), port, host.hostName()
-    });
-  };
-
-  // validate the ip and port
-  const auto validator = [](auto ip, auto port) -> bool {
-    if (!QHostAddress(ip).isNull() && port > 0 && port < 65535) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  const auto tokenHandler = [=, this](syncing::wan::AuthTokenDto token) {
-    syncing::wan::AuthTokenHolder::instance().setAuthToken(token);
-    if (storage::Storage::instance().getHubIsConnectedLastly()) {
-      setupHubConnection();
-    }
-  };
-
   utility::functions::toFuture(
     storage::SecureStorage::instance().getHubAuthToken(),
     &storage::ReadAuthTokenDtoJob::authToken
   ).then([=, this](std::optional<syncing::wan::AuthTokenDto> token) {
-    if (!token.has_value()) {
-      return syncing::wan::AuthTokenHolder::instance().setAuthToken(std::nullopt);
-    } else {
-      tokenHandler(token.value());
-    }
+    if (token.has_value()) syncing::wan::AuthTokenHolder::instance().setAuthToken(token.value());
+    if (token.has_value() && storage::Storage::instance().getHubIsConnectedLastly()) setupHubConnection();
   }).onFailed([=, this](const std::exception& e) {
     throw std::runtime_error("Error reading Hub JWT Token: " + std::string(e.what()));
   });
@@ -828,20 +823,10 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   );
 
   // connect the dialog to window clicked signal
-  connect(joiner, &ui::gui::modals::Connect::onConnect, [=, this](auto ipv4, auto port) {
-    // validate the ip and port
-    if (!validator(ipv4.toShort(), port.toShort())) {
-      return;
-    }
-
-    // bind the port
-    auto slot = std::bind(
-      slot_hr, joiner, port.toShort(), std::placeholders::_1
-    );
-
-    // resolve the host name
-    QHostInfo::lookupHost(ipv4, this, slot);
-  });
+  connect(
+    joiner, &ui::gui::modals::Connect::onConnect,
+    this, &Application::handleConnect
+  );
 
   connect(
     signin, &ui::gui::modals::SignIn::onSignIn,
