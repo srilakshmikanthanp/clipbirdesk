@@ -25,10 +25,10 @@
 
 // Project Headers
 #include "constants/constants.hpp"
-#include "controller/clipboard/clipboard_controller.hpp"
-#include "controller/history/history_controller.hpp"
-#include "controller/lan/lan_controller.hpp"
-#include "controller/wan/wan_controller.hpp"
+#include "clipboard/controller/clipboard_controller.hpp"
+#include "history/controller/history_controller.hpp"
+#include "syncing/lan/controller/lan_controller.hpp"
+#include "syncing/wan/controller/wan_controller.hpp"
 #include "store/secure_storage.hpp"
 #include "store/storage.hpp"
 #include "syncing/wan/auth/auth_api_client.hpp"

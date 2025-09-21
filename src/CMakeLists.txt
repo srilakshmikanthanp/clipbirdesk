@@ -92,15 +92,13 @@ set(CMAKE_AUTORCC ON)
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp
   clipboard/applicationclipboard.cpp
+  clipboard/controller/clipboard_controller.cpp
   clipboard/platformclipboard.cpp
   clipboard/qtclipboard.cpp
   clipboard/waylandclipboard.cpp
   constants/constants.cpp
-  controller/clipboard/clipboard_controller.cpp
-  controller/history/history_controller.cpp
-  controller/lan/lan_controller.cpp
-  controller/wan/wan_controller.cpp
   controller/controller.cpp
+  history/controller/history_controller.cpp
   mdns/browser.cpp
   mdns/dnssd_browser/dnssd_browser.cpp
   mdns/dnssd_register/dnssd_register.cpp
@@ -114,12 +112,14 @@ file(GLOB_RECURSE main_cpp
   store/secure_storage.cpp
   store/storage.cpp
   syncing/lan/client/client.cpp
+  syncing/lan/controller/lan_controller.cpp
   syncing/lan/server/server.cpp
   syncing/synchronizer.cpp
   syncing/wan/auth/auth_api_client.cpp
   syncing/wan/auth/auth_api_repository.cpp
   syncing/wan/auth/auth_repository.cpp
   syncing/wan/auth/auth_token_holder.cpp
+  syncing/wan/controller/wan_controller.cpp
   syncing/wan/device/device_api_client.cpp
   syncing/wan/device/device_api_repository.cpp
   syncing/wan/device/device_repository.cpp
