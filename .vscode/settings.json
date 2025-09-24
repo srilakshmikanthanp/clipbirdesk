@@ -1,9 +1,9 @@
 {
   "C_Cpp.clang_format_fallbackStyle": "Google",
   "cmake.configureSettings": {
-    "CLIPBIRD_API_DOMAIN": "localhost:8080",
-    "CLIPBIRD_API_URL": "http://localhost:8080",
-    "CLIPBIRD_WEBSOCKET_URL": "ws://localhost:8080"
+    "CLIPBIRD_API_DOMAIN": "clipbird-api.srilakshmikanthanp.com",
+    "CLIPBIRD_API_URL": "https://clipbird-api.srilakshmikanthanp.com",
+    "CLIPBIRD_WEBSOCKET_URL": "wss://clipbird-api.srilakshmikanthanp.com"
   },
   "cSpell.words": [
     "Antialiasing",
