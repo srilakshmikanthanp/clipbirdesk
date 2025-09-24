@@ -22,7 +22,9 @@ void Hub::synchronize(const QVector<QPair<QString, QByteArray>>& items) {
   for (const auto& hubDevice : this->getHubDevices()) {
     HubMessageClipboardForwardPayload payload{.toDeviceId = hubDevice.id, .clipboard = items};
     for (auto& item : payload.clipboard) item.second = utility::functions::encrypt(item.second, hubDevice.publicKey.toUtf8());
-    this->sendMessage(QString::fromUtf8(nlohmann::json(payload).dump()));
+    HubMessage message{.type = HubMessageType::CLIPBOARD_FORWARD, .payload = payload};
+    auto json = QString::fromUtf8(nlohmann::json(message).dump());
+    this->sendMessage(json);
   }
 }
 

@@ -22,6 +22,7 @@ class WanController : public Controller {
   void OnHubErrorOccurred(QAbstractSocket::SocketError);
   void OnHubConnected();
   void OnHubDisconnected();
+  void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
 
  public:  // Constructors and Destructors
 

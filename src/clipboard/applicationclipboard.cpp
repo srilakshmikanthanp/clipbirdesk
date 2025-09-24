@@ -7,7 +7,11 @@ namespace srilakshmikanthanp::clipbirdesk::clipboard {
 void ApplicationClipboard::onClipboardChangeImpl(QClipboard::Mode mode) {
   if (mode != QClipboard::Mode::Clipboard) return;
   if (!QApplication::clipboard()->ownsClipboard()) {
-    Q_UNUSED(QtConcurrent::run([this]() { emit OnClipboardChange(this->get()); }));
+    Q_UNUSED(QtConcurrent::run([this]() {
+      QVector<QPair<QString, QByteArray>> items = this->get();
+      if (items.isEmpty()) return;
+      emit OnClipboardChange(items);
+    }));
   }
 }
 

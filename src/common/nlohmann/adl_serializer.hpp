@@ -34,7 +34,7 @@ struct adl_serializer<QByteArray> {
   }
 
   static void to_json(json& j, const QByteArray& b) {
-    j = b.toBase64();
+    j = QString::fromUtf8(b.toBase64());
   }
 };
 
@@ -46,7 +46,7 @@ struct adl_serializer<QPair<QString, QByteArray>> {
   }
 
   static void to_json(json& j, const QPair<QString, QByteArray>& p) {
-    j = json{{"first", p.first}, {"second", p.second.toBase64()}};
+    j = json{{"first", p.first}, {"second", p.second}};
   }
 };
 

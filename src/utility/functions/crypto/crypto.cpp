@@ -163,14 +163,18 @@ QByteArray encrypt(const QByteArray& data, const QByteArray& key) {
   QByteArray encryptedAesKey = internal::encryptAESKey(aesKey, key);
 
   QByteArray result;
-  result.append(qToBigEndian(static_cast<quint32>(encryptedAesKey.size())));
-  result.append(encryptedAesKey);
-  result.append(qToBigEndian(static_cast<quint32>(iv.size())));
-  result.append(iv);
-  result.append(qToBigEndian(static_cast<quint32>(tag.size())));
-  result.append(tag);
-  result.append(qToBigEndian(static_cast<quint32>(ciphertext.size())));
-  result.append(ciphertext);
+  QDataStream stream(&result, QIODevice::WriteOnly);
+  stream.setByteOrder(QDataStream::BigEndian);
+
+  stream << static_cast<quint32>(encryptedAesKey.size());
+  stream.writeRawData(encryptedAesKey.constData(), encryptedAesKey.size());
+  stream << static_cast<quint32>(iv.size());
+  stream.writeRawData(iv.constData(), iv.size());
+  stream << static_cast<quint32>(tag.size());
+  stream.writeRawData(tag.constData(), tag.size());
+  stream << static_cast<quint32>(ciphertext.size());
+  stream.writeRawData(ciphertext.constData(), ciphertext.size());
+
   return result;
 }
 

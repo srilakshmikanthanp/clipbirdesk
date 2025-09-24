@@ -32,6 +32,11 @@ void WanController::connectToHub(const syncing::wan::HubHostDevice &device) {
     this, &WanController::OnHubDisconnected
   );
 
+  connect(
+    &*m_hub, &syncing::wan::HubWebSocket::OnSyncRequest,
+    this, &WanController::OnSyncRequest
+  );
+
   m_hub->connect();
 }
 

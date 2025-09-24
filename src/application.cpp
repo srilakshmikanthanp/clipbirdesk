@@ -417,6 +417,7 @@ void Application::openAbout() {
 void Application::sendClipboard() {
   Q_UNUSED(QtConcurrent::run([this]() {
     auto content = clipboardController->getClipboard().get();
+    if (content.isEmpty()) return;
     QTimer::singleShot(0, lanController, [=, this]() {
       lanController->synchronize(content);
       wanController->synchronize(content);
@@ -705,6 +706,11 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
 
   connect(
     lanController, &controller::LanController::OnSyncRequest,
+    this, &Application::handleSyncRequest
+  );
+
+  connect(
+    wanController, &controller::WanController::OnSyncRequest,
     this, &Application::handleSyncRequest
   );
 
