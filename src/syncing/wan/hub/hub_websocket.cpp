@@ -18,6 +18,12 @@ HubWebSocket::HubWebSocket(HubHostDevice hubHostDevice, QObject* parent) : Hub(h
   QObject::connect(webSocket, &QWebSocket::errorOccurred, this, &HubWebSocket::OnErrorOccurred);
   QObject::connect(webSocket, &QWebSocket::disconnected, this, &HubWebSocket::OnDisconnected);
 
+  pingTimer->setInterval(30000);
+
+  QObject::connect(pingTimer, &QTimer::timeout, [this]() { if (this->isReady()) this->webSocket->ping(); });
+  QObject::connect(webSocket, &QWebSocket::connected, [this]() { this->pingTimer->start(); });
+  QObject::connect(webSocket, &QWebSocket::disconnected, [this]() { this->pingTimer->stop(); });
+
   hubMessageHandler->setPayloadHandler(new HubMessageClipboardDispatchPayloadHandler(this));
   hubMessageHandler->setPayloadHandler(new HubMessageDeviceAddedPayloadHandler(this));
   hubMessageHandler->setPayloadHandler(new HubMessageDeviceRemovedPayloadHandler(this));

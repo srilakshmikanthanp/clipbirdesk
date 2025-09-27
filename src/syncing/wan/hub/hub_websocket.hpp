@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QTimer>
 #include <QWebSocket>
 
 #include "syncing/wan/auth/auth_token_holder.hpp"
@@ -25,6 +26,7 @@ class HubWebSocket : public Hub {
 
  private:
 
+  QTimer *pingTimer = new QTimer(this);
   QWebSocket *webSocket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
   HubMessageHandler *hubMessageHandler = new HubMessageHandler(this);
 
