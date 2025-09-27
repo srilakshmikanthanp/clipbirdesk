@@ -25,6 +25,10 @@ class HistoryController : public Controller {
  signals:
 
   void OnHistoryChanged(QVector<QVector<QPair<QString, QByteArray>>>);
+  void onClipboard(QVector<QPair<QString, QByteArray>>);
+
+ private:
+  bool isEqual(const QVector<QPair<QString, QByteArray>> &a, const QVector<QPair<QString, QByteArray>> &b) const;
 
  public:  // Member functions
 

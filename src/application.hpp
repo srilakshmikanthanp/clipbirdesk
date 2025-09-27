@@ -75,6 +75,7 @@ class Application : public SingleApplication {
   void handleClientStateChanged(types::Device client, bool connected);
   void handleServerStatusChanged(bool status, types::Device host);
   void handleServerFound(types::Device server);
+  void handleOnClipboard(QVector<QPair<QString, QByteArray>> data);
   void handleSyncRequest(QVector<QPair<QString, QByteArray>> data);
 
   void onTrayIconClicked(QSystemTrayIcon::ActivationReason reason);

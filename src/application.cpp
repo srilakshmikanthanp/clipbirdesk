@@ -348,8 +348,11 @@ void Application::handleServerFound(types::Device server) {
   }
 }
 
-void Application::handleSyncRequest(QVector<QPair<QString, QByteArray>> data) {
+void Application::handleOnClipboard(QVector<QPair<QString, QByteArray>> data) {
   clipboardController->getClipboard().set(data);
+}
+
+void Application::handleSyncRequest(QVector<QPair<QString, QByteArray>> data) {
   historyController->addHistory(data);
 }
 
@@ -736,6 +739,13 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     &clipboard::ApplicationClipboard::OnClipboardChange,
     wanController,
     &controller::WanController::synchronize
+  );
+
+  connect(
+    historyController,
+    &controller::HistoryController::onClipboard,
+    this,
+    &Application::handleOnClipboard
   );
 
   if (storage::Storage::instance().getHostIsServer()) {
