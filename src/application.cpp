@@ -131,10 +131,12 @@ void Application::handleConnectionError(QString error) {
 
 void Application::handleTabChange(ui::gui::widgets::Clipbird::Tabs tab) {
   if (tab == ui::gui::widgets::Clipbird::Tabs::Client) {
+    storage::Storage::instance().setHostIsServer(false);
     this->trayMenu->setQrCodeEnabled(false);
     this->trayMenu->setConnectEnabled(true);
     lanController->setHostAsClient();
   } else {
+    storage::Storage::instance().setHostIsServer(true);
     this->trayMenu->setQrCodeEnabled(true);
     this->trayMenu->setConnectEnabled(false);
     lanController->setHostAsServer();
