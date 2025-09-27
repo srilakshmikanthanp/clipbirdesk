@@ -196,9 +196,9 @@ All the Hub messages are in JSON format and sent over a WebSocket connection. Th
 | DEVICE_REMOVED            | Sent by hub server to clients when a device is removed                   |
 | DEVICE_UPDATED            | Sent by hub server to clients when a device is updated                   |
 | HUB_DEVICES               | Sent by hub server to client with the list of connected devices          |
-| NONCE_CHALLENGE_COMPLETED | Sent by client to hub server when nonce challenge succeeds               |
 | NONCE_CHALLENGE_REQUEST   | Sent by hub server to client to request nonce challenge                  |
 | NONCE_CHALLENGE_RESPONSE  | Sent by client to hub server with nonce challenge response               |
+| NONCE_CHALLENGE_COMPLETED | Sent by hub server to clients when a device completes nonce challenge    |
 
 #### Clipboard Dispatch Payload
 
