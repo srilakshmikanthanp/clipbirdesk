@@ -6,11 +6,11 @@
 #define ClipbirdURL "https://github.com/srilakshmikanthanp/clipbirdesk"
 #define ClipbirdExeName "clipbird.exe"
 
-#define VersionHandle FileOpen("conf\\VERSION")
+#define VersionHandle FileOpen("VERSION")
 #define ClipbirdVersion Trim(FileRead(VersionHandle))
 #expr FileClose(VersionHandle)
 
-#define UUIDHandle FileOpen("conf\\APPUUID")
+#define UUIDHandle FileOpen("APPUUID")
 #define ClipbirdUUID Trim(FileRead(UUIDHandle))
 #expr FileClose(UUIDHandle)
 

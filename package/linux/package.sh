@@ -12,7 +12,9 @@ fi
 echo "Building clipbird with Release configuration"
 cmake -G "Ninja" -B ./build && cmake --build ./build --config Release
 
-AppRunScript="$(pwd)/linux/AppRun.sh"
+linuxPackageDir="$(pwd)/package/linux"
+AppRunScript="$linuxPackageDir/AppRun.sh"
+appdir=$linuxPackageDir/appdir
 ClipbirdDir="$(pwd)/setup"
 
 echo "Removing existing appdir folder"
@@ -22,16 +24,16 @@ echo "Making appdir folder"
 mkdir -p $ClipbirdDir
 
 echo "Cloning appdir folder to $ClipbirdDir"
-cp -r ./linux/appdir/* $ClipbirdDir
+cp -r $appdir/* $ClipbirdDir
 
-echo "Copying ./build/src/Release/clipbird to $ClipbirdDir/usr/bin"
-cp ./build/src/clipbird "$ClipbirdDir/usr/bin"
+clipbirdBinary="$(pwd)/build/src/clipbird"
+echo "Copying $clipbirdBinary to $ClipbirdDir/usr/bin"
+cp $clipbirdBinary "$ClipbirdDir/usr/bin"
 
-echo "Removing existing dist folder"
-rm -rf ./dist
+dist="$(pwd)/dist"
 
-echo "Creating dist folder"
-mkdir -p ./dist
+echo "Recreating dist folder"
+rm -rf $dist && mkdir -p $dist
 
 # Run linuxdeploy-x86_64.AppImage to package the clipbird
 # see https://github.com/linuxdeploy/linuxdeploy
