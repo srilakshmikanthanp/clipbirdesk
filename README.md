@@ -130,13 +130,26 @@ Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installe
 
 Just go to [Bonjour](https://developer.apple.com/bonjour/) and download the Bonjour SDK for Windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
 
+#### Installing qtkeychain
+
+~~~sh
+git clone https://github.com/frankosterfeld/qtkeychain.git
+cd qtkeychain
+mkdir build
+cd build
+cmake .. -DBUILD_WITH_QT6=ON -DCMAKE_INSTALL_PREFIX="C:/qtkeychain"
+cmake --build . --config Release
+cmake --install . --config Release
+~~~
+
 #### Environment Variables
 
-| Variable            | Value                              |
-|---------------------|------------------------------------|
-| `OPENSSL_ROOT_DIR`  | OpenSSL installation directory     |
-| `QT_CMAKE_DIR`      | Qt6 cmake directory                |
-| `BONJOUR_SDK_HOME`  | Bonjour SDK directory              |
+| Variable                     | Value                              |
+|------------------------------|------------------------------------|
+| `OPENSSL_ROOT_DIR`           | OpenSSL installation directory     |
+| `QT_CMAKE_DIR`               | Qt6 cmake directory                |
+| `BONJOUR_SDK_HOME`           | Bonjour SDK directory              |
+| `QT_KEYCHAIN_CMAKE_DIR`      | QtKeychain cmake directory         |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
