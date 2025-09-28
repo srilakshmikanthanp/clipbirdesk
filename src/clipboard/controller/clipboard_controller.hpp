@@ -17,12 +17,6 @@ class ClipboardController : public Controller {
 
   clipboard::ApplicationClipboard m_clipboard;
 
- signals:
-
-  void OnHubErrorOccurred(QAbstractSocket::SocketError);
-  void OnHubConnected();
-  void OnHubDisconnected();
-
  public:  // Constructors and Destructors
 
   ClipboardController(QObject *parent = nullptr);
