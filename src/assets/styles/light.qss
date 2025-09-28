@@ -163,6 +163,24 @@ QFrame#Clipbird {
   min-height: 80px;
 }
 
+#ClipSend {
+  background: #ededed;
+  color: white;
+  border-radius: 10px;
+}
+
 #ClipSend > QLabel {
+  background: #ededed;
   font-size: 12px;
+}
+
+#ClipSend > QPushButton {
+  background-color: #ffffff;
+  border-radius: 5px;
+  padding: 6px;
+}
+
+#ClipSend > QPushButton:hover {
+  background-color: #167dff;
+  color: #f9f9f9;
 }
