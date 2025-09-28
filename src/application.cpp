@@ -270,6 +270,9 @@ void Application::handleHubErrorOccurred(QAbstractSocket::SocketError error) {
 }
 
 void Application::handleSleepEvent() {
+  if (wanController->isHubConnected()) {
+    wanController->disconnect();
+  }
   switch (lanController->getHostType()) {
   case types::enums::HostType::CLIENT:
     lanController->disposeClient();
@@ -282,6 +285,9 @@ void Application::handleSleepEvent() {
 }
 
 void Application::handleWakeUpEvent() {
+  if (storage::Storage::instance().getHubIsConnectedLastly()) {
+    this->setupHubConnection();
+  }
   if (storage::Storage::instance().getHostIsServer()) {
     lanController->setHostAsServer();
   } else {
