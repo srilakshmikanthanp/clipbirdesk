@@ -14,10 +14,10 @@ insert_final_newline = true
 max_line_length = off
 trim_trailing_whitespace = false
 
-[APPUUID]
+[APPUUID.txt]
 insert_final_newline = false
 trim_trailing_whitespace = false
 
-[VERSION]
+[VERSION.txt]
 insert_final_newline = false
 trim_trailing_whitespace = false
