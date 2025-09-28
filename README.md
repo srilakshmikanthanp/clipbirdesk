@@ -134,6 +134,12 @@ Just go to [Bonjour](https://developer.apple.com/bonjour/) and download the Bonj
 
 Install meson using msi installer from [here](https://mesonbuild.com/Getting-meson.html#installing-meson-and-ninja-with-the-msi-installer).
 
+#### Installing libpsl
+
+~~~sh
+vcpkg install libpsl --triplet x64-windows
+~~~
+
 #### Installing qtkeychain
 
 ~~~sh
@@ -154,6 +160,7 @@ cmake --install . --config Release
 | `QT_CMAKE_DIR`               | Qt6 cmake directory                |
 | `BONJOUR_SDK_HOME`           | Bonjour SDK directory              |
 | `QT_KEYCHAIN_CMAKE_DIR`      | QtKeychain cmake directory         |
+| `VCPKG_TOOLCHAIN_FILE`       | vcpkg toolchain file               |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -208,6 +215,7 @@ make install
 |------------------------------|------------------------------------|
 | `QT_CMAKE_DIR`      `        | Qt6 cmake directory                |
 | `QT_KEYCHAIN_CMAKE_DIR`      | QtKeychain cmake directory         |
+| `VCPKG_TOOLCHAIN_FILE`       | vcpkg toolchain file               |
 
 <!-- ROADMAP -->
 ## Roadmap
