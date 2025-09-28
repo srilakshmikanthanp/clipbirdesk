@@ -130,6 +130,10 @@ Go to [Qt](https://www.qt.io/download-qt-installer) and download the Qt installe
 
 Just go to [Bonjour](https://developer.apple.com/bonjour/) and download the Bonjour SDK for Windows, then install it in your system. It should set the environment variable `BONJOUR_SDK_HOME` to the Bonjour SDK directory.
 
+#### Installing meson
+
+Install meson using msi installer from [here](https://mesonbuild.com/Getting-meson.html#installing-meson-and-ninja-with-the-msi-installer).
+
 #### Installing qtkeychain
 
 ~~~sh
