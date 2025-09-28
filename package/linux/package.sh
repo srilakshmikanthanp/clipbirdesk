@@ -10,7 +10,7 @@ fi
 
 # Build the clipbird with release configuration
 echo "Building clipbird with Release configuration"
-cmake -G "Ninja" -B ./build && cmake --build ./build --config Release
+cmake -G "Ninja" -B ./build -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE && cmake --build ./build --config Release
 
 linuxPackageDir="$(pwd)/package/linux"
 AppRunScript="$linuxPackageDir/AppRun.sh"

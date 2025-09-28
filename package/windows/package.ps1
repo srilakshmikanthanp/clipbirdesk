@@ -13,7 +13,7 @@ if (-not (Test-Path ./CMakeLists.txt)) {
 #-------------------------- clipbird package --------------------------#
 
 Write-Host "Building clipbird with Release configuration" -ForegroundColor Green
-cmake -G "Visual Studio 17 2022" -B ./build && cmake --build ./build --config Release
+cmake -G "Visual Studio 17 2022" -B ./build -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE && cmake --build ./build --config Release
 
 $ClipbirDir = "./setup"
 
