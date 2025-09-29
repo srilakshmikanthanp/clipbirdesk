@@ -57,14 +57,19 @@ QSslConfiguration Application::getSslConfiguration() {
 }
 
 QFuture<void> Application::connectToHub() {
-  this->trayMenu->setHubEnabled(false);
-  return wanUiController->connectToHub().onFailed([=, this](const std::exception& e) {
+  const auto handleFailure = [=, this](const std::exception& e) {
     this->trayMenu->setHubEnabled(true);
     this->trayIcon->showMessage(
       constants::getAppName(),
       QObject::tr("Hub Connection Error Occurred: %1").arg(e.what()),
       QIcon(QString::fromStdString(constants::getAppLogo()))
     );
+  };
+
+  this->trayMenu->setHubEnabled(false);
+  return wanUiController->connectToHub()
+  .onFailed([=, this](const std::exception& e) {
+    QMetaObject::invokeMethod(this, [=, this] { handleFailure(e); }, Qt::QueuedConnection);
   });
 }
 
@@ -169,20 +174,28 @@ void Application::handleConnect(QString ip, QString port) {
 }
 
 void Application::handleSignin(QString email, QString password) {
-  trayMenu->setAccoundEnabled(false);
-  signin->setSigningIn(true);
-  authController->signIn(email, password)
-  .then([=, this]() {
+  const auto handleSuccess = [=, this]() {
     this->signin->setError(std::nullopt);
     this->signin->reset();
     this->signin->hide();
     this->trayMenu->setAccoundEnabled(true);
     this->signin->setSigningIn(false);
-  })
-  .onFailed([=, this](const std::exception& e) {
+  };
+
+  const auto handleFailure = [=, this](const std::exception& e) {
     this->signin->setError(e.what());
     this->trayMenu->setAccoundEnabled(true);
     this->signin->setSigningIn(false);
+  };
+
+  trayMenu->setAccoundEnabled(false);
+  signin->setSigningIn(true);
+  authController->signIn(email, password)
+  .then([=, this]() {
+    QMetaObject::invokeMethod(this, [=, this] { handleSuccess(); }, Qt::QueuedConnection);
+  })
+  .onFailed([=, this](const std::exception& e) {
+    QMetaObject::invokeMethod(this, [=, this] { handleFailure(e); }, Qt::QueuedConnection);
   });
 }
 
@@ -386,9 +399,13 @@ void Application::resetDevices() {
 }
 
 void Application::onAccountClicked() {
+  const auto handleSignOutFailure = [=, this](const std::exception& e) {
+    this->trayIcon->showMessage(constants::getAppName(), QObject::tr("Error Signing Out: %1").arg(e.what()), QIcon(QString::fromStdString(constants::getAppLogo())));
+  };
+
   if (this->authController->isSignedIn()) {
     this->authController->signOut().onFailed([=, this](const std::exception& e) {
-      this->trayIcon->showMessage(constants::getAppName(), QObject::tr("Error Signing Out: %1").arg(e.what()), QIcon(QString::fromStdString(constants::getAppLogo())));
+      QMetaObject::invokeMethod(this, [=, this] { handleSignOutFailure(e); }, Qt::QueuedConnection);
     });
     return;
   }
