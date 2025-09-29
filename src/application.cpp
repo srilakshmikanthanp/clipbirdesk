@@ -56,63 +56,9 @@ QSslConfiguration Application::getSslConfiguration() {
   return config;
 }
 
-QFuture<void> Application::setupHubConnection() {
-  const auto updateHubHostDevice = [=, this](const syncing::wan::HubHostDevice& device) {
-    auto requestDto = syncing::wan::DeviceRequestDto{ device.publicKey, device.name, device.type };
-    return deviceRepository->updateDevice(device.id, requestDto).then([=, this](const syncing::wan::DeviceResponseDto& updatedDevice) {
-      return syncing::wan::HubHostDevice{updatedDevice.id, updatedDevice.name, updatedDevice.type, updatedDevice.publicKey, device.privateKey};
-    });
-  };
-
-  const auto createHubHostDevice = [=, this]() {
-    auto [privateKey, publicKey] = utility::functions::generateQtKeyPair();
-    auto requestDto = syncing::wan::DeviceRequestDto{ publicKey.toPem(), constants::getMDnsServiceName(), syncing::wan::DeviceType::getCurrentDeviceType() };
-    return deviceRepository->createDevice(requestDto).then([=, this](const syncing::wan::DeviceResponseDto& device) {
-      return syncing::wan::HubHostDevice{device.id, device.name, device.type, device.publicKey, privateKey.toPem()};
-    });
-  };
-
-  const auto saveHubHostDevice = [=](const syncing::wan::HubHostDevice& device) {
-    QKeychain::WritePasswordJob *job = nullptr;
-    bool status = QMetaObject::invokeMethod(
-      &storage::SecureStorage::instance(),
-      &storage::SecureStorage::setHubHostDevice,
-      Qt::BlockingQueuedConnection,
-      qReturnArg(job),
-      device
-    );
-    assert(status && job != nullptr);
-    return utility::functions::toFuture(job).then([device]() {
-      QPromise<syncing::wan::HubHostDevice> promise;
-      promise.addResult(device);
-      promise.finish();
-      return promise.future();
-    }).unwrap();
-  };
-
+QFuture<void> Application::connectToHub() {
   this->trayMenu->setHubEnabled(false);
-
-  return utility::functions::toFuture(
-    storage::SecureStorage::instance().getHubHostDevice(),
-    &storage::ReadHubHostDeviceJob::device
-  ).then([=, this](std::optional<syncing::wan::HubHostDevice> device) {
-    if (device.has_value()) {
-      syncing::wan::HubHostDevice hubDevice = device.value();
-      hubDevice.name = constants::getMDnsServiceName();
-      return updateHubHostDevice(hubDevice);
-    } else {
-      return createHubHostDevice();
-    }
-  })
-  .unwrap()
-  .then([=, this](const syncing::wan::HubHostDevice& device) {
-    return saveHubHostDevice(device);
-  })
-  .unwrap()
-  .then([=, this](const syncing::wan::HubHostDevice& device) {
-    wanController->connectToHub(device);
-  })
-  .onFailed([=, this](const std::exception& e) {
+  return wanUiController->connectToHub().onFailed([=, this](const std::exception& e) {
     this->trayMenu->setHubEnabled(true);
     this->trayIcon->showMessage(
       constants::getAppName(),
@@ -131,12 +77,12 @@ void Application::handleConnectionError(QString error) {
 
 void Application::handleTabChange(ui::gui::widgets::Clipbird::Tabs tab) {
   if (tab == ui::gui::widgets::Clipbird::Tabs::Client) {
-    storage::Storage::instance().setHostIsServer(false);
+    storage::Storage::instance().setHostIsLastlyServer(false);
     this->trayMenu->setQrCodeEnabled(false);
     this->trayMenu->setConnectEnabled(true);
     lanController->setHostAsClient();
   } else {
-    storage::Storage::instance().setHostIsServer(true);
+    storage::Storage::instance().setHostIsLastlyServer(true);
     this->trayMenu->setQrCodeEnabled(true);
     this->trayMenu->setConnectEnabled(false);
     lanController->setHostAsServer();
@@ -225,26 +171,15 @@ void Application::handleConnect(QString ip, QString port) {
 void Application::handleSignin(QString email, QString password) {
   trayMenu->setAccoundEnabled(false);
   signin->setSigningIn(true);
-  authRepository->signIn({email, password})
-  .then([=, this](const syncing::wan::AuthTokenDto& token) {
-    QKeychain::WritePasswordJob *job = nullptr;
-    bool status = QMetaObject::invokeMethod(
-      &storage::SecureStorage::instance(),
-      &storage::SecureStorage::setHubAuthTokenToken,
-      Qt::BlockingQueuedConnection,
-      qReturnArg(job),
-      token
-    );
-    assert(status && job != nullptr);
-    return utility::functions::toFuture(job).then([token, this]() {
-      syncing::wan::AuthTokenHolder::instance().setAuthToken(token);
-      this->signin->setError(std::nullopt);
-      this->signin->reset();
-      this->signin->hide();
-      this->trayMenu->setAccoundEnabled(true);
-      this->signin->setSigningIn(false);
-    });
-  }).unwrap().onFailed([=, this](const std::exception& e) {
+  authController->signIn(email, password)
+  .then([=, this]() {
+    this->signin->setError(std::nullopt);
+    this->signin->reset();
+    this->signin->hide();
+    this->trayMenu->setAccoundEnabled(true);
+    this->signin->setSigningIn(false);
+  })
+  .onFailed([=, this](const std::exception& e) {
     this->signin->setError(e.what());
     this->trayMenu->setAccoundEnabled(true);
     this->signin->setSigningIn(false);
@@ -286,9 +221,9 @@ void Application::handleSleepEvent() {
 
 void Application::handleWakeUpEvent() {
   if (storage::Storage::instance().getHubIsConnectedLastly()) {
-    this->setupHubConnection();
+    this->connectToHub();
   }
-  if (storage::Storage::instance().getHostIsServer()) {
+  if (storage::Storage::instance().getHostIsLastlyServer()) {
     lanController->setHostAsServer();
   } else {
     lanController->setHostAsClient();
@@ -451,12 +386,8 @@ void Application::resetDevices() {
 }
 
 void Application::onAccountClicked() {
-  if (this->trayMenu->isSignedIn()) {
-    utility::functions::toFuture(storage::SecureStorage::instance().removeHubHostDevice()).then([=, this]() {
-      return utility::functions::toFuture(storage::SecureStorage::instance().removeHubJwtToken());
-    }).unwrap().then([=, this]() {
-      syncing::wan::AuthTokenHolder::instance().setAuthToken(std::nullopt);
-    }).onFailed([=, this](const std::exception& e) {
+  if (this->authController->isSignedIn()) {
+    this->authController->signOut().onFailed([=, this](const std::exception& e) {
       this->trayIcon->showMessage(constants::getAppName(), QObject::tr("Error Signing Out: %1").arg(e.what()), QIcon(QString::fromStdString(constants::getAppLogo())));
     });
     return;
@@ -470,13 +401,13 @@ void Application::onAccountClicked() {
 }
 
 void Application::onHubClicked() {
-  if (this->trayMenu->isJoinedToHub()) {
-    storage::Storage::instance().setIsUserConnectedToHubLastly(false);
+  if (this->wanController->isHubConnected()) {
+    storage::Storage::instance().setIsConnectedToHubLastly(false);
     this->trayMenu->setHubEnabled(false);
     wanController->disconnectFromHub();
   } else {
-    storage::Storage::instance().setIsUserConnectedToHubLastly(true);
-    this->setupHubConnection();
+    storage::Storage::instance().setIsConnectedToHubLastly(true);
+    this->connectToHub();
   }
 }
 
@@ -490,23 +421,12 @@ void Application::setQssFile(Qt::ColorScheme scheme) {
 }
 
 Application::Application(int &argc, char **argv) : SingleApplication(argc, argv) {
-  clipboardController = new controller::ClipboardController(this);
-  historyController   = new controller::HistoryController(this);
-  lanController       = new controller::LanController(getSslConfiguration(), this);
-  wanController       = new controller::WanController(this);
-  hotkey              = new QHotkey(QKeySequence(constants::getAppHistoryShortcut()), true, this);
-  clipbird            = new ui::gui::widgets::Clipbird();
-  history             = new ui::gui::widgets::History();
-  trayMenu            = new ui::gui::TrayMenu();
-  trayIcon            = new QSystemTrayIcon();
-  powerHandler        = new PowerHandler(this);
-
   utility::functions::toFuture(
     storage::SecureStorage::instance().getHubAuthToken(),
     &storage::ReadAuthTokenDtoJob::authToken
   ).then([=, this](std::optional<syncing::wan::AuthTokenDto> token) {
     if (token.has_value()) syncing::wan::AuthTokenHolder::instance().setAuthToken(token.value());
-    if (token.has_value() && storage::Storage::instance().getHubIsConnectedLastly()) setupHubConnection();
+    if (token.has_value() && storage::Storage::instance().getHubIsConnectedLastly()) connectToHub();
   }).onFailed([=, this](const std::exception& e) {
     throw std::runtime_error("Error reading Hub JWT Token: " + std::string(e.what()));
   });
@@ -584,7 +504,7 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     this, &Application::onHubClicked
   );
 
-  connect(
+  QObject::connect(
     clipbird, &ui::gui::widgets::Clipbird::onTabChanged,
     this, &Application::handleTabChange
   );
@@ -606,11 +526,11 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
 
   connect(
     history, &ui::gui::widgets::History::onClipDelete,
-    historyController, &controller::HistoryController::deleteHistoryAt
+    historyController, &history::HistoryController::deleteHistoryAt
   );
 
   connect(
-    historyController, &controller::HistoryController::OnHistoryChanged,
+    historyController, &history::HistoryController::OnHistoryChanged,
     history, &ui::gui::widgets::History::setHistory
   );
 
@@ -620,32 +540,32 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   );
 
   connect(
-    lanController, &controller::LanController::OnClientListChanged,
+    lanController, &syncing::lan::LanController::OnClientListChanged,
     clipbird, &ui::gui::widgets::Clipbird::handleClientListChange
   );
 
   connect(
-    lanController, &controller::LanController::OnServerListChanged,
+    lanController, &syncing::lan::LanController::OnServerListChanged,
     clipbird, &ui::gui::widgets::Clipbird::handleServerListChange
   );
 
   connect(
-    lanController, &controller::LanController::OnMdnsRegisterStatusChangeChanged,
+    lanController, &syncing::lan::LanController::OnMdnsRegisterStatusChangeChanged,
     clipbird, &ui::gui::widgets::Clipbird::handleMdnsRegisterStatusChanged
   );
 
   connect(
-    lanController, &controller::LanController::OnAuthRequest,
+    lanController, &syncing::lan::LanController::OnAuthRequest,
     this, &Application::handleAuthRequest
   );
 
   connect(
-    lanController, &controller::LanController::OnServerStatusChanged,
+    lanController, &syncing::lan::LanController::OnServerStatusChanged,
     this, &Application::handleServerStatusChanged
   );
 
   connect(
-    lanController, &controller::LanController::OnServerStatusChanged,
+    lanController, &syncing::lan::LanController::OnServerStatusChanged,
     clipbird, &ui::gui::widgets::Clipbird::handleServerStatusChanged
   );
 
@@ -676,17 +596,17 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   );
 
   connect(
-    wanController, &controller::WanController::OnHubErrorOccurred,
+    wanController, &syncing::wan::WanController::OnHubErrorOccurred,
     this, &Application::handleHubErrorOccurred
   );
 
   connect(
-    wanController, &controller::WanController::OnHubConnected,
+    wanController, &syncing::wan::WanController::OnHubConnected,
     this, &Application::handleHubConnect
   );
 
   connect(
-    wanController, &controller::WanController::OnHubDisconnected,
+    wanController, &syncing::wan::WanController::OnHubDisconnected,
     this, &Application::handleHubDisconnect
   );
 
@@ -701,27 +621,27 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   );
 
   connect(
-    lanController, &controller::LanController::OnCLientStateChanged,
+    lanController, &syncing::lan::LanController::OnCLientStateChanged,
     this, &Application::handleClientStateChanged
   );
 
   connect(
-    lanController, &controller::LanController::OnServerFound,
+    lanController, &syncing::lan::LanController::OnServerFound,
     this, &Application::handleServerFound
   );
 
   connect(
-    lanController, &controller::LanController::OnConnectionError,
+    lanController, &syncing::lan::LanController::OnConnectionError,
     this, &Application::handleConnectionError
   );
 
   connect(
-    lanController, &controller::LanController::OnSyncRequest,
+    lanController, &syncing::lan::LanController::OnSyncRequest,
     this, &Application::handleSyncRequest
   );
 
   connect(
-    wanController, &controller::WanController::OnSyncRequest,
+    wanController, &syncing::wan::WanController::OnSyncRequest,
     this, &Application::handleSyncRequest
   );
 
@@ -739,24 +659,24 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     &clipboardController->getClipboard(),
     &clipboard::ApplicationClipboard::OnClipboardChange,
     lanController,
-    &controller::LanController::synchronize
+    &syncing::lan::LanController::synchronize
   );
 
   connect(
     &clipboardController->getClipboard(),
     &clipboard::ApplicationClipboard::OnClipboardChange,
     wanController,
-    &controller::WanController::synchronize
+    &syncing::wan::WanController::synchronize
   );
 
   connect(
     historyController,
-    &controller::HistoryController::onClipboard,
+    &history::HistoryController::onClipboard,
     this,
     &Application::handleOnClipboard
   );
 
-  if (storage::Storage::instance().getHostIsServer()) {
+  if (storage::Storage::instance().getHostIsLastlyServer()) {
     clipbird->setTabAsServer();
   } else {
     clipbird->setTabAsClient();
@@ -765,36 +685,41 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   trayIcon->show();
 }
 
-/**
- * @brief Destroy the Application object
- */
 Application::~Application() {
-  delete clipboardController;
-  delete historyController;
-  delete lanController;
-  delete wanController;
-  delete clipbird;
-  delete history;
-  delete trayMenu;
-  delete trayIcon;
-  delete aboutUs;
-  delete group;
-  delete joiner;
+  clipboardController->deleteLater();
+  historyController->deleteLater();
+  lanController->deleteLater();
+  wanController->deleteLater();
+  trayIcon->deleteLater();
+  powerHandler->deleteLater();
+  wanUiController->deleteLater();
+  authController->deleteLater();
+
+  clipbird->deleteLater();
+  history->deleteLater();
+  trayMenu->deleteLater();
+
+  hotkey->deleteLater();
+
+  aboutUs->deleteLater();
+  group->deleteLater();
+  joiner->deleteLater();
+  signin->deleteLater();
 }
 
-controller::ClipboardController* Application::getClipboardController() const {
+clipboard::ClipboardController* Application::getClipboardController() const {
   return clipboardController;
 }
 
-controller::HistoryController* Application::getHistoryController() const {
+history::HistoryController* Application::getHistoryController() const {
   return historyController;
 }
 
-controller::LanController* Application::getLanController() const {
+syncing::lan::LanController* Application::getLanController() const {
   return lanController;
 }
 
-controller::WanController* Application::getWanController() const {
+syncing::wan::WanController* Application::getWanController() const {
   return wanController;
 }
 

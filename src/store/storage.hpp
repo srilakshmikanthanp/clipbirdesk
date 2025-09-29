@@ -115,12 +115,12 @@ class Storage : public QObject {
   /**
    * @brief Set the current state of the server or client
    */
-  void setHostIsServer(bool isServer);
+  void setHostIsLastlyServer(bool isServer);
 
   /**
    * @brief Get the current state of the server or client
    */
-  bool getHostIsServer();
+  bool getHostIsLastlyServer();
 
   /**
    * @brief set the Host certificate
@@ -160,7 +160,7 @@ class Storage : public QObject {
   /**
    * @brief set is Hub connected lastly
    */
-  void setIsUserConnectedToHubLastly(bool isConnected);
+  void setIsConnectedToHubLastly(bool isConnected);
 
   /**
    * @brief Instance of the storage

@@ -1,7 +1,7 @@
 #include "history_controller.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::controller {
-HistoryController::HistoryController(QObject *parent) : Controller(parent) {}
+namespace srilakshmikanthanp::clipbirdesk::history {
+HistoryController::HistoryController(QObject *parent) : controller::Controller(parent) {}
 HistoryController::~HistoryController() = default;
 
 bool HistoryController::isEqual(const QVector<QPair<QString, QByteArray>> &a, const QVector<QPair<QString, QByteArray>> &b) const {

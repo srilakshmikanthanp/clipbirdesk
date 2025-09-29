@@ -3,8 +3,8 @@
 // project headers
 #include "controller/controller.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::controller {
-class ClipboardController : public Controller {
+namespace srilakshmikanthanp::clipbirdesk::clipboard {
+class ClipboardController : public controller::Controller {
  private:  // just for Qt
 
   Q_OBJECT

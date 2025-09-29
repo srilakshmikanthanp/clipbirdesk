@@ -1,7 +1,7 @@
 #include "lan_controller.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::controller {
-LanController::LanController(QSslConfiguration config, QObject *parent) : Controller(parent), m_sslConfig(config), m_host(std::in_place_type<Client>, constants::getMDnsServiceName(), constants::getMDnsServiceType(), this) {}
+namespace srilakshmikanthanp::clipbirdesk::syncing::lan {
+LanController::LanController(QSslConfiguration config, QObject *parent) : controller::Controller(parent), m_sslConfig(config), m_host(std::in_place_type<Client>, constants::getMDnsServiceName(), constants::getMDnsServiceType(), this) {}
 LanController::~LanController() = default;
 
 void LanController::synchronize(const QVector<QPair<QString, QByteArray>> &data) {

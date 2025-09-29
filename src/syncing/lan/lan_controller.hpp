@@ -3,8 +3,8 @@
 // project headers
 #include "controller/controller.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::controller {
-class LanController : public Controller {
+namespace srilakshmikanthanp::clipbirdesk::syncing::lan {
+class LanController : public controller::Controller {
  private:  // just for Qt
 
   Q_OBJECT

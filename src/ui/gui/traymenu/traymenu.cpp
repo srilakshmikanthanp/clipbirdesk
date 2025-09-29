@@ -193,13 +193,6 @@ void TrayMenu::setSignedIn(bool issignedin) {
 }
 
 /**
- * @brief Is Signed In
- */
-bool TrayMenu::isSignedIn() const {
-  return m_isSignedIn;
-}
-
-/**
  * @brief set joined to hub
  */
 void TrayMenu::setJoinedToHub(bool isjoinedtohub) {
@@ -208,13 +201,6 @@ void TrayMenu::setJoinedToHub(bool isjoinedtohub) {
   } else {
     hub.setText(QObject::tr("Join Hub"));
   }
-}
-
-/**
- * @brief is joined to hub
- */
-bool TrayMenu::isJoinedToHub() const {
-  return m_isJoinedToHub;
 }
 
 /**

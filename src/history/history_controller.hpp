@@ -3,8 +3,8 @@
 // project headers
 #include "controller/controller.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::controller {
-class HistoryController : public Controller {
+namespace srilakshmikanthanp::clipbirdesk::history {
+class HistoryController : public controller::Controller {
  private:  // just for Qt
 
   Q_OBJECT

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QFuture>
 #include <QPromise>
 #include <QScopeGuard>

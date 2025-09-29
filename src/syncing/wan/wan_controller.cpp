@@ -1,7 +1,7 @@
 #include "wan_controller.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk::controller {
-WanController::WanController(QObject *parent) : Controller(parent) {}
+namespace srilakshmikanthanp::clipbirdesk::syncing::wan {
+WanController::WanController(QObject *parent) : controller::Controller(parent) {}
 WanController::~WanController() = default;
 
 void WanController::synchronize(const QVector<QPair<QString, QByteArray>> &data) {

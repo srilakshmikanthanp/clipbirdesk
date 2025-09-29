@@ -237,7 +237,7 @@ QSslKey Storage::getHostKey() {
  *
  * @param isServer
  */
-void Storage::setHostIsServer(bool isServer) {
+void Storage::setHostIsLastlyServer(bool isServer) {
   settings->beginGroup(commonGroup);
   settings->setValue(hostStateKey, isServer);
   settings->endGroup();
@@ -249,7 +249,7 @@ void Storage::setHostIsServer(bool isServer) {
  * @return true  if server
  * @return false if client
  */
-bool Storage::getHostIsServer() {
+bool Storage::getHostIsLastlyServer() {
   settings->beginGroup(commonGroup);
   auto isServer = settings->value(hostStateKey);
   settings->endGroup();
@@ -277,7 +277,7 @@ bool Storage::getHubIsConnectedLastly() {
 /**
  * @brief set is Hub connected lastly
  */
-void Storage::setIsUserConnectedToHubLastly(bool isConnected) {
+void Storage::setIsConnectedToHubLastly(bool isConnected) {
   settings->beginGroup(commonGroup);
   settings->setValue(hubStateKey, isConnected);
   settings->endGroup();

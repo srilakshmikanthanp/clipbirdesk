@@ -180,19 +180,9 @@ class TrayMenu : public QMenu {
   void setSignedIn(bool);
 
   /**
-   * @brief Is Signed In
-   */
-  bool isSignedIn() const;
-
-  /**
    * @brief set joined to hub
    */
   void setJoinedToHub(bool isjoined);
-
-  /**
-   * @brief is joined to hub
-   */
-  bool isJoinedToHub() const;
 
  protected:
 

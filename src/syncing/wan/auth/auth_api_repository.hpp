@@ -1,3 +1,5 @@
+#pragma once
+
 #include "constants/constants.hpp"
 #include "auth_token_dto.hpp"
 #include "basic_auth_request_dto.hpp"

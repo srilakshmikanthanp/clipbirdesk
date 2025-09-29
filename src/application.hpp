@@ -25,18 +25,20 @@
 
 // Project Headers
 #include "constants/constants.hpp"
-#include "clipboard/controller/clipboard_controller.hpp"
-#include "history/controller/history_controller.hpp"
-#include "syncing/lan/controller/lan_controller.hpp"
-#include "syncing/wan/controller/wan_controller.hpp"
+#include "clipboard/clipboard_controller.hpp"
+#include "history/history_controller.hpp"
+#include "syncing/lan/lan_controller.hpp"
+#include "syncing/wan/wan_controller.hpp"
 #include "store/secure_storage.hpp"
 #include "store/storage.hpp"
 #include "syncing/wan/auth/auth_api_client.hpp"
 #include "syncing/wan/auth/auth_api_repository.hpp"
 #include "syncing/wan/auth/auth_token_holder.hpp"
+#include "syncing/wan/auth/auth_controller.hpp"
 #include "syncing/wan/device/device_api_client.hpp"
 #include "syncing/wan/device/device_api_repository.hpp"
 #include "syncing/wan/device/device_type.hpp"
+#include "syncing/wan/wan_ui_controller.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 #include "ui/gui/traymenu/traymenu.hpp"
 #include "ui/gui/modals/aboutus/aboutus.hpp"
@@ -60,7 +62,7 @@ class Application : public SingleApplication {
   QSslConfiguration getNewSslConfiguration();
   QSslConfiguration getSslConfiguration();
 
-  QFuture<void> setupHubConnection();
+  QFuture<void> connectToHub();
 
   void handleConnectionError(QString error);
   void handleTabChange(ui::gui::widgets::Clipbird::Tabs tab);
@@ -100,19 +102,24 @@ class Application : public SingleApplication {
 
  private:
 
-  controller::ClipboardController *clipboardController;
-  controller::HistoryController *historyController;
-  controller::LanController *lanController;
-  controller::WanController *wanController;
-  ui::gui::widgets::Clipbird *clipbird;
-  ui::gui::widgets::History *history;
-  ui::gui::TrayMenu *trayMenu;
-  QSystemTrayIcon *trayIcon;
-  PowerHandler *powerHandler;
+  clipboard::ClipboardController *clipboardController = new clipboard::ClipboardController(this);
+  history::HistoryController *historyController = new history::HistoryController(this);
+  syncing::lan::LanController *lanController = new syncing::lan::LanController(getSslConfiguration(), this);
+  syncing::wan::WanController *wanController = new syncing::wan::WanController(this);
+  QSystemTrayIcon *trayIcon = new QSystemTrayIcon(this);
+  PowerHandler *powerHandler = new PowerHandler(this);
+  syncing::wan::WanUIController *wanUiController = new syncing::wan::WanUIController(wanController, this);
+  syncing::wan::AuthController *authController = new syncing::wan::AuthController(this);
 
  private:
 
-  QHotkey *hotkey;
+  ui::gui::widgets::Clipbird *clipbird = new ui::gui::widgets::Clipbird();
+  ui::gui::widgets::History *history = new ui::gui::widgets::History();
+  ui::gui::TrayMenu *trayMenu = new ui::gui::TrayMenu();
+
+ private:
+
+  QHotkey *hotkey = new QHotkey(QKeySequence(constants::getAppHistoryShortcut()), true, this);
 
  private:
 
@@ -125,10 +132,6 @@ class Application : public SingleApplication {
   using Server = syncing::lan::Server;
   using Client = syncing::lan::Client;
 
- private:
-  DeviceRepository *deviceRepository = new DeviceApiRepository(new DeviceApiClient(this), this);
-  AuthRepository *authRepository = new AuthApiRepository(new AuthApiClient(this), this);
-
  private:  // Disable Copy, Move and Assignment
 
   Q_DISABLE_COPY_MOVE(Application);
@@ -138,10 +141,11 @@ class Application : public SingleApplication {
   Application(int &argc, char **argv);
   virtual ~Application();
 
-  controller::ClipboardController* getClipboardController() const;
-  controller::HistoryController* getHistoryController() const;
-  controller::LanController* getLanController() const;
-  controller::WanController* getWanController() const;
+  clipboard::ClipboardController* getClipboardController() const;
+  history::HistoryController* getHistoryController() const;
+  syncing::lan::LanController* getLanController() const;
+  syncing::wan::WanController* getWanController() const;
+
   PowerHandler* getPowerHandler() const;
 };
 }
