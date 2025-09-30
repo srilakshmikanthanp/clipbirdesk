@@ -160,7 +160,7 @@ cmake --install . --config Release
 | `QT_CMAKE_DIR`               | Qt6 cmake directory                |
 | `BONJOUR_SDK_HOME`           | Bonjour SDK directory              |
 | `QT_KEYCHAIN_CMAKE_DIR`      | QtKeychain cmake directory         |
-| `VCPKG_TOOLCHAIN_FILE`       | vcpkg toolchain file               |
+| `VCPKG_ROOT`                 | vcpkg installation directory       |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -215,7 +215,7 @@ make install
 |------------------------------|------------------------------------|
 | `QT_CMAKE_DIR`      `        | Qt6 cmake directory                |
 | `QT_KEYCHAIN_CMAKE_DIR`      | QtKeychain cmake directory         |
-| `VCPKG_TOOLCHAIN_FILE`       | vcpkg toolchain file               |
+| `VCPKG_ROOT`                 | vcpkg installation directory       |
 
 <!-- ROADMAP -->
 ## Roadmap
