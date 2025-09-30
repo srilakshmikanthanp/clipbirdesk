@@ -12,13 +12,14 @@
       },
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "VCPKG_TARGET_TRIPLET": "x64-windows"
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
       "name": "linux-vcpkg",
       "displayName": "Linux (x64) with vcpkg",
-      "generator": "Ninja",
+      "generator": "Unix Makefiles",
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
@@ -26,7 +27,8 @@
       },
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "VCPKG_TARGET_TRIPLET": "x64-linux"
+        "VCPKG_TARGET_TRIPLET": "x64-linux",
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     }
   ]
