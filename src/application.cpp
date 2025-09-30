@@ -438,10 +438,8 @@ void Application::setQssFile(Qt::ColorScheme scheme) {
 }
 
 Application::Application(int &argc, char **argv) : SingleApplication(argc, argv) {
-  utility::functions::toFuture(
-    storage::SecureStorage::instance().getHubAuthToken(),
-    &storage::ReadAuthTokenDtoJob::authToken
-  ).then([=, this](std::optional<syncing::wan::AuthTokenDto> token) {
+  utility::functions::toFuture(storage::SecureStorage::instance().getHubAuthToken(), &storage::ReadAuthTokenDtoJob::authToken)
+  .then([=, this](std::optional<syncing::wan::AuthTokenDto> token) {
     if (token.has_value()) syncing::wan::AuthTokenHolder::instance().setAuthToken(token.value());
     if (token.has_value() && storage::Storage::instance().getHubIsConnectedLastly()) connectToHub();
   }).onFailed([=, this](const std::exception& e) {
