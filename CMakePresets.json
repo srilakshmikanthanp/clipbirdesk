@@ -3,7 +3,7 @@
   "configurePresets": [
     {
       "name": "windows-vcpkg-debug",
-      "displayName": "Windows (x64) with vcpkg",
+      "displayName": "Windows (x64) with vcpkg (Debug)",
       "generator": "Visual Studio 17 2022",
       "condition": {
         "type": "equals",
@@ -19,7 +19,7 @@
     },
     {
       "name": "linux-vcpkg-debug",
-      "displayName": "Linux (x64) with vcpkg",
+      "displayName": "Linux (x64) with vcpkg (Debug)",
       "generator": "Ninja",
       "condition": {
         "type": "equals",
@@ -35,7 +35,7 @@
     },
       {
       "name": "windows-vcpkg-release",
-      "displayName": "Windows (x64) with vcpkg",
+      "displayName": "Windows (x64) with vcpkg (Release)",
       "generator": "Visual Studio 17 2022",
       "condition": {
         "type": "equals",
@@ -51,7 +51,7 @@
     },
     {
       "name": "linux-vcpkg-release",
-      "displayName": "Linux (x64) with vcpkg",
+      "displayName": "Linux (x64) with vcpkg (Release)",
       "generator": "Ninja",
       "condition": {
         "type": "equals",
