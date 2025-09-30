@@ -10,7 +10,8 @@ fi
 
 # Build the clipbird with release configuration
 echo "Building clipbird with Release configuration"
-cmake -G "Ninja" -B ./build -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE && cmake --build ./build --config Release
+cmake --preset linux-vcpkg-release
+cmake --build --preset linux-vcpkg-release
 
 linuxPackageDir="$(pwd)/package/linux"
 AppRunScript="$linuxPackageDir/AppRun.sh"
@@ -26,7 +27,7 @@ mkdir -p $ClipbirdDir
 echo "Cloning appdir folder to $ClipbirdDir"
 cp -r $appdir/* $ClipbirdDir
 
-clipbirdBinary="$(pwd)/build/src/clipbird"
+clipbirdBinary="$(pwd)/build/linux-vcpkg-release/src/clipbird"
 echo "Copying $clipbirdBinary to $ClipbirdDir/usr/bin"
 cp $clipbirdBinary "$ClipbirdDir/usr/bin"
 
