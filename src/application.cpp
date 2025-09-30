@@ -142,7 +142,6 @@ void Application::handleAuthRequest(const types::Device& client) {
   toast->show(client);
 }
 
-
 void Application::handleConnect(QString ip, QString port) {
   const auto slot_hr = [=, this](QWidget* dialog, quint16 port, const auto& host) {
     if (host.error() != QHostInfo::NoError) {
@@ -315,6 +314,14 @@ void Application::handleSyncRequest(QVector<QPair<QString, QByteArray>> data) {
 void Application::onTrayIconClicked(QSystemTrayIcon::ActivationReason reason) {
   if (reason == QSystemTrayIcon::ActivationReason::Trigger) {
     clipbird->isVisible() ? clipbird->hide() : this->openClipbird();
+  }
+}
+
+void Application::handleAuthTokenChanged(std::optional<syncing::wan::AuthTokenDto> token) {
+  this->trayMenu->setSignedIn(token.has_value());
+  if (!token.has_value() && this->wanController->isHubConnected()) {
+    this->trayMenu->setHubEnabled(false);
+    this->wanController->disconnectFromHub();
   }
 }
 
@@ -607,7 +614,7 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   connect(
     &syncing::wan::AuthTokenHolder::instance(),
     &syncing::wan::AuthTokenHolder::authTokenChanged,
-    [=, this](auto token) { this->trayMenu->setSignedIn(token.has_value()); }
+    this, &Application::handleAuthTokenChanged
   );
 
   connect(

@@ -79,6 +79,7 @@ class Application : public SingleApplication {
   void handleServerFound(types::Device server);
   void handleOnClipboard(QVector<QPair<QString, QByteArray>> data);
   void handleSyncRequest(QVector<QPair<QString, QByteArray>> data);
+  void handleAuthTokenChanged(std::optional<syncing::wan::AuthTokenDto> token);
 
   void onTrayIconClicked(QSystemTrayIcon::ActivationReason reason);
   void openClipbird();
