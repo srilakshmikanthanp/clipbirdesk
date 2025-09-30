@@ -4,6 +4,15 @@ namespace srilakshmikanthanp::clipbirdesk::syncing::wan {
 WanController::WanController(QObject *parent) : controller::Controller(parent) {}
 WanController::~WanController() = default;
 
+void WanController::handleDisconnected() {
+  m_wasAbnormallyDisconnectedLastly = m_hub->getCloseCode() == QWebSocketProtocol::CloseCodeAbnormalDisconnection;
+  m_hub.reset();
+}
+
+void WanController::handleErrorOccurred(QAbstractSocket::SocketError) {
+  m_hub.reset();
+}
+
 void WanController::synchronize(const QVector<QPair<QString, QByteArray>> &data) {
   if (m_hub.has_value() && m_hub->isReady()) {
     m_hub->synchronize(data);
@@ -50,5 +59,9 @@ void WanController::disconnectFromHub() {
   }
 
   m_hub->disconnect();
+}
+
+bool WanController::wasAbnormallyDisconnectedLastly() {
+  return m_wasAbnormallyDisconnectedLastly;
 }
 }

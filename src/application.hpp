@@ -19,6 +19,7 @@
 #include <QSystemTrayIcon>
 #include <SingleApplication>
 #include <QHotkey>
+#include <QNetworkInformation>
 
 // C++ Headers
 #include <csignal>
@@ -80,6 +81,7 @@ class Application : public SingleApplication {
   void handleOnClipboard(QVector<QPair<QString, QByteArray>> data);
   void handleSyncRequest(QVector<QPair<QString, QByteArray>> data);
   void handleAuthTokenChanged(std::optional<syncing::wan::AuthTokenDto> token);
+  void handleRechabilityChanged(QNetworkInformation::Reachability);
 
   void onTrayIconClicked(QSystemTrayIcon::ActivationReason reason);
   void openClipbird();

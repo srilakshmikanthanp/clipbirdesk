@@ -198,6 +198,7 @@
     "qdbusunixfiledescriptor": "cpp",
     "qwebsocket": "cpp",
     "*.inc": "cpp",
-    "qdbusreply": "cpp"
+    "qdbusreply": "cpp",
+    "qnetworkinformation": "cpp"
   },
 }

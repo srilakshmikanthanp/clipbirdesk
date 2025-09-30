@@ -16,10 +16,16 @@ class WanController : public controller::Controller {
  private:
 
   std::optional<syncing::wan::HubWebSocket> m_hub;
+  bool m_wasAbnormallyDisconnectedLastly = false;
+
+ private:
+  void handleDisconnected();
+  void handleErrorOccurred(QAbstractSocket::SocketError);
 
  signals:
 
   void OnHubErrorOccurred(QAbstractSocket::SocketError);
+  void onConnecting();
   void OnHubConnected();
   void OnHubDisconnected();
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
@@ -34,5 +40,6 @@ class WanController : public controller::Controller {
   void connectToHub(const syncing::wan::HubHostDevice &device);
   bool isHubConnected();
   void disconnectFromHub();
+  bool wasAbnormallyDisconnectedLastly();
 };
 }

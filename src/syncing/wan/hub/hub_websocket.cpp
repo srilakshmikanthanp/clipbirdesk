@@ -19,10 +19,13 @@ HubWebSocket::HubWebSocket(HubHostDevice hubHostDevice, QObject* parent) : Hub(h
   QObject::connect(webSocket, &QWebSocket::disconnected, this, &HubWebSocket::OnDisconnected);
 
   pingTimer->setInterval(30000);
+  pongTimer->setInterval(60000);
 
-  QObject::connect(pingTimer, &QTimer::timeout, [this]() { if (this->isReady()) this->webSocket->ping(); });
-  QObject::connect(webSocket, &QWebSocket::connected, [this]() { this->pingTimer->start(); });
-  QObject::connect(webSocket, &QWebSocket::disconnected, [this]() { this->pingTimer->stop(); });
+  QObject::connect(webSocket, &QWebSocket::disconnected, this, &HubWebSocket::handleDisconnected);
+  QObject::connect(webSocket, &QWebSocket::connected, this, &HubWebSocket::handleConnected);
+  QObject::connect(pingTimer, &QTimer::timeout, this, &HubWebSocket::handlePingTimeout);
+  QObject::connect(webSocket, &QWebSocket::pong, this, &HubWebSocket::handlePong);
+  QObject::connect(pongTimer, &QTimer::timeout, this, &HubWebSocket::handlePongTimeout);
 
   hubMessageHandler->setPayloadHandler(new HubMessageClipboardDispatchPayloadHandler(this));
   hubMessageHandler->setPayloadHandler(new HubMessageDeviceAddedPayloadHandler(this));
@@ -49,6 +52,39 @@ void HubWebSocket::handleTextMessage(const QString& message) {
   } catch (const std::exception& e) {
     qWarning() << "Failed to handle message:" << e.what();
   }
+}
+
+void HubWebSocket::handleConnected() {
+  pingTimer->start();
+  pongTimer->start();
+  lastPong.start();
+}
+
+void HubWebSocket::handleDisconnected() {
+  pingTimer->stop();
+  pongTimer->stop();
+}
+
+void HubWebSocket::handlePingTimeout() {
+  webSocket->ping();
+}
+
+void HubWebSocket::handlePong() {
+  lastPong.restart();
+}
+
+void HubWebSocket::handlePongTimeout() {
+  if (lastPong.elapsed() > 60000) {
+    webSocket->close(QWebSocketProtocol::CloseCodeAbnormalDisconnection, "Pong timeout");
+  }
+}
+
+QWebSocketProtocol::CloseCode HubWebSocket::getCloseCode() const {
+  return webSocket->closeCode();
+}
+
+QString HubWebSocket::getCloseReason() const {
+  return webSocket->closeReason();
 }
 
 /**

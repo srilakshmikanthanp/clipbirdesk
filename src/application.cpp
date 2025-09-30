@@ -325,6 +325,17 @@ void Application::handleAuthTokenChanged(std::optional<syncing::wan::AuthTokenDt
   }
 }
 
+void Application::handleRechabilityChanged(QNetworkInformation::Reachability rechability) {
+  if (
+    rechability == QNetworkInformation::Reachability::Online &&
+    !this->wanController->isHubConnected() &&
+    this->wanController->wasAbnormallyDisconnectedLastly() &&
+    storage::Storage::instance().getHubIsConnectedLastly()
+  ) {
+    this->connectToHub();
+  }
+}
+
 void Application::openClipbird() {
   this->clipbird->setFixedSize(constants::getAppWindowSize());
   this->clipbird->setWindowIcon(QIcon(QString::fromStdString(constants::getAppLogo())));
@@ -696,6 +707,12 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     &history::HistoryController::onClipboard,
     this,
     &Application::handleOnClipboard
+  );
+
+  connect(
+    QNetworkInformation::instance(),
+    &QNetworkInformation::reachabilityChanged,
+    this, &Application::handleRechabilityChanged
   );
 
   if (storage::Storage::instance().getHostIsLastlyServer()) {

@@ -27,12 +27,19 @@ class HubWebSocket : public Hub {
  private:
 
   QTimer *pingTimer = new QTimer(this);
+  QTimer *pongTimer = new QTimer(this);
+  QElapsedTimer lastPong;
   QWebSocket *webSocket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
   HubMessageHandler *hubMessageHandler = new HubMessageHandler(this);
 
  private:
 
   void handleTextMessage(const QString& message);
+  void handleConnected();
+  void handleDisconnected();
+  void handlePingTimeout();
+  void handlePong();
+  void handlePongTimeout();
 
  public:  // constructor and destructor
 
@@ -63,24 +70,11 @@ class HubWebSocket : public Hub {
 
  public:
 
-  /**
-   * @brief connect to the hub
-   */
+  QWebSocketProtocol::CloseCode getCloseCode() const;
+  QString getCloseReason() const;
   void connect();
-
-  /**
-   * @brief disconnect from the hub
-   */
   void disconnect();
-
-  /**
-   * @brief isReady
-   */
   bool isReady();
-
-  /**
-   * @brief send message to the hub
-   */
   void sendMessage(const QString& message) override;
 };
 }
