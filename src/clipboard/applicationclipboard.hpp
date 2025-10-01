@@ -80,7 +80,7 @@ class ApplicationClipboard : public QObject {
    *
    * @return mime type and data
    */
-  QVector<QPair<QString, QByteArray>> get() const;
+  QFuture<QVector<QPair<QString, QByteArray>>> get() const;
 
   /**
    * @brief Clear the clipboard content

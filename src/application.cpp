@@ -392,14 +392,12 @@ void Application::openAbout() {
 }
 
 void Application::sendClipboard() {
-  Q_UNUSED(QtConcurrent::run([this]() {
-    auto content = clipboardController->getClipboard().get();
-    if (content.isEmpty()) return;
-    QTimer::singleShot(0, lanController, [=, this]() {
-      lanController->synchronize(content);
-      wanController->synchronize(content);
-    });
-  }));
+  clipboardController->getClipboard().get().then([=, this](QVector<QPair<QString, QByteArray>> content) {
+    if (!content.isEmpty()) {
+      QTimer::singleShot(0, lanController, [=, this]() { lanController->synchronize(content); });
+      QTimer::singleShot(0, wanController, [=, this]() { wanController->synchronize(content); });
+    }
+  });
 }
 
 void Application::openHistory() {

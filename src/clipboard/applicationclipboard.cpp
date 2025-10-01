@@ -5,13 +5,8 @@ namespace srilakshmikanthanp::clipbirdesk::clipboard {
  * @brief Slot to notify the clipboard change
  */
 void ApplicationClipboard::onClipboardChangeImpl(QClipboard::Mode mode) {
-  if (mode != QClipboard::Mode::Clipboard) return;
-  if (!QApplication::clipboard()->ownsClipboard()) {
-    Q_UNUSED(QtConcurrent::run([this]() {
-      QVector<QPair<QString, QByteArray>> items = this->get();
-      if (items.isEmpty()) return;
-      emit OnClipboardChange(items);
-    }));
+  if (!QApplication::clipboard()->ownsClipboard() && mode != QClipboard::Mode::Clipboard) {
+    this->get().then([this](QVector<QPair<QString, QByteArray>> result){ if (!result.isEmpty()) emit OnClipboardChange(result); });
   }
 }
 
@@ -35,37 +30,39 @@ ApplicationClipboard::ApplicationClipboard(QObject* parent) : QObject(parent) {
  *
  * @return mime type and data
  */
-QVector<QPair<QString, QByteArray>> ApplicationClipboard::get() const {
-  // Default clipboard data & mime data
-  QVector<QPair<QString, QByteArray>> items;
-
-  // get the mime data
+QFuture<QVector<QPair<QString, QByteArray>>> ApplicationClipboard::get() const {
   const auto mimeData = m_clipboard->mimeData(QClipboard::Mode::Clipboard);
+  auto clone = std::make_shared<QMimeData>();
 
-  // if mime data is not supported
-  if (mimeData == nullptr) return items;
-
-  // has HTML
-  if (mimeData->hasHtml()) {
-    items.append({MIME_TYPE_HTML, mimeData->html().toUtf8()});
+  if (mimeData) {
+    const auto formats = mimeData->formats();
+    for (const auto& format : formats) {
+      clone->setData(format, mimeData->data(format));
+    }
   }
 
-  // has Image
-  if (mimeData->hasImage()) {
-    auto image = qvariant_cast<QImage>(mimeData->imageData());
-    QByteArray data; QBuffer buffer(&data);
-    buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, IMAGE_TYPE_PNG);
-    items.append({MIME_TYPE_PNG, data});
-  }
+  return QtConcurrent::run([clone, this]() {
+    QVector<QPair<QString, QByteArray>> items;
 
-  // has Text
-  if (mimeData->hasText()) {
-    items.append({MIME_TYPE_TEXT, mimeData->text().toUtf8()});
-  }
+    if (clone->hasHtml()) {
+      items.append({MIME_TYPE_HTML, clone->html().toUtf8()});
+    }
 
-  // return the data
-  return items;
+    if (clone->hasImage()) {
+      auto image = qvariant_cast<QImage>(clone->imageData());
+      QByteArray data;
+      QBuffer buffer(&data);
+      buffer.open(QIODevice::WriteOnly);
+      image.save(&buffer, IMAGE_TYPE_PNG);
+      items.append({MIME_TYPE_PNG, data});
+    }
+
+    if (clone->hasText()) {
+      items.append({MIME_TYPE_TEXT, clone->text().toUtf8()});
+    }
+
+    return items;
+  });
 }
 
 /**
