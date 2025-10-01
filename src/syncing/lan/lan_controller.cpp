@@ -5,8 +5,8 @@ LanController::LanController(QSslConfiguration config, QObject *parent) : contro
 LanController::~LanController() = default;
 
 void LanController::synchronize(const QVector<QPair<QString, QByteArray>> &data) {
-  if (std::holds_alternative<Client>(m_host) && std::get<Client>(m_host).isConnectedToServer()) {
-    std::get<Client>(m_host).synchronize(data);
+  if (std::holds_alternative<Client>(m_host)) {
+    if (std::get<Client>(m_host).isConnectedToServer()) std::get<Client>(m_host).synchronize(data);
   } else if (std::holds_alternative<Server>(m_host)) {
     std::get<Server>(m_host).synchronize(data);
   } else {
