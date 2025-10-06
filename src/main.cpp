@@ -60,7 +60,6 @@ void globalErrorHandler() {
  * @return int Status code
  */
 auto main(int argc, char **argv) -> int {
-  // using ClipbirdApplication class from namespace
   using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogo;
@@ -72,38 +71,35 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::PowerHandler;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
+  if(QNetworkInformation::loadBackendByFeatures(QNetworkInformation::Feature::Reachability)) {
+    qInfo() << "Loaded QNetworkInformation backend supporting Reachability feature";
+  } else {
+    qWarning() << "Failed to load QNetworkInformation backend supporting Reachability feature";
+  }
+
+  QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
+
   QLoggingCategory::setFilterRules("*.debug=false");
 
   freopen(null_device, "w", stderr);
 
-  // std::string to std::wstring
   const auto W = [](std::string str) -> std::wstring {
     return std::wstring(str.begin(), str.end());
   };
 
-  // create the application
   Application app(argc, argv);
 
-  // disable proxy for the application
-  QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
-
-  // install native event filter
   app.installNativeEventFilter(app.getPowerHandler());
-
-  // install event filter
   app.installEventFilter(new AppEventFilter());
 
 #if defined(_WIN32) || defined(_WIN64)
-  // create AUMI
   auto appAumi = WinToastLib::WinToast::configureAUMI(
       W(getAppOrgName()), W(getAppName()), W(std::string()), W(getAppVersion())
   );
 
-  // set up wintoast lib
   WinToastLib::WinToast::instance()->setAppName(W(getAppName()));
   WinToastLib::WinToast::instance()->setAppUserModelId(appAumi);
 
-  // initialize
   if (!WinToastLib::WinToast::instance()->initialize()) {
     auto dialog = QMessageBox(nullptr);
     dialog.setText(QObject::tr("Can't Initialize WinToast"));
@@ -117,16 +113,12 @@ auto main(int argc, char **argv) -> int {
   auto loop   = g_main_loop_new(nullptr, false);
   auto thread = std::thread([loop]() { g_main_loop_run(loop); });
 
-  // detach
   thread.detach();
 
-  // quiter
   auto quiter = [loop]() { g_main_loop_quit(loop); };
 
-  // set the signal handler
   QObject::connect(&app, &QApplication::aboutToQuit, quiter);
 
-  // initialize libNotify
   if (!notify_init(getAppName())) {
     auto dialog = QMessageBox(nullptr);
     dialog.setText(QObject::tr("Can't Initialize libNotify"));
@@ -137,51 +129,33 @@ auto main(int argc, char **argv) -> int {
     return EXIT_FAILURE;
   }
 
-  // uninitializer
   auto uniniter = []() { notify_uninit(); };
 
-  // uninitialize
   QObject::connect(&app, &QApplication::aboutToQuit, uniniter);
 #endif
 
-  // Home Directory of the application
   auto path = QString::fromStdString(getAppHome());
 
-  // make app home directory if not exists
   if (!QDir(path).exists() && !QDir().mkdir(path)) {
     QMessageBox::critical(nullptr, "Error", "Can't Create App Home");
     return EXIT_FAILURE;
   }
 
-  // set proxy for the application (No Proxy)
   QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
 
 #ifdef NDEBUG
-  // log file to record the logs
   QFile logfile(QString::fromStdString(getAppLogFile()));
-
-  // open the log file
   logfile.open(QIODevice::WriteOnly | QIODevice::Append);
-
-  // open QStream to write the log file
   QTextStream logstream(&logfile);
-
-  // Set the log file
   Logger::setLogStream(&logstream);
 #else
-  // open QStream to write the log file
   QTextStream logstream(stdout);
-
-  // Set the log file as std::cout
   Logger::setLogStream(&logstream);
 #endif
 
-  // Set the custom message handler
   qInstallMessageHandler(Logger::handler);
 
-  // Set the global error handler
   std::set_terminate(globalErrorHandler);
 
-  // start application and return status code
   return app.exec();
 }
