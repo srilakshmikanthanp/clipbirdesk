@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QAbstractSocket>
+#include <QWebSocket>
 #include <unordered_set>
 
 #include "syncing/synchronizer.hpp"
@@ -37,7 +38,7 @@ class Hub : public Synchronizer {
 
   virtual void OnErrorOccurred(QAbstractSocket::SocketError) = 0;
   virtual void OnConnected() = 0;
-  virtual void OnDisconnected() = 0;
+  virtual void OnDisconnected(QWebSocketProtocol::CloseCode code, QString reason) = 0;
 
  public:
   /**

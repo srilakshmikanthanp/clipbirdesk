@@ -16,7 +16,6 @@ namespace srilakshmikanthanp::clipbirdesk::syncing::wan {
 HubWebSocket::HubWebSocket(HubHostDevice hubHostDevice, QObject* parent) : Hub(hubHostDevice, parent) {;
   QObject::connect(webSocket, &QWebSocket::textMessageReceived, this, &HubWebSocket::handleTextMessage);
   QObject::connect(webSocket, &QWebSocket::errorOccurred, this, &HubWebSocket::OnErrorOccurred);
-  QObject::connect(webSocket, &QWebSocket::disconnected, this, &HubWebSocket::OnDisconnected);
 
   pingTimer->setInterval(30000);
   pongTimer->setInterval(60000);
@@ -63,6 +62,7 @@ void HubWebSocket::handleConnected() {
 void HubWebSocket::handleDisconnected() {
   pingTimer->stop();
   pongTimer->stop();
+  emit OnDisconnected(webSocket->closeCode(), webSocket->closeReason());
 }
 
 void HubWebSocket::handlePingTimeout() {
@@ -77,14 +77,6 @@ void HubWebSocket::handlePongTimeout() {
   if (lastPong.elapsed() > 60000) {
     webSocket->close(QWebSocketProtocol::CloseCodeAbnormalDisconnection, "Pong timeout");
   }
-}
-
-QWebSocketProtocol::CloseCode HubWebSocket::getCloseCode() const {
-  return webSocket->closeCode();
-}
-
-QString HubWebSocket::getCloseReason() const {
-  return webSocket->closeReason();
 }
 
 /**

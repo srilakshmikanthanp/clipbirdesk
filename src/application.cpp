@@ -329,7 +329,6 @@ void Application::handleRechabilityChanged(QNetworkInformation::Reachability rec
   if (
     rechability == QNetworkInformation::Reachability::Online &&
     !this->wanController->isHubConnected() &&
-    this->wanController->wasAbnormallyDisconnectedLastly() &&
     storage::Storage::instance().getHubIsConnectedLastly()
   ) {
     this->connectToHub();

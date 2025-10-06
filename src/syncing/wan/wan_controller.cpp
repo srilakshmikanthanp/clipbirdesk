@@ -4,8 +4,7 @@ namespace srilakshmikanthanp::clipbirdesk::syncing::wan {
 WanController::WanController(QObject *parent) : controller::Controller(parent) {}
 WanController::~WanController() = default;
 
-void WanController::handleDisconnected() {
-  m_wasAbnormallyDisconnectedLastly = m_hub->getCloseCode() == QWebSocketProtocol::CloseCodeAbnormalDisconnection;
+void WanController::handleDisconnected(QWebSocketProtocol::CloseCode code, QString reason) {
   m_hub.reset();
 }
 
@@ -14,17 +13,17 @@ void WanController::handleErrorOccurred(QAbstractSocket::SocketError) {
 }
 
 void WanController::synchronize(const QVector<QPair<QString, QByteArray>> &data) {
-  if (m_hub.has_value() && m_hub->isReady()) {
+  if (m_hub && m_hub->isReady()) {
     m_hub->synchronize(data);
   }
 }
 
 void WanController::connectToHub(const syncing::wan::HubHostDevice &device) {
-  if (m_hub.has_value() && m_hub->isReady()) {
+  if (m_hub && m_hub->isReady()) {
     throw std::runtime_error("Hub is already connected");
   }
 
-  m_hub.emplace(device, this);
+  m_hub = HubUniquePointer(new syncing::wan::HubWebSocket(device, this), [](auto p) { if (p) p->deleteLater(); });
 
   connect(
     &*m_hub, &syncing::wan::HubWebSocket::OnErrorOccurred,
@@ -46,22 +45,23 @@ void WanController::connectToHub(const syncing::wan::HubHostDevice &device) {
     this, &WanController::OnSyncRequest
   );
 
+  connect(
+    &*m_hub, &syncing::wan::HubWebSocket::OnDisconnected,
+    this, &WanController::handleDisconnected
+  );
+
   m_hub->connect();
 }
 
 bool WanController::isHubConnected() {
-  return m_hub.has_value() && m_hub->isReady();
+  return m_hub && m_hub->isReady();
 }
 
 void WanController::disconnectFromHub() {
-  if (!m_hub.has_value() || !m_hub->isReady()) {
+  if (!m_hub || !m_hub->isReady()) {
     throw std::runtime_error("Hub is not connected");
   }
 
   m_hub->disconnect();
-}
-
-bool WanController::wasAbnormallyDisconnectedLastly() {
-  return m_wasAbnormallyDisconnectedLastly;
 }
 }

@@ -66,12 +66,10 @@ class HubWebSocket : public Hub {
 
   void OnErrorOccurred(QAbstractSocket::SocketError) override;
   void OnConnected() override;
-  void OnDisconnected() override;
+  void OnDisconnected(QWebSocketProtocol::CloseCode code, QString reason) override;
 
  public:
 
-  QWebSocketProtocol::CloseCode getCloseCode() const;
-  QString getCloseReason() const;
   void connect();
   void disconnect();
   bool isReady();
