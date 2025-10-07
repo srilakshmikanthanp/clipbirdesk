@@ -39,7 +39,7 @@
 #include "syncing/wan/device/device_api_client.hpp"
 #include "syncing/wan/device/device_api_repository.hpp"
 #include "syncing/wan/device/device_type.hpp"
-#include "syncing/wan/wan_ui_controller.hpp"
+#include "syncing/wan/wan_view_model.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 #include "ui/gui/traymenu/traymenu.hpp"
 #include "ui/gui/modals/aboutus/aboutus.hpp"
@@ -111,7 +111,7 @@ class Application : public SingleApplication {
   syncing::wan::WanController *wanController = new syncing::wan::WanController(this);
   QSystemTrayIcon *trayIcon = new QSystemTrayIcon(this);
   PowerHandler *powerHandler = new PowerHandler(this);
-  syncing::wan::WanUIController *wanUiController = new syncing::wan::WanUIController(wanController, this);
+  syncing::wan::WanViewModel *wanUiController = new syncing::wan::WanViewModel(wanController, this);
   syncing::wan::AuthController *authController = new syncing::wan::AuthController(this);
 
  private:

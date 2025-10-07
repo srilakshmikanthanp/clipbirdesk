@@ -136,7 +136,7 @@ file(GLOB_RECURSE main_cpp
   syncing/wan/hub/hub_websocket.cpp
   syncing/wan/hub/hub.cpp
   syncing/wan/wan_controller.cpp
-  syncing/wan/wan_ui_controller.cpp
+  syncing/wan/wan_view_model.cpp
   types/device.cpp
   types/except/except.cpp
   ui/gui/components/cliphistory/cliphistory.cpp

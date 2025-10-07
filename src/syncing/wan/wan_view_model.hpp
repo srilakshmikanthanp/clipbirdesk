@@ -22,14 +22,14 @@
 #include "utility/functions/keychain/keychain.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing::wan {
-class WanUIController : public QObject {
+class WanViewModel : public QObject {
  private:  // just for Qt
 
   Q_OBJECT
 
  private:
 
-  Q_DISABLE_COPY_MOVE(WanUIController)
+  Q_DISABLE_COPY_MOVE(WanViewModel)
 
  private:
 
@@ -39,8 +39,8 @@ class WanUIController : public QObject {
 
  public:  // Constructors and Destructors
 
-  WanUIController(syncing::wan::WanController* wanController, QObject *parent = nullptr);
-  virtual ~WanUIController();
+  WanViewModel(syncing::wan::WanController* wanController, QObject *parent = nullptr);
+  virtual ~WanViewModel();
 
   QFuture<void> connectToHub();
 };
