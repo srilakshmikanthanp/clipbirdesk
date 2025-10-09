@@ -17,10 +17,6 @@ class WanController : public controller::Controller {
   using HubUniquePointer = std::unique_ptr<syncing::wan::HubWebSocket, std::function<void(syncing::wan::HubWebSocket*)>>;
   HubUniquePointer m_hub;
 
- private:
-  void handleDisconnected(QWebSocketProtocol::CloseCode code, QString reason);
-  void handleErrorOccurred(QAbstractSocket::SocketError);
-
  signals:
 
   void OnHubDisconnected(QWebSocketProtocol::CloseCode code, QString reason);
@@ -39,5 +35,7 @@ class WanController : public controller::Controller {
   void connectToHub(const syncing::wan::HubHostDevice &device);
   bool isHubConnected();
   void disconnectFromHub();
+  bool isHubAvailable();
+  void reconnectToHub();
 };
 }

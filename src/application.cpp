@@ -2,6 +2,7 @@
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
+#include <QUnhandledException>
 
 #include "application.hpp"
 
@@ -57,18 +58,23 @@ QSslConfiguration Application::getSslConfiguration() {
 }
 
 QFuture<void> Application::connectToHub() {
-  const auto handleFailure = [=, this](const std::exception& e) {
+  const auto handleFailure = [=, this](const QUnhandledException& e) {
+    QString message = "There was an error while connecting to hub";
+    try {
+      if (e.exception()) std::rethrow_exception(e.exception());
+    } catch (const std::exception& e) {
+      message = QString::fromStdString(e.what());
+    }
     this->trayMenu->setHubEnabled(true);
     this->trayIcon->showMessage(
       constants::getAppName(),
-      QObject::tr("Hub Connection Error Occurred: %1").arg(e.what()),
+      QObject::tr("Hub Connection Error Occurred: %1").arg(message),
       QIcon(QString::fromStdString(constants::getAppLogo()))
     );
   };
 
-  this->trayMenu->setHubEnabled(false);
   return wanUiController->connectToHub()
-  .onFailed([=, this](const std::exception& e) {
+  .onFailed([=, this](const QUnhandledException& e) {
     QMetaObject::invokeMethod(this, [=, this] { handleFailure(e); }, Qt::QueuedConnection);
   });
 }
@@ -181,8 +187,14 @@ void Application::handleSignin(QString email, QString password) {
     this->signin->setSigningIn(false);
   };
 
-  const auto handleFailure = [=, this](const std::exception& e) {
-    this->signin->setError(e.what());
+  const auto handleFailure = [=, this](const QUnhandledException& e) {
+    QString message = "There was an error while signing in";
+    try {
+      if (e.exception()) std::rethrow_exception(e.exception());
+    } catch (const std::exception& e) {
+      message = QString::fromStdString(e.what());
+    }
+    this->signin->setError(message);
     this->trayMenu->setAccoundEnabled(true);
     this->signin->setSigningIn(false);
   };
@@ -193,7 +205,7 @@ void Application::handleSignin(QString email, QString password) {
   .then([=, this]() {
     QMetaObject::invokeMethod(this, [=, this] { handleSuccess(); }, Qt::QueuedConnection);
   })
-  .onFailed([=, this](const std::exception& e) {
+  .onFailed([=, this](const QUnhandledException& e) {
     QMetaObject::invokeMethod(this, [=, this] { handleFailure(e); }, Qt::QueuedConnection);
   });
 }
@@ -329,10 +341,14 @@ void Application::handleRechabilityChanged(QNetworkInformation::Reachability rec
   if (
     rechability == QNetworkInformation::Reachability::Online &&
     !this->wanController->isHubConnected() &&
-    storage::Storage::instance().getHubIsConnectedLastly()
+    this->wanController->isHubAvailable()
   ) {
-    this->connectToHub();
+    this->wanController->reconnectToHub();
   }
+}
+
+void Application::handleConnectingToHub() {
+  this->trayMenu->setHubEnabled(false);
 }
 
 void Application::openClipbird() {
@@ -414,12 +430,18 @@ void Application::resetDevices() {
 }
 
 void Application::onAccountClicked() {
-  const auto handleSignOutFailure = [=, this](const std::exception& e) {
+  const auto handleSignOutFailure = [=, this](const QUnhandledException& e) {
+    QString message = "There was an error while signing out";
+    try {
+      if (e.exception()) std::rethrow_exception(e.exception());
+    } catch (const std::exception& e) {
+      message = QString::fromStdString(e.what());
+    }
     this->trayIcon->showMessage(constants::getAppName(), QObject::tr("Error Signing Out: %1").arg(e.what()), QIcon(QString::fromStdString(constants::getAppLogo())));
   };
 
   if (this->authController->isSignedIn()) {
-    this->authController->signOut().onFailed([=, this](const std::exception& e) {
+    this->authController->signOut().onFailed([=, this](const QUnhandledException& e) {
       QMetaObject::invokeMethod(this, [=, this] { handleSignOutFailure(e); }, Qt::QueuedConnection);
     });
     return;
@@ -435,7 +457,6 @@ void Application::onAccountClicked() {
 void Application::onHubClicked() {
   if (this->wanController->isHubConnected()) {
     storage::Storage::instance().setIsConnectedToHubLastly(false);
-    this->trayMenu->setHubEnabled(false);
     wanController->disconnectFromHub();
   } else {
     storage::Storage::instance().setIsConnectedToHubLastly(true);
@@ -453,14 +474,6 @@ void Application::setQssFile(Qt::ColorScheme scheme) {
 }
 
 Application::Application(int &argc, char **argv) : SingleApplication(argc, argv) {
-  utility::functions::toFuture(storage::SecureStorage::instance().getHubAuthToken(), &storage::ReadAuthTokenDtoJob::authToken)
-  .then([=, this](std::optional<syncing::wan::AuthTokenDto> token) {
-    if (token.has_value()) syncing::wan::AuthTokenHolder::instance().setAuthToken(token.value());
-    if (token.has_value() && storage::Storage::instance().getHubIsConnectedLastly()) connectToHub();
-  }).onFailed([=, this](const std::exception& e) {
-    throw std::runtime_error("Error reading Hub JWT Token: " + std::string(e.what()));
-  });
-
   trayIcon->setIcon(QIcon(constants::getAppLogo()));
   trayIcon->setContextMenu(trayMenu);
   trayIcon->setToolTip(constants::getAppName());
@@ -712,11 +725,30 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     this, &Application::handleRechabilityChanged
   );
 
+  connect(
+    wanController, &syncing::wan::WanController::onConnecting,
+    this, &Application::handleConnectingToHub
+  );
+
   if (storage::Storage::instance().getHostIsLastlyServer()) {
     clipbird->setTabAsServer();
   } else {
     clipbird->setTabAsClient();
   }
+
+  utility::functions::toFuture(storage::SecureStorage::instance().getHubAuthToken(), &storage::ReadAuthTokenDtoJob::authToken)
+  .then([=, this](std::optional<syncing::wan::AuthTokenDto> token) {
+    if (token.has_value()) syncing::wan::AuthTokenHolder::instance().setAuthToken(token.value());
+    if (token.has_value() && storage::Storage::instance().getHubIsConnectedLastly()) connectToHub();
+  }).onFailed([=, this](const QUnhandledException& e) {
+    QString message = "There was an error while reading Jwt token";
+    try {
+      if (e.exception()) std::rethrow_exception(e.exception());
+    } catch (const std::exception& e) {
+      message = QString::fromStdString(e.what());
+    }
+    throw std::runtime_error("Error reading Hub JWT Token: " + std::string(e.what()));
+  });
 
   trayIcon->show();
 }

@@ -33,6 +33,13 @@ class HubWebSocket : public Hub {
   HubMessageHandler *hubMessageHandler = new HubMessageHandler(this);
 
  private:
+  QTimer* reconnectTimer = new QTimer(this);
+  const double backOffFactor = 2.0;
+  const int baseDelayMs = 2000;
+  const int maxDelayMs = 60000;
+  int reconnectAttempts = 0;
+
+ private:
 
   void handleTextMessage(const QString& message);
   void handleConnected();
@@ -40,6 +47,11 @@ class HubWebSocket : public Hub {
   void handlePingTimeout();
   void handlePong();
   void handlePongTimeout();
+
+  void scheduleReconnect();
+  void resetReconnectSchedule();
+
+  void makeConnection();
 
  public:  // constructor and destructor
 
@@ -65,6 +77,7 @@ class HubWebSocket : public Hub {
  signals:  // methods
 
   void OnErrorOccurred(QAbstractSocket::SocketError) override;
+  void OnConnecting() override;
   void OnConnected() override;
   void OnDisconnected(QWebSocketProtocol::CloseCode code, QString reason) override;
 

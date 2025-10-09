@@ -82,6 +82,7 @@ class Application : public SingleApplication {
   void handleSyncRequest(QVector<QPair<QString, QByteArray>> data);
   void handleAuthTokenChanged(std::optional<syncing::wan::AuthTokenDto> token);
   void handleRechabilityChanged(QNetworkInformation::Reachability);
+  void handleConnectingToHub();
 
   void onTrayIconClicked(QSystemTrayIcon::ActivationReason reason);
   void openClipbird();

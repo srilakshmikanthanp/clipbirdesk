@@ -38,6 +38,8 @@ QFuture<void> WanViewModel::connectToHub() {
     }).unwrap();
   };
 
+  emit this->wanController->onConnecting();
+
   return utility::functions::toFuture(
     storage::SecureStorage::instance().getHubHostDevice(),
     &storage::ReadHubHostDeviceJob::device

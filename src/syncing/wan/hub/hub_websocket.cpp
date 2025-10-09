@@ -16,15 +16,16 @@ namespace srilakshmikanthanp::clipbirdesk::syncing::wan {
 HubWebSocket::HubWebSocket(HubHostDevice hubHostDevice, QObject* parent) : Hub(hubHostDevice, parent) {;
   QObject::connect(webSocket, &QWebSocket::textMessageReceived, this, &HubWebSocket::handleTextMessage);
   QObject::connect(webSocket, &QWebSocket::errorOccurred, this, &HubWebSocket::OnErrorOccurred);
-
-  pingTimer->setInterval(30000);
-  pongTimer->setInterval(60000);
-
   QObject::connect(webSocket, &QWebSocket::disconnected, this, &HubWebSocket::handleDisconnected);
   QObject::connect(webSocket, &QWebSocket::connected, this, &HubWebSocket::handleConnected);
   QObject::connect(pingTimer, &QTimer::timeout, this, &HubWebSocket::handlePingTimeout);
   QObject::connect(webSocket, &QWebSocket::pong, this, &HubWebSocket::handlePong);
   QObject::connect(pongTimer, &QTimer::timeout, this, &HubWebSocket::handlePongTimeout);
+  QObject::connect(reconnectTimer, &QTimer::timeout, this, &HubWebSocket::makeConnection);
+
+  reconnectTimer->setSingleShot(true);
+  pingTimer->setInterval(30000);
+  pongTimer->setInterval(60000);
 
   hubMessageHandler->setPayloadHandler(new HubMessageClipboardDispatchPayloadHandler(this));
   hubMessageHandler->setPayloadHandler(new HubMessageDeviceAddedPayloadHandler(this));
@@ -57,12 +58,14 @@ void HubWebSocket::handleConnected() {
   pingTimer->start();
   pongTimer->start();
   lastPong.start();
+  this->resetReconnectSchedule();
 }
 
 void HubWebSocket::handleDisconnected() {
   pingTimer->stop();
   pongTimer->stop();
   emit OnDisconnected(webSocket->closeCode(), webSocket->closeReason());
+  if (webSocket->closeCode() != QWebSocketProtocol::CloseCodeNormal) this->scheduleReconnect();
 }
 
 void HubWebSocket::handlePingTimeout() {
@@ -74,19 +77,35 @@ void HubWebSocket::handlePong() {
 }
 
 void HubWebSocket::handlePongTimeout() {
-  if (lastPong.elapsed() > 60000) {
-    webSocket->close(QWebSocketProtocol::CloseCodeAbnormalDisconnection, "Pong timeout");
-  }
+  if (lastPong.elapsed() > 30000) webSocket->close(QWebSocketProtocol::CloseCodeAbnormalDisconnection, "Pong timeout");
+}
+
+void HubWebSocket::scheduleReconnect() {
+  if (reconnectTimer->isActive() || this->isReady()) return;
+  int delay = std::min(static_cast<int>(baseDelayMs * std::pow(backOffFactor, reconnectAttempts)), maxDelayMs);
+  reconnectTimer->start(delay);
+  reconnectAttempts++;
+}
+
+void HubWebSocket::resetReconnectSchedule() {
+  reconnectAttempts = 0;
+  reconnectTimer->stop();
+}
+
+void HubWebSocket::makeConnection() {
+  QNetworkRequest request(QUrl(QString("%1/%2").arg(constants::getClipbirdWebSocketUrl()).arg(HUB_BASE_URL)));
+  request.setRawHeader(AUTHORIZATION_HEADER, QString("Bearer %1").arg(AuthTokenHolder::instance().getAuthTokenOrThrow().token).toUtf8());
+  request.setRawHeader(DEVICE_ID_HEADER, getHubHostDevice().id.toUtf8());
+  emit OnConnecting();
+  webSocket->open(request);
 }
 
 /**
  * @brief Connect to the hub
  */
 void HubWebSocket::connect() {
-  QNetworkRequest request(QUrl(QString("%1/%2").arg(constants::getClipbirdWebSocketUrl()).arg(HUB_BASE_URL)));
-  request.setRawHeader(AUTHORIZATION_HEADER, QString("Bearer %1").arg(AuthTokenHolder::instance().getAuthTokenOrThrow().token).toUtf8());
-  request.setRawHeader(DEVICE_ID_HEADER, getHubHostDevice().id.toUtf8());
-  webSocket->open(request);
+  this->resetReconnectSchedule();
+  this->makeConnection();
 }
 
 /**
