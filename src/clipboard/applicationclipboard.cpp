@@ -5,7 +5,7 @@ namespace srilakshmikanthanp::clipbirdesk::clipboard {
  * @brief Slot to notify the clipboard change
  */
 void ApplicationClipboard::onClipboardChangeImpl(QClipboard::Mode mode) {
-  if (!QApplication::clipboard()->ownsClipboard() && mode != QClipboard::Mode::Clipboard) {
+  if (!QApplication::clipboard()->ownsClipboard() && mode == QClipboard::Mode::Clipboard) {
     this->get().then([this](QVector<QPair<QString, QByteArray>> result){ if (!result.isEmpty()) emit OnClipboardChange(result); });
   }
 }
@@ -32,35 +32,29 @@ ApplicationClipboard::ApplicationClipboard(QObject* parent) : QObject(parent) {
  */
 QFuture<QVector<QPair<QString, QByteArray>>> ApplicationClipboard::get() const {
   const auto mimeData = m_clipboard->mimeData(QClipboard::Mode::Clipboard);
-  auto clone = std::make_shared<QMimeData>();
+  QVector<QPair<QString, QByteArray>> items;
+  std::optional<QImage> image;
 
-  if (mimeData) {
-    const auto formats = mimeData->formats();
-    for (const auto& format : formats) {
-      clone->setData(format, mimeData->data(format));
-    }
+  if (mimeData->hasHtml()) {
+    items.append({MIME_TYPE_HTML, mimeData->html().toUtf8()});
   }
 
-  return QtConcurrent::run([clone, this]() {
-    QVector<QPair<QString, QByteArray>> items;
+  if (mimeData->hasText()) {
+    items.append({MIME_TYPE_TEXT, mimeData->text().toUtf8()});
+  }
 
-    if (clone->hasHtml()) {
-      items.append({MIME_TYPE_HTML, clone->html().toUtf8()});
-    }
+  if (mimeData->hasImage()) {
+    image = qvariant_cast<QImage>(mimeData->imageData());
+  }
 
-    if (clone->hasImage()) {
-      auto image = qvariant_cast<QImage>(clone->imageData());
-      QByteArray data;
-      QBuffer buffer(&data);
+  return QtConcurrent::run([items, image, this]() mutable {
+    if (image.has_value() && !image->isNull()) {
+      QByteArray byteArray;
+      QBuffer buffer(&byteArray);
       buffer.open(QIODevice::WriteOnly);
-      image.save(&buffer, IMAGE_TYPE_PNG);
-      items.append({MIME_TYPE_PNG, data});
+      image->save(&buffer, IMAGE_TYPE_PNG);
+      items.append({MIME_TYPE_PNG, byteArray});
     }
-
-    if (clone->hasText()) {
-      items.append({MIME_TYPE_TEXT, clone->text().toUtf8()});
-    }
-
     return items;
   });
 }
