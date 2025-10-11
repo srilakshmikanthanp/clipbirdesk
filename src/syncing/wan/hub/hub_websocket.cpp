@@ -10,12 +10,9 @@
 #include "hub_message_nonce_challenge_completed_payload_handler.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing::wan {
-/**
- *  @brief Construct a new Hub Web Socket Impl object
- */
 HubWebSocket::HubWebSocket(HubHostDevice hubHostDevice, QObject* parent) : Hub(hubHostDevice, parent) {;
   QObject::connect(webSocket, &QWebSocket::textMessageReceived, this, &HubWebSocket::handleTextMessage);
-  QObject::connect(webSocket, &QWebSocket::errorOccurred, this, &HubWebSocket::OnErrorOccurred);
+  QObject::connect(webSocket, &QWebSocket::errorOccurred, this, &HubWebSocket::handleErrorOccured);
   QObject::connect(webSocket, &QWebSocket::disconnected, this, &HubWebSocket::handleDisconnected);
   QObject::connect(webSocket, &QWebSocket::connected, this, &HubWebSocket::handleConnected);
   QObject::connect(pingTimer, &QTimer::timeout, this, &HubWebSocket::handlePingTimeout);
@@ -36,14 +33,13 @@ HubWebSocket::HubWebSocket(HubHostDevice hubHostDevice, QObject* parent) : Hub(h
   hubMessageHandler->setPayloadHandler(new HubMessageNonceChallengeCompletedPayloadHandler(this));
 }
 
-/**
- * @brief Destroy the Hub Web Socket Impl object
- */
 HubWebSocket::~HubWebSocket() = default;
 
-/**
- * @brief Handle text message
- */
+void HubWebSocket::handleErrorOccured(QAbstractSocket::SocketError error) {
+  emit OnErrorOccurred(error);
+  this->scheduleReconnect();
+}
+
 void HubWebSocket::handleTextMessage(const QString& message) {
   try {
     nlohmann::json j = nlohmann::json::parse(message.toUtf8());
@@ -100,31 +96,19 @@ void HubWebSocket::makeConnection() {
   webSocket->open(request);
 }
 
-/**
- * @brief Connect to the hub
- */
 void HubWebSocket::connect() {
   this->resetReconnectSchedule();
   this->makeConnection();
 }
 
-/**
- * @brief disconnect from the hub
- */
 void HubWebSocket::disconnect() {
   webSocket->close();
 }
 
-/**
- * @brief isReady
- */
 bool HubWebSocket::isReady() {
   return webSocket->isValid();
 }
 
-/**
- * @brief send message to the hub
- */
 void HubWebSocket::sendMessage(const QString& message) {
   if (webSocket->isValid()) {
     webSocket->sendTextMessage(message);

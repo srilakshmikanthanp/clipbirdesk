@@ -41,6 +41,7 @@ class HubWebSocket : public Hub {
 
  private:
 
+  void handleErrorOccured(QAbstractSocket::SocketError error);
   void handleTextMessage(const QString& message);
   void handleConnected();
   void handleDisconnected();
