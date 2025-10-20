@@ -338,12 +338,14 @@ void Application::handleAuthTokenChanged(std::optional<syncing::wan::AuthTokenDt
 }
 
 void Application::handleRechabilityChanged(QNetworkInformation::Reachability rechability) {
-  if (
-    rechability == QNetworkInformation::Reachability::Online &&
-    !this->wanController->isHubConnected() &&
-    this->wanController->isHubAvailable()
-  ) {
+  if (rechability != QNetworkInformation::Reachability::Online || this->wanController->isHubConnected()) {
+    return;
+  }
+
+  if (this->wanController->isHubAvailable()) {
     this->wanController->reconnectToHub();
+  } else if (storage::Storage::instance().getHubIsConnectedLastly()) {
+    this->connectToHub();
   }
 }
 
