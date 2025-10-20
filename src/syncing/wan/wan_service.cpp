@@ -1,10 +1,10 @@
-#include "wan_view_model.hpp"
+#include "wan_service.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing::wan {
-WanViewModel::WanViewModel(syncing::wan::WanController* controller, QObject* parent): QObject(parent), wanController(controller) {}
-WanViewModel::~WanViewModel() = default;
+WanService::WanService(syncing::wan::WanController* controller, QObject* parent): QObject(parent), wanController(controller) {}
+WanService::~WanService() = default;
 
-QFuture<void> WanViewModel::connectToHub() {
+QFuture<void> WanService::connectToHub() {
  const auto updateHubHostDevice = [=, this](const syncing::wan::HubHostDevice& device) {
     auto requestDto = syncing::wan::DeviceRequestDto{ device.publicKey, device.name, device.type };
     return deviceRepository->updateDevice(device.id, requestDto).then([=, this](const syncing::wan::DeviceResponseDto& updatedDevice) {

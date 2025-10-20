@@ -73,7 +73,7 @@ QFuture<void> Application::connectToHub() {
     );
   };
 
-  return wanUiController->connectToHub()
+  return wanService->connectToHub()
   .onFailed([=, this](const QUnhandledException& e) {
     QMetaObject::invokeMethod(this, [=, this] { handleFailure(e); }, Qt::QueuedConnection);
   });
@@ -762,7 +762,7 @@ Application::~Application() {
   wanController->deleteLater();
   trayIcon->deleteLater();
   powerHandler->deleteLater();
-  wanUiController->deleteLater();
+  wanService->deleteLater();
   authController->deleteLater();
 
   clipbird->deleteLater();
