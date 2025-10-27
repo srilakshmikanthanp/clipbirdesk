@@ -73,6 +73,7 @@ void HubWebSocket::handlePongTimeout() {
 }
 
 void HubWebSocket::connect() {
+  if (isReady()) throw std::runtime_error("WebSocket is already connected");
   QNetworkRequest request(QUrl(QString("%1/%2").arg(constants::getClipbirdWebSocketUrl()).arg(HUB_BASE_URL)));
   request.setRawHeader(AUTHORIZATION_HEADER, QString("Bearer %1").arg(AuthTokenHolder::instance().getAuthTokenOrThrow().token).toUtf8());
   request.setRawHeader(DEVICE_ID_HEADER, getHubHostDevice().id.toUtf8());
