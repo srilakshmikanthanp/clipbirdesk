@@ -23,6 +23,7 @@ class WanController : public controller::Controller {
   void OnHubErrorOccurred(QAbstractSocket::SocketError);
   void OnHubConnected();
   void onConnecting();
+  void OnOpened();
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
 
  public:  // Constructors and Destructors
@@ -33,9 +34,7 @@ class WanController : public controller::Controller {
   void synchronize(const QVector<QPair<QString, QByteArray>> &data);
 
   void connectToHub(const syncing::wan::HubHostDevice &device);
-  bool isHubConnected();
+  bool isHubOpen();
   void disconnectFromHub();
-  bool isHubAvailable();
-  void reconnectToHub();
 };
 }

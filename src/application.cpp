@@ -71,6 +71,7 @@ QFuture<void> Application::connectToHub() {
       QObject::tr("Hub Connection Error Occurred: %1").arg(message),
       QIcon(QString::fromStdString(constants::getAppLogo()))
     );
+    this->scheduleReconnect();
   };
 
   return wanService->connectToHub()
@@ -215,12 +216,19 @@ void Application::handleHubConnect() {
   this->trayMenu->setHubEnabled(true);
 }
 
+void Application::handleHubOpened() {
+  this->trayMenu->setHubEnabled(true);
+  this->resetReconnectSchedule();
+}
+
 void Application::handleHubDisconnect() {
   this->trayMenu->setJoinedToHub(false);
   this->trayMenu->setHubEnabled(true);
+  this->scheduleReconnect();
 }
 
 void Application::handleHubErrorOccurred(QAbstractSocket::SocketError error) {
+  this->scheduleReconnect();
   this->trayIcon->showMessage(
     constants::getAppName(),
     QObject::tr("Hub Connection Error Occurred: %1").arg(QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(error)),
@@ -229,7 +237,7 @@ void Application::handleHubErrorOccurred(QAbstractSocket::SocketError error) {
 }
 
 void Application::handleSleepEvent() {
-  if (wanController->isHubConnected()) {
+  if (wanController->isHubOpen()) {
     wanController->disconnect();
   }
   switch (lanController->getHostType()) {
@@ -331,26 +339,36 @@ void Application::onTrayIconClicked(QSystemTrayIcon::ActivationReason reason) {
 
 void Application::handleAuthTokenChanged(std::optional<syncing::wan::AuthTokenDto> token) {
   this->trayMenu->setSignedIn(token.has_value());
-  if (!token.has_value() && this->wanController->isHubConnected()) {
+  if (!token.has_value() && this->wanController->isHubOpen()) {
     this->trayMenu->setHubEnabled(false);
     this->wanController->disconnectFromHub();
   }
 }
 
 void Application::handleRechabilityChanged(QNetworkInformation::Reachability rechability) {
-  if (rechability != QNetworkInformation::Reachability::Online || this->wanController->isHubConnected()) {
+  if (rechability != QNetworkInformation::Reachability::Online || this->wanController->isHubOpen()) {
     return;
   }
 
-  if (this->wanController->isHubAvailable()) {
-    this->wanController->reconnectToHub();
-  } else if (storage::Storage::instance().getHubIsConnectedLastly()) {
-    this->connectToHub();
+  if (!this->wanController->isHubOpen() && storage::Storage::instance().getHubIsConnectedLastly()) {
+    this->scheduleReconnect();
   }
 }
 
 void Application::handleConnectingToHub() {
   this->trayMenu->setHubEnabled(false);
+}
+
+void Application::scheduleReconnect() {
+  if (reconnectTimer->isActive() || this->wanController->isHubOpen()) return;
+  int delay = std::min(static_cast<int>(baseDelayMs * std::pow(backOffFactor, reconnectAttempts)), maxDelayMs);
+  reconnectTimer->start(delay);
+  reconnectAttempts++;
+}
+
+void Application::resetReconnectSchedule() {
+  reconnectAttempts = 0;
+  reconnectTimer->stop();
 }
 
 void Application::openClipbird() {
@@ -457,11 +475,13 @@ void Application::onAccountClicked() {
 }
 
 void Application::onHubClicked() {
-  if (this->wanController->isHubConnected()) {
+  if (this->wanController->isHubOpen()) {
     storage::Storage::instance().setIsConnectedToHubLastly(false);
+    this->resetReconnectSchedule();
     wanController->disconnectFromHub();
   } else {
     storage::Storage::instance().setIsConnectedToHubLastly(true);
+    this->resetReconnectSchedule();
     this->connectToHub();
   }
 }
@@ -732,11 +752,23 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     this, &Application::handleConnectingToHub
   );
 
+  QObject::connect(
+    reconnectTimer, &QTimer::timeout,
+    this, &Application::connectToHub
+  );
+
+  connect(
+    wanController, &syncing::wan::WanController::OnOpened,
+    this, &Application::handleHubOpened
+  );
+
   if (storage::Storage::instance().getHostIsLastlyServer()) {
     clipbird->setTabAsServer();
   } else {
     clipbird->setTabAsClient();
   }
+
+  reconnectTimer->setSingleShot(true);
 
   utility::functions::toFuture(storage::SecureStorage::instance().getHubAuthToken(), &storage::ReadAuthTokenDtoJob::authToken)
   .then([=, this](std::optional<syncing::wan::AuthTokenDto> token) {

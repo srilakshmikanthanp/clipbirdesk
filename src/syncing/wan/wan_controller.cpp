@@ -32,6 +32,11 @@ void WanController::connectToHub(const syncing::wan::HubHostDevice &device) {
   );
 
   connect(
+    &*m_hub, &syncing::wan::HubWebSocket::OnOpened,
+    this, &WanController::OnOpened
+  );
+
+  connect(
     &*m_hub, &syncing::wan::HubWebSocket::OnDisconnected,
     this, &WanController::OnHubDisconnected
   );
@@ -49,7 +54,7 @@ void WanController::connectToHub(const syncing::wan::HubHostDevice &device) {
   m_hub->connect();
 }
 
-bool WanController::isHubConnected() {
+bool WanController::isHubOpen() {
   return m_hub && m_hub->isReady();
 }
 
@@ -59,21 +64,5 @@ void WanController::disconnectFromHub() {
   }
 
   m_hub->disconnect();
-}
-
-bool WanController::isHubAvailable() {
-  return m_hub != nullptr;
-}
-
-void WanController::reconnectToHub() {
-  if (!m_hub) {
-    throw std::runtime_error("Hub is not available");
-  }
-
-  if (m_hub->isReady()) {
-    throw std::runtime_error("Hub is already connected");
-  }
-
-  m_hub->connect();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::syncing::wan

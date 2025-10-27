@@ -39,6 +39,7 @@ class Hub : public Synchronizer {
   virtual void OnErrorOccurred(QAbstractSocket::SocketError) = 0;
   virtual void OnConnecting() = 0;
   virtual void OnConnected() = 0;
+  virtual void OnOpened() = 0;
   virtual void OnDisconnected(QWebSocketProtocol::CloseCode code, QString reason) = 0;
 
  public:

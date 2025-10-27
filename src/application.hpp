@@ -71,6 +71,7 @@ class Application : public SingleApplication {
   void handleConnect(QString ip, QString port);
   void handleSignin(QString email, QString password);
   void handleHubConnect();
+  void handleHubOpened();
   void handleHubDisconnect();
   void handleHubErrorOccurred(QAbstractSocket::SocketError);
   void handleSleepEvent();
@@ -83,6 +84,9 @@ class Application : public SingleApplication {
   void handleAuthTokenChanged(std::optional<syncing::wan::AuthTokenDto> token);
   void handleRechabilityChanged(QNetworkInformation::Reachability);
   void handleConnectingToHub();
+
+  void scheduleReconnect();
+  void resetReconnectSchedule();
 
   void onTrayIconClicked(QSystemTrayIcon::ActivationReason reason);
   void openClipbird();
@@ -135,6 +139,13 @@ class Application : public SingleApplication {
   using AuthApiRepository = syncing::wan::AuthApiRepository;
   using Server = syncing::lan::Server;
   using Client = syncing::lan::Client;
+
+ private:
+  QTimer* reconnectTimer = new QTimer(this);
+  const double backOffFactor = 2.0;
+  const int baseDelayMs = 2000;
+  const int maxDelayMs = 60000;
+  int reconnectAttempts = 0;
 
  private:  // Disable Copy, Move and Assignment
 

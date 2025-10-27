@@ -18,9 +18,7 @@ HubWebSocket::HubWebSocket(HubHostDevice hubHostDevice, QObject* parent) : Hub(h
   QObject::connect(pingTimer, &QTimer::timeout, this, &HubWebSocket::handlePingTimeout);
   QObject::connect(webSocket, &QWebSocket::pong, this, &HubWebSocket::handlePong);
   QObject::connect(pongTimer, &QTimer::timeout, this, &HubWebSocket::handlePongTimeout);
-  QObject::connect(reconnectTimer, &QTimer::timeout, this, &HubWebSocket::makeConnection);
 
-  reconnectTimer->setSingleShot(true);
   pingTimer->setInterval(30000);
   pongTimer->setInterval(60000);
 
@@ -37,7 +35,6 @@ HubWebSocket::~HubWebSocket() = default;
 
 void HubWebSocket::handleErrorOccured(QAbstractSocket::SocketError error) {
   emit OnErrorOccurred(error);
-  this->scheduleReconnect();
 }
 
 void HubWebSocket::handleTextMessage(const QString& message) {
@@ -54,14 +51,13 @@ void HubWebSocket::handleConnected() {
   pingTimer->start();
   pongTimer->start();
   lastPong.start();
-  this->resetReconnectSchedule();
+  emit OnOpened();
 }
 
 void HubWebSocket::handleDisconnected() {
   pingTimer->stop();
   pongTimer->stop();
   emit OnDisconnected(webSocket->closeCode(), webSocket->closeReason());
-  if (webSocket->closeCode() != QWebSocketProtocol::CloseCodeNormal) this->scheduleReconnect();
 }
 
 void HubWebSocket::handlePingTimeout() {
@@ -76,29 +72,12 @@ void HubWebSocket::handlePongTimeout() {
   if (lastPong.elapsed() > 30000) webSocket->close(QWebSocketProtocol::CloseCodeAbnormalDisconnection, "Pong timeout");
 }
 
-void HubWebSocket::scheduleReconnect() {
-  if (reconnectTimer->isActive() || this->isReady()) return;
-  int delay = std::min(static_cast<int>(baseDelayMs * std::pow(backOffFactor, reconnectAttempts)), maxDelayMs);
-  reconnectTimer->start(delay);
-  reconnectAttempts++;
-}
-
-void HubWebSocket::resetReconnectSchedule() {
-  reconnectAttempts = 0;
-  reconnectTimer->stop();
-}
-
-void HubWebSocket::makeConnection() {
+void HubWebSocket::connect() {
   QNetworkRequest request(QUrl(QString("%1/%2").arg(constants::getClipbirdWebSocketUrl()).arg(HUB_BASE_URL)));
   request.setRawHeader(AUTHORIZATION_HEADER, QString("Bearer %1").arg(AuthTokenHolder::instance().getAuthTokenOrThrow().token).toUtf8());
   request.setRawHeader(DEVICE_ID_HEADER, getHubHostDevice().id.toUtf8());
   emit OnConnecting();
   webSocket->open(request);
-}
-
-void HubWebSocket::connect() {
-  this->resetReconnectSchedule();
-  this->makeConnection();
 }
 
 void HubWebSocket::disconnect() {
