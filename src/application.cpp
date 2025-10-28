@@ -339,6 +339,7 @@ void Application::onTrayIconClicked(QSystemTrayIcon::ActivationReason reason) {
 
 void Application::handleAuthTokenChanged(std::optional<syncing::wan::AuthTokenDto> token) {
   this->trayMenu->setSignedIn(token.has_value());
+  this->resetReconnectSchedule();
   if (!token.has_value() && this->wanController->isHubOpen()) {
     this->trayMenu->setHubEnabled(false);
     this->wanController->disconnectFromHub();
