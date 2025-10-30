@@ -37,11 +37,21 @@ class WanService : public QObject {
   AuthRepository *authRepository = new AuthApiRepository(new AuthApiClient(this), this);
   syncing::wan::WanController *wanController;
 
+ private:
+  QTimer* reconnectTimer = new QTimer(this);
+  const double backOffFactor = 2.0;
+  const int baseDelayMs = 2000;
+  const int maxDelayMs = 60000;
+  int reconnectAttempts = 0;
+
  public:  // Constructors and Destructors
 
   WanService(syncing::wan::WanController* wanController, QObject *parent = nullptr);
+  syncing::wan::WanController* getWanController() const;
   virtual ~WanService();
-
   QFuture<void> connectToHub();
+  void scheduleReconnect();
+  void resetReconnectSchedule();
+  void disconnectFromHub();
 };
 }

@@ -23,6 +23,7 @@
 
 // C++ Headers
 #include <csignal>
+#include <functional>
 
 // Project Headers
 #include "constants/constants.hpp"
@@ -63,16 +64,15 @@ class Application : public SingleApplication {
   QSslConfiguration getNewSslConfiguration();
   QSslConfiguration getSslConfiguration();
 
-  QFuture<void> connectToHub();
-
+  void handleHubConnectionError(const QUnhandledException& e);
   void handleConnectionError(QString error);
   void handleTabChange(ui::gui::widgets::Clipbird::Tabs tab);
   void handleAuthRequest(const types::Device& client);
   void handleConnect(QString ip, QString port);
   void handleSignin(QString email, QString password);
-  void handleHubConnect();
+  void handleHubConnected();
   void handleHubOpened();
-  void handleHubDisconnect();
+  void handleHubDisconnected(QWebSocketProtocol::CloseCode code, QString reason);
   void handleHubErrorOccurred(QAbstractSocket::SocketError);
   void handleSleepEvent();
   void handleWakeUpEvent();
@@ -84,9 +84,6 @@ class Application : public SingleApplication {
   void handleAuthTokenChanged(std::optional<syncing::wan::AuthTokenDto> token);
   void handleRechabilityChanged(QNetworkInformation::Reachability);
   void handleConnectingToHub();
-
-  void scheduleReconnect();
-  void resetReconnectSchedule();
 
   void onTrayIconClicked(QSystemTrayIcon::ActivationReason reason);
   void openClipbird();
@@ -139,13 +136,6 @@ class Application : public SingleApplication {
   using AuthApiRepository = syncing::wan::AuthApiRepository;
   using Server = syncing::lan::Server;
   using Client = syncing::lan::Client;
-
- private:
-  QTimer* reconnectTimer = new QTimer(this);
-  const double backOffFactor = 2.0;
-  const int baseDelayMs = 2000;
-  const int maxDelayMs = 60000;
-  int reconnectAttempts = 0;
 
  private:  // Disable Copy, Move and Assignment
 

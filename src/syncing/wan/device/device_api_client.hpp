@@ -7,6 +7,7 @@
 #include "constants/constants.hpp"
 #include "device_request_dto.hpp"
 #include "device_response_dto.hpp"
+#include "syncing/wan/auth/auth_error.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing::wan {
 class DeviceApiClient : public QObject {

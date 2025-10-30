@@ -23,12 +23,12 @@ void WanController::connectToHub(const syncing::wan::HubHostDevice &device) {
 
   connect(
     &*m_hub, &syncing::wan::HubWebSocket::OnErrorOccurred,
-    this, &WanController::OnHubErrorOccurred
+    this, &WanController::OnErrorOccurred
   );
 
   connect(
     &*m_hub, &syncing::wan::HubWebSocket::OnConnected,
-    this, &WanController::OnHubConnected
+    this, &WanController::OnConnected
   );
 
   connect(
@@ -38,7 +38,7 @@ void WanController::connectToHub(const syncing::wan::HubHostDevice &device) {
 
   connect(
     &*m_hub, &syncing::wan::HubWebSocket::OnDisconnected,
-    this, &WanController::OnHubDisconnected
+    this, &WanController::OnDisconnected
   );
 
   connect(

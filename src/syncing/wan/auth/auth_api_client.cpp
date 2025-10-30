@@ -15,6 +15,9 @@ QFuture<AuthTokenDto> AuthApiClient::signIn(BasicAuthRequestDto dto) {
         cpr::Body{nlohmann::json(dto).dump()},
         cpr::Header{{"Content-Type", "application/json"}}
     );
+    if (res.error && res.status_code == 401) {
+      throw AuthError("Invalid username or password");
+    }
     if (res.error) {
       throw std::runtime_error(res.error.message);
     }

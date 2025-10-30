@@ -7,6 +7,7 @@
 #include "constants/constants.hpp"
 #include "auth_token_dto.hpp"
 #include "basic_auth_request_dto.hpp"
+#include "auth_error.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing::wan {
 class AuthApiClient : public QObject {

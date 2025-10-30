@@ -57,27 +57,29 @@ QSslConfiguration Application::getSslConfiguration() {
   return config;
 }
 
-QFuture<void> Application::connectToHub() {
+void Application::handleHubConnectionError(const QUnhandledException& e) {
   const auto handleFailure = [=, this](const QUnhandledException& e) {
     QString message = "There was an error while connecting to hub";
     try {
       if (e.exception()) std::rethrow_exception(e.exception());
+    } catch (const syncing::wan::AuthError& e) {
+      message = QString::fromStdString(e.what());
     } catch (const std::exception& e) {
       message = QString::fromStdString(e.what());
+      this->wanService->connectToHub().onFailed([=, this](const QUnhandledException& e) { handleHubConnectionError(e); });
     }
+    this->wanService->scheduleReconnect();
     this->trayMenu->setHubEnabled(true);
     this->trayIcon->showMessage(
       constants::getAppName(),
       QObject::tr("Hub Connection Error Occurred: %1").arg(message),
       QIcon(QString::fromStdString(constants::getAppLogo()))
     );
-    this->scheduleReconnect();
   };
 
-  return wanService->connectToHub()
-  .onFailed([=, this](const QUnhandledException& e) {
-    QMetaObject::invokeMethod(this, [=, this] { handleFailure(e); }, Qt::QueuedConnection);
-  });
+  QMetaObject::invokeMethod(this, [=, this] {
+    handleFailure(e);
+  }, Qt::QueuedConnection);
 }
 
 void Application::handleConnectionError(QString error) {
@@ -211,24 +213,23 @@ void Application::handleSignin(QString email, QString password) {
   });
 }
 
-void Application::handleHubConnect() {
+void Application::handleHubConnected() {
   this->trayMenu->setJoinedToHub(true);
   this->trayMenu->setHubEnabled(true);
 }
 
 void Application::handleHubOpened() {
-  this->trayMenu->setHubEnabled(true);
-  this->resetReconnectSchedule();
+  this->wanService->resetReconnectSchedule();
 }
 
-void Application::handleHubDisconnect() {
-  this->trayMenu->setJoinedToHub(false);
+void Application::handleHubDisconnected(QWebSocketProtocol::CloseCode code, QString reason) {
+  if (code != QWebSocketProtocol::CloseCodeNormal) this->wanService->scheduleReconnect();
   this->trayMenu->setHubEnabled(true);
-  this->scheduleReconnect();
+  this->trayMenu->setJoinedToHub(false);
 }
 
 void Application::handleHubErrorOccurred(QAbstractSocket::SocketError error) {
-  this->scheduleReconnect();
+  this->wanService->scheduleReconnect();
   this->trayIcon->showMessage(
     constants::getAppName(),
     QObject::tr("Hub Connection Error Occurred: %1").arg(QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(error)),
@@ -253,7 +254,7 @@ void Application::handleSleepEvent() {
 
 void Application::handleWakeUpEvent() {
   if (storage::Storage::instance().getHubIsConnectedLastly()) {
-    this->connectToHub();
+    wanService->connectToHub().onFailed([=, this](const QUnhandledException& e) { handleHubConnectionError(e); });
   }
   if (storage::Storage::instance().getHostIsLastlyServer()) {
     lanController->setHostAsServer();
@@ -339,10 +340,9 @@ void Application::onTrayIconClicked(QSystemTrayIcon::ActivationReason reason) {
 
 void Application::handleAuthTokenChanged(std::optional<syncing::wan::AuthTokenDto> token) {
   this->trayMenu->setSignedIn(token.has_value());
-  this->resetReconnectSchedule();
   if (!token.has_value() && this->wanController->isHubOpen()) {
     this->trayMenu->setHubEnabled(false);
-    this->wanController->disconnectFromHub();
+    this->wanService->disconnectFromHub();
   }
 }
 
@@ -352,24 +352,12 @@ void Application::handleRechabilityChanged(QNetworkInformation::Reachability rec
   }
 
   if (!this->wanController->isHubOpen() && storage::Storage::instance().getHubIsConnectedLastly()) {
-    this->scheduleReconnect();
+    wanService->connectToHub().onFailed([=, this](const QUnhandledException& e) { handleHubConnectionError(e); });
   }
 }
 
 void Application::handleConnectingToHub() {
   this->trayMenu->setHubEnabled(false);
-}
-
-void Application::scheduleReconnect() {
-  if (reconnectTimer->isActive() || this->wanController->isHubOpen()) return;
-  int delay = std::min(static_cast<int>(baseDelayMs * std::pow(backOffFactor, reconnectAttempts)), maxDelayMs);
-  reconnectTimer->start(delay);
-  reconnectAttempts++;
-}
-
-void Application::resetReconnectSchedule() {
-  reconnectAttempts = 0;
-  reconnectTimer->stop();
 }
 
 void Application::openClipbird() {
@@ -477,13 +465,9 @@ void Application::onAccountClicked() {
 
 void Application::onHubClicked() {
   if (this->wanController->isHubOpen()) {
-    storage::Storage::instance().setIsConnectedToHubLastly(false);
-    this->resetReconnectSchedule();
-    wanController->disconnectFromHub();
+    wanService->disconnectFromHub();
   } else {
-    storage::Storage::instance().setIsConnectedToHubLastly(true);
-    this->resetReconnectSchedule();
-    this->connectToHub();
+    wanService->connectToHub().onFailed([=, this](const QUnhandledException& e) { handleHubConnectionError(e); });
   }
 }
 
@@ -662,18 +646,18 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
   );
 
   connect(
-    wanController, &syncing::wan::WanController::OnHubErrorOccurred,
+    wanController, &syncing::wan::WanController::OnErrorOccurred,
     this, &Application::handleHubErrorOccurred
   );
 
   connect(
-    wanController, &syncing::wan::WanController::OnHubConnected,
-    this, &Application::handleHubConnect
+    wanController, &syncing::wan::WanController::OnConnected,
+    this, &Application::handleHubConnected
   );
 
   connect(
-    wanController, &syncing::wan::WanController::OnHubDisconnected,
-    this, &Application::handleHubDisconnect
+    wanController, &syncing::wan::WanController::OnDisconnected,
+    this, &Application::handleHubDisconnected
   );
 
   connect(
@@ -753,11 +737,6 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     this, &Application::handleConnectingToHub
   );
 
-  QObject::connect(
-    reconnectTimer, &QTimer::timeout,
-    this, &Application::connectToHub
-  );
-
   connect(
     wanController, &syncing::wan::WanController::OnOpened,
     this, &Application::handleHubOpened
@@ -769,12 +748,14 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     clipbird->setTabAsClient();
   }
 
-  reconnectTimer->setSingleShot(true);
-
   utility::functions::toFuture(storage::SecureStorage::instance().getHubAuthToken(), &storage::ReadAuthTokenDtoJob::authToken)
   .then([=, this](std::optional<syncing::wan::AuthTokenDto> token) {
-    if (token.has_value()) syncing::wan::AuthTokenHolder::instance().setAuthToken(token.value());
-    if (token.has_value() && storage::Storage::instance().getHubIsConnectedLastly()) connectToHub();
+    if (token.has_value()) {
+      syncing::wan::AuthTokenHolder::instance().setAuthToken(token.value());
+    }
+    if (token.has_value() && storage::Storage::instance().getHubIsConnectedLastly()) {
+      wanService->connectToHub().onFailed([=, this](const QUnhandledException& e) { handleHubConnectionError(e); });
+    }
   }).onFailed([=, this](const QUnhandledException& e) {
     QString message = "There was an error while reading Jwt token";
     try {

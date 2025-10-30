@@ -19,9 +19,9 @@ class WanController : public controller::Controller {
 
  signals:
 
-  void OnHubDisconnected(QWebSocketProtocol::CloseCode code, QString reason);
-  void OnHubErrorOccurred(QAbstractSocket::SocketError);
-  void OnHubConnected();
+  void OnDisconnected(QWebSocketProtocol::CloseCode code, QString reason);
+  void OnErrorOccurred(QAbstractSocket::SocketError);
+  void OnConnected();
   void onConnecting();
   void OnOpened();
   void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);

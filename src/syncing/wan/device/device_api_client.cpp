@@ -29,6 +29,9 @@ QFuture<DeviceResponseDto> DeviceApiClient::createDevice(DeviceRequestDto dto) {
           {"Content-Type", "application/json"}
         }
     );
+    if (res.error && res.status_code == 401) {
+      throw AuthError("Invalid username or password");
+    }
     if (res.error) {
       throw std::runtime_error(res.error.message);
     }
@@ -49,6 +52,9 @@ QFuture<DeviceResponseDto> DeviceApiClient::updateDevice(const QString& id, Devi
           {"Content-Type", "application/json"}
         }
     );
+    if (res.error && res.status_code == 401) {
+      throw AuthError("Invalid username or password");
+    }
     if (res.error) {
       throw std::runtime_error(res.error.message);
     }

@@ -1,7 +1,15 @@
 #include "wan_service.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing::wan {
-WanService::WanService(syncing::wan::WanController* controller, QObject* parent): QObject(parent), wanController(controller) {}
+WanService::WanService(syncing::wan::WanController* controller, QObject* parent): QObject(parent), wanController(controller) {
+  QObject::connect(reconnectTimer, &QTimer::timeout, this, &WanService::connectToHub);
+  reconnectTimer->setSingleShot(true);
+}
+
+syncing::wan::WanController* WanService::getWanController() const {
+  return wanController;
+}
+
 WanService::~WanService() = default;
 
 QFuture<void> WanService::connectToHub() {
@@ -38,6 +46,8 @@ QFuture<void> WanService::connectToHub() {
     }).unwrap();
   };
 
+  storage::Storage::instance().setIsConnectedToHubLastly(true);
+  this->resetReconnectSchedule();
   emit this->wanController->onConnecting();
 
   return utility::functions::toFuture(
@@ -60,5 +70,23 @@ QFuture<void> WanService::connectToHub() {
   .then([=, this](const syncing::wan::HubHostDevice& device) {
     wanController->connectToHub(device);
   });
+}
+
+void WanService::scheduleReconnect() {
+  if (reconnectTimer->isActive() || this->wanController->isHubOpen()) return;
+  int delay = std::min(static_cast<int>(baseDelayMs * std::pow(backOffFactor, reconnectAttempts)), maxDelayMs);
+  reconnectTimer->start(delay);
+  reconnectAttempts++;
+}
+
+void WanService::resetReconnectSchedule() {
+  reconnectAttempts = 0;
+  reconnectTimer->stop();
+}
+
+void WanService::disconnectFromHub() {
+  storage::Storage::instance().setIsConnectedToHubLastly(false);
+  this->wanController->disconnectFromHub();
+  this->resetReconnectSchedule();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::syncing::wan
