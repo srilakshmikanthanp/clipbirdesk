@@ -92,7 +92,7 @@ std::shared_ptr<X509> generateX509(std::shared_ptr<EVP_PKEY> pkey) {
   }
 
   // get local host name
-  auto cname = constants::getMDnsServiceName();
+  auto cname = constants::getMDnsServiceName().toLocal8Bit();
   auto org   = constants::getAppOrgName();
   auto unit  = constants::getAppName();
 
@@ -210,7 +210,7 @@ QPair<QSslKey, QSslKey> generateQtKeyPair(int bits) {
  * @param bits - RSA key size
  * @return QSslConfiguration
  */
-QSslConfiguration getQSslConfiguration(int bits) {
+common::types::SslConfig getQSslConfiguration(int bits) {
   // Generate the RSA key for the certificate
   std::shared_ptr<EVP_PKEY> pkey = internal::generateRSAKey(bits);
 
@@ -260,27 +260,10 @@ QSslConfiguration getQSslConfiguration(int bits) {
   QByteArray cert(QByteArray(x509_buffer_memory->data, x509_buffer_memory->length));
 
   // Create the QSslCertificate
-  QSslCertificate sslCert(cert, QSsl::Pem);
-
-  // Create the QSslConfiguration
-  QSslConfiguration sslConfig;
-
-  // Add the certificate to the configuration
-  sslConfig.setLocalCertificate(sslCert);
-
-  // Add the key to the configuration
-  sslConfig.setPrivateKey(sslKey);
-
-  // check if the configuration is valid
-  if (sslConfig.isNull()) {
-    throw std::runtime_error("Can't Create QSslConfiguration");
-  }
-
-  // set peer verify
-  sslConfig.setPeerVerifyMode(QSslSocket::VerifyPeer);
-
-  // return the configuration
-  return sslConfig;
+  return common::types::SslConfig {
+    .privateKey = key,
+    .certificate = cert
+  };
 }
 
 /**

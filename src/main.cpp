@@ -28,11 +28,16 @@
 // Project Headers
 #include "application.hpp"
 #include "constants/constants.hpp"
+#include "ui/gui/notification/joinrequest/joinrequest.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
+#include "utility/functions/ssl/ssl.hpp"
 #include "utility/appeventfilter/appeventfilter.hpp"
 #include "utility/functions/ssl/ssl.hpp"
 #include "utility/logging/logging.hpp"
 #include "utility/powerhandler/powerhandler.hpp"
+#include "common/trust/trusted_servers_factory.hpp"
+#include "common/trust/trusted_clients_factory.hpp"
+#include "common/types/ssl_config/ssl_config_factory.hpp"
 
 /**
  * @brief Global Error Handler that helps to log
@@ -49,16 +54,6 @@ void globalErrorHandler() {
   std::abort();
 }
 
-/**
- * @brief main function that starts the application
- * by ensuring that only one instance of the
- * application is running
- *
- * @param argc Unused
- * @param argv Unused
- *
- * @return int Status code
- */
 auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::constants::getAppHome;
   using srilakshmikanthanp::clipbirdesk::constants::getAppLogFile;
@@ -71,14 +66,7 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::PowerHandler;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
-  if(QNetworkInformation::loadBackendByFeatures(QNetworkInformation::Feature::Reachability)) {
-    qInfo() << "Loaded QNetworkInformation backend supporting Reachability feature";
-  } else {
-    qWarning() << "Failed to load QNetworkInformation backend supporting Reachability feature";
-  }
-
   QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
-
   QLoggingCategory::setFilterRules("*.debug=false");
 
   freopen(null_device, "w", stderr);
@@ -89,7 +77,6 @@ auto main(int argc, char **argv) -> int {
 
   Application app(argc, argv);
 
-  app.installNativeEventFilter(app.getPowerHandler());
   app.installEventFilter(new AppEventFilter());
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -154,7 +141,7 @@ auto main(int argc, char **argv) -> int {
 #endif
 
   qInstallMessageHandler(Logger::handler);
-
+  qApp->setQuitOnLastWindowClosed(false);
   std::set_terminate(globalErrorHandler);
 
   return app.exec();

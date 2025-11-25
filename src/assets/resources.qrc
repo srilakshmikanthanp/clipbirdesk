@@ -1,11 +1,4 @@
-<!--
- Copyright (c) 2023 Sri Lakshmi Kanthan P
-
- This software is released under the MIT License.
- https://opensource.org/licenses/MIT
--->
 <!DOCTYPE RCC>
-
 <RCC version="1.0">
   <qresource>
     <file>images/logo.png</file>
@@ -17,10 +10,5 @@
     <file>images/copy.png</file>
     <file>images/delete.png</file>
     <file>images/photo.png</file>
-  </qresource>
-
-  <qresource>
-    <file>styles/light.qss</file>
-    <file>styles/dark.qss</file>
   </qresource>
 </RCC>

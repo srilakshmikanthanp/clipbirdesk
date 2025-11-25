@@ -1,10 +1,5 @@
 {
   "C_Cpp.clang_format_fallbackStyle": "Google",
-  "cmake.configureSettings": {
-    "CLIPBIRD_API_DOMAIN": "clipbird-api.srilakshmikanthanp.com",
-    "CLIPBIRD_API_URL": "https://clipbird-api.srilakshmikanthanp.com",
-    "CLIPBIRD_WEBSOCKET_URL": "wss://clipbird-api.srilakshmikanthanp.com"
-  },
   "cSpell.words": [
     "Antialiasing",
     "Cilp",
@@ -199,6 +194,12 @@
     "qwebsocket": "cpp",
     "*.inc": "cpp",
     "qdbusreply": "cpp",
-    "qnetworkinformation": "cpp"
+    "qnetworkinformation": "cpp",
+    "qtglobal": "cpp",
+    "qsslsocket": "cpp",
+    "qbluetoothdevicediscoveryagent": "cpp",
+    "qsslserver": "cpp",
+    "qbluetoothlocaldevice": "cpp",
+    "qttypes": "cpp"
   },
 }

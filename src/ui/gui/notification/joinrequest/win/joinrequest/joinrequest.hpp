@@ -74,7 +74,7 @@ class JoinRequest : public QObject, public WinToastLib::IWinToastHandler {
   /**
    * @brief Show the notification
    */
-  void show(const types::Device &device);
+  void show(const QString &deviceName);
 
   /**
    * @brief Destroy the Status object

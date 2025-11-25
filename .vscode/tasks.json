@@ -16,6 +16,17 @@
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "label": "Format Qml",
+      "type": "shell",
+      "command": "/usr/local/Qt-6.9.2/bin/qmlformat",
+      "args": [
+        "--inplace",
+        "--indent-width",
+        "4",
+        "${file}"
+      ],
     }
   ]
 }

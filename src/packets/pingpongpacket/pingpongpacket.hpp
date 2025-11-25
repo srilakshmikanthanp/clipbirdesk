@@ -11,35 +11,22 @@
 #include <QtTypes>
 
 // Local header files
-#include "types/enums/enums.hpp"
-#include "types/except/except.hpp"
+#include "packets/network_packet.hpp"
+#include "packets/packet_type.hpp"
+#include "common/types/enums/enums.hpp"
+#include "common/types/exceptions/exceptions.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::packets {
 /**
  * @brief Clipboard Ping Packet's to check the connection
  */
-class PingPongPacket {
- public:
-
-  /// @brief Allowed Packet Types
-  enum PacketType : quint32 {
-    PingPong = 0x03
-  };
-
+class PingPongPacket: public NetworkPacket {
  private:  // private members
 
-  quint32 packetLength;
-  quint32 packetType = PacketType::PingPong;
+  quint32 packetType = PacketType::PING_PONG_PACKET;
   quint32 pingType;
 
  public:
-
-  /**
-   * @brief Set the Packet Length object
-   *
-   * @param length
-   */
-  void setPacketLength(quint32 length);
 
   /**
    * @brief Get the Packet Length object
@@ -47,13 +34,6 @@ class PingPongPacket {
    * @return qint32
    */
   quint32 getPacketLength() const noexcept;
-
-  /**
-   * @brief Set the Packet Type object
-   *
-   * @param type
-   */
-  void setPacketType(quint32 type);
 
   /**
    * @brief Get the Packet Type object
@@ -76,17 +56,10 @@ class PingPongPacket {
    */
   quint32 getPingType() const noexcept;
 
-    /**
-   * @brief Get the size of the packet
-   *
-   * @return size_t
-   */
-  quint32 size() const noexcept;
-
   /**
    * @brief to Bytes
    */
-  QByteArray toBytes() const;
+  QByteArray toBytes() const override;
 
   /**
    * @brief From Bytes

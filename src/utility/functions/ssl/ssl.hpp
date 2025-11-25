@@ -22,6 +22,7 @@
 
 // local headers
 #include "constants/constants.hpp"
+#include "common/types/ssl_config/ssl_config.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions::internal {
   /**
@@ -44,7 +45,7 @@ QPair<QSslKey, QSslKey> generateQtKeyPair(int bits = 2048);
  * @param bits - RSA key size
  * @return QSslConfiguration
  */
-QSslConfiguration getQSslConfiguration(int bits = 2048);
+common::types::SslConfig getQSslConfiguration(int bits = 2048);
 
 /**
  * @brief Generate AES Key

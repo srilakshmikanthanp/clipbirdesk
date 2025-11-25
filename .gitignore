@@ -12,3 +12,6 @@ out
 
 # vcpkg
 CMakeUserPresets.json
+
+# Qt Qml
+.qmlls.ini

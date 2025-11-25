@@ -3,6 +3,10 @@
 // Local header files
 #include "packets/invalidrequest/invalidrequest.hpp"
 #include "packets/syncingpacket/syncingpacket.hpp"
+#include "packets/pingpongpacket/pingpongpacket.hpp"
+#include "packets/authentication/authentication.hpp"
+#include "packets/certificate_exchange_packet/certificate_exchange_packet.hpp"
+#include "packets/network_packet.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions {
 /**

@@ -35,12 +35,3 @@
 
 // META_DATA
 #define META_DATA                  (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " ").c_str()
-
-// Clipbird domain
-#define CLIPBIRD_API_DOMAIN            "@CLIPBIRD_API_DOMAIN@"
-
-// Clipbird Base URL
-#define CLIPBIRD_API_URL          "@CLIPBIRD_API_URL@"
-
-// Clipbird WebSocket URL
-#define CLIPBIRD_WEBSOCKET_URL     "@CLIPBIRD_WEBSOCKET_URL@"

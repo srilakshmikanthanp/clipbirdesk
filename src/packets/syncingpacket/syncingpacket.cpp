@@ -1,12 +1,6 @@
 #include "syncingpacket.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::packets {
-/**
- * @brief Set the Mime Length object
- */
-void SyncingItem::setMimeLength(quint32 length) {
-  this->mimeLength = length;
-}
 
 /**
  * @brief Get the Mime Length object
@@ -14,7 +8,7 @@ void SyncingItem::setMimeLength(quint32 length) {
  * @return qint32
  */
 quint32 SyncingItem::getMimeLength() const noexcept {
-  return this->mimeLength;
+  return this->mimeType.size();
 }
 
 /**
@@ -23,11 +17,7 @@ quint32 SyncingItem::getMimeLength() const noexcept {
  * @param type
  */
 void SyncingItem::setMimeType(const QByteArray& type) {
-  if (type.size() != this->mimeLength) {
-    throw std::invalid_argument("Invalid Mime Type");
-  } else {
-    this->mimeType = type;
-  }
+  this->mimeType = type;
 }
 
 /**
@@ -40,21 +30,12 @@ QByteArray SyncingItem::getMimeType() const noexcept {
 }
 
 /**
- * @brief Set the Payload Length object
- *
- * @param length
- */
-void SyncingItem::setPayloadLength(quint32 length) {
-  this->payloadLength = length;
-}
-
-/**
  * @brief Get the Payload Length object
  *
  * @return qint32
  */
 quint32 SyncingItem::getPayloadLength() const noexcept {
-  return this->payloadLength;
+  return this->payload.size();
 }
 
 /**
@@ -63,11 +44,7 @@ quint32 SyncingItem::getPayloadLength() const noexcept {
  * @param payload
  */
 void SyncingItem::setPayload(const QByteArray& payload) {
-  if (payload.size() != this->payloadLength) {
-    throw std::invalid_argument("Invalid Payload");
-  } else {
-    this->payload = payload;
-  }
+  this->payload = payload;
 }
 
 /**
@@ -86,9 +63,9 @@ QByteArray SyncingItem::getPayload() const noexcept {
  */
 quint32 SyncingItem::size() const noexcept {
   return quint32(
-    sizeof(this->mimeLength) +
+    sizeof(decltype(std::declval<SyncingItem>().getMimeLength())) +
     this->mimeType.size() +
-    sizeof(this->payloadLength) +
+    sizeof(decltype(std::declval<SyncingItem>().getPayloadLength())) +
     this->payload.size()
   );
 }
@@ -97,10 +74,10 @@ quint32 SyncingItem::size() const noexcept {
  * @brief To Stream
  */
 void SyncingItem::toStream(QDataStream& stream) const {
-  stream << this->mimeLength;
-  stream.writeRawData(this->mimeType.data(), this->mimeLength);
-  stream << this->payloadLength;
-  stream.writeRawData(this->payload.data(), this->payloadLength);
+  stream << this->getMimeLength();
+  stream.writeRawData(this->mimeType.data(), this->getMimeLength());
+  stream << this->getPayloadLength();
+  stream.writeRawData(this->payload.data(), this->getPayloadLength());
 }
 
 /**
@@ -126,22 +103,32 @@ QByteArray SyncingItem::toBytes() const {
  */
 SyncingItem SyncingItem::fromStream(QDataStream& stream) {
   // using the utility functions
-  using types::except::MalformedPacket;
-  using types::enums::ErrorCode;
+  using common::types::exceptions::MalformedPacket;
+  using common::types::enums::ErrorCode;
 
   // Create the SyncingItem
   SyncingItem pack;
 
+  quint32 mimeLength;
+  QByteArray mimeType;
+  quint32 payloadLength;
+  QByteArray payload;
+
   // Read the Packet Fields
-  stream >> pack.mimeLength; pack.mimeType.resize(pack.mimeLength);
-  stream.readRawData(pack.mimeType.data(), pack.mimeLength);
-  stream >> pack.payloadLength;pack.payload.resize(pack.payloadLength);
-  stream.readRawData(pack.payload.data(), pack.payloadLength);
+  stream >> mimeLength;
+  mimeType.resize(mimeLength);
+  stream.readRawData(mimeType.data(), mimeLength);
+  stream >> payloadLength;
+  payload.resize(payloadLength);
+  stream.readRawData(payload.data(), payloadLength);
 
   // if the stream is not good
   if (stream.status() != QDataStream::Ok) {
     throw MalformedPacket(ErrorCode::CodingError, "SyncingItem");
   }
+
+  pack.setMimeType(mimeType);
+  pack.setPayload(payload);
 
   // return the payload
   return pack;
@@ -162,32 +149,18 @@ SyncingItem SyncingItem::fromBytes(const QByteArray &array) {
 }
 
 /**
- * @brief Set the Packet Length object
- *
- * @param length
- */
-void SyncingPacket::setPacketLength(quint32 length) {
-  this->packetLength = length;
-}
-
-/**
  * @brief Get the Packet Length object
  *
  * @return qint32
  */
 quint32 SyncingPacket::getPacketLength() const noexcept {
-  return this->packetLength;
-}
+  size_t size = (sizeof(this->packetType) + sizeof(decltype(std::declval<SyncingPacket>().getPacketLength())) + sizeof(decltype(std::declval<SyncingPacket>().getItemCount())));
 
-/**
- * @brief Set the Packet Type object
- *
- * @param type
- */
-void SyncingPacket::setPacketType(quint32 type) {
-  if (type != PacketType::SyncPacket) {
-    throw std::invalid_argument("Invalid Packet Type");
+  for (const auto& payload : this->items) {
+    size += payload.size();
   }
+
+  return qint32(size);
 }
 
 /**
@@ -200,21 +173,12 @@ quint32 SyncingPacket::getPacketType() const noexcept {
 }
 
 /**
- * @brief Set the Item Count object
- *
- * @param count
- */
-void SyncingPacket::setItemCount(quint32 count) {
-  this->itemCount = count;
-}
-
-/**
  * @brief Get the Item Count object
  *
  * @return qint32
  */
 quint32 SyncingPacket::getItemCount() const noexcept {
-  return this->itemCount;
+  return this->items.size();
 }
 
 /**
@@ -223,10 +187,6 @@ quint32 SyncingPacket::getItemCount() const noexcept {
  * @param payloads
  */
 void SyncingPacket::setItems(const QVector<SyncingItem>& payloads) {
-  if (payloads.size() != this->itemCount) {
-    throw std::invalid_argument("Invalid Payloads");
-  }
-
   this->items = payloads;
 }
 
@@ -237,21 +197,6 @@ void SyncingPacket::setItems(const QVector<SyncingItem>& payloads) {
  */
 QVector<SyncingItem> SyncingPacket::getItems() const noexcept {
   return this->items;
-}
-
-/**
- * @brief Get the size of the packet
- *
- * @return size_t
- */
-quint32 SyncingPacket::size() const noexcept {
-  size_t size = (sizeof(this->packetType) + sizeof(this->packetLength) + sizeof(this->itemCount));
-
-  for (const auto& payload : this->items) {
-    size += payload.size();
-  }
-
-  return qint32(size);
 }
 
 /**
@@ -266,9 +211,9 @@ QByteArray SyncingPacket::toBytes() const {
   stream.setByteOrder(QDataStream::BigEndian);
 
   // Write the fields
-  stream << this->packetLength;
+  stream << this->getPacketLength();
   stream << this->packetType;
-  stream << this->itemCount;
+  stream << this->getItemCount();
 
   // Write the Payloads
   for (const auto& payload : this->items) {
@@ -287,8 +232,8 @@ SyncingPacket SyncingPacket::fromBytes(const QByteArray &array) {
   auto stream = QDataStream(array);
 
   // using the utility functions
-  using types::except::MalformedPacket;
-  using types::enums::ErrorCode;
+  using common::types::exceptions::MalformedPacket;
+  using common::types::enums::ErrorCode;
 
   // set the byte order
   stream.setByteOrder(QDataStream::BigEndian);
@@ -296,30 +241,38 @@ SyncingPacket SyncingPacket::fromBytes(const QByteArray &array) {
   // Create the SyncingPacket
   SyncingPacket packet;
 
-  // Read the Packet Fields
-  stream >> packet.packetLength;
-  stream >> packet.packetType;
-  stream >> packet.itemCount;
+  quint32 packetLength;
+  quint32 packetType;
+  quint32 itemCount;
 
-  // if the stream is not good
-  if (stream.status() != QDataStream::Ok) {
-    throw MalformedPacket(ErrorCode::CodingError, "SyncingPacket");
-  }
+  // Read the Packet Fields
+  stream >> packetLength;
+  stream >> packetType;
+  stream >> itemCount;
 
   // check the packet type
-  if (packet.packetType != PacketType::SyncPacket) {
-    throw types::except::NotThisPacket("Not SyncingPacket");
-  }
-
-  // Read the Payloads
-  for (quint32 i = 0; i < packet.itemCount; i++) {
-    packet.items.push_back(SyncingItem::fromStream(stream));
+  if (packetType != PacketType::SYNCING_PACKET) {
+    throw common::types::exceptions::NotThisPacket("Not SyncingPacket");
   }
 
   // if the stream is not good
   if (stream.status() != QDataStream::Ok) {
     throw MalformedPacket(ErrorCode::CodingError, "SyncingPacket");
   }
+
+  auto items = QVector<SyncingItem>();
+
+  // Read the Payloads
+  for (quint32 i = 0; i < itemCount; i++) {
+    items.push_back(SyncingItem::fromStream(stream));
+  }
+
+  // if the stream is not good
+  if (stream.status() != QDataStream::Ok) {
+    throw MalformedPacket(ErrorCode::CodingError, "SyncingPacket");
+  }
+
+  packet.setItems(items);
 
   // return the packet
   return packet;

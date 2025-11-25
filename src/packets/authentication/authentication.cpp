@@ -2,34 +2,16 @@
 
 namespace srilakshmikanthanp::clipbirdesk::packets {
 /**
- * @brief Set the Packet Length object
- *
- * @param length
- */
-void Authentication::setPacketLength(quint32 length) {
-  this->packetLength = length;
-}
-
-/**
  * @brief Get the Packet Length object
  *
  * @return qint32
  */
 quint32 Authentication::getPacketLength() const noexcept {
-  return this->packetLength;
-}
-
-/**
- * @brief Set the Packet Type object
- *
- * @param type
- */
-void Authentication::setPacketType(quint32 type) {
-  if (type != PacketType::AuthStatus) {
-    throw std::invalid_argument("Invalid Packet Type");
-  }
-
-  this->packetType = type;
+  return qint32(
+    sizeof(quint32) +
+    sizeof(this->packetType) +
+    sizeof(this->authStatus)
+  );
 }
 
 /**
@@ -47,12 +29,12 @@ quint32 Authentication::getPacketType() const noexcept {
  * @param status
  */
 void Authentication::setAuthStatus(quint32 status) {
-  if (status == types::enums::AuthStatus::AuthFail) {
+  if (status == common::types::enums::AuthStatus::AuthFail) {
     this->authStatus = status;
     return;
   }
 
-  if (status == types::enums::AuthStatus::AuthOkay) {
+  if (status == common::types::enums::AuthStatus::AuthOkay) {
     this->authStatus = status;
     return;
   }
@@ -70,19 +52,6 @@ quint32 Authentication::getAuthStatus() const noexcept {
 }
 
 /**
- * @brief Get the Size of the Packet
- *
- * @return qint32
- */
-quint32 Authentication::size() const noexcept {
-  return qint32(
-    sizeof(this->packetLength) +
-    sizeof(this->packetType) +
-    sizeof(this->authStatus)
-  );
-}
-
-/**
  * @brief Convert Authentication Packet to Bytes BigEndian
  */
 QByteArray Authentication::toBytes() const {
@@ -94,7 +63,7 @@ QByteArray Authentication::toBytes() const {
   stream.setByteOrder(QDataStream::BigEndian);
 
   // write the fields
-  stream << this->packetLength;
+  stream << this->getPacketLength();
   stream << this->packetType;
   stream << this->authStatus;
 
@@ -113,16 +82,20 @@ Authentication Authentication::fromBytes(const QByteArray &array) {
   stream.setByteOrder(QDataStream::BigEndian);
 
   // Using Utility Functions
-  using types::except::MalformedPacket;
-  using types::enums::ErrorCode;
+  using common::types::exceptions::MalformedPacket;
+  using common::types::enums::ErrorCode;
 
   // Create Packet
   Authentication packet;
 
+  quint32 packetLength;
+  quint32 packetType;
+  quint32 authStatus;
+
   // read the Packet
-  stream >> packet.packetLength;
-  stream >> packet.packetType;
-  stream >> packet.authStatus;
+  stream >> packetLength;
+  stream >> packetType;
+  stream >> authStatus;
 
   // if stream is not in good state
   if (stream.status() != QDataStream::Ok) {
@@ -130,20 +103,23 @@ Authentication Authentication::fromBytes(const QByteArray &array) {
   }
 
   // check packet type
-  if (packet.packetType != PacketType::AuthStatus) {
-    throw types::except::NotThisPacket("Not Authentication Packet");
+  if (packetType != PacketType::AUTHENTICATION_PACKET) {
+    throw common::types::exceptions::NotThisPacket("Not Authentication Packet");
   }
 
   // allowed status
   const QList<int> allowedStatus = {
-    types::enums::AuthStatus::AuthOkay,
-    types::enums::AuthStatus::AuthFail,
+    common::types::enums::AuthStatus::AuthOkay,
+    common::types::enums::AuthStatus::AuthFail,
   };
 
   // Check the auth status
-  if (!allowedStatus.contains(packet.authStatus)) {
+  if (!allowedStatus.contains(authStatus)) {
     throw MalformedPacket(ErrorCode::CodingError, "Invalid Auth Status");
   }
+
+  packet.packetType   = packetType;
+  packet.authStatus   = authStatus;
 
   // return packet
   return packet;

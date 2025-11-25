@@ -17,7 +17,6 @@
 #endif
 
 #include "constants/constants.hpp"
-#include "syncing/lan/lan_controller.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk {

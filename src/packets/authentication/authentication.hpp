@@ -11,34 +11,23 @@
 #include <QtTypes>
 
 // Local header files
-#include "types/enums/enums.hpp"
-#include "types/except/except.hpp"
+#include "packets/network_packet.hpp"
+#include "packets/packet_type.hpp"
+#include "common/types/enums/enums.hpp"
+#include "common/types/exceptions/exceptions.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::packets {
 /**
  * @brief Authentication Packet used to indicate the status
  * of the authentication process
  */
-class Authentication {
- public:
-
-  /// @brief Allowed Packet Types
-  enum PacketType : quint8 { AuthStatus = 0x01 };
-
+class Authentication : public NetworkPacket {
  private:
 
-  quint32 packetLength;
-  quint32 packetType = PacketType::AuthStatus;
+  quint32 packetType = PacketType::AUTHENTICATION_PACKET;
   quint32 authStatus;
 
  public:
-
-  /**
-   * @brief Set the Packet Length object
-   *
-   * @param length
-   */
-  void setPacketLength(quint32 length);
 
   /**
    * @brief Get the Packet Length object
@@ -46,13 +35,6 @@ class Authentication {
    * @return qint32
    */
   quint32 getPacketLength() const noexcept;
-
-  /**
-   * @brief Set the Packet Type object
-   *
-   * @param type
-   */
-  void setPacketType(quint32 type);
 
   /**
    * @brief Get the Packet Type object
@@ -76,16 +58,9 @@ class Authentication {
   quint32 getAuthStatus() const noexcept;
 
   /**
-   * @brief Get the Size of the Packet
-   *
-   * @return qint32
-   */
-  quint32 size() const noexcept;
-
-  /**
    * @brief Convert Authentication Packet to Bytes
    */
-  QByteArray toBytes() const;
+  QByteArray toBytes() const override;
 
   /**
    * @brief Create Authentication Packet from Bytes

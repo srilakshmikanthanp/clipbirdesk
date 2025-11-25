@@ -21,3 +21,6 @@ trim_trailing_whitespace = false
 [VERSION.txt]
 insert_final_newline = false
 trim_trailing_whitespace = false
+
+[*.qml]
+indent_size = 4

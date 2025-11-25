@@ -131,19 +131,4 @@ long long getAppMaxWriteIdleTime();
  * @brief Used to get Keyboard shortcut for Clipbird history
  */
 const char* getAppHistoryShortcut();
-
-/**
- * @brief Used to get base url for api
- */
-const char* getClipbirdDomain();
-
-/**
- * @brief Used to get base url for api
- */
-const char* getClipbirdApiUrl();
-
-/**
- * @brief Used to get websocket url for api
- */
-const char* getClipbirdWebSocketUrl();
 }  // namespace srilakshmikanthanp::clipbirdesk::config

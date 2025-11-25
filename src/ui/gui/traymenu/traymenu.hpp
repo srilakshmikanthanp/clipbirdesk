@@ -29,47 +29,14 @@ class TrayMenu : public QMenu {
 
  private:  // Actions
 
-  QAction connect   =   QAction();
-  QAction qrCode    =   QAction();
-  QAction reset     =   QAction();
   QAction openApp   =   QAction();
-  QAction history   =   QAction();
-  QAction about     =   QAction();
-  QAction hub       =   QAction();
-  QAction account   =   QAction();
   QAction exitApp   =   QAction();
-
- private:
-
-  bool m_isSignedIn = false;
-  bool m_isJoinedToHub = false;
-
- signals:  // signals
-  void OnConnectClicked();
-
- signals:  // signals
-  void OnQrCodeClicked();
-
- signals:  // signals
-  void OnResetClicked();
 
  signals:  // signals
   void OnOpenAppClicked();
 
  signals:  // signals
-  void OnHistoryClicked();
-
- signals:  // signals
-  void OnAboutClicked();
-
- signals:  // signals
   void OnExitClicked();
-
- signals:  // signals
-  void OnAccountClicked();
-
- signals:  // signals
-  void OnHubClicked();
 
  public:  // Member function
   /**
@@ -85,26 +52,6 @@ class TrayMenu : public QMenu {
   virtual ~TrayMenu() = default;
 
   /**
-   * @brief set Qr Code Enabled or Disabled
-   */
-  void setQrCodeEnabled(bool);
-
-  /**
-   * @brief set Connect Enabled or Disabled
-   */
-  void setConnectEnabled(bool);
-
-  /**
-   * @brief set About Enabled or Disabled
-   */
-  void setAboutEnabled(bool);
-
-  /**
-   * @brief set Reset Enabled or Disabled
-   */
-  void setResetEnabled(bool);
-
-  /**
    * @brief set Exit Enabled or Disabled
    */
   void setExitEnabled(bool);
@@ -115,41 +62,6 @@ class TrayMenu : public QMenu {
   void setOpenAppEnabled(bool);
 
   /**
-   * @brief set Received Enabled or Disabled
-   */
-  void setHistoryEnabled(bool);
-
-  /**
-   * @brief Is account In Enabled
-   */
-  void setAccoundEnabled(bool);
-
-  /**
-   * @brief set Hub Enabled or Disabled
-   */
-  void setHubEnabled(bool);
-
-  /**
-   * @brief Is Qr Code Enabled
-   */
-  bool isQrCodeEnabled() const;
-
-  /**
-   * @brief Is Connect Enabled
-   */
-  bool isConnectEnabled() const;
-
-  /**
-   * @brief Is About Enabled
-   */
-  bool isAboutEnabled() const;
-
-  /**
-   * @brief Is Reset Enabled
-   */
-  bool isResetEnabled() const;
-
-  /**
    * @brief Is Exit Enabled
    */
   bool isExitEnabled() const;
@@ -158,31 +70,6 @@ class TrayMenu : public QMenu {
    * @brief is Open App Enabled
    */
   bool isOpenAppEnabled() const;
-
-  /**
-   * @brief Is Received Enabled
-   */
-  bool isHistoryEnabled() const;
-
-  /**
-   * @brief Is Account Enabled
-   */
-  bool isAccountEnabled() const;
-
-  /**
-   * @brief Is Hub Enabled
-   */
-  bool isHubEnabled() const;
-
-  /**
-   * @brief Is Signed In
-   */
-  void setSignedIn(bool);
-
-  /**
-   * @brief set joined to hub
-   */
-  void setJoinedToHub(bool isjoined);
 
  protected:
 

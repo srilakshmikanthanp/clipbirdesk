@@ -11,8 +11,10 @@
 #include <QtTypes>
 
 // Local header files
-#include "types/enums/enums.hpp"
-#include "types/except/except.hpp"
+#include "packets/network_packet.hpp"
+#include "packets/packet_type.hpp"
+#include "common/types/enums/enums.hpp"
+#include "common/types/exceptions/exceptions.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::packets {
 /**
@@ -21,17 +23,10 @@ namespace srilakshmikanthanp::clipbirdesk::packets {
 class SyncingItem {
  private:
 
-  quint32 mimeLength;
   QByteArray mimeType;
-  quint32 payloadLength;
   QByteArray payload;
 
  public:
-
-  /**
-   * @brief Set the Mime Length object
-   */
-  void setMimeLength(quint32 length);
 
   /**
    * @brief Get the Mime Length object
@@ -53,13 +48,6 @@ class SyncingItem {
    * @return QByteArray
    */
   QByteArray getMimeType() const noexcept;
-
-  /**
-   * @brief Set the Payload Length object
-   *
-   * @param length
-   */
-  void setPayloadLength(quint32 length);
 
   /**
    * @brief Get the Payload Length object
@@ -113,27 +101,13 @@ class SyncingItem {
 /**
  * @brief Clipboard Sync Packet
  */
-class SyncingPacket {
- public:
-
-  /// @brief Allowed Packet Types
-  enum PacketType : quint32 { SyncPacket = 0x02 };
-
+class SyncingPacket: public NetworkPacket {
  private:  // private members
 
-  quint32 packetLength;
-  quint32 packetType = PacketType::SyncPacket;
-  quint32 itemCount;
+  quint32 packetType = PacketType::SYNCING_PACKET;
   QVector<SyncingItem> items;
 
  public:
-
-  /**
-   * @brief Set the Packet Length object
-   *
-   * @param length
-   */
-  void setPacketLength(quint32 length);
 
   /**
    * @brief Get the Packet Length object
@@ -143,25 +117,11 @@ class SyncingPacket {
   quint32 getPacketLength() const noexcept;
 
   /**
-   * @brief Set the Packet Type object
-   *
-   * @param type
-   */
-  void setPacketType(quint32 type);
-
-  /**
    * @brief Get the Packet Type object
    *
    * @return quint32
    */
   quint32 getPacketType() const noexcept;
-
-  /**
-   * @brief Set the Item Count object
-   *
-   * @param count
-   */
-  void setItemCount(quint32 count);
 
   /**
    * @brief Get the Item Count object
@@ -185,16 +145,9 @@ class SyncingPacket {
   QVector<SyncingItem> getItems() const noexcept;
 
   /**
-   * @brief Get the size of the packet
-   *
-   * @return size_t
-   */
-  quint32 size() const noexcept;
-
-  /**
    * @brief to Bytes
    */
-  QByteArray toBytes() const;
+  QByteArray toBytes() const override;
 
   /**
    * @brief From Bytes

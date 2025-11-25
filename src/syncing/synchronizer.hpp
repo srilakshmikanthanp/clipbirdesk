@@ -29,11 +29,6 @@ class Synchronizer : public QObject {
 
  public:  // methods
 
-   /**
-   * @brief  On Sync Request
-   */
-  virtual void OnSyncRequest(QVector<QPair<QString, QByteArray>> items) = 0;
-
   /**
    * @brief Synchronize the clipboard data
    *
@@ -42,5 +37,12 @@ class Synchronizer : public QObject {
    * all clients have the same clipboard content.
    */
   virtual void synchronize(const QVector<QPair<QString, QByteArray>>& items) = 0;
+
+ signals:
+
+  /**
+   * @brief  On Sync Request
+   */
+  void OnSyncRequest(QVector<QPair<QString, QByteArray>> items);
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::syncing

@@ -57,9 +57,9 @@ JoinRequest::JoinRequest(QObject *parent) : QObject(parent) {
 /**
  * @brief Show the notification
  */
-void JoinRequest::show(const types::Device &device) {
+void JoinRequest::show(const QString &deviceName) {
   auto toast = WinToastLib::WinToastTemplate(WinToastLib::WinToastTemplate::ImageAndText01);
-  auto text  = QObject::tr("%1 wants to Join to your Group").arg(device.name);
+  auto text  = QObject::tr("%1 wants to Join to your Group").arg(deviceName);
   toast.setTextField(text.toStdWString(), WinToastLib::WinToastTemplate::FirstLine);
 
   std::vector<std::wstring> actions{

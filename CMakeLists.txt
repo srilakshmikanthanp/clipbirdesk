@@ -62,8 +62,11 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{QT_KEYCHAIN_CMAKE_DIR})
 # set CMP0071 to NEW
 cmake_policy(SET CMP0071 NEW)
 
+# set qmlls ini generation
+set(QT_QML_GENERATE_QMLLS_INI ON)
+
 # add subdirectory for src
 add_subdirectory(src)
 
 # add subdirectory for tests
-add_subdirectory(tests)
+add_subdirectory(test)

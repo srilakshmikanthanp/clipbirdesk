@@ -18,7 +18,6 @@
 #endif
 
 #include "constants/constants.hpp"
-#include "types/device.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::notification {
 /**
@@ -80,7 +79,7 @@ class JoinRequest : public QObject {
   /**
    * @brief Show the notification
    */
-  void show(const types::Device &device);
+  void show(const QString &deviceName);
 
   /**
    * @brief Destroy the Status object

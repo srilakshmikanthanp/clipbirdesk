@@ -1,20 +1,5 @@
-# set the main.qss path variable (Light)
-set(APPLICATION_LIGHT_QSS_PATH ":/styles/light.qss")
-
-# set the main.qss path variable (Dark)
-set(APPLICATION_DARK_QSS_PATH ":/styles/dark.qss")
-
 # Set the logo.ico path variable
 set(APPLICATION_LOGO_PATH ":/images/logo.ico")
-
-# Clipbird Domain
-set(CLIPBIRD_API_DOMAIN "clipbird-api.srilakshmikanthanp.com" CACHE STRING "Clipbird Domain")
-
-# websocket url
-set(CLIPBIRD_WEBSOCKET_URL "wss://${CLIPBIRD_API_DOMAIN}" CACHE STRING "Clipbird WebSocket URL")
-
-# Base url
-set(CLIPBIRD_API_URL "https://${CLIPBIRD_API_DOMAIN}" CACHE STRING "Clipbird Base URL")
 
 # Set the BBONJOUR_DIR from env
 set(BONJOUR_SDK_HOME $ENV{BONJOUR_SDK_HOME})
@@ -38,23 +23,6 @@ FetchContent_Declare(SingleApplication
   GIT_REPOSITORY https://github.com/itay-grudev/SingleApplication.git
   GIT_TAG        v3.4.0
 )
-
-# Fetch https://github.com/nlohmann/json.git
-FetchContent_Declare(json
-  URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
-)
-
-# Make Available nlohmann_json
-FetchContent_MakeAvailable(json)
-
-# Fetch https://github.com/libcpr/cpr.git
-FetchContent_Declare(cpr
-  GIT_REPOSITORY https://github.com/libcpr/cpr.git
-  GIT_TAG        1.12.0
-)
-
-# Make Available cpr
-FetchContent_MakeAvailable(cpr)
 
 # set QT_DEFAULT_MAJOR_VERSION to QT_MAJOR_VERSION
 set(QT_DEFAULT_MAJOR_VERSION ${QT_MAJOR_VERSION})
@@ -91,69 +59,59 @@ set(CMAKE_AUTORCC ON)
 
 # glob pattern for main cpp files exclude
 file(GLOB_RECURSE main_cpp
+  clipboard/application_clipboard_factory.cpp
   clipboard/applicationclipboard.cpp
-  clipboard/clipboard_controller.cpp
   clipboard/platformclipboard.cpp
   clipboard/qtclipboard.cpp
   clipboard/waylandclipboard.cpp
+  common/trust/trusted_clients.cpp
+  common/trust/trusted_clients_factory.cpp
+  common/trust/trusted_clients_qsettings.cpp
+  common/trust/trusted_servers.cpp
+  common/trust/trusted_servers_factory.cpp
+  common/trust/trusted_servers_qsettings.cpp
+  common/types/exceptions/exceptions.cpp
+  common/types/ssl_config/ssl_config_factory.cpp
   constants/constants.cpp
-  controller/controller.cpp
-  history/history_controller.cpp
-  mdns/browser.cpp
-  mdns/dnssd_browser/dnssd_browser.cpp
-  mdns/dnssd_register/dnssd_register.cpp
-  mdns/register.cpp
+  history/clipboard_history_factory.cpp
+  history/clipboard_history.cpp
   packets/authentication/authentication.cpp
+  packets/certificate_exchange_packet/certificate_exchange_packet.cpp
   packets/invalidrequest/invalidrequest.cpp
   packets/pingpongpacket/pingpongpacket.cpp
   packets/syncingpacket/syncingpacket.cpp
-  store/read_auth_token_dto_job.cpp
-  store/read_hub_host_device_job.cpp
-  store/secure_storage.cpp
-  store/storage.cpp
-  syncing/lan/client/client.cpp
-  syncing/lan/lan_controller.cpp
-  syncing/lan/server/server.cpp
+  service/clipbird_service_factory.cpp
+  service/clipbird_service.cpp
+  syncing/bluetooth/bt_browser.cpp
+  syncing/bluetooth/bt_client_server_browser.cpp
+  syncing/bluetooth/bt_client_server.cpp
+  syncing/bluetooth/bt_client_server_session.cpp
+  syncing/bluetooth/bt_sdp_browser.cpp
+  syncing/bluetooth/bt_server_client_session.cpp
+  syncing/bluetooth/bt_server.cpp
+  syncing/client_server_browser.cpp
+  syncing/client_server.cpp
+  syncing/manager/client_manager.cpp
+  syncing/manager/host_manager.cpp
+  syncing/manager/server_manager.cpp
+  syncing/manager/syncing_manager_factory.cpp
+  syncing/manager/syncing_manager.cpp
+  syncing/network/dnssd_browser/dnssd_browser.cpp
+  syncing/network/dnssd_register/dnssd_register.cpp
+  syncing/network/net_browser.cpp
+  syncing/network/net_client_server_browser.cpp
+  syncing/network/net_client_server.cpp
+  syncing/network/net_client_server_session.cpp
+  syncing/network/net_register.cpp
+  syncing/network/net_server_client_session.cpp
+  syncing/network/net_server.cpp
+  syncing/server.cpp
+  syncing/session.cpp
   syncing/synchronizer.cpp
-  syncing/wan/auth/auth_api_client.cpp
-  syncing/wan/auth/auth_api_repository.cpp
-  syncing/wan/auth/auth_controller.cpp
-  syncing/wan/auth/auth_repository.cpp
-  syncing/wan/auth/auth_token_holder.cpp
-  syncing/wan/device/device_api_client.cpp
-  syncing/wan/device/device_api_repository.cpp
-  syncing/wan/device/device_repository.cpp
-  syncing/wan/device/device_response_dto.cpp
-  syncing/wan/hub/hub_host_device.cpp
-  syncing/wan/hub/hub_message_clipboard_dispatch_payload_handler.cpp
-  syncing/wan/hub/hub_message_device_added_payload_handler.cpp
-  syncing/wan/hub/hub_message_device_removed_payload_handler.cpp
-  syncing/wan/hub/hub_message_device_updated_payload_handler.cpp
-  syncing/wan/hub/hub_message_devices_payload_handler.cpp
-  syncing/wan/hub/hub_message_handler.cpp
-  syncing/wan/hub/hub_message_nonce_challenge_completed_payload_handler.cpp
-  syncing/wan/hub/hub_message_nonce_challenge_request_payload_handler.cpp
-  syncing/wan/hub/hub_websocket.cpp
-  syncing/wan/hub/hub.cpp
-  syncing/wan/wan_controller.cpp
-  syncing/wan/wan_service.cpp
-  types/device.cpp
-  types/except/except.cpp
-  ui/gui/components/cliphistory/cliphistory.cpp
-  ui/gui/components/clipsend/clipsend.cpp
-  ui/gui/components/cliptile/cliptile.cpp
-  ui/gui/components/hostlist/hostlist.cpp
-  ui/gui/components/hosttile/hosttile.cpp
-  ui/gui/modals/aboutus/aboutus.cpp
-  ui/gui/modals/connect/connect.cpp
-  ui/gui/modals/group/group.cpp
-  ui/gui/modals/signin/signin.cpp
   ui/gui/notification/joinrequest/linux/joinrequest/joinrequest.cpp
   ui/gui/notification/joinrequest/win/joinrequest/joinrequest.cpp
   ui/gui/traymenu/traymenu.cpp
   ui/gui/utilities/functions/functions.cpp
-  ui/gui/widgets/clipbird/clipbird.cpp
-  ui/gui/widgets/history/history.cpp
   utility/appeventfilter/appeventfilter.cpp
   utility/functions/crypto/crypto.cpp
   utility/functions/ipconv/ipconv.cpp
@@ -164,6 +122,9 @@ file(GLOB_RECURSE main_cpp
   utility/logging/logging.cpp
   utility/powerhandler/powerhandler.cpp
   application.cpp
+  application_factory.cpp
+  application_state.cpp
+  application_state_qsettings.cpp
   main.cpp
 )
 
@@ -183,7 +144,10 @@ find_package(Qt6 REQUIRED COMPONENTS
   Concurrent
   Widgets
   Network
-  WebSockets)
+  Bluetooth
+  WebSockets
+  Qml
+  Quick)
 
 # Find OpenSSL
 find_package(OpenSSL REQUIRED)
@@ -241,11 +205,60 @@ endif()
 qt_add_executable(clipbird
   ${main_cpp} ${RESOURCES})
 
+qt_add_qml_module(clipbird
+  URI Clipbird.Qml
+  QML_FILES
+    ui/gui/qml/AboutUs/AboutUs.qml
+    ui/gui/qml/Components/NavigationMenu.qml
+    ui/gui/qml/Components/Card.qml
+    ui/gui/qml/Devices/ClientGroup.qml
+    ui/gui/qml/Devices/ClientServer.qml
+    ui/gui/qml/Devices/ClientServerSession.qml
+    ui/gui/qml/Devices/Devices.qml
+    ui/gui/qml/Devices/ServerClientSession.qml
+    ui/gui/qml/Devices/ServerGroup.qml
+    ui/gui/qml/History/SendClipboardCard.qml
+    ui/gui/qml/History/HistoryItem.qml
+    ui/gui/qml/History/HistoryItemAction.qml
+    ui/gui/qml/History/HistoryItemContent.qml
+    ui/gui/qml/History/History.qml
+    ui/gui/qml/Settings/Settings.qml
+    ui/gui/qml/Trust/Trust.qml
+    ui/gui/qml/Trust/TrustedDevice.qml
+    ui/gui/qml/Trust/TrustedDevices.qml
+    ui/gui/qml/Main.qml
+  SOURCES
+    ui/gui/binding/clipboard/clipbird_qml_application_clipboard.cpp
+    ui/gui/binding/common/trust/clipbird_qml_trusted_clients.cpp
+    ui/gui/binding/common/trust/clipbird_qml_trusted_servers.cpp
+    ui/gui/binding/constants/clipbird_qml_constants.cpp
+    ui/gui/binding/history/clipbird_qml_history.cpp
+    ui/gui/binding/image/clipbird_qml_image_provider.cpp
+    ui/gui/binding/syncing/manager/clipbird_qml_syncing_manager.cpp
+    ui/gui/binding/syncing/clipbird_qml_client_server.cpp
+    ui/gui/binding/syncing/clipbird_qml_session.cpp
+    ui/gui/binding/utility/clipbird_qml_hash_helper.cpp
+    ui/gui/binding/utility/clipbird_qml_image_helper.cpp
+    ui/gui/binding/clipbird_qml_application_state.cpp
+)
+
 # Include Directories for libqrencode
 target_include_directories(clipbird
   PRIVATE ${CMAKE_CURRENT_LIST_DIR}
   PRIVATE ${libqrencode_SOURCE_DIR}
 )
+
+file(GLOB_RECURSE BINDING_DIRS LIST_DIRECTORIES true ${CMAKE_CURRENT_LIST_DIR}/ui/gui/binding/*)
+
+target_include_directories(clipbird
+  PRIVATE ${CMAKE_CURRENT_LIST_DIR}/ui/gui/binding
+)
+
+foreach(dir ${BINDING_DIRS})
+  if(IS_DIRECTORY ${dir})
+    target_include_directories(clipbird PRIVATE ${dir})
+  endif()
+endforeach()
 
 # Include Directories
 include_directories(${PROJECT_BINARY_DIR})
@@ -258,32 +271,23 @@ target_include_directories(clipbird
 # Link libraries
 target_link_libraries(clipbird
   PRIVATE SingleApplication::SingleApplication
-  PRIVATE nlohmann_json::nlohmann_json
-  PRIVATE Qt6Keychain::Qt6Keychain
-  PRIVATE cpr::cpr
   PRIVATE Qt6::Widgets
   PRIVATE Qt6::Network
+  PRIVATE Qt6::Bluetooth
   PRIVATE Qt6::Concurrent
   PRIVATE OpenSSL::SSL
   PRIVATE OpenSSL::Crypto
   PRIVATE qrencode
   PRIVATE QHotkey::QHotkey
-  PRIVATE Qt6::WebSockets)
+  PRIVATE Qt6::WebSockets
+  PRIVATE Qt6::Qml
+  PRIVATE Qt6::Quick)
 
 # set target properties
 set_target_properties(clipbird PROPERTIES
   WIN32_EXECUTABLE TRUE
   MACOSX_BUNDLE TRUE
 )
-
-# generate wayland protocol sources
-if (UNIX AND NOT APPLE)
-  qt_generate_wayland_protocol_client_sources(
-    clipbird
-    FILES
-      ${CMAKE_CURRENT_LIST_DIR}/protocols/wlr-data-control-unstable-v1.xml
-  )
-endif()
 
 # Add Platform specific definitions for apple
 if(APPLE)
@@ -305,7 +309,6 @@ endif()
 # Add Platform specific definitions for linux
 if(UNIX AND NOT APPLE)
   target_compile_definitions(clipbird PRIVATE WITH_WAYLAND)
-  target_link_libraries(clipbird PRIVATE Qt6::GuiPrivate Qt6::WaylandCompositor Qt6::WaylandClient Qt6::WaylandClientPrivate Wayland::Client)
   target_include_directories(clipbird PUBLIC ${WAYLAND_CLIENT_INCLUDE_DIR})
   target_include_directories(clipbird PUBLIC ${Avahi_INCLUDE_DIRS})
   target_link_libraries(clipbird PUBLIC ${Avahi_LIBRARIES})

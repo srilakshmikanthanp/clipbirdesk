@@ -10,10 +10,11 @@
 
 // Local header files
 #include "packets/authentication/authentication.hpp"
+#include "packets/certificate_exchange_packet/certificate_exchange_packet.hpp"
 #include "packets/invalidrequest/invalidrequest.hpp"
 #include "packets/pingpongpacket/pingpongpacket.hpp"
 #include "packets/syncingpacket/syncingpacket.hpp"
-#include "types/enums/enums.hpp"
+#include "common/types/enums/enums.hpp"
 #include "utility/functions/ipconv/ipconv.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::utility::functions::params {
@@ -21,15 +22,20 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions::params {
  * @brief parameters for Authentication
  */
 struct AuthenticationParams {
-  quint32 packetType;
   quint32 authStatus;
+};
+
+/**
+ * @brief parameters for the CertificateExchangePacket
+ */
+struct CertificateExchangePacketParams {
+  const QByteArray& certificate;
 };
 
 /**
  * @brief Parameters for the ErrorMessage
  */
 struct InvalidPacketParams {
-  quint32 packetType;
   quint32 errorCode;
   const QString& errorMessage;
 };
@@ -46,7 +52,6 @@ struct SyncingItemParams {
  * @brief parameters for the SyncingPacket
  */
 struct SyncingPacketParams {
-  quint32 packetType;
   QVector<QPair<QString, QByteArray>> items;
 };
 
@@ -54,7 +59,6 @@ struct SyncingPacketParams {
  * @brief PingPongPacket parameters
  */
 struct PingPacketParams {
-  quint32 packetType;
   quint32 pingType;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::utility::functions::params
@@ -69,6 +73,17 @@ namespace srilakshmikanthanp::clipbirdesk::utility::functions {
  * @return Authentication
  */
 packets::Authentication createPacket(params::AuthenticationParams params);
+
+
+/**
+ * @brief Create the CertificateExchangePacket
+ *
+ * @param packetType
+ * @param certificate
+ *
+ * @return CertificateExchangePacket
+ */
+packets::CertificateExchangePacket createPacket(params::CertificateExchangePacketParams params);
 
 /**
  * @brief Create the ErrorMessage

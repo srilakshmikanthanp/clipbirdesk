@@ -19,7 +19,7 @@
 
 // project header
 #include "clipboard/platformclipboard.hpp"
-#include "types/except/except.hpp"
+#include "common/types/exceptions/exceptions.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::clipboard {
 
