@@ -127,7 +127,7 @@ InvalidRequest InvalidRequest::fromBytes(const QByteArray &array) {
   ));
 
   // Read the message
-  stream.readRawData(packet.errorMessage.data(), packet.errorMessage.size());
+  stream.readRawData(errorMessage.data(), errorMessage.size());
 
   // check packet type
   if (packetType != PacketType::INVALID_REQUEST) {
