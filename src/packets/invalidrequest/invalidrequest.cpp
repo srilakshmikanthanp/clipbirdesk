@@ -8,7 +8,7 @@ namespace srilakshmikanthanp::clipbirdesk::packets {
  */
 quint32 InvalidRequest::getPacketLength() const noexcept {
   return quint32(
-    sizeof(decltype(std::declval<InvalidRequest>().getPacketType())) +
+    (sizeof(decltype(std::declval<InvalidRequest>().getPacketLength()))) +
     sizeof(packetType) +
     sizeof(errorCode) +
     errorMessage.size()

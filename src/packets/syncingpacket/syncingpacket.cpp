@@ -154,7 +154,7 @@ SyncingItem SyncingItem::fromBytes(const QByteArray &array) {
  * @return qint32
  */
 quint32 SyncingPacket::getPacketLength() const noexcept {
-  size_t size = (sizeof(this->packetType) + sizeof(decltype(std::declval<SyncingPacket>().getPacketLength())) + sizeof(decltype(std::declval<SyncingPacket>().getItemCount())));
+  size_t size = (sizeof(decltype(std::declval<SyncingPacket>().getPacketLength())) + sizeof(this->packetType) + sizeof(decltype(std::declval<SyncingPacket>().getItemCount())));
 
   for (const auto& payload : this->items) {
     size += payload.size();

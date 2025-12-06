@@ -8,7 +8,7 @@ namespace srilakshmikanthanp::clipbirdesk::packets {
  */
 quint32 Authentication::getPacketLength() const noexcept {
   return qint32(
-    sizeof(quint32) +
+    (sizeof(decltype(std::declval<Authentication>().getPacketLength()))) +
     sizeof(this->packetType) +
     sizeof(this->authStatus)
   );

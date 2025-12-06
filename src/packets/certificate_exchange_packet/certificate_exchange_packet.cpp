@@ -8,7 +8,7 @@ namespace srilakshmikanthanp::clipbirdesk::packets {
  */
 quint32 CertificateExchangePacket::getPacketLength() const noexcept {
   return quint32(
-    sizeof(quint32) +
+    (sizeof(decltype(std::declval<CertificateExchangePacket>().getPacketLength()))) +
     sizeof(packetType) +
     certificateBytes.size()
   );

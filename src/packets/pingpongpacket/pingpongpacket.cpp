@@ -7,7 +7,7 @@ namespace srilakshmikanthanp::clipbirdesk::packets {
  * @return qint32
  */
 quint32 PingPongPacket::getPacketLength() const noexcept {
-  return sizeof(decltype(std::declval<PingPongPacket>().getPacketType())) + sizeof(packetType) + sizeof(pingType);
+  return (sizeof(decltype(std::declval<PingPongPacket>().getPacketLength()))) + + sizeof(packetType) + sizeof(pingType);
 }
 
 /**
