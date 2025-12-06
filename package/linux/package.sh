@@ -6,6 +6,9 @@ if [ ! -f "./CMakeLists.txt" ]; then
   exit 1
 fi
 
+# Set fast fail option
+set -e
+
 #-------------------------- clipbird package --------------------------#
 
 # Build the clipbird with release configuration
@@ -30,6 +33,10 @@ cp -r $appdir/* $ClipbirdDir
 clipbirdBinary="$(pwd)/build/linux-vcpkg-release/src/clipbird"
 echo "Copying $clipbirdBinary to $ClipbirdDir/usr/bin"
 cp $clipbirdBinary "$ClipbirdDir/usr/bin"
+
+qmlFileDir="$(pwd)/build/linux-vcpkg-release/src/Clipbird"
+echo "Copying QML files from $qmlFileDir to $ClipbirdDir/usr/bin/Clipbird"
+cp -r $qmlFileDir "$ClipbirdDir/usr/bin/Clipbird"
 
 dist="$(pwd)/dist"
 
