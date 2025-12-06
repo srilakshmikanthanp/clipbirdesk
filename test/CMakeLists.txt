@@ -20,13 +20,24 @@ find_package(Qt6 REQUIRED COMPONENTS
 
 # glob pattern for test cpp files
 file(GLOB_RECURSE test_cpp
-  ${PROJECT_SOURCE_DIR}/src/utility/functions/packet/*.cpp
-  ${PROJECT_SOURCE_DIR}/src/types/*.cpp
-  *.cpp
-  ${PROJECT_SOURCE_DIR}/src/packets/*.cpp)
+  ${PROJECT_SOURCE_DIR}/src/common/types/exceptions/exceptions.cpp
+  ${PROJECT_SOURCE_DIR}/src/packets/authentication/authentication.cpp
+  ${PROJECT_SOURCE_DIR}/src/packets/certificate_exchange_packet/certificate_exchange_packet.cpp
+  ${PROJECT_SOURCE_DIR}/src/packets/invalidrequest/invalidrequest.cpp
+  ${PROJECT_SOURCE_DIR}/src/packets/pingpongpacket/pingpongpacket.cpp
+  ${PROJECT_SOURCE_DIR}/src/packets/syncingpacket/syncingpacket.cpp
+  ${PROJECT_SOURCE_DIR}/src/utility/functions/packet/packet.cpp
+  ${PROJECT_SOURCE_DIR}/test/CMakeLists.txt
+  ${PROJECT_SOURCE_DIR}/test/packets
+  ${PROJECT_SOURCE_DIR}/test/packets/authentication.hpp
+  ${PROJECT_SOURCE_DIR}/test/packets/certificate_exchange_packet.hpp
+  ${PROJECT_SOURCE_DIR}/test/packets/invalidrequest.hpp
+  ${PROJECT_SOURCE_DIR}/test/packets/pingpongpacket.hpp
+  ${PROJECT_SOURCE_DIR}/test/packets/syncingpacket.hpp
+  ${PROJECT_SOURCE_DIR}/test/test.cpp)
 
 # Add Executable to test
-qt_add_executable(check
+qt_add_executable(test
   ${test_cpp} ${PROTO_SRCS} ${PROTO_HDRS})
 
 # Enable testing
@@ -36,16 +47,16 @@ enable_testing()
 include(GoogleTest)
 
 # Discover tests
-gtest_discover_tests(check)
+gtest_discover_tests(test)
 
 # Include directories
-target_include_directories(check
+target_include_directories(test
   PUBLIC ${PROJECT_SOURCE_DIR}/src
   PUBLIC ${PROJECT_BINARY_DIR}
   PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 # link test executable to gtest & gtest_main
-target_link_libraries(check
+target_link_libraries(test
   PRIVATE GTest::gtest_main
   PRIVATE Qt6::Core
   PRIVATE Qt6::Network)
