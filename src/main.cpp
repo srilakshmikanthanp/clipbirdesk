@@ -67,7 +67,6 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
   QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
-  QLoggingCategory::setFilterRules("*.debug=false");
 
   freopen(null_device, "w", stderr);
 
