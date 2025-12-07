@@ -11,6 +11,7 @@
 #include "common/trust/trusted_clients_factory.hpp"
 #include "common/trust/trusted_servers_factory.hpp"
 #include "ui/gui/notification/joinrequest/joinrequest.hpp"
+#include "utility/powerhandler/powerhandler.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::service {
 class ClipbirdService : public QObject {
@@ -22,7 +23,7 @@ class ClipbirdService : public QObject {
   void handleClientDisconnected(syncing::Session* session);
   void handleServerFound(syncing::ClientServer* server);
   void handleClientConnected(syncing::Session* client);
-  void updateHostState(bool isServer, bool useBluetooth);
+  void setHostState(bool isServer, bool useBluetooth);
 
  public:
   explicit ClipbirdService(QObject* parent = nullptr);

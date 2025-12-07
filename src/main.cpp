@@ -63,7 +63,6 @@ auto main(int argc, char **argv) -> int {
   using srilakshmikanthanp::clipbirdesk::constants::getAppVersion;
   using srilakshmikanthanp::clipbirdesk::AppEventFilter;
   using srilakshmikanthanp::clipbirdesk::Application;
-  using srilakshmikanthanp::clipbirdesk::PowerHandler;
   using srilakshmikanthanp::clipbirdesk::logging::Logger;
 
   QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
@@ -77,6 +76,7 @@ auto main(int argc, char **argv) -> int {
   Application app(argc, argv);
 
   app.installEventFilter(new AppEventFilter());
+  app.installEventFilter(app.getPowerHandler());
 
 #if defined(_WIN32) || defined(_WIN64)
   auto appAumi = WinToastLib::WinToast::configureAUMI(

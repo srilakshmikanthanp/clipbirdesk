@@ -1,9 +1,6 @@
 #include "powerhandler.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk {
-/**
- * @brief Construct a new Clipbird Native Event Filter object
- */
+namespace srilakshmikanthanp::clipbirdesk::utility {
 PowerHandler::PowerHandler(QObject *parent) : QObject(parent) {
 #if defined(__linux__)
   this->registerPowerManagementListener();
@@ -129,8 +126,5 @@ void PowerHandler::handleWakeUpEvent() {
   emit OnWakeUpEvent();
 }
 
-/**
- * @brief Destroy the Clipbird Native Event Filter object
- */
 PowerHandler::~PowerHandler() = default;
-}  // namespace srilakshmikanthanp::clipbirdesk
+}  // namespace srilakshmikanthanp::clipbirdesk::utility

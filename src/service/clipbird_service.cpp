@@ -49,7 +49,7 @@ void ClipbirdService::handleClientConnected(syncing::Session* client) {
   joinRequest->show(client->getName());
 }
 
-void ClipbirdService::updateHostState(bool isServer, bool useBluetooth) {
+void ClipbirdService::setHostState(bool isServer, bool useBluetooth) {
   if (isServer) {
     syncingManager->setHostAsServer(useBluetooth);
   } else {
@@ -104,7 +104,7 @@ ClipbirdService::ClipbirdService(QObject* parent): QObject(parent) {
     applicationState,
     &ApplicatiionState::onIsServerChanged,
     [this](bool isServer) {
-      updateHostState(isServer, applicationState->shouldUseBluetooth());
+      setHostState(isServer, applicationState->shouldUseBluetooth());
     }
   );
 
@@ -112,11 +112,11 @@ ClipbirdService::ClipbirdService(QObject* parent): QObject(parent) {
     applicationState,
     &ApplicatiionState::shouldUseBluetoothChanged,
     [this](bool useBluetooth) {
-      updateHostState(applicationState->getIsServer(), useBluetooth);
+      setHostState(applicationState->getIsServer(), useBluetooth);
     }
   );
 
-  this->updateHostState(
+  this->setHostState(
     applicationState->getIsServer(),
     applicationState->shouldUseBluetooth()
   );

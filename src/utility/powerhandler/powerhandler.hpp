@@ -19,7 +19,7 @@
 #include "constants/constants.hpp"
 #include "ui/gui/utilities/functions/functions.hpp"
 
-namespace srilakshmikanthanp::clipbirdesk {
+namespace srilakshmikanthanp::clipbirdesk::utility {
 /**
  * @brief Custom event filter for the application that
  * captures Native event and if the device is going to sleep

@@ -84,17 +84,7 @@ void SyncingManager::synchronize(const QVector<QPair<QString, QByteArray>>& item
 
 // Host management
 void SyncingManager::setHostAsServer(bool useBluetooth) {
-  for (auto* client : connectedClients) client->disconnectFromHost();
-  connectedClients.clear();
-  emit connectedClientsChanged(connectedClients);
-
-  availableServers.clear();
-  emit availableServersChanged(availableServers);
-
-  if (hostManager != nullptr) {
-    hostManager->stop();
-  }
-
+  this->stop();
   hostManager = serverManager;
   hostManager->start(useBluetooth);
   emit hostManagerChanged(hostManager);
@@ -102,6 +92,14 @@ void SyncingManager::setHostAsServer(bool useBluetooth) {
 }
 
 void SyncingManager::setHostAsClient(bool useBluetooth) {
+  this->stop();
+  hostManager = clientManager;
+  hostManager->start(useBluetooth);
+  emit hostManagerChanged(hostManager);
+  emit isHostServerChanged(false);
+}
+
+void SyncingManager::stop() {
   for (auto* client : connectedClients) client->disconnectFromHost();
   connectedClients.clear();
   emit connectedClientsChanged(connectedClients);
@@ -113,8 +111,7 @@ void SyncingManager::setHostAsClient(bool useBluetooth) {
     hostManager->stop();
   }
 
-  hostManager = clientManager;
-  hostManager->start(useBluetooth);
+  hostManager = nullptr;
   emit hostManagerChanged(hostManager);
   emit isHostServerChanged(false);
 }

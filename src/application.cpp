@@ -12,6 +12,18 @@ void Application::handleOpenApplication() {
   engine.rootObjects().first()->setProperty("visible", !isVisible);
 }
 
+void Application::handleWakeUpEvent() {
+  if (applicationState->getIsServer()) {
+    this->clipbirdService->getSyncingManager()->setHostAsServer(applicationState->shouldUseBluetooth());
+  } else {
+    this->clipbirdService->getSyncingManager()->setHostAsClient(applicationState->shouldUseBluetooth());
+  }
+}
+
+void Application::handleSleepEvent() {
+  this->clipbirdService->getSyncingManager()->stop();
+}
+
 void Application::handleExit() {
   this->quit();
 }
@@ -38,6 +50,24 @@ Application::Application(int &argc, char **argv) : SingleApplication(argc, argv)
     this,
     &Application::handleExit
   );
+
+  QObject::connect(
+    &powerHandler,
+    &utility::PowerHandler::OnSleepEvent,
+    this,
+    &Application::handleSleepEvent
+  );
+
+  QObject::connect(
+    &powerHandler,
+    &utility::PowerHandler::OnWakeUpEvent,
+    this,
+    &Application::handleWakeUpEvent
+  );
+}
+
+utility::PowerHandler* Application::getPowerHandler() {
+  return &powerHandler;
 }
 
 Application::~Application() {}

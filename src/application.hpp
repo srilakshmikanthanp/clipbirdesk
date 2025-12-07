@@ -50,14 +50,20 @@ class Application : public SingleApplication {
   QQmlApplicationEngine engine = QQmlApplicationEngine(this);
   QSystemTrayIcon trayIcon = QSystemTrayIcon(this);
   ui::gui::TrayMenu trayMenu = ui::gui::TrayMenu();
+  utility::PowerHandler powerHandler = utility::PowerHandler(this);
+  ApplicatiionState *applicationState = ApplicationFactory::getApplicationState();
 
  private:
   void handleOpenApplication();
+  void handleSleepEvent();
+  void handleWakeUpEvent();
   void handleExit();
 
  public:  // Constructors and Destructors
 
   Application(int &argc, char **argv);
   virtual ~Application();
+
+  utility::PowerHandler* getPowerHandler();
 };
 }

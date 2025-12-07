@@ -61,6 +61,9 @@ class SyncingManager : public Synchronizer {
   void setHostAsServer(bool useBluetooth = false);
   void setHostAsClient(bool useBluetooth = false);
 
+  // stop
+  void stop();
+
   // Connection management
   void connectToServer(ClientServer* server);
 
