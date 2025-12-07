@@ -54,9 +54,10 @@ Item {
             text: root.contentItem.data.toString(Qt.CompatUtf8)
             color: Material.primaryTextColor
             wrapMode: Text.WordWrap
-            elide: Text.ElideRight
+            clip: true
             maximumLineCount: 4
             width: parent.width
+            padding: 4
         }
     }
 }
