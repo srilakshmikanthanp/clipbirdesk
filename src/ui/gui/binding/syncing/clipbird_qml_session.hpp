@@ -58,7 +58,7 @@ class ClipbirdQmlSession : public QObject {
   /**
    * @brief Disconnect the session
    */
-  Q_INVOKABLE void disconnect();
+  Q_INVOKABLE void disconnectFromHost();
 
   /**
    * @brief Get the underlying session pointer

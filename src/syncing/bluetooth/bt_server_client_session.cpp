@@ -34,7 +34,7 @@ void BtServerClientSession::sendPacket(const packets::NetworkPacket& packet) {
   this->m_socket->write(packet.toBytes());
 }
 
-void BtServerClientSession::disconnect() {
+void BtServerClientSession::disconnectFromHost() {
   this->m_socket->close();
 }
 

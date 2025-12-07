@@ -47,7 +47,7 @@ void NetServerClientSession::sendPacket(const packets::NetworkPacket& packet) {
   this->m_socket->flush();
 }
 
-void NetServerClientSession::disconnect() {
+void NetServerClientSession::disconnectFromHost() {
   this->m_socket->disconnectFromHost();
 }
 

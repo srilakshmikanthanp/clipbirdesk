@@ -212,7 +212,7 @@ void NetServer::handlePongTimeout() {
     auto diff     = lastRead.msecsTo(now);
 
     if (diff > constants::getAppMaxReadIdleTime()) {
-      client->disconnect();
+      client->disconnectFromHost();
     }
   }
 }
@@ -282,7 +282,7 @@ void NetServer::stop() {
   m_pongTimer->stop();
 
   for (auto client : m_clients) {
-    client->disconnect();
+    client->disconnectFromHost();
   }
 
   m_clients.clear();

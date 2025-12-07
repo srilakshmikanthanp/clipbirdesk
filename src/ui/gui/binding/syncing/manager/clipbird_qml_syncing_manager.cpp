@@ -102,13 +102,13 @@ void ClipbirdQmlSyncingManager::connectToServer(const QString& serverName) {
 void ClipbirdQmlSyncingManager::disconnectFromServer() {
   auto* server = m_syncingManager->getConnectedServer();
   if (!server) throw std::runtime_error("No connected server to disconnect from");
-  server->disconnect();
+  server->disconnectFromHost();
 }
 
 void ClipbirdQmlSyncingManager::disconnectClient(const QString& clientName) {
   auto client = m_syncingManager->getServerClientSessionByName(clientName);
   if (!client.has_value()) throw std::runtime_error("Client with name " + clientName.toStdString() + " not found");
-  client.value()->disconnect();
+  client.value()->disconnectFromHost();
 }
 
 void ClipbirdQmlSyncingManager::setHostAsServer(bool useBluetooth) {

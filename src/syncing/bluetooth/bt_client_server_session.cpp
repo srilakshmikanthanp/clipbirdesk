@@ -34,7 +34,7 @@ void BtClientServerSession::handlePongTimeout() {
   auto diff     = lastRead.msecsTo(now);
 
   if (diff > constants::getAppMaxReadIdleTime()) {
-    m_bt_socket->disconnect();
+    m_bt_socket->disconnectFromService();
   }
 }
 
@@ -132,7 +132,7 @@ void BtClientServerSession::handleReadyRead() {
   }
 
   if (!this->isHandshakeCompleted()) {
-    this->m_bt_socket->disconnect();
+    this->m_bt_socket->disconnectFromService();
     return;
   }
 
@@ -271,8 +271,8 @@ void BtClientServerSession::sendPacket(const packets::NetworkPacket& packet) {
   this->m_bt_socket->write(packet.toBytes());
 }
 
-void BtClientServerSession::disconnect() {
-  this->m_bt_socket->disconnect();
+void BtClientServerSession::disconnectFromHost() {
+  this->m_bt_socket->disconnectFromService();
 }
 
 bool BtClientServerSession::isTrusted() const {

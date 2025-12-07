@@ -24,8 +24,8 @@ bool ClipbirdQmlSession::isTrusted() const {
   return m_session->isTrusted();
 }
 
-void ClipbirdQmlSession::disconnect() {
-  m_session->disconnect();
+void ClipbirdQmlSession::disconnectFromHost() {
+  m_session->disconnectFromHost();
 }
 
 syncing::Session* ClipbirdQmlSession::getSession() const {

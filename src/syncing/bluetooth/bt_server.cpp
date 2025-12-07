@@ -209,7 +209,7 @@ void BtServer::handlePongTimeout() {
     auto diff     = lastRead.msecsTo(now);
 
     if (diff > constants::getAppMaxReadIdleTime()) {
-      client->disconnect();
+      client->disconnectFromHost();
     }
   }
 }
@@ -260,7 +260,7 @@ void BtServer::stop() {
   }
 
   for (auto client : m_clients) {
-    client->disconnect();
+    client->disconnectFromHost();
   }
 
   m_clients.clear();

@@ -24,7 +24,7 @@ class Session : public QObject {
   virtual ~Session()                                            = default;
 
   virtual void sendPacket(const packets::NetworkPacket &packet) = 0;
-  virtual void disconnect()                                     = 0;
+  virtual void disconnectFromHost()                                     = 0;
   virtual bool isTrusted() const                                = 0;
   virtual QByteArray getCertificate() const                     = 0;
 

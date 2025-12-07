@@ -38,7 +38,7 @@ class NetServerClientSession : public Session {
   QSslSocket* getSocket() const;
 
   void sendPacket(const packets::NetworkPacket& packet) override;
-  void disconnect() override;
+  void disconnectFromHost() override;
   bool isTrusted() const override;
   QByteArray getCertificate() const override;
 };

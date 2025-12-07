@@ -56,7 +56,7 @@ class NetClientServerSession : public Session {
   virtual ~NetClientServerSession();
 
   virtual void sendPacket(const packets::NetworkPacket& packet) override;
-  virtual void disconnect() override;
+  virtual void disconnectFromHost() override;
   virtual bool isTrusted() const override;
   virtual QByteArray getCertificate() const override;
 

@@ -31,14 +31,12 @@ void SyncingManager::onBrowsingStopFailed(std::exception_ptr eptr) {
 }
 
 void SyncingManager::onServerConnected(Session* session) {
-  connectedServer = session;
-  emit connectedEvent(session);
+  emit connectedToServer(session);
   emit connectedServerChanged(session);
 }
 
 void SyncingManager::onServerDisconnected(Session* session) {
-  connectedServer = nullptr;
-  emit disconnectedEvent(session);
+  emit disconnectedFromServer(session);
   emit connectedServerChanged(nullptr);
 }
 
@@ -86,18 +84,12 @@ void SyncingManager::synchronize(const QVector<QPair<QString, QByteArray>>& item
 
 // Host management
 void SyncingManager::setHostAsServer(bool useBluetooth) {
-  for (auto* client : connectedClients) client->disconnect();
+  for (auto* client : connectedClients) client->disconnectFromHost();
   connectedClients.clear();
   emit connectedClientsChanged(connectedClients);
 
   availableServers.clear();
   emit availableServersChanged(availableServers);
-
-  if (connectedServer != nullptr) {
-    connectedServer->disconnect();
-    connectedServer = nullptr;
-    emit connectedServerChanged(nullptr);
-  }
 
   if (hostManager != nullptr) {
     hostManager->stop();
@@ -110,18 +102,12 @@ void SyncingManager::setHostAsServer(bool useBluetooth) {
 }
 
 void SyncingManager::setHostAsClient(bool useBluetooth) {
-  for (auto* client : connectedClients) client->disconnect();
+  for (auto* client : connectedClients) client->disconnectFromHost();
   connectedClients.clear();
   emit connectedClientsChanged(connectedClients);
 
   availableServers.clear();
   emit availableServersChanged(availableServers);
-
-  if (connectedServer != nullptr) {
-    connectedServer->disconnect();
-    connectedServer = nullptr;
-    emit connectedServerChanged(nullptr);
-  }
 
   if (hostManager != nullptr) {
     hostManager->stop();
@@ -134,35 +120,7 @@ void SyncingManager::setHostAsClient(bool useBluetooth) {
 }
 
 void SyncingManager::connectToServer(ClientServer* server) {
-  QObject::connect(
-    server,
-    &ClientServer::onNetworkPacket,
-    clientManager,
-    &ClientManager::handleNetworkPacket
-  );
-
-  QObject::connect(
-    server,
-    &ClientServer::onConnected,
-    clientManager,
-    &ClientManager::handleConnected
-  );
-
-  QObject::connect(
-    server,
-    &ClientServer::onDisconnected,
-    clientManager,
-    &ClientManager::handleDisconnected
-  );
-
-  QObject::connect(
-    server,
-    &ClientServer::onError,
-    clientManager,
-    &ClientManager::handleError
-  );
-
-  server->connect();
+  this->clientManager->connectToServer(server);
 }
 
 // Getters
@@ -189,7 +147,7 @@ QVector<Session*> SyncingManager::getConnectedClients() const {
 }
 
 Session* SyncingManager::getConnectedServer() const {
-  return connectedServer;
+  return this->clientManager->getSession();
 }
 
 HostManager* SyncingManager::getHostManager() const {

@@ -28,7 +28,6 @@ class SyncingManager : public Synchronizer {
   // State
   QVector<ClientServer*> availableServers;
   QVector<Session*> connectedClients;
-  Session* connectedServer = nullptr;
 
  private:
   // ClientManager event handlers
@@ -83,8 +82,8 @@ class SyncingManager : public Synchronizer {
   void serverGoneEvent(ClientServer* server);
   void browsingStartedEvent();
   void browsingStoppedEvent();
-  void connectedEvent(Session* session);
-  void disconnectedEvent(Session* session);
+  void connectedToServer(Session* session);
+  void disconnectedFromServer(Session* session);
   void errorEvent(Session* session, std::exception_ptr eptr);
 
   // ServerManager events

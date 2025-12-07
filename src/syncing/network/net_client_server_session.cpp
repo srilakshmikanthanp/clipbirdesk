@@ -271,7 +271,7 @@ void NetClientServerSession::sendPacket(const packets::NetworkPacket& packet) {
   this->m_ssl_socket->write(packet.toBytes());
 }
 
-void NetClientServerSession::disconnect() {
+void NetClientServerSession::disconnectFromHost() {
   this->m_ssl_socket->disconnectFromHost();
 }
 

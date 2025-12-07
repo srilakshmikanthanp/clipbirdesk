@@ -90,7 +90,7 @@ class ClipbirdQmlSyncingManager : public QObject {
 
   /**
    * @brief Disconnect a client by name
-   * @param clientName Client name to disconnect
+   * @param clientName Client name to disconnectFromHost
    */
   Q_INVOKABLE void disconnectClient(const QString& clientName);
 

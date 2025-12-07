@@ -8,7 +8,7 @@ void ClientManager::handleAuthenticationPacket(Session* session, const packets::
   if (packet.getAuthStatus() == common::types::enums::AuthStatus::AuthOkay) {
     emit connected(session);
   } else {
-    session->disconnect();
+    session->disconnectFromHost();
   }
 }
 
@@ -55,6 +55,7 @@ void ClientManager::handleBrowsingStopFailed(std::exception_ptr eptr) {
 
 void ClientManager::handleConnected(Session *session) {
   this->session = session;
+  this->session->setParent(this);
 }
 
 void ClientManager::handleDisconnected(Session *session) {
@@ -79,8 +80,45 @@ void ClientManager::handleNetworkPacket(Session* session, const packets::Network
 }
 
 void ClientManager::synchronize(const QVector<QPair<QString, QByteArray>>& items) {
-  if (session == nullptr || !session->isTrusted()) return;
-  session->sendPacket(utility::functions::createPacket(utility::functions::params::SyncingPacketParams{.items = items}));
+  if (session != nullptr && session->isTrusted()) {
+    session->sendPacket(utility::functions::createPacket(utility::functions::params::SyncingPacketParams{.items = items}));
+  }
+}
+
+Session* ClientManager::getSession() {
+  return this->session;
+}
+
+void ClientManager::connectToServer(ClientServer* server) {
+  QObject::connect(
+    server,
+    &ClientServer::onNetworkPacket,
+    this,
+    &ClientManager::handleNetworkPacket
+  );
+
+  QObject::connect(
+    server,
+    &ClientServer::onConnected,
+    this,
+    &ClientManager::handleConnected
+  );
+
+  QObject::connect(
+    server,
+    &ClientServer::onDisconnected,
+    this,
+    &ClientManager::handleDisconnected
+  );
+
+  QObject::connect(
+    server,
+    &ClientServer::onError,
+    this,
+    &ClientManager::handleError
+  );
+
+  server->connect();
 }
 
 void ClientManager::start(bool useBluetooth) {
@@ -105,6 +143,7 @@ void ClientManager::stop() {
   if (this->clientServerBrowser == nullptr) {
     throw std::runtime_error("ClientManager is not started");
   }
+  this->session->disconnectFromHost();
   this->clientServerBrowser->stop();
   this->clientServerBrowser->deleteLater();
   this->clientServerBrowser = nullptr;
