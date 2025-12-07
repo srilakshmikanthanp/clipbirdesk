@@ -51,7 +51,7 @@ class ClientManager : public HostManager {
   virtual void synchronize(const QVector<QPair<QString, QByteArray>>& items) override;
   virtual void start(bool useBluetooth) override;
   virtual void stop() override;
-  Session* getSession();
+
   void connectToServer(ClientServer* server);
 
  signals:

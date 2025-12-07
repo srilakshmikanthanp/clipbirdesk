@@ -31,11 +31,15 @@ void SyncingManager::onBrowsingStopFailed(std::exception_ptr eptr) {
 }
 
 void SyncingManager::onServerConnected(Session* session) {
+  this->connectedServer = session;
+  this->connectedServer->setParent(this);
   emit connectedToServer(session);
   emit connectedServerChanged(session);
 }
 
 void SyncingManager::onServerDisconnected(Session* session) {
+  this->connectedServer->deleteLater();
+  this->connectedServer = nullptr;
   emit disconnectedFromServer(session);
   emit connectedServerChanged(nullptr);
 }
@@ -144,7 +148,7 @@ QVector<Session*> SyncingManager::getConnectedClients() const {
 }
 
 Session* SyncingManager::getConnectedServer() const {
-  return this->clientManager->getSession();
+  return this->connectedServer;
 }
 
 HostManager* SyncingManager::getHostManager() const {

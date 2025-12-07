@@ -24,6 +24,7 @@ class SyncingManager : public Synchronizer {
   ClientManager* clientManager = new ClientManager(this);
   ServerManager* serverManager = new ServerManager(this);
   HostManager* hostManager = nullptr;
+  Session* connectedServer = nullptr;
 
   // State
   QVector<ClientServer*> availableServers;

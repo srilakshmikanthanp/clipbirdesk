@@ -55,11 +55,9 @@ void ClientManager::handleBrowsingStopFailed(std::exception_ptr eptr) {
 
 void ClientManager::handleConnected(Session *session) {
   this->session = session;
-  this->session->setParent(this);
 }
 
 void ClientManager::handleDisconnected(Session *session) {
-  this->session = nullptr;
   emit disconnected(session);
 }
 
@@ -83,10 +81,6 @@ void ClientManager::synchronize(const QVector<QPair<QString, QByteArray>>& items
   if (session != nullptr && session->isTrusted()) {
     session->sendPacket(utility::functions::createPacket(utility::functions::params::SyncingPacketParams{.items = items}));
   }
-}
-
-Session* ClientManager::getSession() {
-  return this->session;
 }
 
 void ClientManager::connectToServer(ClientServer* server) {
@@ -143,7 +137,9 @@ void ClientManager::stop() {
   if (this->clientServerBrowser == nullptr) {
     throw std::runtime_error("ClientManager is not started");
   }
-  this->session->disconnectFromHost();
+  if (this->session != nullptr) {
+    this->session->disconnectFromHost();
+  }
   this->clientServerBrowser->stop();
   this->clientServerBrowser->deleteLater();
   this->clientServerBrowser = nullptr;
