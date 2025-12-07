@@ -14,14 +14,14 @@
 #include "bt_constants.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing::bluetooth {
-class BtSdpBrowser : public BtBrowser {
+class BtDeviceConnectionBrowser : public BtBrowser {
  private:
 
   Q_OBJECT
 
  private:
 
-  Q_DISABLE_COPY_MOVE(BtSdpBrowser)
+  Q_DISABLE_COPY_MOVE(BtDeviceConnectionBrowser)
 
  private:
   QBluetoothServiceDiscoveryAgent *discoveryAgent = new QBluetoothServiceDiscoveryAgent(this);
@@ -32,11 +32,12 @@ class BtSdpBrowser : public BtBrowser {
  private:
   void handleServiceDiscovered(const QBluetoothServiceInfo &info);
   void handleDiscoveryFinished();
+  void handleDeviceDisconnected(const QBluetoothAddress &address);
 
  public:
 
-  BtSdpBrowser(QObject *parent = nullptr);
-  virtual ~BtSdpBrowser();
+  BtDeviceConnectionBrowser(QObject *parent = nullptr);
+  virtual ~BtDeviceConnectionBrowser();
 
   void start() override;
   void stop() override;

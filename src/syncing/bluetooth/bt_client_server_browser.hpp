@@ -8,7 +8,7 @@
 #include "syncing/bluetooth/bt_browser.hpp"
 #include "syncing/bluetooth/bt_client_server.hpp"
 #include "syncing/bluetooth/bt_resolved_device.hpp"
-#include "syncing/bluetooth/bt_sdp_browser.hpp"
+#include "syncing/bluetooth/bt_device_connection_browser.hpp"
 #include "common/types/ssl_config/ssl_config.hpp"
 #include "common/trust/trusted_servers.hpp"
 
@@ -21,7 +21,7 @@ class BtClientServerBrowser : public ClientServerBrowser {
   Q_DISABLE_COPY_MOVE(BtClientServerBrowser)
 
  private:
-  BtSdpBrowser *sdpBrowser = new BtSdpBrowser(this);
+  BtDeviceConnectionBrowser *sdpBrowser = new BtDeviceConnectionBrowser(this);
   common::trust::TrustedServers* trustedServers;
   QMap<BtResolvedDevice, ClientServer*> clientServers;
 
