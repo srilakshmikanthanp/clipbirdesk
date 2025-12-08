@@ -7,6 +7,10 @@ void BtDeviceConnectionBrowser::handleServiceDiscovered(const QBluetoothServiceI
     return;
   }
 
+  if (localDevice.connectedDevices().indexOf(info.device().address()) == -1) {
+    return;
+  }
+
   BtResolvedDevice resolvedDevice {
     .name = info.device().name(),
     .address = info.device().address(),
@@ -21,10 +25,8 @@ void BtDeviceConnectionBrowser::handleServiceDiscovered(const QBluetoothServiceI
   emit onServiceAdded(resolvedDevice);
 }
 
-void BtDeviceConnectionBrowser::handleDiscoveryFinished() {
-  QTimer::singleShot(BROWSER_INTERVAL_MS, this, [this]() {
-    this->discoveryAgent->start();
-  });
+void BtDeviceConnectionBrowser::handleDeviceConnected() {
+  this->discoveryAgent->start();
 }
 
 void BtDeviceConnectionBrowser::handleDeviceDisconnected(const QBluetoothAddress &address) {
@@ -55,13 +57,6 @@ BtDeviceConnectionBrowser::BtDeviceConnectionBrowser(QObject *parent) : BtBrowse
   );
 
   QObject::connect(
-    discoveryAgent,
-    &QBluetoothServiceDiscoveryAgent::finished,
-    this,
-    &BtDeviceConnectionBrowser::handleDiscoveryFinished
-  );
-
-  QObject::connect(
     &localDevice,
     &QBluetoothLocalDevice::deviceDisconnected,
     this,
@@ -74,11 +69,13 @@ BtDeviceConnectionBrowser::~BtDeviceConnectionBrowser() {
 }
 
 void BtDeviceConnectionBrowser::start() {
-  discoveryAgent->start(QBluetoothServiceDiscoveryAgent::FullDiscovery);
+  QObject::connect(&localDevice, &QBluetoothLocalDevice::deviceConnected, this, &BtDeviceConnectionBrowser::handleDeviceConnected);
+  if (localDevice.connectedDevices().size() > 0) discoveryAgent->start();
   emit onBrowsingStarted();
 }
 
 void BtDeviceConnectionBrowser::stop() {
+  QObject::disconnect(&localDevice, &QBluetoothLocalDevice::deviceConnected, this, &BtDeviceConnectionBrowser::handleDeviceConnected);
   discoveryAgent->stop();
   emit onBrowsingStopped();
 }

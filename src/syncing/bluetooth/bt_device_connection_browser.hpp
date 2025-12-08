@@ -31,7 +31,7 @@ class BtDeviceConnectionBrowser : public BtBrowser {
 
  private:
   void handleServiceDiscovered(const QBluetoothServiceInfo &info);
-  void handleDiscoveryFinished();
+  void handleDeviceConnected();
   void handleDeviceDisconnected(const QBluetoothAddress &address);
 
  public:
