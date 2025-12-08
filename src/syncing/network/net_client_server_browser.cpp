@@ -64,7 +64,6 @@ void NetClientServerBrowser::handleServiceRemoved(NetResolvedDevice device) {
   if (!clientServers.contains(device)) return;
   ClientServer* clientServer = clientServers.take(device);
   emit onServerGone(clientServer);
-  clientServer->deleteLater();
 }
 
 void NetClientServerBrowser::handleBrowsingStarted() {

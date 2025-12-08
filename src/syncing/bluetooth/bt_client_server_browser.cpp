@@ -63,7 +63,6 @@ void BtClientServerBrowser::handleServiceRemoved(BtResolvedDevice device) {
   if (!clientServers.contains(device)) return;
   ClientServer* clientServer = clientServers.take(device);
   emit onServerGone(clientServer);
-  clientServer->deleteLater();
 }
 
 void BtClientServerBrowser::handleBrowsingStarted() {
