@@ -7,14 +7,10 @@
 #include "syncing/bluetooth/bt_resolved_device.hpp"
 #include "common/types/ssl_config/ssl_config.hpp"
 #include "common/trust/trusted_servers.hpp"
+#include "syncing/client_server_event_handler.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing::bluetooth {
 class BtClientServer : public ClientServer {
-  Q_OBJECT
-
- private:
-  Q_DISABLE_COPY_MOVE(BtClientServer)
-
  private:
   BtResolvedDevice btResolvedDevice;
   common::types::SslConfig sslConfig;
@@ -28,7 +24,8 @@ class BtClientServer : public ClientServer {
     QObject* parent = nullptr
   );
   virtual ~BtClientServer();
-
-  virtual void connect() override;
+  virtual void connect(
+    syncing::ClientServerEventHandler *handler
+  ) override;
 };
 }  // namespace srilakshmikanthanp::clipbirdesk::syncing

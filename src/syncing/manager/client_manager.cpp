@@ -55,13 +55,11 @@ void ClientManager::handleBrowsingStopFailed(std::exception_ptr eptr) {
 
 void ClientManager::handleConnected(Session *session) {
   this->session = session;
-  this->session->setParent(this);
 }
 
 void ClientManager::handleDisconnected(Session *session) {
-  emit disconnected(this->session);
-  this->session->deleteLater();
   this->session = nullptr;
+  emit disconnected(this->session);
 }
 
 void ClientManager::handleError(Session *session, std::exception_ptr eptr) {
@@ -87,35 +85,7 @@ void ClientManager::synchronize(const QVector<QPair<QString, QByteArray>>& items
 }
 
 void ClientManager::connectToServer(ClientServer* server) {
-  QObject::connect(
-    server,
-    &ClientServer::onNetworkPacket,
-    this,
-    &ClientManager::handleNetworkPacket
-  );
-
-  QObject::connect(
-    server,
-    &ClientServer::onConnected,
-    this,
-    &ClientManager::handleConnected
-  );
-
-  QObject::connect(
-    server,
-    &ClientServer::onDisconnected,
-    this,
-    &ClientManager::handleDisconnected
-  );
-
-  QObject::connect(
-    server,
-    &ClientServer::onError,
-    this,
-    &ClientManager::handleError
-  );
-
-  server->connect();
+  server->connect(this);
 }
 
 void ClientManager::start(bool useBluetooth) {
@@ -148,7 +118,7 @@ void ClientManager::stop() {
   this->clientServerBrowser = nullptr;
 }
 
-ClientManager::ClientManager(QObject* parent): HostManager(parent) {}
+ClientManager::ClientManager(QObject* parent): ClientServerEventHandler(parent) {}
 
 ClientManager::~ClientManager() {
   if (this->clientServerBrowser != nullptr) {

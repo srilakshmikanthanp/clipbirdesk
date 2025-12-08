@@ -4,6 +4,7 @@
 
 #include "session.hpp"
 #include "packets/network_packet.hpp"
+#include "syncing/client_server_event_handler.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing {
 class ClientServer: public QObject {
@@ -20,12 +21,6 @@ class ClientServer: public QObject {
 
   QString getName();
 
-  virtual void connect() = 0;
-
- signals:
-  void onNetworkPacket(Session* session, const packets::NetworkPacket &networkPacket);
-  void onConnected(Session* session);
-  void onDisconnected(Session* session);
-  void onError(Session* session, std::exception_ptr eptr);
+  virtual void connect(syncing::ClientServerEventHandler *handler) = 0;
 };
 }

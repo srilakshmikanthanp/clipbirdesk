@@ -38,8 +38,7 @@ void ClipbirdQmlSyncingManager::putAvailableServers(QVector<syncing::ClientServe
   emit availableServersChanged();
 }
 
-ClipbirdQmlSyncingManager::ClipbirdQmlSyncingManager(syncing::SyncingManager* syncingManager, QObject* parent)
-    : QObject(parent), m_syncingManager(syncingManager) {
+ClipbirdQmlSyncingManager::ClipbirdQmlSyncingManager(syncing::SyncingManager* syncingManager, QObject* parent): QObject(parent), m_syncingManager(syncingManager) {
   connect(
     m_syncingManager,
     &syncing::SyncingManager::connectedClientsChanged,

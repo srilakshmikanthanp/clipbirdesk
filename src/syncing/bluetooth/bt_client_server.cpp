@@ -19,7 +19,7 @@ BtClientServer::~BtClientServer() {
   // No additional implementation needed
 }
 
-void BtClientServer::connect() {
+void BtClientServer::connect(syncing::ClientServerEventHandler *handler) {
   BtClientServerSession* session = new BtClientServerSession(
     trustedServers,
     btResolvedDevice,
@@ -30,29 +30,29 @@ void BtClientServer::connect() {
   QObject::connect(
     session,
     &BtClientServerSession::networkPacket,
-    this,
-    &BtClientServer::onNetworkPacket
+    handler,
+    &ClientServerEventHandler::handleNetworkPacket
   );
 
   QObject::connect(
     session,
     &BtClientServerSession::connected,
-    this,
-    &BtClientServer::onConnected
+    handler,
+    &ClientServerEventHandler::handleConnected
   );
 
   QObject::connect(
     session,
     &BtClientServerSession::disconnected,
-    this,
-    &BtClientServer::onDisconnected
+    handler,
+    &ClientServerEventHandler::handleDisconnected
   );
 
   QObject::connect(
     session,
     &BtClientServerSession::error,
-    this,
-    &BtClientServer::onError
+    handler,
+    &ClientServerEventHandler::handleError
   );
 
   session->connect();

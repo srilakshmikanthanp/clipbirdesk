@@ -8,7 +8,7 @@ NetClientServer::NetClientServer(
   const common::types::SslConfig& sslConfig,
   common::trust::TrustedServers* trustedServers,
   QObject* parent
-) : ClientServer(device.name),
+) : ClientServer(device.name, parent),
   netResolvedDevice(device),
   sslConfig(sslConfig),
   trustedServers(trustedServers) {
@@ -19,7 +19,7 @@ NetClientServer::~NetClientServer() {
   // No operation
 }
 
-void NetClientServer::connect() {
+void NetClientServer::connect(syncing::ClientServerEventHandler *handler) {
   auto session = new NetClientServerSession(
     trustedServers,
     netResolvedDevice,
@@ -30,29 +30,29 @@ void NetClientServer::connect() {
   QObject::connect(
     session,
     &NetClientServerSession::networkPacket,
-    this,
-    &NetClientServer::onNetworkPacket
+    handler,
+    &ClientServerEventHandler::handleNetworkPacket
   );
 
   QObject::connect(
     session,
     &NetClientServerSession::connected,
-    this,
-    &NetClientServer::onConnected
+    handler,
+    &ClientServerEventHandler::handleConnected
   );
 
   QObject::connect(
     session,
     &NetClientServerSession::disconnected,
-    this,
-    &NetClientServer::onDisconnected
+    handler,
+    &ClientServerEventHandler::handleDisconnected
   );
 
   QObject::connect(
     session,
     &NetClientServerSession::error,
-    this,
-    &NetClientServer::onError
+    handler,
+    &ClientServerEventHandler::handleError
   );
 
   session->connect();

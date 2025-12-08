@@ -11,10 +11,6 @@ QString ClipbirdQmlClientServer::getName() const {
   return m_clientServer->getName();
 }
 
-void ClipbirdQmlClientServer::connect() {
-  m_clientServer->connect();
-}
-
 syncing::ClientServer* ClipbirdQmlClientServer::getClientServer() const {
   return m_clientServer;
 }

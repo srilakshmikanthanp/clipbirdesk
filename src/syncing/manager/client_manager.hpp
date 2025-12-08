@@ -14,9 +14,10 @@
 #include "syncing/session.hpp"
 #include "packets/network_packet.hpp"
 #include "syncing/client_server_browser.hpp"
+#include "syncing/client_server_event_handler.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing {
-class ClientManager : public HostManager {
+class ClientManager : public ClientServerEventHandler {
   Q_OBJECT
 
  private:
@@ -34,11 +35,11 @@ class ClientManager : public HostManager {
   void handleBrowsingStartFailed(std::exception_ptr eptr);
   void handleBrowsingStopFailed(std::exception_ptr eptr);
 
- public:
-  void handleNetworkPacket(Session* session, const packets::NetworkPacket& networkPacket);
-  void handleConnected(Session *session);
-  void handleDisconnected(Session *session);
-  void handleError(Session *session, std::exception_ptr eptr);
+ public slots:
+  void handleNetworkPacket(Session* session, const packets::NetworkPacket& networkPacket) override;
+  void handleConnected(Session *session) override;
+  void handleDisconnected(Session *session) override;
+  void handleError(Session *session, std::exception_ptr eptr) override;
 
  private:
   ClientServerBrowser* clientServerBrowser = nullptr;

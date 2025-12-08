@@ -54,7 +54,7 @@ BtClientServerBrowser::BtClientServerBrowser(
 
 void BtClientServerBrowser::handleServiceAdded(BtResolvedDevice device) {
   if (clientServers.contains(device)) return;
-  auto clientServer = new BtClientServer(device, sslConfig, trustedServers, this);
+  ClientServer* clientServer = new BtClientServer(device, sslConfig, trustedServers, this);
   clientServers.insert(device, clientServer);
   emit onServerFound(clientServer);
 }

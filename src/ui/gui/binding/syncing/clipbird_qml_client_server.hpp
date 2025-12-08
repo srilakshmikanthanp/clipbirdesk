@@ -36,11 +36,6 @@ class ClipbirdQmlClientServer : public QObject {
   Q_INVOKABLE QString getName() const;
 
   /**
-   * @brief Connect to the server
-   */
-  Q_INVOKABLE void connect();
-
-  /**
    * @brief Get the underlying ClientServer pointer
    * @return syncing::ClientServer* ClientServer pointer
    */

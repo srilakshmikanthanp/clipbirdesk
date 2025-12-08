@@ -89,6 +89,7 @@ file(GLOB_RECURSE main_cpp
   syncing/bluetooth/bt_device_connection_browser.cpp
   syncing/bluetooth/bt_server_client_session.cpp
   syncing/bluetooth/bt_server.cpp
+  syncing/client_server_event_handler.cpp
   syncing/client_server_browser.cpp
   syncing/client_server.cpp
   syncing/manager/client_manager.cpp
