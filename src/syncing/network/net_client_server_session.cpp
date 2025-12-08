@@ -147,7 +147,7 @@ void NetClientServerSession::handleReadyRead() {
     qDebug() << e.what();
     return;
   } catch (const common::types::exceptions::NotThisPacket& e) {
-    qDebug() << e.what();
+    // No-Op
   } catch (const std::exception& e) {
     qDebug() << e.what();
     return;
@@ -163,7 +163,7 @@ void NetClientServerSession::handleReadyRead() {
     qDebug() << e.what();
     return;
   } catch (const common::types::exceptions::NotThisPacket& e) {
-    qDebug() << e.what();
+    // No-Op
   } catch (const std::exception& e) {
     qDebug() << e.what();
     return;
@@ -179,7 +179,7 @@ void NetClientServerSession::handleReadyRead() {
     qDebug() << e.what();
     return;
   } catch (const common::types::exceptions::NotThisPacket& e) {
-    qDebug() << e.what();
+    // No-Op
   } catch (const std::exception& e) {
     qDebug() << e.what();
     return;
@@ -195,7 +195,7 @@ void NetClientServerSession::handleReadyRead() {
     qDebug() << e.what();
     return;
   } catch (const common::types::exceptions::NotThisPacket& e) {
-    qDebug() << e.what();
+    // No-Op
   } catch (const std::exception& e) {
     qDebug() << e.what();
     return;
