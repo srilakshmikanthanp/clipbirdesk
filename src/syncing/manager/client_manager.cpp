@@ -55,10 +55,13 @@ void ClientManager::handleBrowsingStopFailed(std::exception_ptr eptr) {
 
 void ClientManager::handleConnected(Session *session) {
   this->session = session;
+  this->session->setParent(this);
 }
 
 void ClientManager::handleDisconnected(Session *session) {
-  emit disconnected(session);
+  emit disconnected(this->session);
+  this->session->deleteLater();
+  this->session = nullptr;
 }
 
 void ClientManager::handleError(Session *session, std::exception_ptr eptr) {
