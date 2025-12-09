@@ -26,7 +26,9 @@ void BtDeviceConnectionBrowser::handleServiceDiscovered(const QBluetoothServiceI
 }
 
 void BtDeviceConnectionBrowser::handleDeviceConnected() {
-  this->discoveryAgent->start();
+  if (!discoveryAgent->isActive()) {
+    this->discoveryAgent->start();
+  }
 }
 
 void BtDeviceConnectionBrowser::handleDeviceDisconnected(const QBluetoothAddress &address) {
@@ -70,7 +72,7 @@ BtDeviceConnectionBrowser::~BtDeviceConnectionBrowser() {
 
 void BtDeviceConnectionBrowser::start() {
   QObject::connect(&localDevice, &QBluetoothLocalDevice::deviceConnected, this, &BtDeviceConnectionBrowser::handleDeviceConnected);
-  if (localDevice.connectedDevices().size() > 0) discoveryAgent->start();
+  discoveryAgent->start();
   emit onBrowsingStarted();
 }
 
