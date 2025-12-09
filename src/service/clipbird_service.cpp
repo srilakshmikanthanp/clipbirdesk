@@ -24,7 +24,8 @@ void ClipbirdService::handleClientConnected(syncing::Session* client) {
 
   ui::gui::notification::JoinRequest *joinRequest = new ui::gui::notification::JoinRequest(this);
 
-  auto handleAccept = [client, joinRequest]() {
+  auto handleAccept = [client, joinRequest, this]() {
+    trustedClients->addTrustedClient(client->getName(), client->getCertificate());
     client->sendPacket(utility::functions::createPacket(utility::functions::params::AuthenticationParams{common::types::enums::AuthOkay}));
     joinRequest->deleteLater();
   };
