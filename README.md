@@ -140,18 +140,6 @@ Install meson using msi installer from [here](https://mesonbuild.com/Getting-mes
 vcpkg install libpsl --triplet x64-windows
 ~~~
 
-#### Installing qtkeychain
-
-~~~sh
-git clone https://github.com/frankosterfeld/qtkeychain.git
-cd qtkeychain
-mkdir build
-cd build
-cmake .. -DBUILD_WITH_QT6=ON -DCMAKE_INSTALL_PREFIX="C:/qtkeychain"
-cmake --build . --config Release
-cmake --install . --config Release
-~~~
-
 #### Environment Variables
 
 | Variable                     | Value                              |
@@ -159,7 +147,6 @@ cmake --install . --config Release
 | `OPENSSL_ROOT_DIR`           | OpenSSL installation directory     |
 | `QT_CMAKE_DIR`               | Qt6 cmake directory                |
 | `BONJOUR_SDK_HOME`           | Bonjour SDK directory              |
-| `QT_KEYCHAIN_CMAKE_DIR`      | QtKeychain cmake directory         |
 | `VCPKG_ROOT`                 | vcpkg installation directory       |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -199,22 +186,11 @@ sudo apt-get install libglib2.0-dev
 sudo apt-get install libnotify-dev
 ~~~
 
-~~~sh
-git clone https://github.com/frankosterfeld/qtkeychain.git
-cd qtkeychain
-mkdir build
-cd build
-cmake .. -DBUILD_WITH_QT6=ON -DCMAKE_INSTALL_PREFIX=/usr/local
-make
-make install
-~~~
-
 #### Environment Variables
 
 | Variable                     | Value                              |
 |------------------------------|------------------------------------|
 | `QT_CMAKE_DIR`      `        | Qt6 cmake directory                |
-| `QT_KEYCHAIN_CMAKE_DIR`      | QtKeychain cmake directory         |
 | `VCPKG_ROOT`                 | vcpkg installation directory       |
 
 <!-- ROADMAP -->
