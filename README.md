@@ -73,6 +73,8 @@
 
 Clipbird Software helps you to sync your clipboard data between devices connected to a local network. It is a cross-platform software that works on various platforms. It is free and open-source software that is licensed under the MIT License. It currently supports `Windows`, `Linux` and [`Android`](https://github.com/srilakshmikanthanp/clipbirdroid).
 
+_New: Latest commit supports sync over bluetooth also instead of local network. enable the bluetooth option in settings._
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
@@ -190,7 +192,7 @@ sudo apt-get install libnotify-dev
 
 | Variable                     | Value                              |
 |------------------------------|------------------------------------|
-| `QT_CMAKE_DIR`      `        | Qt6 cmake directory                |
+| `QT_CMAKE_DIR`               | Qt6 cmake directory                |
 | `VCPKG_ROOT`                 | vcpkg installation directory       |
 
 <!-- ROADMAP -->
