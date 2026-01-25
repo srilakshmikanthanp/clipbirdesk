@@ -7,10 +7,6 @@ void BtDeviceConnectionBrowser::handleServiceDiscovered(const QBluetoothServiceI
     return;
   }
 
-  if (localDevice.connectedDevices().indexOf(info.device().address()) == -1) {
-    return;
-  }
-
   BtResolvedDevice resolvedDevice {
     .name = info.device().name(),
     .address = info.device().address(),
