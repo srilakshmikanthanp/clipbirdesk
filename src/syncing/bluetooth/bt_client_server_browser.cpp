@@ -11,42 +11,42 @@ BtClientServerBrowser::BtClientServerBrowser(
 
   QObject::connect(
     sdpBrowser,
-    &BtDeviceConnectionBrowser::onBrowsingStarted,
+    &BtDeviceBrowser::onBrowsingStarted,
     this,
     &BtClientServerBrowser::handleBrowsingStarted
   );
 
   QObject::connect(
     sdpBrowser,
-    &BtDeviceConnectionBrowser::onBrowsingStopped,
+    &BtDeviceBrowser::onBrowsingStopped,
     this,
     &BtClientServerBrowser::handleBrowsingStopped
   );
 
   QObject::connect(
     sdpBrowser,
-    &BtDeviceConnectionBrowser::onServiceAdded,
+    &BtDeviceBrowser::onServiceAdded,
     this,
     &BtClientServerBrowser::handleServiceAdded
   );
 
   QObject::connect(
     sdpBrowser,
-    &BtDeviceConnectionBrowser::onServiceRemoved,
+    &BtDeviceBrowser::onServiceRemoved,
     this,
     &BtClientServerBrowser::handleServiceRemoved
   );
 
   QObject::connect(
     sdpBrowser,
-    &BtDeviceConnectionBrowser::onBrowsingStartFailed,
+    &BtDeviceBrowser::onBrowsingStartFailed,
     this,
     &BtClientServerBrowser::handleBrowsingStartFailed
   );
 
   QObject::connect(
     sdpBrowser,
-    &BtDeviceConnectionBrowser::onBrowsingStopFailed,
+    &BtDeviceBrowser::onBrowsingStopFailed,
     this,
     &BtClientServerBrowser::handleBrowsingStopFailed
   );
