@@ -17,7 +17,7 @@ void ClipbirdService::handleServerFound(syncing::ClientServer* server) {
 }
 
 void ClipbirdService::handleClientConnected(syncing::Session* client) {
-  if (this->trustedClients->isTrustedClient(client->getName(), client->getCertificate())) {
+  if (this->trustedClients->isTrustedClient(common::trust::TrustedClient{client->getName(), client->getCertificate()})) {
     client->sendPacket(utility::functions::createPacket(utility::functions::params::AuthenticationParams{common::types::enums::AuthOkay}));
     return;
   }
@@ -25,7 +25,7 @@ void ClipbirdService::handleClientConnected(syncing::Session* client) {
   ui::gui::notification::JoinRequest *joinRequest = new ui::gui::notification::JoinRequest(this);
 
   auto handleAccept = [client, joinRequest, this]() {
-    trustedClients->addTrustedClient(client->getName(), client->getCertificate());
+    trustedClients->addTrustedClient(common::trust::TrustedClient{client->getName(), client->getCertificate()});
     client->sendPacket(utility::functions::createPacket(utility::functions::params::AuthenticationParams{common::types::enums::AuthOkay}));
     joinRequest->deleteLater();
   };

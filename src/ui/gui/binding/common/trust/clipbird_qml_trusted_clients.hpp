@@ -36,7 +36,7 @@ class ClipbirdQmlTrustedClients : public QObject {
 
  private:
 
-  void handleTrustedClientsChanged(const QMap<QString, QByteArray>& clients);
+  void handleTrustedClientsChanged(const QList<common::trust::TrustedClient>& clients);
 
  signals:
   /**

@@ -21,7 +21,7 @@ class BtServerClientSession : public Session {
   QBluetoothSocket* m_socket;
 
  private:
-  void handleTrustedClientsChanged(QMap<QString, QByteArray> servers);
+  void handleTrustedClientsChanged(QList<common::trust::TrustedClient> servers);
 
  public:
 

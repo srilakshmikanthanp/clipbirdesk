@@ -15,7 +15,7 @@ void BtClientServerSession::handleCertificateExchangePacket(const packets::Certi
   emit this->connected(this);
 }
 
-void BtClientServerSession::handleTrustedServersChanged(QMap<QString, QByteArray> servers) {
+void BtClientServerSession::handleTrustedServersChanged(QList<common::trust::TrustedServer> servers) {
   if (m_bt_socket->state() == QBluetoothSocket::SocketState::ConnectedState) {
     emit onTrustedStateChanged(isTrusted());
   }
@@ -279,7 +279,7 @@ bool BtClientServerSession::isTrusted() const {
   if (!this->isHandshakeCompleted()) {
     throw std::runtime_error("Handshake not completed. Certificate not available.");
   } else {
-    return this->trustedServers->isTrustedServer(this->device.name, certificate);
+    return this->trustedServers->isTrustedServer(common::trust::TrustedServer{this->device.name, certificate});
   }
 }
 

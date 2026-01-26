@@ -41,7 +41,7 @@ class BtClientServerSession : public Session {
 
  private:
   void handleCertificateExchangePacket(const packets::CertificateExchangePacket& packet);
-  void handleTrustedServersChanged(QMap<QString, QByteArray> servers);
+  void handleTrustedServersChanged(QList<common::trust::TrustedServer> servers);
   void handlePingTimeout();
   void handlePongTimeout();
   void handleConnected();

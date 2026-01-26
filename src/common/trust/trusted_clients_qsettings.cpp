@@ -4,12 +4,12 @@ namespace srilakshmikanthanp::clipbirdesk::common::trust {
 TrustedClientsQSettings::TrustedClientsQSettings(QObject* parent): TrustedClients(parent) {}
 TrustedClientsQSettings::~TrustedClientsQSettings() {}
 
-QMap<QString, QByteArray> TrustedClientsQSettings::getTrustedClients() {
-  QMap<QString, QByteArray> clients;
+QList<TrustedClient> TrustedClientsQSettings::getTrustedClients() {
+  QList<TrustedClient> clients;
   settings->beginGroup(trustedClientsGroup);
   QStringList keys = settings->allKeys();
   for (const QString& key : keys) {
-    clients.insert(key, settings->value(key).toByteArray());
+    clients.append(TrustedClient{key, settings->value(key).toByteArray()});
   }
   settings->endGroup();
   return clients;
@@ -22,16 +22,16 @@ bool TrustedClientsQSettings::hasTrustedClient(const QString& name) {
   return exists;
 }
 
-bool TrustedClientsQSettings::isTrustedClient(const QString& name, const QByteArray& certificate) {
+bool TrustedClientsQSettings::isTrustedClient(const TrustedClient& client) {
   settings->beginGroup(trustedClientsGroup);
-  QByteArray storedCert = settings->value(name).toByteArray();
+  QByteArray storedCert = settings->value(client.name).toByteArray();
   settings->endGroup();
-  return storedCert == certificate;
+  return storedCert == client.certificate;
 }
 
-void TrustedClientsQSettings::addTrustedClient(const QString& name, const QByteArray& certificate) {
+void TrustedClientsQSettings::addTrustedClient(const TrustedClient& client) {
   settings->beginGroup(trustedClientsGroup);
-  settings->setValue(name, certificate);
+  settings->setValue(client.name, client.certificate);
   settings->endGroup();
   emit trustedClientsChanged(getTrustedClients());
 }

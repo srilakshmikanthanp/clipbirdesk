@@ -4,12 +4,12 @@ namespace srilakshmikanthanp::clipbirdesk::common::trust {
 TrustedServersQSettings::TrustedServersQSettings(QObject* parent): TrustedServers(parent) {}
 TrustedServersQSettings::~TrustedServersQSettings() {}
 
-QMap<QString, QByteArray> TrustedServersQSettings::getTrustedServers() {
-  QMap<QString, QByteArray> servers;
+QList<TrustedServer> TrustedServersQSettings::getTrustedServers() {
+  QList<TrustedServer> servers;
   settings->beginGroup(trustedServersGroup);
   QStringList keys = settings->allKeys();
   for (const QString& key : keys) {
-    servers.insert(key, settings->value(key).toByteArray());
+    servers.append(TrustedServer{key, settings->value(key).toByteArray()});
   }
   settings->endGroup();
   return servers;
@@ -22,16 +22,16 @@ bool TrustedServersQSettings::hasTrustedServer(const QString& name) {
   return exists;
 }
 
-bool TrustedServersQSettings::isTrustedServer(const QString& name, const QByteArray& certificate) {
+bool TrustedServersQSettings::isTrustedServer(const TrustedServer& server) {
   settings->beginGroup(trustedServersGroup);
-  QByteArray storedCert = settings->value(name).toByteArray();
+  QByteArray storedCert = settings->value(server.name).toByteArray();
   settings->endGroup();
-  return storedCert == certificate;
+  return storedCert == server.certificate;
 }
 
-void TrustedServersQSettings::addTrustedServer(const QString& name, const QByteArray& certificate) {
+void TrustedServersQSettings::addTrustedServer(const TrustedServer& server) {
   settings->beginGroup(trustedServersGroup);
-  settings->setValue(name, certificate);
+  settings->setValue(server.name, server.certificate);
   settings->endGroup();
   emit trustedServersChanged(getTrustedServers());
 }

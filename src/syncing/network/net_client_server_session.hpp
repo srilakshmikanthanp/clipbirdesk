@@ -36,7 +36,7 @@ class NetClientServerSession : public Session {
   Q_DISABLE_COPY_MOVE(NetClientServerSession)
 
  private:
-  void handleTrustedServersChanged(QMap<QString, QByteArray> servers);
+  void handleTrustedServersChanged(QList<common::trust::TrustedServer> servers);
   void handleSslErrors(const QList<QSslError>& errors);
   void handlePingTimeout();
   void handlePongTimeout();

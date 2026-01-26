@@ -1,12 +1,12 @@
 #include "clipbird_qml_trusted_servers.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::qml {
-void ClipbirdQmlTrustedServers::handleTrustedServersChanged(const QMap<QString, QByteArray>& servers) {
+void ClipbirdQmlTrustedServers::handleTrustedServersChanged(const QList<common::trust::TrustedServer>& servers) {
   QVariantList variantServers;
   for (auto it = servers.begin(); it != servers.end(); ++it) {
     QVariantMap server;
-    server[devieName] = it.key();
-    server[certificate] = it.value().toBase64();
+    server[devieName] = it->name;
+    server[certificate] = it->certificate.toBase64();
     variantServers.append(server);
   }
   emit trustedServersChanged(variantServers);
@@ -32,13 +32,13 @@ ClipbirdQmlTrustedServers::~ClipbirdQmlTrustedServers() = default;
  * @return QVariantList of objects with deviceName and certificate (as base64 strings)
  */
 QVariantList ClipbirdQmlTrustedServers::getTrustedServers() const {
-  QMap<QString, QByteArray> servers = m_trustedServers->getTrustedServers();
+  QList<common::trust::TrustedServer> servers = m_trustedServers->getTrustedServers();
   QVariantList variantServers;
 
   for (auto it = servers.begin(); it != servers.end(); ++it) {
     QVariantMap server;
-    server[devieName] = it.key();
-    server[certificate] = it.value().toBase64();
+    server[devieName] = it->name;
+    server[certificate] = it->certificate.toBase64();
     variantServers.append(server);
   }
 
@@ -53,7 +53,7 @@ QVariantList ClipbirdQmlTrustedServers::getTrustedServers() const {
  */
 bool ClipbirdQmlTrustedServers::isTrustedServer(const QString& name, const QString& certificate) const {
   QByteArray certBytes = QByteArray::fromBase64(certificate.toUtf8());
-  return m_trustedServers->isTrustedServer(name, certBytes);
+  return m_trustedServers->isTrustedServer(common::trust::TrustedServer{name, certBytes});
 }
 
 /**
@@ -72,7 +72,7 @@ bool ClipbirdQmlTrustedServers::hasTrustedServer(const QString& name) const {
  */
 void ClipbirdQmlTrustedServers::addTrustedServer(const QString& name, const QString& certificate) {
   QByteArray certBytes = QByteArray::fromBase64(certificate.toUtf8());
-  m_trustedServers->addTrustedServer(name, certBytes);
+  m_trustedServers->addTrustedServer(common::trust::TrustedServer{name, certBytes});
 }
 
 /**

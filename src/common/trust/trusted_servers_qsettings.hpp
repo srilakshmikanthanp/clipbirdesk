@@ -26,10 +26,10 @@ class TrustedServersQSettings : public TrustedServers {
   explicit TrustedServersQSettings(QObject* parent = nullptr);
   virtual ~TrustedServersQSettings();
 
-  QMap<QString, QByteArray> getTrustedServers() override;
-  bool isTrustedServer(const QString& name, const QByteArray& certificate) override;
-  bool hasTrustedServer(const QString& name) override;
-  void addTrustedServer(const QString& name, const QByteArray& certificate) override;
-  void removeTrustedServer(const QString& name) override;
+  virtual QList<TrustedServer> getTrustedServers()            override;
+  virtual bool isTrustedServer(const TrustedServer& server)   override;
+  virtual bool hasTrustedServer(const QString& name)          override;
+  virtual void addTrustedServer(const TrustedServer& server)  override;
+  virtual void removeTrustedServer(const QString& name)       override;
 };
 }

@@ -1,12 +1,12 @@
 #include "clipbird_qml_trusted_clients.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::qml {
-void ClipbirdQmlTrustedClients::handleTrustedClientsChanged(const QMap<QString, QByteArray>& clients) {
+void ClipbirdQmlTrustedClients::handleTrustedClientsChanged(const QList<common::trust::TrustedClient>& clients) {
   QVariantList variantClients;
   for (auto it = clients.begin(); it != clients.end(); ++it) {
     QVariantMap client;
-    client[devieName] = it.key();
-    client[certificate] = it.value().toBase64();
+    client[devieName] = it->name;
+    client[certificate] = it->certificate.toBase64();
     variantClients.append(client);
   }
   emit trustedClientsChanged(variantClients);
@@ -32,13 +32,13 @@ ClipbirdQmlTrustedClients::~ClipbirdQmlTrustedClients() = default;
  * @return QVariantList of objects with deviceName and certificate (as base64 strings)
  */
 QVariantList ClipbirdQmlTrustedClients::getTrustedClients() const {
-  QMap<QString, QByteArray> clients = m_trustedClients->getTrustedClients();
+  QList<common::trust::TrustedClient> clients = m_trustedClients->getTrustedClients();
   QVariantList variantClients;
 
   for (auto it = clients.begin(); it != clients.end(); ++it) {
     QVariantMap client;
-    client[devieName] = it.key();
-    client[certificate] = it.value().toBase64();
+    client[devieName] = it->name;
+    client[certificate] = it->certificate.toBase64();
     variantClients.append(client);
   }
 
@@ -53,7 +53,7 @@ QVariantList ClipbirdQmlTrustedClients::getTrustedClients() const {
  */
 bool ClipbirdQmlTrustedClients::isTrustedClient(const QString& name, const QString& certificate) const {
   QByteArray certBytes = QByteArray::fromBase64(certificate.toUtf8());
-  return m_trustedClients->isTrustedClient(name, certBytes);
+  return m_trustedClients->isTrustedClient(common::trust::TrustedClient{name, certBytes});
 }
 
 /**
@@ -72,7 +72,7 @@ bool ClipbirdQmlTrustedClients::hasTrustedClient(const QString& name) const {
  */
 void ClipbirdQmlTrustedClients::addTrustedClient(const QString& name, const QString& certificate) {
   QByteArray certBytes = QByteArray::fromBase64(certificate.toUtf8());
-  m_trustedClients->addTrustedClient(name, certBytes);
+  m_trustedClients->addTrustedClient(common::trust::TrustedClient{name, certBytes});
 }
 
 /**

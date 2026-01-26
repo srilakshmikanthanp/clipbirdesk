@@ -33,7 +33,7 @@ private:
   common::trust::TrustedServers* m_trustedServers = nullptr;
 
 private:
-  void handleTrustedServersChanged(const QMap<QString, QByteArray>& servers);
+  void handleTrustedServersChanged(const QList<common::trust::TrustedServer>& servers);
 
 signals:
   /**

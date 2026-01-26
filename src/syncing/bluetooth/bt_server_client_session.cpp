@@ -1,7 +1,7 @@
 #include "bt_server_client_session.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing::bluetooth {
-void BtServerClientSession::handleTrustedClientsChanged(QMap<QString, QByteArray> servers) {
+void BtServerClientSession::handleTrustedClientsChanged(QList<common::trust::TrustedClient> servers) {
   if (m_socket->state() == QBluetoothSocket::SocketState::ConnectedState) {
     emit onTrustedStateChanged(isTrusted());
   }
@@ -39,7 +39,7 @@ void BtServerClientSession::disconnectFromHost() {
 }
 
 bool BtServerClientSession::isTrusted() const {
-  return this->trustedClients->isTrustedClient(this->getName(), m_certificate);
+  return this->trustedClients->isTrustedClient(common::trust::TrustedClient{this->getName(), m_certificate});
 }
 
 QByteArray BtServerClientSession::getCertificate() const {

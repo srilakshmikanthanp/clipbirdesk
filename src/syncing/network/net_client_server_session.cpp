@@ -8,7 +8,7 @@
 #include "utility/functions/packet/packet.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::syncing::network {
-void NetClientServerSession::handleTrustedServersChanged(QMap<QString, QByteArray> servers) {
+void NetClientServerSession::handleTrustedServersChanged(QList<common::trust::TrustedServer> servers) {
   if (m_ssl_socket->state() == QAbstractSocket::ConnectedState) {
     emit onTrustedStateChanged(isTrusted());
   }
@@ -276,7 +276,7 @@ void NetClientServerSession::disconnectFromHost() {
 }
 
 bool NetClientServerSession::isTrusted() const {
-  return this->trustedServers->isTrustedServer(this->device.name, m_ssl_socket->peerCertificate().toPem());
+  return this->trustedServers->isTrustedServer(common::trust::TrustedServer{this->device.name, m_ssl_socket->peerCertificate().toPem()});
 }
 
 QByteArray NetClientServerSession::getCertificate() const {
