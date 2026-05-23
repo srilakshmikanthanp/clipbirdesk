@@ -7,7 +7,7 @@ import Clipbird.Qml
 
 Page {
     id: root
-    title: qsTr("About Us")
+    title: qsTr("About")
     height: column.implicitHeight
 
     ColumnLayout {

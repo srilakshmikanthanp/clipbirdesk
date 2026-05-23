@@ -35,8 +35,8 @@ ApplicationWindow {
             page: "Settings/Settings.qml"
         }
         ListElement {
-            name: "About Us"
-            page: "AboutUs/AboutUs.qml"
+            name: "About"
+            page: "About/About.qml"
         }
     }
 

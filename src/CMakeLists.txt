@@ -208,7 +208,7 @@ qt_add_executable(clipbird
 qt_add_qml_module(clipbird
   URI Clipbird.Qml
   QML_FILES
-    ui/gui/qml/AboutUs/AboutUs.qml
+    ui/gui/qml/About/About.qml
     ui/gui/qml/Components/NavigationMenu.qml
     ui/gui/qml/Components/Card.qml
     ui/gui/qml/Devices/ClientGroup.qml
