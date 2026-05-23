@@ -114,7 +114,6 @@ file(GLOB_RECURSE main_cpp
   ui/gui/traymenu/traymenu.cpp
   ui/gui/utilities/functions/functions.cpp
   utility/appeventfilter/appeventfilter.cpp
-  utility/functions/crypto/crypto.cpp
   utility/functions/ipconv/ipconv.cpp
   utility/functions/packet/packet.cpp
   utility/functions/qrcode/qrcode.cpp

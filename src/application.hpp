@@ -35,7 +35,6 @@
 #include "ui/gui/utilities/functions/functions.hpp"
 #include "ui/gui/traymenu/traymenu.hpp"
 #include "utility/functions/ssl/ssl.hpp"
-#include "utility/functions/crypto/crypto.hpp"
 #include "utility/logging/logging.hpp"
 #include "utility/powerhandler/powerhandler.hpp"
 
