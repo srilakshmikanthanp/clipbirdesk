@@ -10,6 +10,32 @@ Page {
     title: qsTr("About")
     height: column.implicitHeight
 
+    Dialog {
+        id: fingerprintDialog
+
+        modal: true
+        anchors.centerIn: Overlay.overlay
+
+        width: 420
+        padding: 24
+
+        title: qsTr("Certificate Fingerprint (SHA-256)")
+
+        standardButtons: Dialog.Close
+
+        contentItem: Label {
+            text: ClipbirdQmlHashHelper.sha256(ClipbirdQmlSslConfig.getHostSslConfig().certificate)
+
+            font.pixelSize: 12
+            font.family: "Monospace"
+
+            wrapMode: Text.WrapAnywhere
+            horizontalAlignment: Text.AlignHCenter
+
+            width: parent.width
+        }
+    }
+
     ColumnLayout {
         id: column
         anchors.centerIn: parent
@@ -55,6 +81,13 @@ Page {
                 text: qsTr("Donate")
                 icon.source: "qrc:/images/dollar.png"
                 onClicked: Qt.openUrlExternally(ClipbirdQmlConstants.getAppDonatePage())
+            }
+
+            Button {
+                id: fingerprintButton
+                text: qsTr("Fingerprint")
+                icon.source: "qrc:/images/fingerprint.png"
+                onClicked: fingerprintDialog.open()
             }
         }
     }

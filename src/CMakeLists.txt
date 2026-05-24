@@ -240,6 +240,7 @@ qt_add_qml_module(clipbird
     ui/gui/binding/syncing/clipbird_qml_session.cpp
     ui/gui/binding/utility/clipbird_qml_hash_helper.cpp
     ui/gui/binding/utility/clipbird_qml_image_helper.cpp
+    ui/gui/binding/common/types/ssl_config/clipbird_qml_ssl_config.cpp
     ui/gui/binding/clipbird_qml_application_state.cpp
 )
 
