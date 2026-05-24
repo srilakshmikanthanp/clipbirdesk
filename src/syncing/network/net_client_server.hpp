@@ -29,7 +29,7 @@ class NetClientServer : public ClientServer {
     QObject* parent = nullptr
   );
   virtual ~NetClientServer();
-  virtual void connect(
+  virtual syncing::Session* connect(
     syncing::ClientServerEventHandler *handler
   ) override;
 };

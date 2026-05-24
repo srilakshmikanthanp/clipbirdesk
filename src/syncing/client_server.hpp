@@ -21,6 +21,6 @@ class ClientServer: public QObject {
 
   QString getName();
 
-  virtual void connect(syncing::ClientServerEventHandler *handler) = 0;
+  virtual Session* connect(syncing::ClientServerEventHandler *handler) = 0;
 };
 }

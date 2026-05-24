@@ -24,7 +24,7 @@ class BtClientServer : public ClientServer {
     QObject* parent = nullptr
   );
   virtual ~BtClientServer();
-  virtual void connect(
+  virtual syncing::Session* connect(
     syncing::ClientServerEventHandler *handler
   ) override;
 };

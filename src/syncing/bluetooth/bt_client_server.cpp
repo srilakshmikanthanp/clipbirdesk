@@ -19,7 +19,7 @@ BtClientServer::~BtClientServer() {
   // No additional implementation needed
 }
 
-void BtClientServer::connect(syncing::ClientServerEventHandler *handler) {
+syncing::Session* BtClientServer::connect(syncing::ClientServerEventHandler *handler) {
   BtClientServerSession* session = new BtClientServerSession(
     trustedServers,
     btResolvedDevice,
@@ -56,5 +56,6 @@ void BtClientServer::connect(syncing::ClientServerEventHandler *handler) {
   );
 
   session->connect();
+  return session;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::syncing::bluetooth

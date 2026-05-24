@@ -19,7 +19,7 @@ NetClientServer::~NetClientServer() {
   // No operation
 }
 
-void NetClientServer::connect(syncing::ClientServerEventHandler *handler) {
+syncing::Session* NetClientServer::connect(syncing::ClientServerEventHandler *handler) {
   auto session = new NetClientServerSession(
     trustedServers,
     netResolvedDevice,
@@ -56,5 +56,6 @@ void NetClientServer::connect(syncing::ClientServerEventHandler *handler) {
   );
 
   session->connect();
+  return session;
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::syncing::network
