@@ -185,7 +185,7 @@ QPair<QSslKey, QSslKey> generateQtKeyPair(int bits) {
   BUF_MEM *privateBufffer = nullptr;
   BIO_get_mem_ptr(privateBio.get(), &privateBufffer);
   QByteArray privatePem(privateBufffer->data, static_cast<int>(privateBufffer->length));
-  QSslKey privateKey(privatePem, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
+  QSslKey privateKey(privatePem, QSsl::Rsa, QSsl::Der, QSsl::PrivateKey);
 
   std::shared_ptr<BIO> publicBio(BIO_new(BIO_s_mem()), BIO_free_all);
 
@@ -200,7 +200,7 @@ QPair<QSslKey, QSslKey> generateQtKeyPair(int bits) {
   BUF_MEM *publicBuffer = nullptr;
   BIO_get_mem_ptr(publicBio.get(), &publicBuffer);
   QByteArray publicPem(publicBuffer->data, static_cast<int>(publicBuffer->length));
-  QSslKey publicKey(publicPem, QSsl::Rsa, QSsl::Pem, QSsl::PublicKey);
+  QSslKey publicKey(publicPem, QSsl::Rsa, QSsl::Der, QSsl::PublicKey);
 
   return qMakePair(privateKey, publicKey);
 }
@@ -256,13 +256,13 @@ common::types::SslConfig getQSslConfiguration(int bits) {
   // Get the certificate from buffer
   BIO_get_mem_ptr(x509_buffer, &x509_buffer_memory);
 
-  // QByteArray for the Certificate
-  QByteArray cert(QByteArray(x509_buffer_memory->data, x509_buffer_memory->length));
+  // Certificate
+  QSslCertificate certificate(QByteArray(x509_buffer_memory->data, x509_buffer_memory->length), QSsl::Pem);
 
   // Create the QSslCertificate
   return common::types::SslConfig {
     .privateKey = key,
-    .certificate = cert
+    .certificate = certificate.toDer()
   };
 }
 

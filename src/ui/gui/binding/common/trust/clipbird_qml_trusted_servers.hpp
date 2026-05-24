@@ -26,8 +26,8 @@ class ClipbirdQmlTrustedServers : public QObject {
   QML_SINGLETON
 
  private:
-  static inline const char* devieName = "deviceName";
-  static inline const char* certificate = "certificate";
+  static inline const char* deviceName = "deviceName";
+  static inline const char* deviceCertificate = "deviceCertificate";
 
 private:
   common::trust::TrustedServers* m_trustedServers = nullptr;

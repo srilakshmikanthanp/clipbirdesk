@@ -32,9 +32,6 @@ class ApplicatiionStateQSettings : public ApplicatiionState {
   explicit ApplicatiionStateQSettings(QObject* parent = nullptr);
   virtual ~ApplicatiionStateQSettings();
 
-  void setHostSslConfig(const std::optional<common::types::SslConfig>& sslConfig);
-  std::optional<common::types::SslConfig> getHostSslConfig() const override;
-
   bool getIsServer() const override;
   void setIsServer(bool isServer) override;
 

@@ -48,55 +48,6 @@ void ClipbirdQmlApplicationState::handleHostSslConfigChanged(const std::optional
 }
 
 /**
- * @brief Get host SSL config
- * @return QVariantMap containing privateKey and certificate as base64 strings (empty if not set)
- */
-QVariantMap ClipbirdQmlApplicationState::getHostSslConfig() const {
-  auto sslConfig = m_applicationState->getHostSslConfig();
-  QVariantMap config;
-
-  if (sslConfig.has_value()) {
-    config[privateKeyKey] = sslConfig->privateKey.toBase64();
-    config[certificateKey] = sslConfig->certificate.toBase64();
-  }
-
-  return config;
-}
-
-/**
- * @brief Set host SSL config
- * @param config Map containing privateKey and certificate as base64 strings
- */
-void ClipbirdQmlApplicationState::setHostSslConfig(const QVariantMap& config) {
-  if (config.isEmpty() || !config.contains(privateKeyKey) || !config.contains(certificateKey)) {
-    clearHostSslConfig();
-    return;
-  }
-
-  common::types::SslConfig sslConfig;
-  sslConfig.privateKey = QByteArray::fromBase64(config[privateKeyKey].toString().toUtf8());
-  sslConfig.certificate = QByteArray::fromBase64(config[certificateKey].toString().toUtf8());
-
-  m_applicationState->setHostSslConfig(sslConfig);
-}
-
-/**
- * @brief Clear host SSL config
- */
-void ClipbirdQmlApplicationState::clearHostSslConfig() {
-  m_applicationState->setHostSslConfig(std::nullopt);
-}
-
-/**
- * @brief Check if host SSL config is set
- * @return true if SSL config is set, false otherwise
- */
-bool ClipbirdQmlApplicationState::hasHostSslConfig() const {
-  auto sslConfig = m_applicationState->getHostSslConfig();
-  return sslConfig.has_value() && !sslConfig->isNull();
-}
-
-/**
  * @brief Get whether application is running as server
  * @return true if server, false if client
  */

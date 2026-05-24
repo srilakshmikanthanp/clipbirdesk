@@ -1,11 +1,13 @@
 #include "ssl_config_factory.hpp"
+#include "ssl_config_provider.hpp"
 
 namespace srilakshmikanthanp::clipbirdesk::common::types {
+Q_GLOBAL_STATIC(SslConfigProvider, sslConfigProviderInstance)
+
 SslConfig SslConfigFactory::getHostSslConfig() {
-  auto appState = srilakshmikanthanp::clipbirdesk::ApplicationFactory::getApplicationState();
-  if (!appState->getHostSslConfig().has_value() || !appState->getHostSslConfig()->isCertificateValid()) {
-    appState->setHostSslConfig(utility::functions::getQSslConfiguration());
+  if (!sslConfigProviderInstance->getHostSslConfig().has_value() || !sslConfigProviderInstance->getHostSslConfig()->isCertificateValid()) {
+    sslConfigProviderInstance->setHostSslConfig(utility::functions::getQSslConfiguration());
   }
-  return appState->getHostSslConfig().value();
+  return sslConfigProviderInstance->getHostSslConfig().value();
 }
 }

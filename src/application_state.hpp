@@ -24,9 +24,6 @@ class ApplicatiionState : public QObject {
   explicit ApplicatiionState(QObject* parent = nullptr);
   virtual ~ApplicatiionState();
 
-  virtual void setHostSslConfig(const std::optional<common::types::SslConfig>& sslConfig) = 0;
-  virtual std::optional<common::types::SslConfig> getHostSslConfig() const = 0;
-
   virtual bool getIsServer() const = 0;
   virtual void setIsServer(bool isServer) = 0;
 

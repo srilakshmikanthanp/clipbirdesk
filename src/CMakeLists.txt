@@ -71,6 +71,7 @@ file(GLOB_RECURSE main_cpp
   common/trust/trusted_servers_factory.cpp
   common/trust/trusted_servers_qsettings.cpp
   common/types/exceptions/exceptions.cpp
+  common/types/ssl_config/ssl_config_provider.cpp
   common/types/ssl_config/ssl_config_factory.cpp
   constants/constants.cpp
   history/clipboard_history_factory.cpp

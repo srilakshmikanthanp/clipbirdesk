@@ -5,8 +5,8 @@ void ClipbirdQmlTrustedClients::handleTrustedClientsChanged(const QList<common::
   QVariantList variantClients;
   for (auto it = clients.begin(); it != clients.end(); ++it) {
     QVariantMap client;
-    client[devieName] = it->name;
-    client[certificate] = it->certificate.toBase64();
+    client[deviceName] = it->name;
+    client[deviceCertificate] = QString::fromUtf8(it->certificate.toBase64());
     variantClients.append(client);
   }
   emit trustedClientsChanged(variantClients);
@@ -37,8 +37,8 @@ QVariantList ClipbirdQmlTrustedClients::getTrustedClients() const {
 
   for (auto it = clients.begin(); it != clients.end(); ++it) {
     QVariantMap client;
-    client[devieName] = it->name;
-    client[certificate] = it->certificate.toBase64();
+    client[deviceName] = it->name;
+    client[deviceCertificate] = QString::fromUtf8(it->certificate.toBase64());
     variantClients.append(client);
   }
 

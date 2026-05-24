@@ -38,9 +38,9 @@ Item {
 
             delegate: TrustedDevice {
                 required property string deviceName
-                required property string certificate
+                required property string deviceCertificate
                 name: deviceName
-                certificate: certificate
+                certificate: deviceCertificate
                 onRemove: root.removeClicked(deviceName)
             }
         }

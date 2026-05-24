@@ -24,7 +24,7 @@ void NetServer::handlePendingConnections() {
       &NetServer::handleClientReadyRead
     );
 
-    auto session = new NetServerClientSession(name, cert.toPem(), trustedClients, client, this);
+    auto session = new NetServerClientSession(name, cert.toDer(), trustedClients, client, this);
     client->setParent(session);
     client->setProperty(SESSION, QVariant::fromValue<QObject*>(session));
     m_clients.append(session);
@@ -261,8 +261,8 @@ NetServer::~NetServer() {
 
 void NetServer::start() {
   QSslConfiguration ssl = m_server->sslConfiguration();
-  ssl.setPrivateKey(QSslKey(sslConfig.privateKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey));
-  ssl.setLocalCertificate(QSslCertificate(sslConfig.certificate, QSsl::Pem));
+  ssl.setPrivateKey(QSslKey(sslConfig.privateKey, QSsl::Rsa, QSsl::Der, QSsl::PrivateKey));
+  ssl.setLocalCertificate(QSslCertificate(sslConfig.certificate, QSsl::Der));
   m_server->setSslConfiguration(ssl);
 
   if (!m_server->listen()) {

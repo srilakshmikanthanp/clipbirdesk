@@ -1,14 +1,13 @@
 #include "clipbird_qml_hash_helper.hpp"
 
+#include <QSslCertificate>
+
 namespace srilakshmikanthanp::clipbirdesk::ui::gui::qml {
 ClipbirdQmlHashHelper::ClipbirdQmlHashHelper(QObject* parent): QObject(parent) {}
 
 QString ClipbirdQmlHashHelper::sha256(const QString& data) {
-  QByteArray hash = QCryptographicHash::hash(QByteArray::fromBase64(data.toUtf8()), QCryptographicHash::Sha256);
-  QStringList hashParts;
-  for (auto byte : hash) {
-    hashParts.append(QString("%1").arg(static_cast<unsigned char>(byte), 2, 16, QChar('0')).toUpper());
-  }
-  return hashParts.join(":");
+  QByteArray der = QByteArray::fromBase64(data.toUtf8());
+  QByteArray hash = QCryptographicHash::hash(der, QCryptographicHash::Sha256);
+  return hash.toHex(':').toUpper();
 }
 }  // namespace srilakshmikanthanp::clipbirdesk::ui::gui::qml

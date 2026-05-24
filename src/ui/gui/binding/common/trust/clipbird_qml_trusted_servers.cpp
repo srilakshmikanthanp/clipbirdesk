@@ -5,8 +5,8 @@ void ClipbirdQmlTrustedServers::handleTrustedServersChanged(const QList<common::
   QVariantList variantServers;
   for (auto it = servers.begin(); it != servers.end(); ++it) {
     QVariantMap server;
-    server[devieName] = it->name;
-    server[certificate] = it->certificate.toBase64();
+    server[deviceName] = it->name;
+    server[deviceCertificate] = QString::fromUtf8(it->certificate.toBase64());
     variantServers.append(server);
   }
   emit trustedServersChanged(variantServers);
@@ -37,8 +37,8 @@ QVariantList ClipbirdQmlTrustedServers::getTrustedServers() const {
 
   for (auto it = servers.begin(); it != servers.end(); ++it) {
     QVariantMap server;
-    server[devieName] = it->name;
-    server[certificate] = it->certificate.toBase64();
+    server[deviceName] = it->name;
+    server[deviceCertificate] = QString::fromUtf8(it->certificate.toBase64());
     variantServers.append(server);
   }
 

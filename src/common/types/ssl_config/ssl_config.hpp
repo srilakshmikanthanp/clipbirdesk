@@ -14,7 +14,7 @@ struct SslConfig {
   }
 
   bool isCertificateValid() const {
-    QSslCertificate cert(certificate, QSsl::Pem);
+    QSslCertificate cert(certificate, QSsl::Der);
     return cert.expiryDate() > QDateTime::currentDateTime();
   }
 };

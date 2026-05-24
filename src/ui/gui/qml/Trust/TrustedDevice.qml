@@ -32,7 +32,7 @@ Rectangle {
             }
 
             Text {
-                text: ClipbirdQmlHashHelper.sha256(root.certificateBase64)
+                text: ClipbirdQmlHashHelper.sha256(root.certificate)
                 font.pixelSize: 13
                 wrapMode: Text.WrapAnywhere
                 color: Material.secondaryTextColor

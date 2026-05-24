@@ -276,11 +276,11 @@ void NetClientServerSession::disconnectFromHost() {
 }
 
 bool NetClientServerSession::isTrusted() const {
-  return this->trustedServers->isTrustedServer(common::trust::TrustedServer{this->device.name, m_ssl_socket->peerCertificate().toPem()});
+  return this->trustedServers->isTrustedServer(common::trust::TrustedServer{this->device.name, m_ssl_socket->peerCertificate().toDer()});
 }
 
 QByteArray NetClientServerSession::getCertificate() const {
-  return m_ssl_socket->peerCertificate().toPem();
+  return m_ssl_socket->peerCertificate().toDer();
 }
 
 void NetClientServerSession::connect() {
@@ -289,8 +289,8 @@ void NetClientServerSession::connect() {
   }
 
   QSslConfiguration ssl = m_ssl_socket->sslConfiguration();
-  ssl.setPrivateKey(QSslKey(sslConfig.privateKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey));
-  ssl.setLocalCertificate(QSslCertificate(sslConfig.certificate, QSsl::Pem));
+  ssl.setPrivateKey(QSslKey(sslConfig.privateKey, QSsl::Rsa, QSsl::Der, QSsl::PrivateKey));
+  ssl.setLocalCertificate(QSslCertificate(sslConfig.certificate, QSsl::Der));
   m_ssl_socket->setSslConfiguration(ssl);
 
   QObject::connect(

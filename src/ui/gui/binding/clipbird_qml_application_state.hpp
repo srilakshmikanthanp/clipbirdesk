@@ -26,7 +26,6 @@ class ClipbirdQmlApplicationState : public QObject {
 
   Q_PROPERTY(bool isServer READ getIsServer WRITE setIsServer NOTIFY isServerChanged)
   Q_PROPERTY(bool useBluetooth READ shouldUseBluetooth WRITE setUseBluetooth NOTIFY useBluetoothChanged)
-  Q_PROPERTY(bool hasHostSslConfig READ hasHostSslConfig NOTIFY hostSslConfigChanged)
 
 private:
   ApplicatiionState* m_applicationState = nullptr;
@@ -83,29 +82,6 @@ private slots:
   void handleHostSslConfigChanged(const std::optional<common::types::SslConfig>& sslConfig);
 
 public:
-  /**
-   * @brief Get host SSL config
-   * @return QVariantMap containing privateKey and certificate as base64 strings (empty if not set)
-   */
-  Q_INVOKABLE QVariantMap getHostSslConfig() const;
-
-  /**
-   * @brief Set host SSL config
-   * @param config Map containing privateKey and certificate as base64 strings
-   */
-  Q_INVOKABLE void setHostSslConfig(const QVariantMap& config);
-
-  /**
-   * @brief Clear host SSL config
-   */
-  Q_INVOKABLE void clearHostSslConfig();
-
-  /**
-   * @brief Check if host SSL config is set
-   * @return true if SSL config is set, false otherwise
-   */
-  Q_INVOKABLE bool hasHostSslConfig() const;
-
   /**
    * @brief Get whether application is running as server
    * @return true if server, false if client
