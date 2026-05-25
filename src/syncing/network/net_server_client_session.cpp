@@ -41,7 +41,7 @@ void NetServerClientSession::sendPacket(const packets::NetworkPacket& packet) {
   }
 
   if (wrote != data.size()) {
-    qErrnoWarning("Error while writing to the socket");
+    throw std::runtime_error("Failed to write entire packet to socket");
   }
 
   this->m_socket->flush();
