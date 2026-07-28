@@ -4,6 +4,8 @@
 
 <a name="readme-top"></a>
 
+> This repository has been archived. Development has moved to https://github.com/srilakshmikanthanp/clipbird. Please visit the new repository for future updates and support.
+
 <!--
 *** Thanks for checking out the Best-README-Template. If you have a suggestion*** That would make this better, please fork the repo and create a pull request
 *** or simply open an issue with the tag "enhancement".
